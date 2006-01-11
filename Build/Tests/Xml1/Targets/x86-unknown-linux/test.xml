@@ -1,0 +1,39 @@
+<platform
+    licensee="1234"
+    implementer="4567"
+    group="889"
+    type="90789"
+    major="0"
+    minor="5"
+    revision="3">
+    <property name="Name" type="string">Sample Platform</property>
+    <property name="Implementer" type="string">TiVo HPK</property>
+    <input type="file">
+        <property name="Name" type="string">File Input</property>
+    </input>
+    <input type="socket">
+        <property name="Name" type="string">Socket Input</property>
+    </input>
+    <output type="sdl-output">
+        <property name="Name">Linux Output</property>
+        <compositor width="720" height="480">
+            <property name="Name">Sample Compositor</property>
+            <connector-group-ref id="0"/>
+        </compositor>
+        <mixer sample-rate="48000">
+            <property name="Name">Sample Mixer</property>
+            <connector-group-ref id="0"/>
+        </mixer>
+        <connector-group id="0">
+            <property name="Name">X-Windows + OSS Output Connector Group</property>
+            <connector-ref id="0"/>
+            <connector-ref id="1"/>
+        </connector-group>
+    </output>
+    <connector type="oss" id="0">
+        <property name="Name">Analog Audio Out Jack</property>
+    </connector>
+    <connector type="x-windows" id="1">
+        <property name="Name">X-Windows Display</property>
+    </connector>
+</platform>

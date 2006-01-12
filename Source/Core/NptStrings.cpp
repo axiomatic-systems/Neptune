@@ -15,6 +15,7 @@
 #include "NptConstants.h"
 #include "NptStrings.h"
 #include "NptResults.h"
+#include "NptUtils.h"
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
@@ -37,6 +38,39 @@ inline char NPT_Lowercase(char x) {
 |       NPT_String::EmptyString
 +---------------------------------------------------------------------*/
 char NPT_String::EmptyString = '\0';
+
+/*----------------------------------------------------------------------
+|       NPT_String::FromInteger
++---------------------------------------------------------------------*/
+NPT_String
+NPT_String::FromInteger(long value)
+{
+    char str[32];
+    char* c = &str[31];
+    *c-- = '\0';
+
+    // handle the sign
+    bool negative = false;
+    if (value < 0) {
+        negative = true;
+        value = -value;
+    }
+
+    // process the digits
+    do {
+        int digit = value%10;
+        *c-- = '0'+digit;
+        value /= 10;
+    } while(value);
+
+    if (negative) {
+        *c = '-';
+    } else {
+        ++c;
+    }
+
+    return NPT_String(c);
+}
 
 /*----------------------------------------------------------------------
 |       NPT_String::NPT_String
@@ -281,6 +315,31 @@ NPT_String::Compare(const char *s, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
+|       NPT_String::CompareN
++---------------------------------------------------------------------*/
+int 
+NPT_String::CompareN(const char *s, NPT_Size count, bool ignore_case) const
+{
+    const char* me = GetChars();
+
+    if (ignore_case) {
+        for (unsigned int i=0; i<count; i++) {
+            if (NPT_Uppercase(me[i]) != NPT_Uppercase(s[i])) {
+                return NPT_Uppercase(me[i]) - NPT_Uppercase(s[i]);
+            }
+        }
+        return 0;
+    } else {
+        for (unsigned int i=0; i<count; i++) {
+            if (me[i] != s[i]) {
+                return (me[i] - s[i]);
+            }
+        }
+        return 0;
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_String::SubString
 +---------------------------------------------------------------------*/
 NPT_String
@@ -298,13 +357,22 @@ NPT_String::SubString(NPT_Ordinal first, NPT_Size length) const
 |     -1 if str is too short to start with sub
 +---------------------------------------------------------------------*/
 static inline int
-NPT_StringStartsWith(const char* str, const char* sub)
+NPT_StringStartsWith(const char* str, const char* sub, bool ignore_case)
 {
-    while (*str == *sub) {
-        if (*str++ == '\0') {
-            return 1;
+    if (ignore_case) {
+        while (NPT_Uppercase(*str) == NPT_Uppercase(*sub)) {
+            if (*str++ == '\0') {
+                return 1;
+            }
+            sub++;
         }
-        sub++;
+    } else {
+        while (*str == *sub) {
+            if (*str++ == '\0') {
+                return 1;
+            }
+            sub++;
+        }
     }
     return (*sub == '\0') ? 1 : (*str == '\0' ? -1 : 0);
 }
@@ -313,16 +381,29 @@ NPT_StringStartsWith(const char* str, const char* sub)
 |       NPT_String::StartsWith
 +---------------------------------------------------------------------*/
 bool 
-NPT_String::StartsWith(const char *s) const
+NPT_String::StartsWith(const char *s, bool ignore_case) const
 {
-    return NPT_StringStartsWith(GetChars(), s) == 1;
+    if (s == NULL || *s == '\0') return false;
+    return NPT_StringStartsWith(GetChars(), s, ignore_case) == 1;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::EndsWith
++---------------------------------------------------------------------*/
+bool 
+NPT_String::EndsWith(const char *s, bool ignore_case) const
+{
+    if (s == NULL || *s == '\0') return false;
+    NPT_Size str_length = NPT_StringLength(s);
+    if (str_length > GetLength()) return false;
+    return NPT_StringStartsWith(GetChars()+GetLength()-str_length, s, ignore_case) == 1;
 }
 
 /*----------------------------------------------------------------------
 |       NPT_String::Find
 +---------------------------------------------------------------------*/
 int
-NPT_String::Find(const char* str, NPT_Ordinal start) const
+NPT_String::Find(const char* str, NPT_Ordinal start, bool ignore_case) const
 {
     // check args
     if (str == NULL || start >= GetLength()) return -1;
@@ -332,7 +413,7 @@ NPT_String::Find(const char* str, NPT_Ordinal start) const
 
     // look for a substring
     while (*src) {
-        int cmp = NPT_StringStartsWith(src, str);
+        int cmp = NPT_StringStartsWith(src, str, ignore_case);
         switch (cmp) {
             case -1:
                 // ref is too short, abort
@@ -351,7 +432,7 @@ NPT_String::Find(const char* str, NPT_Ordinal start) const
 |       NPT_String::Find
 +---------------------------------------------------------------------*/
 int
-NPT_String::Find(char c, NPT_Ordinal start) const
+NPT_String::Find(char c, NPT_Ordinal start, bool ignore_case) const
 {
     // check args
     if (start >= GetLength()) return -1;
@@ -360,9 +441,74 @@ NPT_String::Find(char c, NPT_Ordinal start) const
     const char* src = m_Chars + start;
 
     // look for the character
-    while (*src) {
-        if (*src == c) return (int)(src-m_Chars);
-        src++;
+    if (ignore_case) {
+        while (*src) {
+            if (NPT_Uppercase(*src) == NPT_Uppercase(c)) {
+                return (int)(src-m_Chars);
+            }
+            src++;
+        }
+    } else {
+        while (*src) {
+            if (*src == c) return (int)(src-m_Chars);
+            src++;
+        }
+    }
+
+    return -1;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::ReverseFind
++---------------------------------------------------------------------*/
+int
+NPT_String::ReverseFind(const char* str, NPT_Ordinal start, bool ignore_case) const
+{
+    // check args
+    if (str == NULL || *str == '\0') return -1;
+
+    // look for a substring
+    NPT_Size my_length = GetLength();
+    NPT_Size str_length = NPT_StringLength(str);
+    int i=my_length-start-str_length;
+    const char* src = GetChars();
+    if (i<0) return -1;
+    for (;i>=0; i--) {
+        int cmp = NPT_StringStartsWith(src+i, str, ignore_case);
+        if (cmp == 1) {
+            // match
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::ReverseFind
++---------------------------------------------------------------------*/
+int
+NPT_String::ReverseFind(char c, NPT_Ordinal start, bool ignore_case) const
+{
+    // check args
+    NPT_Size length = GetLength();
+    int i = length-start-1;
+    if (i < 0) return -1;
+
+    // look for the character
+    const char* src = GetChars();
+    if (ignore_case) {
+        for (;i>=0;i--) {
+            if (NPT_Uppercase(src[i]) == NPT_Uppercase(src[i])) {
+                return i;
+            }
+        }
+    } else {
+        for (;i>=0;i--) {
+            if (src[i] == src[i]) {
+                return i;
+            }
+        }
     }
 
     return -1;
@@ -492,55 +638,16 @@ NPT_String::Insert(const char* str, NPT_Ordinal where)
 NPT_Result 
 NPT_String::ToInteger(long& value, bool relaxed) const
 {
-    bool negative   = false;
-    bool empty      = true;
-    const char* str = GetChars();
-    char c;
+    return NPT_ParseInteger(GetChars(), value, relaxed);
+}
 
-    // defaults
-    value = 0;
-
-    // ignore leading whitespace
-    if (relaxed) {
-        while (*str == ' ' || *str == '\t') {
-            str++;
-        }
-    }
-    if (str == NULL || *str == '\0') {
-        return NPT_ERROR_INVALID_PARAMETERS;
-    }
-
-    // check for sign
-    if (*str == '-') {
-        // negative number
-        negative = true; 
-        str++;
-    } else if (*str == '+') {
-        // skip the + sign
-        str++;
-    }
-
-    while ((c = *str++)) {
-        if (c >= '0' && c <= '9') {
-            value = 10*value + (c-'0');
-            empty = false;
-        } else {
-            if (relaxed) {
-                break;
-            } else {
-                return NPT_ERROR_INVALID_PARAMETERS;
-            }
-        } 
-    }
-
-    // check that the value was non empty
-    if (empty) {
-        return NPT_ERROR_INVALID_PARAMETERS;
-    }
-
-    // return the result
-    value = negative ? -value : value;
-    return NPT_SUCCESS;
+/*----------------------------------------------------------------------
+|    NPT_String::ToFloat
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_String::ToFloat(float& value, bool relaxed) const
+{
+    return NPT_ParseFloat(GetChars(), value, relaxed);
 }
 
 /*----------------------------------------------------------------------

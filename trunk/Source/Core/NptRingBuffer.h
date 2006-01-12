@@ -36,6 +36,10 @@ class NPT_RingBuffer
     NPT_Result    MoveOut(NPT_Offset offset);
     NPT_Result    Flush();
 
+    // accessors
+    unsigned char* GetReadPointer()  { return m_In; }
+    unsigned char* GetWritePointer() { return m_Out;}
+
  private:
     // members
     struct {

@@ -96,6 +96,14 @@ main(int /*argc*/, char** /*argv*/)
     NPT_String n1 = "Bye";
     n1 = "ByeBye";
 
+    printf(":: testing factories\n");
+    NPT_String f0 = NPT_String::FromInteger(0);
+    StringTest("FromInteger(0)", f0, "0");
+    f0 = NPT_String::FromInteger(1234567);
+    StringTest("FromInteger(1234567)", f0, "1234567");
+    f0 = NPT_String::FromInteger(-1234567);
+    StringTest("FromInteger(-1234567)", f0, "-1234567");
+
     printf(":: testing constructors\n");
     NPT_String s00;
     StringTest("constructor()", s00, "");
@@ -255,8 +263,8 @@ main(int /*argc*/, char** /*argv*/)
     IntTest("o1[0]", 'a', o1[0]);
     IntTest("o1[1]", 'b', o1[1]);
     IntTest("o1[2]", 'c', o1[2]);
-    IntTest("o1[-1]", '\0', o1[-1]);
-    IntTest("o1[100]", '\0', o1[100]);
+    o1[0] = '7';
+    IntTest("o1[0]", '7', o1[0]);
 
     printf(":: testing operator comparisons\n");
     CompareTest(">",  "abc", "abc", NPT_String("abc") >  "abc", 0);
@@ -294,7 +302,7 @@ main(int /*argc*/, char** /*argv*/)
     CompareTest("<",  "abc", "bc", NPT_String("abc") <  "bc", 1);
     CompareTest("<=", "abc", "bc", NPT_String("abc") <= "bc", 1);
 
-    printf(":: testing CompareNoCase\n");
+    printf(":: testing Compare\n");
     CompareTest("cnc", "abc", "abc", NPT_String("abc").Compare("abc", true), 0);
     CompareTest("cnc", "AbC3", "aBC3", NPT_String("AbC3").Compare("aBC3", true), 0);
     CompareTest("cnc", "AbCc", "aBcD", NPT_String("AbCc").Compare("aBcD", true), -1);
@@ -355,6 +363,47 @@ main(int /*argc*/, char** /*argv*/)
     NPT_String s1;
     f = s1.Find("hello");
     IntTest("Find() in empty string", f, -1);
+
+    printf(":: testing ReverseFind\n");
+    s = "aabbccaa";
+    f = s.ReverseFind("a");
+    IntTest("", f, 7);
+    f = s.ReverseFind("a", 1);
+    IntTest("", f, 6);
+    f = s.ReverseFind("a", 9);
+    IntTest("", f, -1);
+    f = s.ReverseFind("aab");
+    IntTest("", f, 0);
+    f = s.ReverseFind((const char*)NULL);
+    IntTest("", f, -1);
+    f = s.ReverseFind("");
+    IntTest("", f, -1);
+    f = s.ReverseFind("aa", 1);
+    IntTest("", f, 0);
+    f = s.ReverseFind("aabbccaa");
+    IntTest("", f, 0);
+    f = s.ReverseFind("aabbccaaa");
+    IntTest("", f, -1);
+
+    printf(":: testing StartsWith\n");
+    bool b = s.StartsWith("");
+    IntTest("", b, 0);
+    b = s.StartsWith("aaba");
+    IntTest("", b, 0);
+    b = s.StartsWith("aabbccaaa");
+    IntTest("", b, 0);
+    b = s.StartsWith("aabb");
+    IntTest("", b, 1);
+
+    printf(":: testing EndsWith\n");
+    b = s.EndsWith("");
+    IntTest("", b, 0);
+    b = s.EndsWith("aaba");
+    IntTest("", b, 0);
+    b = s.EndsWith("aabbccaaa");
+    IntTest("", b, 0);
+    b = s.EndsWith("ccaa");
+    IntTest("", b, 1);
 
     printf(":: testing Replace\n");
     NPT_String r0 = "abcdefghijefe";

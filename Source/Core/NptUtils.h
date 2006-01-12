@@ -32,6 +32,15 @@ extern unsigned short NPT_BytesToInt16Le(const unsigned char* buffer);
 extern void NPT_ByteToHex(NPT_Byte b, char* buffer);
 
 /*----------------------------------------------------------------------
+|    conversion utilities
++---------------------------------------------------------------------*/
+extern NPT_Result 
+NPT_ParseFloat(const char* str, float& result, bool relaxed = true);
+
+extern NPT_Result 
+NPT_ParseInteger(const char* str, long& result, bool relaxed = true);
+
+/*----------------------------------------------------------------------
 |       string utils
 +---------------------------------------------------------------------*/
 #if defined (NPT_CONFIG_HAVE_STDIO_H)

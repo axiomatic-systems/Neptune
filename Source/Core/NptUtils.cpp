@@ -10,9 +10,12 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
+#include <math.h>
+
 #include "NptConfig.h"
 #include "NptDebug.h"
 #include "NptUtils.h"
+#include "NptResults.h"
 
 /*----------------------------------------------------------------------
 |       NPT_BytesToInt32Be
@@ -90,7 +93,149 @@ void NPT_ByteToHex(NPT_Byte b, char* buffer)
     buffer[1] = NPT_NibbleToHex(b      & 0x0F);
 }
 
+/*----------------------------------------------------------------------
+|    NPT_ParseInteger
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_ParseInteger(const char* str, long& result, bool relaxed)
+{
+    // safe default value
+    result = 0;
 
+    // ignore leading whitespace
+    if (relaxed) {
+        while (*str == ' ' || *str == '\t') {
+            str++;
+        }
+    }
+    if (str == NULL || *str == '\0') {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
 
+    // check for sign
+    bool negative = false;
+    if (*str == '-') {
+        // negative number
+        negative = true; 
+        str++;
+    } else if (*str == '+') {
+        // skip the + sign
+        str++;
+    }
+
+    // parse the digits
+    bool empty    = true;
+    long value    = 0;
+    char c;
+    while ((c = *str++)) {
+        if (c >= '0' && c <= '9') {
+            value = 10*value + (c-'0');
+            empty = false;
+        } else {
+            if (relaxed) {
+                break;
+            } else {
+                return NPT_ERROR_INVALID_PARAMETERS;
+            }
+        } 
+    }
+
+    // check that the value was non empty
+    if (empty) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // return the result
+    result = negative ? -value : value;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|    NPT_ParseFloat
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_ParseFloat(const char* str, float& result, bool relaxed)
+{
+    // safe default value 
+    result = 0.0f;
+
+    // check params
+    if (str == NULL || *str == '\0') {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // ignore leading whitespace
+    if (relaxed) {
+        while (*str == ' ' || *str == '\t') {
+            str++;
+        }
+    }
+    if (str == NULL || *str == '\0') {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // check for sign
+    bool  negative = false;
+    if (*str == '-') {
+        // negative number
+        negative = true; 
+        str++;
+    } else if (*str == '+') {
+        // skip the + sign
+        str++;
+    }
+
+    // parse the digits
+    bool  after_radix = false;
+    bool  empty = true;
+    float value = 0.0f;
+    float decimal = 10.0f;
+    char  c;
+    while ((c = *str++)) {
+        if (c == '.') {
+            if (after_radix || (*str < '0' || *str > '9')) {
+                return NPT_ERROR_INVALID_PARAMETERS;
+            } else {
+                after_radix = true;
+            }
+        } else if (c >= '0' && c <= '9') {
+            empty = false;
+            if (after_radix) {
+                value += (float)(c-'0')/decimal;
+                decimal *= 10.0f;
+            } else {
+                value = 10.0f*value + (float)(c-'0');
+            }
+        } else if (c == 'e' || c == 'E') {
+            // exponent
+            if (*str == '+' || *str == '-' || (*str >= '0' && *str <= '9')) {
+                long exponent = 0;
+                if (NPT_SUCCEEDED(NPT_ParseInteger(str, exponent, relaxed))) {
+                    value *= (float)pow(10.0f, (float)exponent);
+                    break;
+                } else {
+                    return NPT_ERROR_INVALID_PARAMETERS;
+                }
+            } else {
+                return NPT_ERROR_INVALID_PARAMETERS;
+            }
+        } else {
+            if (relaxed) {
+                break;
+            } else {
+                return NPT_ERROR_INVALID_PARAMETERS;
+            }
+        } 
+    }
+
+    // check that the value was non empty
+    if (empty) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // return the result
+    result = negative ? -value : value;
+    return NPT_SUCCESS;
+}
 
 

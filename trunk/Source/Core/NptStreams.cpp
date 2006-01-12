@@ -86,6 +86,7 @@ NPT_MemoryStream::Read(void*     buffer,
     // copy the data
     if (bytes_to_read) {
         NPT_CopyMemory(buffer, (void*)(((char*)m_Buffer.UseData())+m_ReadOffset), bytes_to_read);
+        m_ReadOffset += bytes_to_read;
     } 
     if (bytes_read) *bytes_read = bytes_to_read;
 
@@ -121,7 +122,7 @@ NPT_MemoryStream::Write(const void* data,
                             space_available*2: // try to double
                             1024;              // start with 1k
         if (allocate < space_needed) allocate = space_needed;
-        NPT_Result result = m_Buffer.SetBufferSize(space_needed);
+        NPT_Result result = m_Buffer.SetBufferSize(allocate);
         if (NPT_FAILED(result)) return result;
     }
 

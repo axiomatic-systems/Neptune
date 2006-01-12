@@ -16,6 +16,7 @@
 #include <new>
 #include "NptTypes.h"
 #include "NptConstants.h"
+#include "NptDebug.h"
 
 /*----------------------------------------------------------------------
 |       constants
@@ -28,7 +29,10 @@ const int NPT_STRING_SEARCH_FAILED = -1;
 class NPT_String
 {
 public:
-    // methods
+    // factories
+    static NPT_String FromInteger(long value);
+
+    // constructors
     NPT_String(const NPT_String& str);
     NPT_String(const char* str);
     NPT_String(const char* str, NPT_Size length);
@@ -36,10 +40,6 @@ public:
     NPT_String(char c, NPT_Cardinal repeat = 1);
     NPT_String() : m_Chars(NULL) {}
    ~NPT_String() { if (m_Chars) delete GetBuffer(); }
-
-    // character access
-    char GetChar(NPT_Ordinal index) const { return operator[](index); }
-    void SetChar(NPT_Ordinal index, char c);
 
     // string info and manipulations
     bool IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
@@ -49,6 +49,7 @@ public:
     void Append(const char* chars, NPT_Size size);
     void Append(const char* s) { Append(s, StringLength(s)); }
     int Compare(const char* s, bool ignore_case = false) const;
+    int CompareN(const char* s, NPT_Size count, bool ignore_case = false) const;
 
     // substrings
     NPT_String SubString(NPT_Ordinal first, NPT_Size length) const;
@@ -71,19 +72,20 @@ public:
     NPT_String ToLowercase() const;
     NPT_String ToUppercase() const;
     NPT_Result ToInteger(long& value, bool relaxed = true) const;
-
+    NPT_Result ToFloat(float& value, bool relaxed = true) const;
+    
     // processing
     void MakeLowercase();
     void MakeUppercase();
     void Replace(char a, char b);
 
     // search
-    int  Find(char c, NPT_Ordinal start = 0) const;
-    int  Find(const char* s, NPT_Ordinal start = 0) const;
-    int  ReverseFind(char c, NPT_Ordinal start = 0) const;
-    int  ReverseFind(const char* s, NPT_Ordinal start = 0) const;
-    bool StartsWith(const char* s) const;
-    bool EndsWidth(const char* s) const;
+    int  Find(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;
+    int  Find(const char* s, NPT_Ordinal start = 0, bool ignore_case = false) const;
+    int  ReverseFind(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;
+    int  ReverseFind(const char* s, NPT_Ordinal start = 0, bool ignore_case = false) const;
+    bool StartsWith(const char* s, bool ignore_case = false) const;
+    bool EndsWith(const char* s, bool ignore_case = false) const;
 
     // editing
     void Insert(const char* s, NPT_Ordinal where = 0);
@@ -122,11 +124,12 @@ public:
         return *this;
     }
     char operator[](int index) const {
-        if ((unsigned int)index < GetLength()) {
-            return GetChars()[index];
-        } else {
-            return 0;
-        }
+        NPT_ASSERT((unsigned int)index < GetLength());
+        return GetChars()[index];
+    }
+    char& operator[](int index) {
+        NPT_ASSERT((unsigned int)index < GetLength());
+        return UseChars()[index];
     }
 
     // friend operators

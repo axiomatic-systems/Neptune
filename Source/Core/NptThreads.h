@@ -66,6 +66,15 @@ class NPT_AutoLock
 };
 
 /*----------------------------------------------------------------------
+|       NPT_Lock
++---------------------------------------------------------------------*/
+template <typename T> 
+class NPT_Lock : public T,
+                 public NPT_Mutex
+{
+};
+
+/*----------------------------------------------------------------------
 |       NPT_SharedVariableInterface
 +---------------------------------------------------------------------*/
 class NPT_SharedVariableInterface
@@ -75,8 +84,8 @@ class NPT_SharedVariableInterface
     virtual           ~NPT_SharedVariableInterface() {}
     virtual NPT_Result SetValue(NPT_Integer value)        = 0;
     virtual NPT_Result GetValue(NPT_Integer& value)       = 0;
-    virtual NPT_Result WaitUntilEquals(NPT_Integer value) = 0;
-    virtual NPT_Result WaitWhileEquals(NPT_Integer value) = 0;
+    virtual NPT_Result WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;
+    virtual NPT_Result WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -86,7 +95,7 @@ class NPT_SharedVariable : public NPT_SharedVariableInterface
 {
  public:
     // methods
-               NPT_SharedVariable(NPT_Integer value);
+               NPT_SharedVariable(NPT_Integer value = 0);
               ~NPT_SharedVariable() { delete m_Delegate; }
     NPT_Result SetValue(NPT_Integer value) { 
         return m_Delegate->SetValue(value); 
@@ -94,11 +103,11 @@ class NPT_SharedVariable : public NPT_SharedVariableInterface
     NPT_Result GetValue(NPT_Integer& value) { 
         return m_Delegate->GetValue(value); 
     }
-    NPT_Result WaitUntilEquals(NPT_Integer value) { 
-        return m_Delegate->WaitUntilEquals(value); 
+    NPT_Result WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) { 
+        return m_Delegate->WaitUntilEquals(value, timeout); 
     }
-    NPT_Result WaitWhileEquals(NPT_Integer value) { 
-        return m_Delegate->WaitWhileEquals(value); 
+    NPT_Result WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) { 
+        return m_Delegate->WaitWhileEquals(value, timeout); 
     }
 
  private:

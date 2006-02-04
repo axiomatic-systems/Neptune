@@ -60,10 +60,10 @@ public:
 class Thread3 : public NPT_Thread
 {
 public:
-    Thread3(NPT_SharedVariable* variable) : NPT_Thread(NPT_FALSE),
+    Thread3(NPT_SharedVariable* variable) : NPT_Thread(false),
                                            m_SharedVariable(variable) {}
     virtual ~Thread3() { NPT_Debug("~Thread3\n"); }
-    Thread3() : NPT_Thread(NPT_FALSE) {}
+    Thread3() : NPT_Thread(false) {}
     void Run() {
         NPT_Debug("Thread3::Run - start\n");
 
@@ -119,9 +119,9 @@ main(int argc, char** argv)
 
     NPT_SharedVariable shv1(0);
     NPT_Thread* thread1 = new Thread1();
-    NPT_Thread* thread2 = new NPT_Thread(NPT_TRUE, new Thread2(&shv1));
+    NPT_Thread* thread2 = new NPT_Thread(true, new Thread2(&shv1));
     NPT_Thread* thread3 = new Thread3(&shv1);
-    NPT_Thread* thread4 = new NPT_Thread(NPT_FALSE, new Thread4());
+    NPT_Thread* thread4 = new NPT_Thread(false, new Thread4());
 
     NPT_Debug("starting thread1...\n");
     thread1->Start();

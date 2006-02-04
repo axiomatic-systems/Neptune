@@ -191,6 +191,8 @@ TestFile(const char* filename)
         return;
     }
 
+	return;
+
     // dump the tree
     NPT_XmlWriter writer(2);
     NPT_File output(NPT_FILE_STANDARD_OUTPUT);
@@ -227,7 +229,7 @@ main(int argc, char** argv)
     // check args
     if (argc == 2) {
         TestFile(argv[1]);
-        //return 0;
+        return 0;
     }
 
     TestNamespaces();

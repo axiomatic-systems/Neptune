@@ -43,13 +43,16 @@ public:
 
     // string info and manipulations
     bool IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
-    NPT_Size GetLength() const { return m_Chars ? GetBuffer()->GetLength() : 0; }
+    NPT_Size GetLength()   const { return m_Chars ? GetBuffer()->GetLength() : 0;    }
+    NPT_Size GetCapacity() const { return m_Chars ? GetBuffer()->GetAllocated() : 0; }
     NPT_Result SetLength(NPT_Size length);
     void Assign(const char* chars, NPT_Size size);
     void Append(const char* chars, NPT_Size size);
     void Append(const char* s) { Append(s, StringLength(s)); }
     int Compare(const char* s, bool ignore_case = false) const;
+    static int Compare(const char* s1, const char* s2, bool ignore_case = false);
     int CompareN(const char* s, NPT_Size count, bool ignore_case = false) const;
+    static int CompareN(const char* s1, const char* s2, NPT_Size count, bool ignore_case = false);
 
     // substrings
     NPT_String SubString(NPT_Ordinal first, NPT_Size length) const;
@@ -72,6 +75,7 @@ public:
     NPT_String ToLowercase() const;
     NPT_String ToUppercase() const;
     NPT_Result ToInteger(long& value, bool relaxed = true) const;
+    NPT_Result ToInteger(unsigned long& value, bool relaxed = true) const;
     NPT_Result ToFloat(float& value, bool relaxed = true) const;
     
     // processing

@@ -22,6 +22,20 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
+|       compatibility wrappers
++---------------------------------------------------------------------*/
+#if !defined(NPT_CONFIG_HAVE_FOPEN_S)
+static errno_t fopen_s(FILE**      file,
+                       const char* filename,
+                       const char* mode)
+{
+    *file = fopen(filename, mode);
+    if (file == NULL) return errno;
+    return 0;
+}
+#endif // defined(NPT_CONFIG_HAVE_FOPEN_S
+
+/*----------------------------------------------------------------------
 |       NPT_StdcFileWrapper
 +---------------------------------------------------------------------*/
 class NPT_StdcFileWrapper
@@ -319,13 +333,13 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
         }
 
         // open the file
-        file = fopen(name, fmode);
+        int open_result = fopen_s(&file, name, fmode);
 
         // test the result of the open
-        if (file == NULL) {
-            if (errno == ENOENT) {
+        if (open_result != 0) {
+            if (open_result == ENOENT) {
                 return NPT_ERROR_NO_SUCH_FILE;
-            } else if (errno == EACCES) {
+            } else if (open_result == EACCES) {
                 return NPT_ERROR_PERMISSION_DENIED;
             } else {
                 return NPT_FAILURE;
@@ -341,7 +355,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 
     // unbuffer the file if needed 
     if ((mode & NPT_FILE_OPEN_MODE_UNBUFFERED) && file != NULL) {
-        setbuf(file, NULL);
+        setvbuf(file, NULL, _IONBF, 0);
     }   
 
     // create a reference to the FILE object

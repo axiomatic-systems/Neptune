@@ -126,8 +126,6 @@ GetEndPointStreams(EndPoint*                  endpoint,
                    NPT_InputStreamReference*  input_stream,
                    NPT_OutputStreamReference* output_stream)
 {
-    NPT_Result result = NPT_FAILURE;
-
     // default return values
     if (input_stream) *input_stream = NULL;
     if (output_stream) *output_stream = NULL;
@@ -146,22 +144,18 @@ GetEndPointStreams(EndPoint*                  endpoint,
 
             // resolve name
             NPT_IpAddress address;
-            result = address.ResolveName(endpoint->info.udp_client.hostname);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(address.ResolveName(endpoint->info.udp_client.hostname));
 
             // connect socket
-            result = sender.Connect(NPT_SocketAddress(address,
-                                    endpoint->info.udp_client.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(sender.Connect(NPT_SocketAddress(address,
+                                                       endpoint->info.udp_client.port)));
 
             // get the streams
             if (input_stream) {
-                result = sender.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(sender.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = sender.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(sender.GetOutputStream(*output_stream));
             }
                         
             return NPT_SUCCESS;
@@ -181,13 +175,11 @@ GetEndPointStreams(EndPoint*                  endpoint,
 
             // resolve the name
             NPT_IpAddress address;
-            result = address.ResolveName(endpoint->info.tcp_client.hostname);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(address.ResolveName(endpoint->info.tcp_client.hostname));
 
             // connect
-            result = client.Connect(NPT_SocketAddress(address,
-                                    endpoint->info.tcp_client.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(client.Connect(NPT_SocketAddress(address,
+                                                       endpoint->info.tcp_client.port)));
 
             // info
             if (Options.verbose) {
@@ -196,12 +188,10 @@ GetEndPointStreams(EndPoint*                  endpoint,
 
             // get the streams
             if (input_stream) {
-                result = client.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(client.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = client.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(client.GetOutputStream(*output_stream));
             }
             
             return NPT_SUCCESS;
@@ -220,26 +210,21 @@ GetEndPointStreams(EndPoint*                  endpoint,
             }
 
             // set time to live
-            result = sender.SetTimeToLive(endpoint->info.multicast_client.ttl);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(sender.SetTimeToLive(endpoint->info.multicast_client.ttl));
 
             // resolve name
             NPT_IpAddress address;
-            result = address.ResolveName(endpoint->info.multicast_client.groupname);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(address.ResolveName(endpoint->info.multicast_client.groupname));
 
             // connect socket
-            result = sender.Connect(NPT_SocketAddress(address, endpoint->info.multicast_client.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(sender.Connect(NPT_SocketAddress(address, endpoint->info.multicast_client.port)));
 
             // get the streams
             if (input_stream) {
-                result = sender.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(sender.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = sender.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(sender.GetOutputStream(*output_stream));
             }
 
             return NPT_SUCCESS;
@@ -256,17 +241,14 @@ GetEndPointStreams(EndPoint*                  endpoint,
             }
 
             // listen on port, any addr
-            result = listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.udp_server.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.udp_server.port)));
 
             // get the streams
             if (input_stream) {
-                result = listener.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(listener.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = listener.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(listener.GetOutputStream(*output_stream));
             }
 
             return NPT_SUCCESS;
@@ -289,8 +271,7 @@ GetEndPointStreams(EndPoint*                  endpoint,
                         endpoint->info.tcp_server.port));
 
             // wait for connection
-            result = server.WaitForNewClient(client);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(server.WaitForNewClient(client));
 
             // info
             if (Options.verbose) {
@@ -299,12 +280,10 @@ GetEndPointStreams(EndPoint*                  endpoint,
 
             // get the streams
             if (input_stream) {
-                result = client->GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(client->GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = client->GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(client->GetOutputStream(*output_stream));
             }
 
             delete client;
@@ -322,8 +301,7 @@ GetEndPointStreams(EndPoint*                  endpoint,
             }
 
             // listen on port, any addr
-            result = listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.multicast_server.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.multicast_server.port)));
 
             // info
             if (Options.verbose) {
@@ -332,21 +310,17 @@ GetEndPointStreams(EndPoint*                  endpoint,
 
             // resolve name
             NPT_IpAddress address;
-            result = address.ResolveName(endpoint->info.multicast_server.groupname);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(address.ResolveName(endpoint->info.multicast_server.groupname));
 
             // join the group
-            result = listener.JoinGroup(address);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(listener.JoinGroup(address));
 
             // get the streams
             if (input_stream) {
-                result = listener.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(listener.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = listener.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(listener.GetOutputStream(*output_stream));
             }
 
             return NPT_SUCCESS;
@@ -358,22 +332,19 @@ GetEndPointStreams(EndPoint*                  endpoint,
             // create a file object
             NPT_File file(endpoint->info.file.name);
             if (endpoint->direction == ENDPOINT_DIRECTION_IN) {
-                result = file.Open(NPT_FILE_OPEN_MODE_READ | 
-                                   NPT_FILE_OPEN_MODE_UNBUFFERED);
+                NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_READ | 
+                                    NPT_FILE_OPEN_MODE_UNBUFFERED));
             } else {
-                result = file.Open(NPT_FILE_OPEN_MODE_WRITE | 
-                                   NPT_FILE_OPEN_MODE_CREATE);
+                NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_WRITE | 
+                                    NPT_FILE_OPEN_MODE_CREATE));
             }
-            if (NPT_FAILED(result)) return result;
 
             // get the streams
             if (input_stream) {
-                result = file.GetInputStream(*input_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(file.GetInputStream(*input_stream));
             }
             if (output_stream) {
-                result = file.GetOutputStream(*output_stream);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(file.GetOutputStream(*output_stream));
             }
 
             return NPT_SUCCESS;
@@ -421,8 +392,7 @@ GetEndPointUdpSocket(EndPoint* endpoint, NPT_UdpSocket*& udp_socket)
             }
 
             // listen on port, any addr
-            result = udp_socket->Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.multicast_server.port));
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(udp_socket->Bind(NPT_SocketAddress(NPT_IpAddress::Any, endpoint->info.multicast_server.port)));
 
             // info
             if (Options.verbose) {
@@ -431,12 +401,10 @@ GetEndPointUdpSocket(EndPoint* endpoint, NPT_UdpSocket*& udp_socket)
 
             // resolve name
             NPT_IpAddress address;
-            result = address.ResolveName(endpoint->info.multicast_server.groupname);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(address.ResolveName(endpoint->info.multicast_server.groupname));
 
             // join the group
-            result = udp_multicast_socket->JoinGroup(address);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(udp_multicast_socket->JoinGroup(address));
 
             return NPT_SUCCESS;
         }

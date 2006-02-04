@@ -72,8 +72,8 @@ NPT_MemoryStream::Read(void*     buffer,
                        NPT_Size* bytes_read)
 {
     // check for shortcut
-    if (bytes_read == 0) {
-        if (*bytes_read) *bytes_read = 0;
+    if (bytes_to_read == 0) {
+        if (bytes_read) *bytes_read = 0;
         return NPT_SUCCESS;
     }
 
@@ -122,8 +122,7 @@ NPT_MemoryStream::Write(const void* data,
                             space_available*2: // try to double
                             1024;              // start with 1k
         if (allocate < space_needed) allocate = space_needed;
-        NPT_Result result = m_Buffer.SetBufferSize(allocate);
-        if (NPT_FAILED(result)) return result;
+        NPT_CHECK(m_Buffer.SetBufferSize(allocate));
     }
 
     NPT_CopyMemory(m_Buffer.UseData()+m_WriteOffset, data, bytes_to_write);
@@ -157,8 +156,7 @@ NPT_Result
 NPT_MemoryStream::SetSize(NPT_Size size)
 {
     // try to resize the data buffer
-    NPT_Result result = m_Buffer.SetDataSize(size);
-    if (NPT_FAILED(result)) return result;
+    NPT_CHECK(m_Buffer.SetDataSize(size));
 
     // adjust the read and write offsets
     if (m_ReadOffset > size) m_ReadOffset = size;

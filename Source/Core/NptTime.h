@@ -30,8 +30,8 @@ class NPT_TimeStamp
     NPT_TimeStamp& operator-=(const NPT_TimeStamp& time_stamp);
     bool operator==(const NPT_TimeStamp& time_stamp) const;
     bool operator!=(const NPT_TimeStamp& time_stamp) const;
-    //bool operator>(const NPT_TimeStamp& time_stamp) const;
-    //bool operator<(const NPT_TimeStamp& time_stamp) const;
+    bool operator>(const NPT_TimeStamp& time_stamp) const;
+    bool operator<(const NPT_TimeStamp& time_stamp) const;
 
     // members
     long m_Seconds;

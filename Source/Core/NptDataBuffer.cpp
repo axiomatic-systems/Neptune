@@ -39,13 +39,25 @@ NPT_DataBuffer::NPT_DataBuffer(NPT_Size bufferSize) :
 /*----------------------------------------------------------------------
 |       NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
-NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size dataSize, bool copy) :
-    m_BufferIsLocal(copy),
+NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size dataSize) :
+    m_BufferIsLocal(true),
     m_Buffer(new NPT_Byte[dataSize]),
     m_BufferSize(dataSize),
     m_DataSize(dataSize)
 {
     NPT_CopyMemory(m_Buffer, data, dataSize);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_DataBuffer::NPT_DataBuffer
++---------------------------------------------------------------------*/
+NPT_DataBuffer::NPT_DataBuffer(void* data, NPT_Size dataSize, bool copy) :
+    m_BufferIsLocal(copy),
+    m_Buffer(copy?new NPT_Byte[dataSize]:(NPT_Byte*)data),
+    m_BufferSize(dataSize),
+    m_DataSize(dataSize)
+{
+    if (copy) NPT_CopyMemory(m_Buffer, data, dataSize);
 }
 
 /*----------------------------------------------------------------------
@@ -113,8 +125,7 @@ NPT_DataBuffer::SetDataSize(NPT_Size size)
     if (size > m_BufferSize) {
         // the buffer is too small, we need to reallocate it
         if (m_BufferIsLocal) {
-            NPT_Result result = ReallocateBuffer(size);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(ReallocateBuffer(size));
         } else { 
             // we cannot reallocate an external buffer
             return NPT_ERROR_NOT_SUPPORTED;
@@ -132,13 +143,12 @@ NPT_DataBuffer::SetData(NPT_Byte* data, NPT_Size size)
 {
     if (size > m_BufferSize) {
         if (m_BufferIsLocal) {
-            NPT_Result result = ReallocateBuffer(size);
-            if (NPT_FAILED(result)) return result;
+            NPT_CHECK(ReallocateBuffer(size));
         } else {
             return NPT_FAILURE;
         }
     }
-    memcpy(m_Buffer, data, size);
+    NPT_CopyMemory(m_Buffer, data, size);
     m_DataSize = size;
 
     return NPT_SUCCESS;
@@ -159,7 +169,7 @@ NPT_DataBuffer::ReallocateBuffer(NPT_Size size)
 
     // copy the contents of the previous buffer ,is any
 	if (m_Buffer && m_DataSize) {
-		memcpy(newBuffer, m_Buffer, m_DataSize);
+            NPT_CopyMemory(newBuffer, m_Buffer, m_DataSize);
 	}
 
     // destroy the previous buffer

@@ -77,7 +77,7 @@ UdpPing(const char* hostname, int port)
 
     // get the current timestamp
     NPT_TimeStamp before;
-    NPT_System::GetSystem().GetCurrentTimeStamp(before);
+    NPT_System::GetCurrentTimeStamp(before);
 
     // send the packet
     sender.Connect(NPT_SocketAddress(ip_address, port));
@@ -117,7 +117,7 @@ UdpPing(const char* hostname, int port)
            socket_info.remote_address.GetPort());
 
     NPT_TimeStamp after;
-    NPT_System::GetSystem().GetCurrentTimeStamp(after);
+    NPT_System::GetCurrentTimeStamp(after);
     NPT_TimeInterval i = after-before;
     printf("RTT: %f ms\n", ((float)i)*1000.0f);
 }
@@ -145,7 +145,7 @@ TcpPing(const char* hostname, int port)
 
     // get the current timestamp
     NPT_TimeStamp before;
-    NPT_System::GetSystem().GetCurrentTimeStamp(before);
+    NPT_System::GetCurrentTimeStamp(before);
 
     // send the ping
     sender.GetOutputStream(output);
@@ -163,7 +163,7 @@ TcpPing(const char* hostname, int port)
     }
 
     NPT_TimeStamp after;
-    NPT_System::GetSystem().GetCurrentTimeStamp(after);
+    NPT_System::GetCurrentTimeStamp(after);
     NPT_TimeInterval i = after-before;
     printf("RTT: %f ms\n", ((float)i)*1000.0f);
 }

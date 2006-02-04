@@ -95,5 +95,26 @@ NPT_TimeStamp::operator!=(const NPT_TimeStamp& t) const
         m_NanoSeconds != t.m_NanoSeconds;
 }
 
+/*----------------------------------------------------------------------
+|       NPT_TimeStamp::operator>
++---------------------------------------------------------------------*/
+bool
+NPT_TimeStamp::operator>(const NPT_TimeStamp& t) const
+{
+    return 
+        m_Seconds   > t.m_Seconds || 
+        (m_Seconds == t.m_Seconds && m_NanoSeconds > t.m_NanoSeconds);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_TimeStamp::operator<
++---------------------------------------------------------------------*/
+bool
+NPT_TimeStamp::operator<(const NPT_TimeStamp& t) const
+{
+    return 
+        m_Seconds   < t.m_Seconds || 
+        (m_Seconds == t.m_Seconds && m_NanoSeconds < t.m_NanoSeconds);
+}
 
 

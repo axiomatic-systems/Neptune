@@ -54,7 +54,7 @@ NPT_BytesFromInt32Be(unsigned char* buffer, unsigned long value)
 }
 
 /*----------------------------------------------------------------------
-|    ATX_BytesFromInt16Be
+|    NPT_BytesFromInt16Be
 +---------------------------------------------------------------------*/
 void 
 NPT_BytesFromInt16Be(unsigned char* buffer, unsigned short value)
@@ -85,12 +85,35 @@ static char NPT_NibbleToHex(unsigned int nibble)
 }
 
 /*----------------------------------------------------------------------
+|       NPT_HexToNibble
++---------------------------------------------------------------------*/
+static unsigned int NPT_HexToNibble(char hex)
+{
+    if (hex >= 'a') {
+        return ((hex - 'a') + 10);
+    } else if (hex >= 'A') {
+        return ((hex - 'A') + 10);
+    } else {
+        return (hex - '0');
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_ByteToHex
 +---------------------------------------------------------------------*/
 void NPT_ByteToHex(NPT_Byte b, char* buffer)
 {
     buffer[0] = NPT_NibbleToHex((b>>4) & 0x0F);
     buffer[1] = NPT_NibbleToHex(b      & 0x0F);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HexToByte
++---------------------------------------------------------------------*/
+void NPT_HexToByte(const char* buffer, NPT_Byte& b)
+{
+    NPT_ASSERT(NPT_StringLength(buffer) >= 2);
+    b = (NPT_HexToNibble(buffer[0]) << 4) | NPT_HexToNibble(buffer[1]);
 }
 
 /*----------------------------------------------------------------------
@@ -102,13 +125,17 @@ NPT_ParseInteger(const char* str, long& result, bool relaxed)
     // safe default value
     result = 0;
 
+    if (str == NULL) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
     // ignore leading whitespace
     if (relaxed) {
         while (*str == ' ' || *str == '\t') {
             str++;
         }
     }
-    if (str == NULL || *str == '\0') {
+    if (*str == '\0') {
         return NPT_ERROR_INVALID_PARAMETERS;
     }
 
@@ -170,7 +197,7 @@ NPT_ParseFloat(const char* str, float& result, bool relaxed)
             str++;
         }
     }
-    if (str == NULL || *str == '\0') {
+    if (*str == '\0') {
         return NPT_ERROR_INVALID_PARAMETERS;
     }
 

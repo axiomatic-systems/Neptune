@@ -25,8 +25,25 @@
 #include <winsock.h>
 #endif
 #include <windows.h>
+
 #elif defined(__TCS__)
 #include <sockets.h>
+
+#elif defined(PSP)
+#include <psptypes.h>
+#include <kernel.h>
+#include <pspnet.h>
+#include <pspnet_error.h>
+#include <pspnet_inet.h>
+#include <pspnet_resolver.h>
+#include <pspnet_apctl.h>
+#include <pspnet_ap_dialog_dummy.h>
+#include <errno.h>
+#include <wlan.h>
+#include <pspnet/sys/socket.h>
+#include <pspnet/sys/select.h>
+#include <pspnet/netinet/in.h>
+
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -65,7 +82,8 @@ const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 5;
 #include "NptWin32Network.h"
 static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer; 
 
-#define EINPROGRESS  WSAEWOULDBLOCK
+#define EWOULDBLOCK  WSAEWOULDBLOCK
+#define EINPROGRESS  WSAEINPROGRESS
 #define ECONNREFUSED WSAECONNREFUSED
 #define ECONNRESET   WSAECONNRESET
 #define ETIMEDOUT    WSAETIMEDOUT
@@ -96,6 +114,79 @@ typedef const void* SocketConstBuffer;
 typedef void*  SocketOption;
 typedef int    SocketFd;
 #define GetSocketError() errno
+
+#elif defined(PSP)
+typedef SceNetInetSocklen_t socklen_t;
+#define timeval SceNetInetTimeval
+#define inet_addr sceNetInetInetAddr
+#define select sceNetInetSelect
+#define socket sceNetInetSocket
+#define connect sceNetInetConnect
+#define bind sceNetInetBind
+#define accept sceNetInetAccept
+#define getpeername sceNetInetGetpeername
+#define getsockopt sceNetInetGetsockopt
+#define setsockopt sceNetInetSetsockopt
+#define listen sceNetInetListen
+#define getsockname sceNetInetGetsockname
+#define sockaddr SceNetInetSockaddr
+#define sockaddr_in SceNetInetSockaddrIn
+#define in_addr SceNetInetInAddr
+#define send  sceNetInetSend
+#define sendto sceNetInetSendto
+#define recv  sceNetInetRecv
+#define recvfrom sceNetInetRecvfrom
+#define closesocket sceNetInetClose
+#define htonl sceNetHtonl
+#define htons sceNetHtons
+#define ntohl sceNetNtohl
+#define ntohs sceNetNtohs
+#define SOL_SOCKET SCE_NET_INET_SOL_SOCKET
+#define AF_INET SCE_NET_INET_AF_INET
+#define SOCK_STREAM SCE_NET_INET_SOCK_STREAM
+#define SOCK_DGRAM SCE_NET_INET_SOCK_DGRAM
+#define SO_BROADCAST SCE_NET_INET_SO_BROADCAST
+#define SO_ERROR SCE_NET_INET_SO_ERROR
+#define IPPROTO_IP SCE_NET_INET_IPPROTO_IP
+#define IP_ADD_MEMBERSHIP SCE_NET_INET_IP_ADD_MEMBERSHIP
+#define IP_MULTICAST_IF SCE_NET_INET_IP_MULTICAST_IF
+#define IP_MULTICAST_TTL SCE_NET_INET_IP_MULTICAST_TTL
+//#define SO_REUSEPORT SCE_NET_INET_SO_REUSEPORT
+#define SO_REUSEADDR SCE_NET_INET_SO_REUSEADDR
+//#define SO_REUSEADDR SCE_NET_INET_SO_REUSEPORT
+#define INADDR_ANY SCE_NET_INET_INADDR_ANY
+#define ip_mreq SceNetInetIpMreq
+#ifdef fd_set
+#undef fd_set
+#endif
+#define fd_set SceNetInetFdSet
+#ifdef FD_ZERO
+#undef FD_ZERO
+#endif
+#define FD_ZERO SceNetInetFD_ZERO
+#ifdef FD_SET
+#undef FD_SET
+#endif
+#define FD_SET SceNetInetFD_SET
+#ifdef FD_CLR
+#undef FD_CLR
+#endif
+#define FD_CLR SceNetInetFD_CLR
+#ifdef FD_ISSET
+#undef FD_ISSET
+#endif
+#define FD_ISSET SceNetInetFD_ISSET
+
+#define NPT_BSD_INVALID_SOCKET (-1)
+#define NPT_BSD_SOCKET_ERROR   (-1)
+#define NPT_BSD_IOCTL_ERROR    (-1)
+typedef void*  SocketBuffer;
+typedef const void* SocketConstBuffer;
+typedef void*  SocketOption;
+typedef int    SocketFd;
+#define GetSocketError() sceNetInetGetErrno()
+#define RESOLVER_TIMEOUT (5 * 1000 * 1000)
+#define RESOLVER_RETRY 5
 
 #else  // normal unix
 #define NPT_BSD_INVALID_SOCKET (-1)
@@ -164,6 +255,11 @@ MapErrorCode(int error)
         case ENETUNREACH:
             return NPT_ERROR_NETWORK_UNREACHABLE;
 
+        case EINPROGRESS:
+        case EAGAIN:
+        case EWOULDBLOCK:
+            return NPT_ERROR_WOULD_BLOCK;
+
         default:
             return NPT_FAILURE;
     }
@@ -187,6 +283,21 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
 
 #if defined(__TCS__)
     Set(getHostByName(name));
+#elif (PSP)
+    int rid;
+    char buf[1024];
+    int buflen = sizeof(buf);
+
+    int ret = sceNetResolverCreate(&rid, buf, buflen);
+    if(ret < 0){
+        return NPT_FAILURE;
+    }
+    ret = sceNetResolverStartNtoA(rid, name, &address->sin_addr,
+        RESOLVER_TIMEOUT, RESOLVER_RETRY);
+    if(ret < 0){
+        return NPT_ERROR_HOST_UNKNOWN;
+    }
+    sceNetResolverDelete(rid);
 #else
     // do a name lookup
     struct hostent *host_entry = gethostbyname(name);
@@ -394,27 +505,30 @@ class NPT_BsdSocket : public NPT_SocketInterface
     NPT_Result RefreshInfo();
 
     // NPT_SocketInterface methods
-	NPT_Result Bind(const NPT_SocketAddress& address);
+	NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true);
 	NPT_Result Connect(const NPT_SocketAddress& address,
                        NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result WaitForConnection(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
     NPT_Result GetInfo(NPT_SocketInfo& info);
 
- protected:
     // methods
     NPT_Result SetBlockingMode(bool blocking);
 
+ protected:
     // members
     NPT_BsdSocketFdReference m_SocketFdReference;
     NPT_SocketInfo           m_Info;
+    bool                     m_Blocking;
 };
 
 /*----------------------------------------------------------------------
 |       NPT_BsdSocket::NPT_BsdSocket
 +---------------------------------------------------------------------*/
 NPT_BsdSocket::NPT_BsdSocket(SocketFd fd) : 
-    m_SocketFdReference(new NPT_BsdSocketFd(fd))
+    m_SocketFdReference(new NPT_BsdSocketFd(fd)),
+    m_Blocking(true)
 {
     RefreshInfo();
 }
@@ -432,8 +546,17 @@ NPT_BsdSocket::~NPT_BsdSocket()
 |       NPT_BsdSocket::Bind
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdSocket::Bind(const NPT_SocketAddress& address)
+NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
 {
+    // set socket options
+    if (reuse_address) {
+        int option = 1;
+        setsockopt(m_SocketFdReference->GetSocketFd(), 
+                   SOL_SOCKET, 
+                   SO_REUSEADDR, 
+                   (SocketOption)&option, 
+                   sizeof(option));
+    }
     
     // convert the address
     struct sockaddr_in inet_address;
@@ -457,6 +580,16 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address)
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdSocket::Connect(const NPT_SocketAddress&, NPT_Timeout)
+{
+    // this is unsupported unless overridden in a derived class
+    return NPT_FAILURE;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_BsdSocket::WaitForConnection
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_BsdSocket::WaitForConnection(NPT_Timeout)
 {
     // this is unsupported unless overridden in a derived class
     return NPT_FAILURE;
@@ -552,6 +685,21 @@ NPT_BsdSocket::SetBlockingMode(bool blocking)
         NPT_BSD_IOCTL_ERROR) {
         return NPT_FAILURE;
     }
+    m_Blocking = blocking;
+    return NPT_SUCCESS;
+}
+#elif defined(PSP)
+/*----------------------------------------------------------------------
+|       NPT_BsdSocket::SetBlockingMode
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocket::SetBlockingMode(bool blocking)
+{
+    unsigned long args = (blocking == true) ? 0 : 1;
+    if (setsockopt(m_SocketFdReference->GetSocketFd(), SOL_SOCKET, SCE_NET_INET_SO_NBIO, &args, sizeof(args))) {
+        return NPT_FAILURE;
+    }
+    m_Blocking = blocking;
     return NPT_SUCCESS;
 }
 #else
@@ -570,6 +718,7 @@ NPT_BsdSocket::SetBlockingMode(bool blocking)
     if (fcntl(m_SocketFdReference->GetSocketFd(), F_SETFL, flags)) {
         return NPT_FAILURE;
     }
+    m_Blocking = blocking;
     return NPT_SUCCESS;
 }
 #endif
@@ -592,6 +741,7 @@ class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
  public:
     // constructor
      NPT_BsdUdpSocket();
+    virtual ~NPT_BsdUdpSocket() {}
 
     // NPT_SocketInterface methods
     NPT_Result Connect(const NPT_SocketAddress& address,
@@ -613,13 +763,6 @@ class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
 NPT_BsdUdpSocket::NPT_BsdUdpSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_DGRAM, 0))
 {
-    // set default socket options
-    int option = 1;
-    setsockopt(m_SocketFdReference->GetSocketFd(), 
-               SOL_SOCKET, 
-               SO_REUSEADDR, 
-               (SocketOption)&option, 
-               sizeof(option));
 }
 
 /*----------------------------------------------------------------------
@@ -758,6 +901,14 @@ NPT_UdpSocket::NPT_UdpSocket()
 }
 
 /*----------------------------------------------------------------------
+|       NPT_UdpSocket::NPT_UdpSocket
++---------------------------------------------------------------------*/
+NPT_UdpSocket::NPT_UdpSocket(NPT_UdpSocketInterface* delegate) :
+    m_UdpSocketDelegate(delegate)
+{
+}
+
+/*----------------------------------------------------------------------
 |       NPT_UdpSocket::~NPT_UdpSocket
 +---------------------------------------------------------------------*/
 NPT_UdpSocket::~NPT_UdpSocket()
@@ -788,6 +939,7 @@ class NPT_BsdUdpMulticastSocket : public    NPT_UdpMulticastSocketInterface,
     NPT_Result LeaveGroup(const NPT_IpAddress& group,
                           const NPT_IpAddress& iface);
     NPT_Result SetTimeToLive(unsigned char ttl);
+    NPT_Result SetInterface(const NPT_IpAddress& iface);
 
     // friends 
     friend class NPT_UdpMulticastSocket;
@@ -860,6 +1012,27 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
 }
 
 /*----------------------------------------------------------------------
+|       NPT_BsdUdpMulticastSocket::SetInterface
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
+{
+    struct in_addr iface_addr;
+    // set the interface address
+    iface_addr.s_addr = htonl(iface.AsLong());
+
+    // set socket option
+    int io_result = setsockopt(m_SocketFdReference->GetSocketFd(), 
+                               IPPROTO_IP, IP_MULTICAST_IF, 
+                               (char*)&iface_addr, sizeof(iface_addr));
+    if (io_result == 0) {
+        return NPT_SUCCESS;
+    } else {
+        return MapErrorCode(GetSocketError());
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_BsdUdpMulticastSocket::SetTimeToLive
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -881,7 +1054,8 @@ NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
 /*----------------------------------------------------------------------
 |       NPT_UdpMulticastSocket::NPT_UdpMulticastSocket
 +---------------------------------------------------------------------*/
-NPT_UdpMulticastSocket::NPT_UdpMulticastSocket()
+NPT_UdpMulticastSocket::NPT_UdpMulticastSocket() :
+    NPT_UdpSocket(NULL)
 {
     NPT_BsdUdpMulticastSocket* delegate = new NPT_BsdUdpMulticastSocket();
     m_SocketDelegate             = delegate;
@@ -916,6 +1090,7 @@ class NPT_BsdTcpClientSocket : protected NPT_BsdSocket
     // NPT_SocketInterface methods
     NPT_Result Connect(const NPT_SocketAddress& address,
                        NPT_Timeout              timeout);
+    NPT_Result WaitForConnection(NPT_Timeout timeout);
 
     // friends
     friend class NPT_TcpClientSocket;
@@ -944,6 +1119,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                                 NPT_Timeout              timeout)
 {
     SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
+    bool blocking = m_Blocking;
 
     // set the socket to nonblocking so that we can timeout on connect
     if (NPT_FAILED(SetBlockingMode(false))) {
@@ -961,16 +1137,38 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                         sizeof(inet_address));
     if (io_result == 0) {
         // immediate connection
-        SetBlockingMode(true);
+        // put back in original blocking mode
+        SetBlockingMode(blocking);
 
         // get socket info
         RefreshInfo();
 
         return NPT_SUCCESS;
     }
-    if (io_result == NPT_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS) {
+    if (io_result == NPT_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS && GetSocketError() != EWOULDBLOCK) {   
+        // put back in original blocking mode
+        SetBlockingMode(blocking);
+
         // error
         return MapErrorCode(GetSocketError());
+    }
+
+    return WaitForConnection(timeout);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_BsdTcpClientSocket::WaitForConnection
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
+{
+    SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
+    int io_result;
+    bool blocking = m_Blocking;
+
+    // set the socket to nonblocking so that we can timeout on connect
+    if (NPT_FAILED(SetBlockingMode(false))) {
+        return NPT_FAILURE;
     }
 
     // wait for connection to succeed or fail
@@ -994,7 +1192,14 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                        &read_set, &write_set, &except_set, 
                        timeout == NPT_TIMEOUT_INFINITE ? 
                        NULL : &timeout_value);
+
+    // put back in original blocking mode
+    SetBlockingMode(blocking);
+
     if (io_result == 0) {
+        if (!blocking) {
+            return NPT_ERROR_WOULD_BLOCK;
+        }
         // timeout
         return NPT_ERROR_TIMEOUT;
     }
@@ -1016,9 +1221,6 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
         }
     }
     
-    // put the socket back in blocking mode
-    SetBlockingMode(true);
-
     // get socket info
     RefreshInfo();
 
@@ -1102,13 +1304,6 @@ NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket() :
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0)),
     m_ListenMax(0)
 {
-    // set default socket options
-    int option = 1;
-    setsockopt(m_SocketFdReference->GetSocketFd(), 
-               SOL_SOCKET, 
-               SO_REUSEADDR, 
-               (SocketOption)&option, 
-               sizeof(option));
 }
 
 /*----------------------------------------------------------------------
@@ -1154,7 +1349,7 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client)
                        &namelen); 
     if (socket_fd == NPT_BSD_INVALID_SOCKET) {
         client = NULL;
-        return NPT_ERROR_ACCEPT_FAILED;
+        return MapErrorCode(GetSocketError());
     }
     client = new NPT_Socket(new NPT_BsdSocket(socket_fd));
 

@@ -16,7 +16,8 @@
 /*----------------------------------------------------------------------
 |       NPT_Uri::NPT_Uri
 +---------------------------------------------------------------------*/
-NPT_Uri::NPT_Uri(const char* uri)
+NPT_Uri::NPT_Uri(const char* uri) :
+    m_Uri(uri)
 {
     if (uri == NULL) return;
 
@@ -56,17 +57,18 @@ NPT_Uri::Encode(const char* uri)
 
     // process each character
     while (unsigned char c = *uri++) {
-        if (c == '<'  ||
-            c == '>'  || 
-            c == '"'  || 
-            c == '{'  || 
-            c == '}'  || 
-            c == '|'  ||
-            c == '\\' ||
-            c == '^'  ||
-            c == '\'' || 
-            c < 0x20  ||
-            c > 0x7F) {
+        if (c == '<'   ||
+            c == '>'   || 
+            c == '"'   || 
+            c == '\\'  ||
+            c == '^'   ||
+            c == '`'   ||
+            c == ']'   ||
+            c == '['   ||
+            c == '#'   ||
+            c == '%'   ||
+            c <= 0x20  ||
+            c >= 0x7B) {
             // needs to be escaped
             char escaped[3];
             escaped[0] = '%';
@@ -80,3 +82,35 @@ NPT_Uri::Encode(const char* uri)
     
     return encoded;
 }
+
+/*----------------------------------------------------------------------
+|       NPT_Uri::Decode
++---------------------------------------------------------------------*/
+NPT_String
+NPT_Uri::Decode(const char* uri)
+{
+    NPT_String decoded;
+
+    // check args
+    if (uri == NULL) return decoded;
+
+    // reserve at least the size of the current uri
+    decoded.Reserve(NPT_StringLength(uri));
+
+    // process each character
+    while (unsigned char c = *uri++) {
+        if (c == '%') {
+            // needs to be unescaped
+            unsigned char unescaped;
+            NPT_HexToByte(uri, unescaped);
+            decoded += unescaped;
+            uri += 2;
+        } else {
+            // no unescaping required
+            decoded += c;
+        }
+    }
+
+    return decoded;
+}
+

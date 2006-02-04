@@ -30,10 +30,10 @@ class NPT_MessageHandler
 {
  public:
     // methods
-    virtual           ~NPT_MessageHandler() {}
+    virtual ~NPT_MessageHandler() {}
 
     // default message handler
-    virtual void       OnMessage(NPT_Message*) {}
+    virtual void OnMessage(NPT_Message*) {}
 
     // this method is a central point of handling for received messages.
     // it can be overloaded by subclasses who wish to process all 
@@ -133,13 +133,13 @@ protected:
 /*----------------------------------------------------------------------
 |       NPT_MessageBroadcaster
 +---------------------------------------------------------------------*/
-class NPT_MessageBroadcaster : public NPT_List<NPT_MessageReceiver>::ItemOperator
+class NPT_MessageBroadcaster
 {
 public:
     // methods
     NPT_MessageBroadcaster(NPT_Message* message) : m_Message(message) {}
-    NPT_Result operator()(NPT_MessageReceiver& receiver) const {
-        receiver.PostMessage(m_Message);
+    NPT_Result operator()(NPT_MessageReceiver*& receiver) const {
+        receiver->PostMessage(m_Message);
         return NPT_SUCCESS;
     }
 

@@ -63,6 +63,9 @@ class NPT_XmlAttribute
 class NPT_XmlNamespaceMap
 {
 public:
+    // destructor
+    ~NPT_XmlNamespaceMap();
+
     // methods   
     NPT_Result        SetNamespaceUri(const char* prefix, const char* uri);
     const NPT_String* GetNamespaceUri(const char* prefix);
@@ -82,10 +85,11 @@ private:
     };
 
     // members
-    NPT_List<Entry> m_Entries;
+    NPT_List<Entry*> m_Entries;
 
     // friends
     friend class NPT_XmlWriter;
+    friend class NPT_XmlNodeWriter;
 };
 
 /*----------------------------------------------------------------------
@@ -150,7 +154,7 @@ class NPT_XmlElementNode : public NPT_XmlNode
                                          const char* name, 
                                          const char* value);
     NPT_Result              AddText(const char* text); 
-    NPT_List<NPT_XmlAttribute>& 
+    NPT_List<NPT_XmlAttribute*>& 
                             GetAttributes() { return m_Attributes; }
     const NPT_String*       GetAttribute(const char* name,
                                          const char* namespc = NULL) const;
@@ -175,17 +179,18 @@ protected:
     void RelinkNamespaceMaps();
 
     // members  
-    NPT_String                 m_Prefix;
-    NPT_String                 m_Tag;
-    NPT_List<NPT_XmlNode*>     m_Children;
-    NPT_List<NPT_XmlAttribute> m_Attributes;
-    NPT_XmlNamespaceMap*       m_NamespaceMap;
-    NPT_XmlElementNode*        m_NamespaceParent;
+    NPT_String                  m_Prefix;
+    NPT_String                  m_Tag;
+    NPT_List<NPT_XmlNode*>      m_Children;
+    NPT_List<NPT_XmlAttribute*> m_Attributes;
+    NPT_XmlNamespaceMap*        m_NamespaceMap;
+    NPT_XmlElementNode*         m_NamespaceParent;
 
     // friends
     friend class NPT_XmlTagFinder;
     friend class NPT_XmlSerializer;
     friend class NPT_XmlWriter;
+    friend class NPT_XmlNodeWriter;
 };
 
 /*----------------------------------------------------------------------

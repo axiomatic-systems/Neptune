@@ -28,10 +28,14 @@ public:
 
     // class methods
     static NPT_String Encode(const char* uri);
+    static NPT_String Decode(const char* uri);
 
     // methods
     NPT_Uri(const char* uri);
     virtual ~NPT_Uri() {}
+    const NPT_String& AsString() const { 
+        return m_Uri;  
+    }
     const NPT_String& GetScheme() const {
         return m_Scheme;
     }
@@ -41,6 +45,7 @@ public:
 
 protected:
     // members
+    NPT_String m_Uri;
     NPT_String m_Scheme;
     SchemeId   m_SchemeId;
     NPT_String m_Specific;

@@ -37,42 +37,40 @@
 /*----------------------------------------------------------------------
 |       NPT_XmlAttributeFinder
 +---------------------------------------------------------------------*/
-class NPT_XmlAttributeFinder : public NPT_List<NPT_XmlAttribute>::ItemFinder
+class NPT_XmlAttributeFinder
 {
 public:
-    NPT_XmlAttributeFinder(const char* name) : m_Name(name) {}
-    NPT_Result operator()(const NPT_XmlAttribute& attribute) const {
-        if (attribute.m_Name == m_Name) {
-            return NPT_SUCCESS;
-        } else {
-            return NPT_FAILURE;
-        }
+    NPT_XmlAttributeFinder(const char* name, const char* namespc) : 
+      m_Name(name), m_Namespace(namespc) {}
+    bool operator()(const NPT_XmlAttribute* const & attribute) const {
+        return attribute->m_Name == m_Name;
     }
 
 private:
     const char* m_Name;
+    const char* m_Namespace;
 };
 
 /*----------------------------------------------------------------------
 |       NPT_XmlTagFinder
 +---------------------------------------------------------------------*/
-class NPT_XmlTagFinder : public NPT_List<NPT_XmlNode*>::ItemFinder
+class NPT_XmlTagFinder
 {
 public:
     NPT_XmlTagFinder(const char* tag, const char* namespc) : 
       m_Tag(tag), m_Namespace(namespc) {}
-    NPT_Result operator()(NPT_XmlNode* const & node) const {
+    bool operator()(const NPT_XmlNode* const & node) const {
         const NPT_XmlElementNode* element = node->AsElementNode();
         if (element && element->m_Tag == m_Tag) {
             if (m_Namespace) {
                 // look for a specific namespace
-                return NPT_SUCCESS; // TODO
+                return true; // TODO
             } else {
                 // any namespace will match
-                return NPT_SUCCESS;
+                return true;
             }
         } else {
-            return NPT_FAILURE;
+            return false;
         }
     }
 
@@ -84,15 +82,11 @@ private:
 /*----------------------------------------------------------------------
 |       NPT_XmlTextFinder
 +---------------------------------------------------------------------*/
-class NPT_XmlTextFinder : public NPT_List<NPT_XmlNode*>::ItemFinder
+class NPT_XmlTextFinder
 {
 public:
-    NPT_Result operator()(NPT_XmlNode* const & node) const {
-        if (node->AsTextNode() != NULL) {
-            return NPT_SUCCESS;
-        } else {
-            return NPT_FAILURE;
-        }
+    bool operator()(const NPT_XmlNode* const & node) const {
+        return node->AsTextNode() != NULL;
     }
 };
 
@@ -152,6 +146,7 @@ NPT_XmlElementNode::NPT_XmlElementNode(const char* tag) :
 NPT_XmlElementNode::~NPT_XmlElementNode()
 {
     m_Children.Apply(NPT_ObjectDeleter<NPT_XmlNode>());
+    m_Attributes.Apply(NPT_ObjectDeleter<NPT_XmlAttribute>());
     delete m_NamespaceMap;
 }
 
@@ -199,9 +194,9 @@ NPT_XmlElementNode::AddChild(NPT_XmlNode* child)
 NPT_XmlElementNode*
 NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n)
 {
-    NPT_XmlNode* node;
-    if (NPT_SUCCEEDED(m_Children.Find(NPT_XmlTagFinder(tag, namespc), node, n))) {
-        return node->AsElementNode();
+    NPT_List<NPT_XmlNode*>::Iterator item;
+    if (NPT_SUCCEEDED(m_Children.Find(NPT_XmlTagFinder(tag, namespc), item, n))) {
+        return (*item)->AsElementNode();
     } else {
         return NULL;
     }
@@ -216,7 +211,7 @@ NPT_XmlElementNode::AddAttribute(const char* prefix,
                                  const char* value)
 {
     if (name == NULL || value == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-    return m_Attributes.Add(NPT_XmlAttribute(prefix, name, value));
+    return m_Attributes.Add(new NPT_XmlAttribute(prefix, name, value));
 }
 
 /*----------------------------------------------------------------------
@@ -227,7 +222,7 @@ NPT_XmlElementNode::AddAttribute(const char* name,
                                  const char* value)
 {
     if (name == NULL || value == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-    return m_Attributes.Add(NPT_XmlAttribute(name, value));
+    return m_Attributes.Add(new NPT_XmlAttribute(name, value));
 }
 
 /*----------------------------------------------------------------------
@@ -236,10 +231,10 @@ NPT_XmlElementNode::AddAttribute(const char* name,
 const NPT_String*
 NPT_XmlElementNode::GetAttribute(const char* name, const char* namespc) const
 {
-    NPT_XmlAttribute* attribute;
-    if (NPT_SUCCEEDED(m_Attributes.Find(NPT_XmlAttributeFinder(name), 
+    NPT_List<NPT_XmlAttribute*>::Iterator attribute;
+    if (NPT_SUCCEEDED(m_Attributes.Find(NPT_XmlAttributeFinder(name, namespc), 
                                         attribute))) { 
-        return &attribute->GetValue();
+        return &(*attribute)->GetValue();
     } else {
         return NULL;
     }
@@ -260,9 +255,9 @@ NPT_XmlElementNode::AddText(const char* text)
 const NPT_String*
 NPT_XmlElementNode::GetText(NPT_Ordinal n) const
 {
-    NPT_XmlNode* node;
+    NPT_List<NPT_XmlNode*>::Iterator node;
     if (NPT_SUCCEEDED(m_Children.Find(NPT_XmlTextFinder(), node, n))) {
-        return &node->AsTextNode()->GetString();
+        return &(*node)->AsTextNode()->GetString();
     } else {
         return NULL;
     }
@@ -276,9 +271,9 @@ NPT_XmlElementNode::RelinkNamespaceMaps()
 {
     // update our children so that they can inherit the right
     // namespace map
-    NPT_List<NPT_XmlNode*>::Item* item = m_Children.GetFirstItem();
+    NPT_List<NPT_XmlNode*>::Iterator item = m_Children.GetFirstItem();
     while (item) {
-        NPT_XmlElementNode* element = item->GetData()->AsElementNode();
+        NPT_XmlElementNode* element = (*item)->AsElementNode();
         if (element) {
             if (m_NamespaceMap) {
                 // we have a map, so our children point to us
@@ -289,7 +284,7 @@ NPT_XmlElementNode::RelinkNamespaceMaps()
                 element->SetNamespaceParent(m_NamespaceParent);
             }
         }
-        item = item->GetNext();
+        ++item;
     }
 }
 
@@ -505,23 +500,31 @@ NPT_XmlAccumulator::GetString()
 }
 
 /*----------------------------------------------------------------------
+|       NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap
++---------------------------------------------------------------------*/
+NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap()
+{
+    m_Entries.Apply(NPT_ObjectDeleter<Entry>());
+}
+
+/*----------------------------------------------------------------------
 |       NPT_XmlNamespaceMap::SetNamespaceUri
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlNamespaceMap::SetNamespaceUri(const char* prefix, const char* uri)
 {
-    NPT_List<Entry>::Item* item = m_Entries.GetFirstItem();
+    NPT_List<Entry*>::Iterator item = m_Entries.GetFirstItem();
     while (item) {
-        if (item->GetData().m_Prefix == prefix) {
+        if ((*item)->m_Prefix == prefix) {
             // the prefix is already in the map, update the value
-            item->GetData().m_Uri = uri;
+            (*item)->m_Uri = uri;
             return NPT_SUCCESS;
         }
-        item = item->GetNext();
+        ++item;
     }
 
     // the prefix is not in the map, add it
-    return m_Entries.Add(Entry(prefix, uri));
+    return m_Entries.Add(new Entry(prefix, uri));
 }
 
 /*----------------------------------------------------------------------
@@ -530,13 +533,13 @@ NPT_XmlNamespaceMap::SetNamespaceUri(const char* prefix, const char* uri)
 const NPT_String*
 NPT_XmlNamespaceMap::GetNamespaceUri(const char* prefix)
 {
-    NPT_List<Entry>::Item* item = m_Entries.GetFirstItem();
+    NPT_List<Entry*>::Iterator item = m_Entries.GetFirstItem();
     while (item) {
-        if (item->GetData().m_Prefix == prefix) {
+        if ((*item)->m_Prefix == prefix) {
             // match
-            return &item->GetData().m_Uri;
+            return &(*item)->m_Uri;
         }
-        item = item->GetNext();
+        ++item;
     }
 
     // the prefix is not in the map
@@ -549,13 +552,13 @@ NPT_XmlNamespaceMap::GetNamespaceUri(const char* prefix)
 const NPT_String*
 NPT_XmlNamespaceMap::GetNamespacePrefix(const char* uri)
 {
-    NPT_List<Entry>::Item* item = m_Entries.GetFirstItem();
+    NPT_List<Entry*>::Iterator item = m_Entries.GetFirstItem();
     while (item) {
-        if (item->GetData().m_Uri == uri) {
+        if ((*item)->m_Uri == uri) {
             // match
-            return &item->GetData().m_Prefix;
+            return &(*item)->m_Prefix;
         }
-        item = item->GetNext();
+        ++item;
     }
 
     // the uri is not in the map
@@ -1065,7 +1068,6 @@ NPT_XmlProcessor::ResolveEntity(NPT_XmlAccumulator& source,
 NPT_Result
 NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 {
-    NPT_Result    result;
     unsigned char c;
 
     while (size-- && (c = *buffer++)) {
@@ -1119,8 +1121,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
               case CONTEXT_CLOSE_TAG:
                 if (c == '>') {
-                    result = m_Parser->OnEndElement(m_Name.GetString());
-                    if (NPT_FAILED(result)) return result;
+                    NPT_CHECK(m_Parser->OnEndElement(m_Name.GetString()));
                     m_Text.Reset();
                     SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
                 } else {
@@ -1152,8 +1153,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
                 if (c == '>' || 
                     c == '/' ||
                     NPT_XML_CHAR_IS_WHITESPACE(c)) {
-                    result = m_Parser->OnStartElement(m_Name.GetString());
-                    if (NPT_FAILED(result)) return result;
+                    NPT_CHECK(m_Parser->OnStartElement(m_Name.GetString()));
                     m_Name.Reset();
                     if (c == '>') {
                         SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
@@ -1169,8 +1169,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
               case CONTEXT_CLOSE_TAG:
                 if (c == '>') {
-                    result = m_Parser->OnEndElement(m_Name.GetString());
-                    if (NPT_FAILED(result)) return result;
+                    NPT_CHECK(m_Parser->OnEndElement(m_Name.GetString()));
                     SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
                 } else if (NPT_XML_CHAR_IS_WHITESPACE(c)) {
                     SetState(STATE_IN_WHITESPACE);
@@ -1241,9 +1240,8 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
           case STATE_IN_VALUE:
             if ((c == '"'  && m_Context == CONTEXT_VALUE_DOUBLE_QUOTE) || 
                 (c == '\'' && m_Context == CONTEXT_VALUE_SINGLE_QUOTE)) {
-                result =  m_Parser->OnElementAttribute(m_Name.GetString(),
-                                                       m_Value.GetString());
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(m_Parser->OnElementAttribute(m_Name.GetString(),
+                                                       m_Value.GetString()));
                 SetState(STATE_IN_WHITESPACE, CONTEXT_ATTRIBUTE);
             } else if (c == '&') {
                 m_Entity.Reset();
@@ -1273,8 +1271,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_EMPTY_TAG_END:
             if (c == '>') {
-                result = m_Parser->OnEndElement(NULL);
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(m_Parser->OnEndElement(NULL));
                 m_Text.Reset();
                 SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
             } else {
@@ -1287,8 +1284,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
               case CONTEXT_VALUE_SINGLE_QUOTE:
               case CONTEXT_VALUE_DOUBLE_QUOTE:
                 if (c == ';') {
-                    NPT_Result result = ResolveEntity(m_Entity, m_Value);
-                    if (NPT_FAILED(result)) return result;
+                    NPT_CHECK(ResolveEntity(m_Entity, m_Value));
                     SetState(STATE_IN_VALUE);
                 } else if (NPT_XML_CHAR_IS_ENTITY_REF_CHAR(c)) {
                     m_Entity.Append(c);
@@ -1299,8 +1295,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
               case CONTEXT_NONE:
                 if (c == ';') {
-                    NPT_Result result = ResolveEntity(m_Entity, m_Text);
-                    if (NPT_FAILED(result)) return result;
+                    NPT_CHECK(ResolveEntity(m_Entity, m_Text));
                     SetState(STATE_IN_TEXT);
                 } else if (NPT_XML_CHAR_IS_ENTITY_REF_CHAR(c)) {
                     m_Entity.Append(c);
@@ -1342,9 +1337,8 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_TEXT:
             if (c == '<') {
-                result = m_Parser->OnCharacterData(m_Text.GetString(),
-                                                   m_Text.GetSize());
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(m_Parser->OnCharacterData(m_Text.GetString(),
+                                                    m_Text.GetSize()));
                 m_Text.Reset();
                 SetState(STATE_IN_TAG_START, CONTEXT_NONE);
             } else if (c == '&') {
@@ -1415,9 +1409,8 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_CDATA_END_2:
             if (c == '>') {
-                result = m_Parser->OnCharacterData(m_Text.GetString(),
-                                                   m_Text.GetSize());
-                if (NPT_FAILED(result)) return result;
+                NPT_CHECK(m_Parser->OnCharacterData(m_Text.GetString(),
+                                                    m_Text.GetSize()));
                 m_Text.Reset();
                 SetState(STATE_IN_TEXT, CONTEXT_NONE);
             } else {
@@ -1477,8 +1470,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream, NPT_XmlNode*& node)
 	    result = stream.Read(buffer, sizeof(buffer), &bytes_read);
 	    if (NPT_SUCCEEDED(result)) {
 	        // parse the buffer
-	        result = m_Processor->ProcessBuffer(buffer, bytes_read);
-	        if (NPT_FAILED(result)) return result;
+	        NPT_CHECK(m_Processor->ProcessBuffer(buffer, bytes_read));
 	    } else {
             if (result != NPT_ERROR_EOS) return result;
 	    }
@@ -1507,14 +1499,11 @@ NPT_XmlParser::Parse(const char* xml, NPT_XmlNode*& node)
 NPT_Result
 NPT_XmlParser::Parse(const char* xml, NPT_Size size, NPT_XmlNode*& node)
 { 
-    NPT_Result result;
-
     // if there is a current tree, reset it
     m_Tree = NULL;
 
     // parse the buffer
-    result = m_Processor->ProcessBuffer(xml, size);
-    if (NPT_FAILED(result)) return result;
+    NPT_CHECK(m_Processor->ProcessBuffer(xml, size));
 
     // return a tree if we have one 
     node = m_Tree;
@@ -1563,7 +1552,7 @@ NPT_XmlParser::OnElementAttribute(const char* name, const char* value)
         name[4] == 's' &&
         (name[5] == '\0' || name[5] == ':')) {
         // namespace definition
-        m_CurrentElement->SetNamespaceUri(name+6, value);
+        m_CurrentElement->SetNamespaceUri((name[5] == ':')?name+6:"", value);
     } else {
         m_CurrentElement->AddAttribute(name, value);
     }
@@ -1635,6 +1624,66 @@ NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
 
     return NPT_SUCCESS;
 }
+
+/*----------------------------------------------------------------------
+|       NPT_XmlAttributeWriter
++---------------------------------------------------------------------*/
+class NPT_XmlAttributeWriter
+{
+public:
+    NPT_XmlAttributeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
+    void operator()(NPT_XmlAttribute*& attribute) const {
+        m_Serializer.Attribute(attribute->GetPrefix().GetChars(),
+                               attribute->GetName().GetChars(),
+                               attribute->GetValue().GetChars());
+    }
+
+private:
+    // members
+    NPT_XmlSerializer& m_Serializer;
+};
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeWriter
++---------------------------------------------------------------------*/
+class NPT_XmlNodeWriter
+{
+public:
+    NPT_XmlNodeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
+    void operator()(NPT_XmlNode*& node) const {
+        if (NPT_XmlElementNode* element = node->AsElementNode()) {
+            m_Serializer.StartElement(element->GetPrefix().GetChars(),
+                element->GetTag().GetChars());
+            element->GetAttributes().Apply(NPT_XmlAttributeWriter(m_Serializer));
+
+            // emit namespace attributes
+            if (element->m_NamespaceMap) {
+                NPT_List<NPT_XmlNamespaceMap::Entry*>::Iterator item = 
+                    element->m_NamespaceMap->m_Entries.GetFirstItem();
+                while (item) {
+                    if ((*item)->m_Prefix.IsEmpty()) {
+                        // default namespace
+                        m_Serializer.Attribute(NULL, "xmlns", (*item)->m_Uri);
+                    } else {
+                        // namespace with prefix
+                        m_Serializer.Attribute("xmlns", (*item)->m_Prefix, (*item)->m_Uri);
+                    }
+                    ++item;
+                }
+            }
+
+            element->GetChildren().Apply(NPT_XmlNodeWriter(m_Serializer));
+            m_Serializer.EndElement(element->GetPrefix().GetChars(),
+                element->GetTag().GetChars());
+        } else if (NPT_XmlTextNode* text = node->AsTextNode()) {
+            m_Serializer.Text(text->GetString().GetChars());
+        }
+    }
+
+private:
+    // members
+    NPT_XmlSerializer& m_Serializer;
+};
 
 /*----------------------------------------------------------------------
 |       NPT_XmlSerializer::NPT_XmlSerializer
@@ -1875,59 +1924,8 @@ NPT_XmlSerializer::Comment(const char* comment)
 NPT_Result
 NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
 {
-    class AttributeWriter : public NPT_List<NPT_XmlAttribute>::ItemOperator
-    {
-    public:
-        AttributeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
-        NPT_Result operator()(NPT_XmlAttribute& attribute) const {
-            m_Serializer.Attribute(attribute.GetPrefix().GetChars(),
-                                   attribute.GetName().GetChars(),
-                                   attribute.GetValue().GetChars());
-            return NPT_SUCCESS;
-        }
-        NPT_XmlSerializer& m_Serializer;
-    };
-
-    class NodeWriter : public NPT_List<NPT_XmlNode*>::ItemOperator
-    {
-    public:
-        NodeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
-        NPT_Result operator()(NPT_XmlNode*& node) const {
-            if (NPT_XmlElementNode* element = node->AsElementNode()) {
-                m_Serializer.StartElement(element->GetPrefix().GetChars(),
-                                          element->GetTag().GetChars());
-                element->GetAttributes().Apply(AttributeWriter(m_Serializer));
-
-                // emit namespace attributes
-                NPT_List<NPT_XmlNamespaceMap::Entry>::Item* item = 
-                    element->m_NamespaceMap ?
-                    element->m_NamespaceMap->m_Entries.GetFirstItem() :
-                    NULL;
-                while (item) {
-                    const NPT_XmlNamespaceMap::Entry& entry = item->GetData();
-                    if (entry.m_Prefix.IsEmpty()) {
-                        // default namespace
-                        m_Serializer.Attribute(NULL, "xmlns", entry.m_Uri.GetChars());
-                    } else {
-                        // namespace with prefix
-                        m_Serializer.Attribute("xmlns", entry.m_Prefix.GetChars(), entry.m_Uri.GetChars());
-                    }
-                    item= item->GetNext();
-                }
-
-                element->GetChildren().Apply(NodeWriter(m_Serializer));
-                m_Serializer.EndElement(element->GetPrefix().GetChars(),
-                                        element->GetTag().GetChars());
-            } else if (NPT_XmlTextNode* text = node->AsTextNode()) {
-                m_Serializer.Text(text->GetString().GetChars());
-            }
-            return NPT_SUCCESS;
-        }
-        NPT_XmlSerializer& m_Serializer;
-    };
-
     NPT_XmlSerializer serializer(&output, m_Indentation);
-    NodeWriter node_writer(serializer);
+    NPT_XmlNodeWriter node_writer(serializer);
     NPT_XmlNode* node_pointer = &node;
     node_writer(node_pointer);
 

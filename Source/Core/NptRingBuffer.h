@@ -14,6 +14,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
+#include "NptReferences.h"
 
 /*----------------------------------------------------------------------
 |       NPT_RingBuffer
@@ -23,6 +24,7 @@ class NPT_RingBuffer
  public:
     // methods
                   NPT_RingBuffer(NPT_Size size);
+                  NPT_RingBuffer(void* buffer, NPT_Size size);
     virtual      ~NPT_RingBuffer();
     NPT_Size      GetSpace() const;
     NPT_Size      GetContiguousSpace() const;
@@ -37,8 +39,8 @@ class NPT_RingBuffer
     NPT_Result    Flush();
 
     // accessors
-    unsigned char* GetReadPointer()  { return m_In; }
-    unsigned char* GetWritePointer() { return m_Out;}
+    unsigned char* GetWritePointer()  { return m_In; }
+    unsigned char* GetReadPointer()   { return m_Out;}
 
  private:
     // members
@@ -49,6 +51,9 @@ class NPT_RingBuffer
     unsigned char* m_In;
     unsigned char* m_Out;
     NPT_Size       m_Size;
+    bool           m_BufferIsLocal;
 };
+
+typedef NPT_Reference<NPT_RingBuffer> NPT_RingBufferReference;
 
 #endif // _NPT_RING_BUFFER_H_

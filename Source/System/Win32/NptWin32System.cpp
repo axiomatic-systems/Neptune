@@ -20,46 +20,10 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       globals
-+---------------------------------------------------------------------*/
-NPT_System System;
-
-/*----------------------------------------------------------------------
-|       NPT_Win32System
-+---------------------------------------------------------------------*/
-class NPT_Win32System : public NPT_SystemInterface
-{
-public:
-    // methods
-                NPT_Win32System();
-               ~NPT_Win32System();
-    NPT_Result  GetProcessId(NPT_Integer& id);
-    NPT_Result  GetCurrentTimeStamp(NPT_TimeStamp& now);
-    NPT_Result  Sleep(const NPT_TimeInterval& duration);
-    NPT_Result  SleepUntil(const NPT_TimeStamp& when);
-    NPT_Result  SetRandomSeed(unsigned int seed);
-    NPT_Integer GetRandomInteger();
-};
-
-/*----------------------------------------------------------------------
-|       NPT_Win32System::NPT_Win32System
-+---------------------------------------------------------------------*/
-NPT_Win32System::NPT_Win32System()
-{
-}
-
-/*----------------------------------------------------------------------
-|       NPT_Win32System::~NPT_Win32System
-+---------------------------------------------------------------------*/
-NPT_Win32System::~NPT_Win32System()
-{
-}
-
-/*----------------------------------------------------------------------
-|       NPT_Win32System::GetProcessId
+|       NPT_System::GetProcessId
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32System::GetProcessId(NPT_Integer& id)
+NPT_System::GetProcessId(NPT_Integer& id)
 {
     //id = getpid();
     id = 0;
@@ -67,25 +31,29 @@ NPT_Win32System::GetProcessId(NPT_Integer& id)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32System::GetCurrentTimeStamp
+|       NPT_System::GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32System::GetCurrentTimeStamp(NPT_TimeStamp& now)
+NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 {
     struct _timeb time_stamp;
 
-    _ftime(&time_stamp);
-    now.m_Seconds     = time_stamp.time;
-    now.m_NanoSeconds = time_stamp.millitm*1000000;
+#if (_MSC_VER >= 1400)
+    _ftime_s(&time_stamp);
+#else
+	_ftime(&time_stamp);
+#endif
+    now.m_Seconds     = (long)time_stamp.time;
+    now.m_NanoSeconds = (long)time_stamp.millitm*1000000;
 
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32System::Sleep
+|       NPT_System::Sleep
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32System::Sleep(const NPT_TimeInterval& duration)
+NPT_System::Sleep(const NPT_TimeInterval& duration)
 {
     DWORD milliseconds = 1000*duration.m_Seconds + duration.m_NanoSeconds/1000000;
     ::Sleep(milliseconds);
@@ -94,10 +62,10 @@ NPT_Win32System::Sleep(const NPT_TimeInterval& duration)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32System::SleepUntil
+|       NPT_System::SleepUntil
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32System::SleepUntil(const NPT_TimeStamp& when)
+NPT_System::SleepUntil(const NPT_TimeStamp& when)
 {
     NPT_TimeStamp now;
     GetCurrentTimeStamp(now);
@@ -110,10 +78,10 @@ NPT_Win32System::SleepUntil(const NPT_TimeStamp& when)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32System::SetRandomSeed
+|       NPT_System::SetRandomSeed
 +---------------------------------------------------------------------*/
 NPT_Result  
-NPT_Win32System::SetRandomSeed(unsigned int seed)
+NPT_System::SetRandomSeed(unsigned int seed)
 {
     srand(seed);
     return NPT_SUCCESS;
@@ -123,16 +91,16 @@ NPT_Win32System::SetRandomSeed(unsigned int seed)
 |       NPT_System::NPT_System
 +---------------------------------------------------------------------*/
 NPT_Integer 
-NPT_Win32System::GetRandomInteger()
+NPT_System::GetRandomInteger()
 {
-    return rand();
-}
+    static bool seeded = false;
+    if (seeded == false) {
+        NPT_TimeStamp now;
+        GetCurrentTimeStamp(now);
+        srand(now.m_NanoSeconds);
+        seeded = true;
+    }
 
-/*----------------------------------------------------------------------
-|       NPT_System::NPT_System
-+---------------------------------------------------------------------*/
-NPT_System::NPT_System()
-{
-    m_Delegate = new NPT_Win32System();
+    return rand();
 }
 

@@ -18,9 +18,23 @@
 |       NPT_RingBuffer::NPT_RingBuffer
 +---------------------------------------------------------------------*/
 NPT_RingBuffer::NPT_RingBuffer(NPT_Size size) :
-    m_Size(size)
+    m_Size(size),
+    m_BufferIsLocal(true)
 {
     m_Data.start = new unsigned char[size];
+    m_Data.end   = m_Data.start + size;
+
+    m_In = m_Out = m_Data.start;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_RingBuffer::NPT_RingBuffer
++---------------------------------------------------------------------*/
+NPT_RingBuffer::NPT_RingBuffer(void* buffer, NPT_Size size) :
+    m_Size(size),
+    m_BufferIsLocal(false)
+{
+    m_Data.start = (unsigned char*)buffer;
     m_Data.end   = m_Data.start + size;
 
     m_In = m_Out = m_Data.start;
@@ -31,7 +45,7 @@ NPT_RingBuffer::NPT_RingBuffer(NPT_Size size) :
 +---------------------------------------------------------------------*/
 NPT_RingBuffer::~NPT_RingBuffer()
 {
-    delete[] m_Data.start;
+    if (m_BufferIsLocal) delete[] m_Data.start;
 }
 
 /*----------------------------------------------------------------------
@@ -68,20 +82,20 @@ NPT_RingBuffer::Write(const void* buffer, NPT_Size byte_count)
 {
     if (byte_count == 0) return NPT_SUCCESS;
     if (m_In < m_Out) {
-        if (buffer != NULL) NPT_CopyMemory(m_In, buffer, byte_count);
+        if (buffer) NPT_CopyMemory(m_In, buffer, byte_count);
         m_In += byte_count;
         if (m_In == m_Data.end) m_In = m_Data.start;
     } else {
-        unsigned int chunk = (NPT_Size)(m_Data.end - m_In);
+        unsigned int chunk = (unsigned int)(m_Data.end - m_In);
         if (chunk >= byte_count) chunk = byte_count;
 
-        if (buffer != NULL) NPT_CopyMemory(m_In, buffer, chunk);
+        if (buffer) NPT_CopyMemory(m_In, buffer, chunk);
         m_In += chunk;
         if (m_In == m_Data.end) m_In = m_Data.start;
         if (chunk != byte_count) {
-            if (buffer != NULL) {
+            if (buffer) {
                 NPT_CopyMemory(m_In, 
-                               (const char*)buffer+chunk, 
+                               ((const char*)buffer)+chunk, 
                                byte_count-chunk);
             }
             m_In += byte_count-chunk;
@@ -124,19 +138,19 @@ NPT_RingBuffer::Read(void* buffer, NPT_Size byte_count)
 {
     if (byte_count == 0) return NPT_SUCCESS;
     if (m_In > m_Out) {
-        if (buffer != NULL) NPT_CopyMemory(buffer, m_Out, byte_count);
+        if (buffer) NPT_CopyMemory(buffer, m_Out, byte_count);
         m_Out += byte_count;
         if (m_Out == m_Data.end) m_Out = m_Data.start;
     } else {
-        unsigned int chunk = (NPT_Size)(m_Data.end - m_Out);
+        unsigned int chunk = (unsigned int)(m_Data.end - m_Out);
         if (chunk >= byte_count) chunk = byte_count;
 
-        if (buffer != NULL) NPT_CopyMemory(buffer, m_Out, chunk);
+        if (buffer) NPT_CopyMemory(buffer, m_Out, chunk);
         m_Out += chunk;
         if (m_Out == m_Data.end) m_Out = m_Data.start;
         if (chunk != byte_count) {
-            if (buffer != NULL) {
-                NPT_CopyMemory((char*)buffer+chunk, m_Out, byte_count-chunk);
+            if (buffer) {
+                NPT_CopyMemory(((char*)buffer)+chunk, m_Out, byte_count-chunk);
             }
             m_Out += byte_count-chunk;
             if (m_Out == m_Data.end) m_Out = m_Data.start;

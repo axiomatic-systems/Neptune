@@ -67,15 +67,16 @@ Fail()
 int
 main(int /*argc*/, char** /*argv*/)
 {
+    NPT_Result res;
     NPT_Array<int> a;
-    a.Append(7);
+    a.Add(7);
     NPT_ASSERT(a[0] == 7);
 
     NPT_Array<A> a_array;
-    a_array.Append(A(1,2));
-    a_array.Append(A(3,4));
+    a_array.Add(A(1,2));
+    a_array.Add(A(3,4));
     a_array.Reserve(100);
-    a_array.Append(A(4,5));
+    a_array.Add(A(4,5));
 
     NPT_ASSERT(A_Count == 3);
     NPT_Array<A> b_array = a_array;
@@ -97,6 +98,7 @@ main(int /*argc*/, char** /*argv*/)
     
     a_array.Resize(6, A(9,10));
     NPT_ASSERT(A_Count == 11);
+    NPT_ASSERT(a_array.GetItemCount() == 6);
     NPT_ASSERT(a_array[5] == A(9,10));
 
     for (NPT_Ordinal i=0; i<a_array.GetItemCount(); i++) {
@@ -106,10 +108,47 @@ main(int /*argc*/, char** /*argv*/)
         b_array[i].Check();
     }
 
+    res = a_array.Erase(6);
+    NPT_ASSERT(res != NPT_SUCCESS);
+    a_array.Erase(2);
+    NPT_ASSERT(a_array.GetItemCount() == 5);
+    NPT_ASSERT(A_Count == 10);
+    NPT_ASSERT(a_array[4] == A(9,10));
+
+    a_array.Insert(1, A(3, 110), 1);
+    NPT_ASSERT(a_array.GetItemCount() == 6);
+    NPT_ASSERT(A_Count == 11);
+    NPT_ASSERT(a_array[1] == A(3,110));
+    NPT_ASSERT(a_array[5] == A(9,10));
+
+    a_array.Erase(1, 3);
+    NPT_ASSERT(a_array.GetItemCount() == 3);
+    NPT_ASSERT(A_Count == 8);
+    NPT_ASSERT(a_array[2] == A(9,10));
+
+    a_array.Insert(0, A(34, 0), 4);
+    NPT_ASSERT(a_array.GetItemCount() == 7);
+    NPT_ASSERT(A_Count == 12);
+    NPT_ASSERT(a_array[6] == A(9,10));
+
+    a_array.Insert(5, A(116, 'e'), 200);
+    NPT_ASSERT(a_array.GetItemCount() == 207);
+    NPT_ASSERT(a_array[206] == A(9,10));
+
+	a_array.Clear();
+	a_array.Insert(0, A(1, 'c'));
+	NPT_ASSERT(a_array.GetItemCount() == 1);
+	NPT_ASSERT(a_array[0] == A(1,'c'));
+	
+	a_array.Insert(1, A(2, 'd'));
+	NPT_ASSERT(a_array.GetItemCount() == 2);
+	NPT_ASSERT(a_array[0] == A(1,'c'));
+	NPT_ASSERT(a_array[1] == A(2,'d'));
+
     NPT_Array<int>* int_array = new NPT_Array<int>(100);
     NPT_ASSERT(int_array->GetItemCount() == 0);
-    int_array->Append(1);
-    int_array->Append(2);
+    int_array->Add(1);
+    int_array->Add(2);
     NPT_ASSERT(int_array->GetItemCount() == 2);
     NPT_ASSERT((*int_array)[0] == 1);
     NPT_ASSERT((*int_array)[1] == 2);
@@ -117,4 +156,20 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(int_array->GetItemCount() == 0);
     delete int_array;
 
+    NPT_Array<A*> c_array;
+    A* o = new A(3, 2);
+    c_array.Add(o);
+    NPT_ASSERT(c_array.GetItemCount() == 1);
+    for (int i=0; i<4; i++) {
+        c_array.Insert(0, new A(55, 'a'));
+    }
+
+    NPT_Ordinal pos;
+    NPT_ASSERT(c_array.Find(NPT_ObjectComparator<A*>(o), pos) == NPT_SUCCESS);
+    NPT_ASSERT(pos == 4);
+    c_array.Erase(pos);
+    delete o;
+    NPT_ASSERT(c_array.GetItemCount() == 4);
+
+    c_array.Apply(NPT_ObjectDeleter<A>());
 }

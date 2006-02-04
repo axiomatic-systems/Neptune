@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Byte Streams
+|   Neptune - Byte Streams
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_STREAMS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|    includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptReferences.h"
@@ -20,19 +20,19 @@
 #include "NptDataBuffer.h"
 
 /*----------------------------------------------------------------------
-|       class references
+|    class references
 +---------------------------------------------------------------------*/
 class NPT_String;
 
 /*----------------------------------------------------------------------
-|       constants
+|    constants
 +---------------------------------------------------------------------*/
 const int NPT_ERROR_READ_FAILED  = NPT_ERROR_BASE_IO - 0;
 const int NPT_ERROR_WRITE_FAILED = NPT_ERROR_BASE_IO - 1;
 const int NPT_ERROR_EOS          = NPT_ERROR_BASE_IO - 2;
 
 /*----------------------------------------------------------------------
-|       NPT_InputStream
+|    NPT_InputStream
 +---------------------------------------------------------------------*/
 class NPT_InputStream
 {
@@ -53,7 +53,7 @@ class NPT_InputStream
 typedef NPT_Reference<NPT_InputStream> NPT_InputStreamReference;
 
 /*----------------------------------------------------------------------
-|       NPT_OutputStream
+|    NPT_OutputStream
 +---------------------------------------------------------------------*/
 class NPT_OutputStream
 {
@@ -75,7 +75,7 @@ public:
 typedef NPT_Reference<NPT_OutputStream> NPT_OutputStreamReference;
 
 /*----------------------------------------------------------------------
-|       NPT_DelegatingInputStream
+|    NPT_DelegatingInputStream
 |
 |    Use this class as a base class if you need to inherit both from
 |    NPT_InputStream and NPT_OutputStream which share the Seek and Tell
@@ -101,7 +101,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_DelegatingOutputStream
+|    NPT_DelegatingOutputStream
 |
 |    Use this class as a base class if you need to inherit both from
 |    NPT_InputStream and NPT_OutputStream which share the Seek and Tell
@@ -127,7 +127,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream
+|    NPT_MemoryStream
 +---------------------------------------------------------------------*/
 class NPT_MemoryStream : 
     public NPT_DelegatingInputStream,
@@ -137,6 +137,7 @@ public:
     // constructor and destructor
     NPT_MemoryStream();
     NPT_MemoryStream(void* data, NPT_Size size);
+    virtual ~NPT_MemoryStream() {}
 
     // NPT_InputStream methods
     NPT_Result Read(void*     buffer, 
@@ -178,11 +179,13 @@ private:
         return NPT_SUCCESS;
     }
 
+protected:
     // members
     NPT_DataBuffer m_Buffer;
-    NPT_Offset     m_WriteOffset;
     NPT_Offset     m_ReadOffset;
+    NPT_Offset     m_WriteOffset;
 };
 
+typedef NPT_Reference<NPT_MemoryStream> NPT_MemoryStreamReference;
 
 #endif // _NPT_STREAMS_H_

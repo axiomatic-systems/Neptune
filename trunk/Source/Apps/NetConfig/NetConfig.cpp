@@ -85,41 +85,39 @@ main(int argc, char**)
         printf("GetNetworkInterfaces() failed\n");
         return 0;
     }
-    NPT_List<NPT_NetworkInterface*>::Item* item = interfaces.GetFirstItem();
+    NPT_List<NPT_NetworkInterface*>::Iterator iface = interfaces.GetFirstItem();
     unsigned int index = 0;
-    while (item != NULL) {
-        NPT_NetworkInterface* iface = item->GetData();
+    while (iface) {
         printf("Interface %d:\n", index);
-        printf("  name  = %s\n", iface->GetName().GetChars());
-        printf("  flags = %x [ ", iface->GetFlags());
-        PrintFlags(iface->GetFlags());
+        printf("  name  = %s\n", (*iface)->GetName().GetChars());
+        printf("  flags = %x [ ", (*iface)->GetFlags());
+        PrintFlags((*iface)->GetFlags());
         printf("]\n");
-        printf("  mac   = %s\n", iface->GetMacAddress().ToString().GetChars());
+        printf("  mac   = %s\n", (*iface)->GetMacAddress().ToString().GetChars());
         
         // print all addresses
-        NPT_List<NPT_NetworkInterfaceAddress>::Item* addritem = 
-            iface->GetAddresses().GetFirstItem();
+        NPT_List<NPT_NetworkInterfaceAddress>::Iterator nwifaddr = 
+            (*iface)->GetAddresses().GetFirstItem();
         unsigned int addr_index = 0;
-        while (addritem != NULL) {
-            NPT_NetworkInterfaceAddress& nwifaddr = addritem->GetData();
+        while (nwifaddr) {
             printf("  address %d:\n", addr_index);
             printf("    primary address     = ");
-            printf("%s\n", nwifaddr.GetPrimaryAddress().ToString().GetChars());
-            if (iface->GetFlags() & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
+            printf("%s\n", nwifaddr->GetPrimaryAddress().ToString().GetChars());
+            if ((*iface)->GetFlags() & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
                 printf("    broadcast address   = ");
-                printf("%s\n", nwifaddr.GetBroadcastAddress().ToString().GetChars());
+                printf("%s\n", nwifaddr->GetBroadcastAddress().ToString().GetChars());
             }
-            if (iface->GetFlags() & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
+            if ((*iface)->GetFlags() & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
                 printf("    destination address = ");
-                printf("%s\n", nwifaddr.GetDestinationAddress().ToString().GetChars());
+                printf("%s\n", nwifaddr->GetDestinationAddress().ToString().GetChars());
             }
             printf("    netmask             = ");
-            printf("%s\n", nwifaddr.GetNetMask().ToString().GetChars());
-            addritem = addritem->GetNext();
+            printf("%s\n", nwifaddr->GetNetMask().ToString().GetChars());
+            ++nwifaddr;
         }
         
-        item = item->GetNext();
-        index++;
+        ++iface;
+        ++index;
     }
     
     return 0;

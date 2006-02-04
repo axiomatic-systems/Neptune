@@ -84,15 +84,17 @@ NPT_IpAddress::AsLong() const
 NPT_String
 NPT_IpAddress::ToString() const
 {
-    char repr[64];
-    NPT_FormatString(repr, sizeof(repr), 
-                     "%d.%d.%d.%d",
-                     m_Address[0],
-                     m_Address[1],
-                     m_Address[2],
-                     m_Address[3]);
+    NPT_String address;
+    address.Reserve(16);
+    address += NPT_String::FromInteger(m_Address[0]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[0]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[0]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[0]);
 
-    return NPT_String(repr);
+    return address;
 }
 
 /*----------------------------------------------------------------------

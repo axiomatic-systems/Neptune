@@ -203,8 +203,7 @@ NPT_BufferedInputStream::ReadLine(NPT_String& line,
 
     // read the line
     NPT_Size chars_read = 0;
-    NPT_Result result = ReadLine(line.UseChars(), max_chars, &chars_read);
-    if (NPT_FAILED(result)) return result;
+    NPT_CHECK(ReadLine(line.UseChars(), max_chars, &chars_read));
 
     // adjust the length of the string object
     line.SetLength(chars_read);

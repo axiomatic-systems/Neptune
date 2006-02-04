@@ -38,11 +38,13 @@
 #include "NptXml.h"
 #include "NptStrings.h"
 #include "NptArray.h"
+#include "NptList.h"
 #include "NptUri.h"
 #include "NptHttp.h"
 #include "NptDataBuffer.h"
 #include "NptUtils.h"
 #include "NptRingBuffer.h"
+#include "NptBase64.h"
 #include "NptVersion.h"
 
 

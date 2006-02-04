@@ -292,8 +292,17 @@ NPT_String::Append(const char* str, NPT_Size length)
 int 
 NPT_String::Compare(const char *s, bool ignore_case) const
 {
-    const char *r1 = GetChars();
-    const char *r2 = s;
+    return NPT_String::Compare(GetChars(), s, ignore_case);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::Compare
++---------------------------------------------------------------------*/
+int 
+NPT_String::Compare(const char *s1, const char *s2, bool ignore_case)
+{
+    const char *r1 = s1;
+    const char *r2 = s2;
 
     if (ignore_case) {
         while (NPT_Uppercase(*r1) == NPT_Uppercase(*r2)) {
@@ -320,19 +329,28 @@ NPT_String::Compare(const char *s, bool ignore_case) const
 int 
 NPT_String::CompareN(const char *s, NPT_Size count, bool ignore_case) const
 {
-    const char* me = GetChars();
+    return NPT_String::CompareN(GetChars(), s, count, ignore_case);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::CompareN
++---------------------------------------------------------------------*/
+int 
+NPT_String::CompareN(const char* s1, const char *s2, NPT_Size count, bool ignore_case)
+{
+    const char* me = s1;
 
     if (ignore_case) {
         for (unsigned int i=0; i<count; i++) {
-            if (NPT_Uppercase(me[i]) != NPT_Uppercase(s[i])) {
-                return NPT_Uppercase(me[i]) - NPT_Uppercase(s[i]);
+            if (NPT_Uppercase(me[i]) != NPT_Uppercase(s2[i])) {
+                return NPT_Uppercase(me[i]) - NPT_Uppercase(s2[i]);
             }
         }
         return 0;
     } else {
         for (unsigned int i=0; i<count; i++) {
-            if (me[i] != s[i]) {
-                return (me[i] - s[i]);
+            if (me[i] != s2[i]) {
+                return (me[i] - s2[i]);
             }
         }
         return 0;
@@ -499,15 +517,13 @@ NPT_String::ReverseFind(char c, NPT_Ordinal start, bool ignore_case) const
     const char* src = GetChars();
     if (ignore_case) {
         for (;i>=0;i--) {
-            if (NPT_Uppercase(src[i]) == NPT_Uppercase(src[i])) {
+            if (NPT_Uppercase(src[i]) == NPT_Uppercase(c)) {
                 return i;
             }
         }
     } else {
         for (;i>=0;i--) {
-            if (src[i] == src[i]) {
-                return i;
-            }
+            if (src[i] == c) return i;
         }
     }
 
@@ -630,6 +646,26 @@ NPT_String::Insert(const char* str, NPT_Ordinal where)
     // use the new string
     if (m_Chars) delete GetBuffer();
     m_Chars = nst;
+}
+
+/*----------------------------------------------------------------------
+|    NPT_String::ToInteger
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_String::ToInteger(unsigned long& value, bool relaxed) const
+{
+    long tmp;
+    NPT_Result res = ToInteger(tmp, relaxed);
+    if (NPT_FAILED(res)) {
+        return res;
+    }
+
+    if (tmp < 0) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    value = (unsigned long)tmp;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -822,3 +858,4 @@ operator+(const char* s1, const NPT_String& s2)
     
     return result;
 }
+

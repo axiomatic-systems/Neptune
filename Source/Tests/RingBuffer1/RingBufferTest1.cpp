@@ -31,8 +31,7 @@ ReadChunk(NPT_RingBuffer& buffer)
 
     // read a chunk
     unsigned char bytes[BUFFER_SIZE];
-    NPT_Result result = buffer.Read(bytes, chunk);
-    if (NPT_FAILED(result)) return result;
+    NPT_CHECK(buffer.Read(bytes, chunk));
 
     // check values
     for (unsigned int i=0; i<chunk; i++) {
@@ -69,8 +68,7 @@ WriteChunk(NPT_RingBuffer& buffer)
     }
 
     // write chunk
-    NPT_Result result = buffer.Write(bytes, chunk);
-    if (NPT_FAILED(result)) return result;
+    NPT_CHECK(buffer.Write(bytes, chunk));
     total_written += chunk;
 
     return NPT_SUCCESS;

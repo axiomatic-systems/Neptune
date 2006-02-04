@@ -17,6 +17,11 @@
 #include "NptTypes.h"
 
 /*----------------------------------------------------------------------
+|       macros
++---------------------------------------------------------------------*/
+#define NPT_ARRAY_SIZE(_a) (sizeof(_a)/sizeof((_a)[0]))
+
+/*----------------------------------------------------------------------
 |       byte I/O
 +---------------------------------------------------------------------*/
 extern void NPT_BytesFromInt32Be(unsigned char* buffer, unsigned long value);
@@ -30,6 +35,7 @@ extern unsigned long NPT_BytesToInt32Le(const unsigned char* buffer);
 extern unsigned short NPT_BytesToInt16Le(const unsigned char* buffer);
 
 extern void NPT_ByteToHex(NPT_Byte b, char* buffer);
+extern void NPT_HexToByte(const char* buffer, NPT_Byte& b);
 
 /*----------------------------------------------------------------------
 |    conversion utilities

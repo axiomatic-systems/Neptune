@@ -30,8 +30,8 @@ class NPT_SimpleMessageQueue : public NPT_MessageQueue
 {
  public:
     // members
-    ~NPT_SimpleMessageQueue();
-     NPT_SimpleMessageQueue();
+    NPT_SimpleMessageQueue();
+    virtual ~NPT_SimpleMessageQueue();
 
     // NPT_MessageQueue methods
     virtual NPT_Result QueueMessage(NPT_Message*        message, 

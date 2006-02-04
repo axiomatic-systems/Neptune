@@ -45,12 +45,12 @@ ShowResponse(NPT_HttpResponse* response)
 
     // show headers
     NPT_HttpHeaders& headers = response->GetHeaders();
-    NPT_List<NPT_HttpHeader>::Item* header = headers.GetHeaders().GetFirstItem();
+    NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
     while (header) {
         NPT_Debug("%s: %s\n", 
-            header->GetData().GetName(),
-            header->GetData().GetValue());
-        header = header->GetNext();
+            (*header)->GetName(),
+            (*header)->GetValue());
+        ++header;
     }
 
     // show entity
@@ -63,7 +63,7 @@ ShowResponse(NPT_HttpResponse* response)
     }
 
     // dump the body
-    NPT_BufferedInputStreamReference stream;
+    NPT_InputStreamReference stream;
     entity->GetInputStream(stream);
     NPT_OutputStreamReference output;
     NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
@@ -117,12 +117,14 @@ main(int argc, char** argv)
 #endif 
 
     // check args
+#if 0
     if (argc != 2) {
         NPT_Debug("HttpClient: missing URL argument\n");
         return -1;
     }
+#endif
 
-#if 0
+#if 1
     // test URL parsing
     TestUrlParser(NULL);
     TestUrlParser("");

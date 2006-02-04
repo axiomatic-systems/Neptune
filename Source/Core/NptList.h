@@ -16,6 +16,7 @@
 #include "NptResults.h"
 #include "NptTypes.h"
 #include "NptConstants.h"
+#include "NptCommon.h"
 
 /*----------------------------------------------------------------------
 |       constants
@@ -29,91 +30,134 @@ const int NPT_ERROR_LIST_OPERATION_ABORTED = NPT_ERROR_BASE_LIST - 1;
 template <typename T> 
 class NPT_List 
 {
+private:
+    class Item;
+
 public:
-    // types
-    class Item 
-    {
-     public:
-        // types
-        class Operator 
-        {
-        public:
-            // methods
-            virtual NPT_Result operator()(T& data) const = 0;
-        };
+    class Iterator {
+    public:
+        Iterator() : m_Item(NULL) {}
+        explicit Iterator(Item* item) : m_Item(item) {}
+        Iterator(const Iterator& copy) : m_Item(copy.m_Item) {}
+        T&  operator*()  const { return m_Item->m_Data; }
+        T*  operator->() const { return &m_Item->m_Data;}
+        Iterator& operator++()  { // prefix
+            m_Item = m_Item->m_Next;
+            return (*this); 
+        }
+        Iterator operator++(int) { // postfix
+            Iterator saved_this = *this;
+            m_Item = m_Item->m_Next;
+            return saved_this;
+        }
+        Iterator& operator--() { // prefix
+            m_Item = m_Item->m_Prev;
+            return (*this); 
+        }
+        Iterator operator--(int) { // postfix
+            Iterator saved_this = *this;
+            m_Item = m_Item->m_Prev;
+            return saved_this;
+        }
+        operator bool() const {
+            return m_Item != NULL;
+        }
+        bool operator==(const Iterator& other) const {
+            return m_Item == other.m_Item;
+        }
+        bool operator!=(const Iterator& other) const {
+            return m_Item != other.m_Item;
+        }
+		void operator=(const Iterator& other) {
+			m_Item = other.m_Item;
+		}
+		void operator=(Item* item) {
+			m_Item = item;
+		}
 
-        class Finder 
-        {
-        public:
-            // methods
-            virtual NPT_Result operator()(const T& data) const = 0;
-        };
+    private:
+        Item* m_Item;
 
-        // methods
-        Item(const T& data) : m_Data(data), m_Next(0), m_Prev(0) {}
-       ~Item() {}
-        T&    operator()()    { return m_Data; }
-        T&    GetData()       { return m_Data; }
-        Item* GetNext() const { return m_Next; }
-        Item* GetPrev() const { return m_Prev; }
-    
-     private:
-        // members
-        T     m_Data;
-        Item* m_Next;
-        Item* m_Prev;
-        
-        // friends
-        friend class NPT_List<T>;
+		// friends
+		friend class NPT_List<T>;
     };
 
-    // convenience typdefs to help compilers who do not handle
-    // the syntax NPT_List<T>::Item::Operator directly
-    typedef typename Item::Operator ItemOperator;
-    typedef typename Item::Finder   ItemFinder;
-
     // methods
-                 NPT_List();
-                 NPT_List(const NPT_List<T>& list);
-                ~NPT_List();
+                 NPT_List<T>();
+                 NPT_List<T>(const NPT_List<T>& list);
+                ~NPT_List<T>();
     NPT_Result   Add(const T& data);
-    NPT_Result   Add(Item& item);
-    NPT_Result   Insert(Item* where, const T&data);
-    NPT_Result   Insert(Item* where, Item& item);
-    NPT_Result   Remove(T& data);
-    NPT_Result   Remove(Item& item);
-    NPT_Result   Detach(Item& item);
+    NPT_Result   Insert(Iterator where, const T& data);
+    NPT_Result   Remove(const T& data, bool all=false);
+    NPT_Result   Erase(Iterator position);
+    NPT_Result   PopHead(T& data);
+    bool         Contains(const T& data) const;
+    NPT_Result   Clear();
     NPT_Result   Get(NPT_Ordinal index, T& data) const;
     NPT_Result   Get(NPT_Ordinal index, T*& data) const;
-    NPT_Result   PopHead(T& data);
-    NPT_Result   Apply(const ItemOperator& op) const;
-    NPT_Result   ApplyUntilFailure(const ItemOperator& op) const;
-    NPT_Result   ApplyUntilSuccess(const ItemOperator& op) const;
-    NPT_Result   ReverseApply(const ItemOperator& op) const;
-    bool         Contains(const T& data) const;
-    NPT_Result   Find(const ItemFinder& finder, 
-                      T*& data, NPT_Ordinal index = 0) const;
-    NPT_Result   Find(const ItemFinder& finder, 
-                      T& data, NPT_Ordinal index = 0) const;
-    NPT_Result   Find(const ItemFinder& finder, 
-                      Item*& item, NPT_Ordinal index = 0) const;
-    NPT_Result   ReverseFind(const ItemFinder& finder, 
-                             T& data, NPT_Ordinal index = 0) const;
-    NPT_Result   ReverseFind(const ItemFinder& finder, 
-                             T*& data, NPT_Ordinal index = 0) const;
-    NPT_Result   ReverseFind(ItemFinder& finder, 
-                             Item*& item, 
-                             NPT_Ordinal index = 0) const;
-    NPT_Result   Empty();
-    NPT_Result   DeleteReferences();
     NPT_Cardinal GetItemCount() const { return m_ItemCount; }
-    Item*        GetFirstItem() const { return m_Head; }
-    Item*        GetLastItem() const  { return m_Tail; }
- 
+    Iterator     GetFirstItem() const { return Iterator(m_Head); }
+    Iterator     GetLastItem() const  { return Iterator(m_Tail); }
+    Iterator     GetItem(NPT_Ordinal index) const;
+
+    // item manipulation
+    NPT_Result   Add(Item& item);
+    NPT_Result   Detach(Item& item);
+    NPT_Result   Insert(Iterator where, Item& item);
+
+    // list operations
+	// keep these template members defined here because MSV6 does not let
+	// us define them later
+    template <typename X> 
+	NPT_Result Apply(const X& function) const
+	{                          
+		Item* item = m_Head;
+		while (item) {
+			function(item->m_Data);
+			item = item->m_Next;
+		}
+
+		return NPT_SUCCESS;
+	}
+
+    template <typename X> 
+	NPT_Result Find(const X& predicate, Iterator& i, NPT_Ordinal n=0) const
+	{
+		Item* item = m_Head;
+		while (item) {
+			if (predicate(item->m_Data)) {
+				if (n == 0) {
+					i = Iterator(item);
+					return NPT_SUCCESS;
+				}
+				--n;
+			}
+			item = item->m_Next;
+		}
+
+		return NPT_ERROR_NO_SUCH_ITEM;
+	}
+
     // operators
     void operator=(const NPT_List<T>& list);
 
 private:
+    // types
+    class Item 
+    {
+        // methods
+        Item(const T& data) : m_Next(0), m_Prev(0), m_Data(data) {}
+
+        // members
+        Item* m_Next;
+        Item* m_Prev;
+        T     m_Data;
+
+        // friends
+        friend class NPT_List<T>;
+        friend class NPT_List<T>::Iterator;
+    };
+
     // members
     NPT_Cardinal m_ItemCount;
     Item*        m_Head;
@@ -134,7 +178,7 @@ NPT_List<T>::NPT_List() : m_ItemCount(0), m_Head(0), m_Tail(0)
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
-NPT_List<T>::NPT_List(const NPT_List<T>& list)
+NPT_List<T>::NPT_List(const NPT_List<T>& list) : m_ItemCount(0), m_Head(0), m_Tail(0) 
 {
     *this = list;
 }
@@ -144,9 +188,9 @@ NPT_List<T>::NPT_List(const NPT_List<T>& list)
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
-NPT_List<T>::~NPT_List<T>()
+NPT_List<T>::~NPT_List()
 {
-    Empty();
+    Clear();
 }
  
 /*----------------------------------------------------------------------
@@ -157,50 +201,27 @@ void
 NPT_List<T>::operator=(const NPT_List<T>& list)
 {
     // cleanup
-    Empty();
+    Clear();
 
     // copy the new list
-    Item* item = list.GetFirstItem();
+    Item* item = list.m_Head;
     while (item) {
-        Add(item->GetData());
-        item = item->GetNext();
+        Add(item->m_Data);
+        item = item->m_Next;
     }
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Empty
+|       NPT_List<T>::Clear
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_List<T>::Empty()
+NPT_List<T>::Clear()
 {
     // delete all items
     Item* item = m_Head;
     while (item) {
         Item* next = item->m_Next;
-        delete item;
-        item = next;
-    }
-
-    m_ItemCount = 0;
-    m_Head      = NULL;
-    m_Tail      = NULL;
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::DeleteReferences
-+---------------------------------------------------------------------*/
-template <typename T> 
-NPT_Result
-NPT_List<T>::DeleteReferences()
-{
-    Item* item = m_Head;
-
-    while (item) {
-        Item* next = item->m_Next;
-        delete item->m_Data;
         delete item;
         item = next;
     }
@@ -250,13 +271,31 @@ NPT_List<T>::Add(const T& data)
 }
 
 /*----------------------------------------------------------------------
+|       NPT_List<T>::GetItem
++---------------------------------------------------------------------*/
+template <typename T>
+typename NPT_List<T>::Iterator
+NPT_List<T>::GetItem(NPT_Ordinal n) const
+{
+	Iterator result;
+	if (n >= m_ItemCount) return result;
+	
+	result = m_Head;
+	for (unsigned int i=0; i<n; i++) {
+		++result;
+	}
+
+	return result;
+}
+
+/*----------------------------------------------------------------------
 |       NPT_List<T>::Insert
 +---------------------------------------------------------------------*/
 template <typename T>
 inline NPT_Result
-NPT_List<T>::Insert(Item* where, const T& data)
+NPT_List<T>::Insert(Iterator where, const T&data)
 {
-    return Insert(where, new Item(data));
+    return Insert(where, *new Item(data));
 }
 
 /*----------------------------------------------------------------------
@@ -264,58 +303,44 @@ NPT_List<T>::Insert(Item* where, const T& data)
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_List<T>::Insert(Item* where, Item& item)
+NPT_List<T>::Insert(Iterator where, Item& item)
 {
     // insert the item in the list
-    if (where == NULL) {
-        // insert as the head
-        if (m_Head) {
-            // replace the current head
-            item->m_Prev = NULL;
-            item->m_Next = m_Head;
-            m_Head->m_Prev = item;
-            m_Head = item;
+    Item* position = where.m_Item;
+    if (position) {
+        // insert at position
+        item.m_Next = position;
+        item.m_Prev = position->m_Prev;
+        position->m_Prev = &item;
+        if (item.m_Prev) {
+            item.m_Prev->m_Next = &item;
         } else {
-            // this item becomes the head and tail
-            m_Head = item;
-            m_Tail = item;
-            item->m_Next = NULL;
-            item->m_Prev = NULL;
+            // this is the new head
+            m_Head = &item;
         }
-    } else {
-        // insert after the 'where' item
-        if (where == m_Tail) {
-            // add the item at the end
-            return Add(item);
-        } else {
-            // update the links
-            item->m_Prev = where;
-            item->m_Next = where->m_Next;
-            where->m_Next->m_Prev = item;
-            where->m_Next = item;
-        }
-    }
 
-    // one more item in the list now
-    ++m_ItemCount;
+        // one more item in the list now
+        ++m_ItemCount;
+    } else {
+        // insert at tail
+        return Add(item);
+    }
  
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Remove
+|       NPT_List<T>::Erase
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_List<T>::Remove(Item& item)
+NPT_List<T>::Erase(Iterator position) 
 {
-    // detach the item
-    NPT_RETURN_IF_FAILED(Detach(item));
+	if (!position) return NPT_ERROR_NO_SUCH_ITEM;
+	Detach(*position.m_Item);
+	delete position.m_Item;
 
-    // delete the item
-    delete item;
-
-    return NPT_SUCCESS;
+	return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -323,19 +348,28 @@ NPT_List<T>::Remove(Item& item)
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_List<T>::Remove(T& data)
+NPT_List<T>::Remove(const T& data, bool all)
 {
     Item* item = m_Head;
+    NPT_Cardinal matches = 0;
 
     while (item) {
         if (item->m_Data == data) {
-            // remove item
-            return Remove(item);
+            // we found a match
+            ++matches;
+
+            // detach item
+            Detach(*item);
+            
+            // destroy the item
+            delete item;
+
+            if (!all) return 1;
         }
         item = item->m_Next;
     }
  
-    return NPT_ERROR_NO_SUCH_ITEM;
+    return matches?matches:NPT_ERROR_NO_SUCH_ITEM;
 }
 
 /*----------------------------------------------------------------------
@@ -382,15 +416,10 @@ template <typename T>
 NPT_Result
 NPT_List<T>::Get(NPT_Ordinal index, T& data) const
 {
-    Item* item = m_Head;
-
-    if (index < m_ItemCount) {
-        while (index--) item = item->m_Next;
-        data = item->m_Data;
-        return NPT_SUCCESS;
-    } else {
-        return NPT_ERROR_NO_SUCH_ITEM;
-    }
+    T* data_pointer;
+    NPT_CHECK(Get(index, data_pointer));
+    data = *data_pointer;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -440,200 +469,5 @@ NPT_List<T>::PopHead(T& data)
 
     return NPT_SUCCESS;
 }
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::Apply
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::Apply(const ItemOperator& op) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        op(item->m_Data);
-        item = item->m_Next;
-    }
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::ApplyUntilFailure
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::ApplyUntilFailure(const ItemOperator& op) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        NPT_RETURN_IF_FAILED(op(item->m_Data));
-        item = item->m_Next;
-    }
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::ApplyUntilSuccess
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::ApplyUntilSuccess(const ItemOperator& op) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        NPT_Result result;
-        result = op(item->m_Data);
-        if (NPT_SUCCEEDED(result)) return NPT_SUCCESS;
-        item = item->m_Next;
-    }
-
-    return NPT_FAILURE;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::ReverseApply
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::ReverseApply(const ItemOperator& op) const
-{
-    Item* item = m_Tail;
- 
-    while (item) {
-        if (NPT_FAILED(op(item->m_Data))) {
-            return NPT_ERROR_LIST_OPERATION_ABORTED;
-        }
-        item = item->m_Prev;
-    }
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::Contains
-+---------------------------------------------------------------------*/
-template <typename T>
-bool
-NPT_List<T>::Contains(const T& data) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        if (item->m_Data == data) {
-            return true;
-        }
-        item = item->m_Next;
-    }
-
-    return false;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::Find
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::Find(const ItemFinder& finder, 
-                  T&                data, 
-                  NPT_Ordinal       index) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        if (NPT_SUCCEEDED(finder(item->m_Data)) && index-- == 0) {
-            data = item->m_Data;
-            return NPT_SUCCESS;
-        }
-        item = item->m_Next;
-    }
-
-    return NPT_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::Find
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::Find(const ItemFinder& finder, 
-                  T*&               data,
-                  NPT_Ordinal       index) const
-{
-    Item* item = m_Head;
- 
-    while (item) {
-        if (NPT_SUCCEEDED(finder(item->m_Data)) && index-- == 0) {
-            data = &item->m_Data;
-            return NPT_SUCCESS;
-        }
-        item = item->m_Next;
-    }
-
-    data = NULL;
-    return NPT_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::ReverseFind
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::ReverseFind(const ItemFinder& finder, 
-                         T&                data,
-                         NPT_Ordinal       index) const
-{
-    Item* item = m_Tail;
- 
-    while (item) {
-        if (NPT_SUCCEEDED(finder(item->m_Data)) && index-- == 0) {
-            data = item->m_Data;
-            return NPT_SUCCESS;
-        }
-        item = item->m_Prev;
-    }
-
-    return NPT_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_List<T>::ReverseFind
-+---------------------------------------------------------------------*/
-template <typename T>
-NPT_Result
-NPT_List<T>::ReverseFind(const ItemFinder& finder, 
-                         T*&               data,
-                         NPT_Ordinal       index) const
-{
-    Item* item = m_Tail;
- 
-    while (item) {
-        if (NPT_SUCCEEDED(finder(item->m_Data)) && index-- == 0) {
-            data = &item->m_Data;
-            return NPT_SUCCESS;
-        }
-        item = item->m_Prev;
-    }
-
-    data = NULL;
-    return NPT_ERROR_NO_SUCH_ITEM;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_ObjectDeleter
-+---------------------------------------------------------------------*/
-template <class T> 
-class NPT_ObjectDeleter : public NPT_List<T*>::ItemOperator 
-{
-public:
-    // methods
-    NPT_Result operator()(T*& data) const {
-        delete data;
-        return NPT_SUCCESS;
-    }
-};
 
 #endif // _NPT_LIST_H_

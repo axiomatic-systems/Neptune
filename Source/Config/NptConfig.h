@@ -1,11 +1,11 @@
 /*****************************************************************
 |
-|      File: NptConfig.h
+|   File: NptConfig.h
 |
-|      Neptune - Configuration
+|   Neptune - Configuration
 |
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -13,7 +13,7 @@
 #define _NPT_CONFIG_H_
 
 /*----------------------------------------------------------------------
-|    defaults
+|   defaults
 +---------------------------------------------------------------------*/
 #define NPT_CONFIG_HAVE_ASSERT_H
 #define NPT_CONFIG_HAVE_STD_C
@@ -22,7 +22,7 @@
 #define NPT_CONFIG_HAVE_STRING_H
 
 /*----------------------------------------------------------------------
-|    standard C runtime
+|   standard C runtime
 +---------------------------------------------------------------------*/
 #if defined(NPT_CONFIG_HAVE_STD_C)
 #define NPT_CONFIG_HAVE_MALLOC
@@ -50,12 +50,12 @@
 #endif /* NPT_CONFIG_HAVE_STDIO_H */
 
 /*----------------------------------------------------------------------
-|    sockets
+|   sockets
 +---------------------------------------------------------------------*/
 #define NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
 
 /*----------------------------------------------------------------------
-|    platform specifics
+|   platform specifics
 +---------------------------------------------------------------------*/
 /* Windows 32 */
 #if defined(WIN32)
@@ -80,7 +80,7 @@
 #endif
 
 /*----------------------------------------------------------------------
-|    compiler specifics
+|   compiler specifics
 +---------------------------------------------------------------------*/
 /* GCC */
 #if defined(__GNUC__)
@@ -105,11 +105,27 @@
 #endif
 #endif
 
+/* Microsoft C/C++ Compiler */
+#if defined(_MSC_VER)
+#if _MSC_VER >= 1400
+typedef __w64 long NPT_PointerLong;
+#define NPT_POINTER_TO_LONG(_p) ((long)(NPT_PointerLong) (_p) )
+#define NPT_CONFIG_HAVE_FOPEN_S
+#endif
+#endif
+
 /*----------------------------------------------------------------------
-|    includes
+|   defaults
++---------------------------------------------------------------------*/
+#ifndef NPT_POINTER_TO_LONG
+#define NPT_POINTER_TO_LONG(_p) ((long)(_p))
+#endif
+
+/*----------------------------------------------------------------------
+|   includes
 +---------------------------------------------------------------------*/
 #if defined(DMALLOC)
 #include <dmalloc.h>
 #endif
 
-#endif /* _NPT_CONFIG_H_ */
+#endif // _NPT_CONFIG_H_ 

@@ -15,8 +15,10 @@
 
 #include "NptConfig.h"
 #include "NptTypes.h"
+#include "NptConstants.h"
 #include "NptThreads.h"
 #include "NptDebug.h"
+#include "NptResults.h"
 #include "NptWin32Threads.h"
 
 /*----------------------------------------------------------------------
@@ -115,6 +117,78 @@ NPT_Win32CriticalSection::Unlock()
 }
 
 /*----------------------------------------------------------------------
+|       NPT_Win32Event
++---------------------------------------------------------------------*/
+class NPT_Win32Event
+{
+public:
+    // methods
+    NPT_Win32Event(bool bManual = false);
+    virtual ~NPT_Win32Event();
+
+    // NPT_Mutex methods
+    virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+    virtual void       Signal();
+    virtual void       Reset();
+
+private:
+    // members
+    HANDLE m_Event;
+};
+
+/*----------------------------------------------------------------------
+|       NPT_Win32Event::NPT_Win32Event
++---------------------------------------------------------------------*/
+NPT_Win32Event::NPT_Win32Event(bool bManual)
+{
+    m_Event = CreateEvent(NULL, (bManual==true)?TRUE:FALSE, FALSE, NULL);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Win32Event::~NPT_Win32Event
++---------------------------------------------------------------------*/
+NPT_Win32Event::~NPT_Win32Event()
+{
+    CloseHandle(m_Event);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Win32Event::Wait
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Win32Event::Wait(NPT_Timeout timeout)
+{
+    if (m_Event) {
+        DWORD result = WaitForSingleObject(m_Event, timeout==NPT_TIMEOUT_INFINITE?INFINITE:timeout);
+        if (result == WAIT_TIMEOUT) {
+            return NPT_ERROR_TIMEOUT;
+        }
+        if (result != WAIT_OBJECT_0 && result != WAIT_ABANDONED) {
+            return NPT_FAILURE;
+        }
+    }
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Win32Event::Signal
++---------------------------------------------------------------------*/
+void
+NPT_Win32Event::Signal()
+{
+    SetEvent(m_Event);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Win32Event::Reset
++---------------------------------------------------------------------*/
+void
+NPT_Win32Event::Reset()
+{
+    ResetEvent(m_Event);
+}
+
+/*----------------------------------------------------------------------
 |       NPT_Win32SharedVariable
 +---------------------------------------------------------------------*/
 class NPT_Win32SharedVariable : public NPT_SharedVariableInterface
@@ -125,14 +199,14 @@ class NPT_Win32SharedVariable : public NPT_SharedVariableInterface
               ~NPT_Win32SharedVariable();
     NPT_Result SetValue(NPT_Integer value);
     NPT_Result GetValue(NPT_Integer& value);
-    NPT_Result WaitUntilEquals(NPT_Integer value);
-    NPT_Result WaitWhileEquals(NPT_Integer value);
+    NPT_Result WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
 
  private:
     // members
     volatile NPT_Integer m_Value;
-    //pthread_mutex_t m_Mutex;
-    //pthread_cond_t  m_Condition;
+    NPT_Mutex            m_Lock;
+    NPT_Win32Event       m_Event;
 };
 
 /*----------------------------------------------------------------------
@@ -141,8 +215,6 @@ class NPT_Win32SharedVariable : public NPT_SharedVariableInterface
 NPT_Win32SharedVariable::NPT_Win32SharedVariable(NPT_Integer value) : 
     m_Value(value)
 {
-    //pthread_mutex_init(&m_Mutex, NULL);
-    //pthread_cond_init(&m_Condition, NULL);
 }
 
 /*----------------------------------------------------------------------
@@ -150,8 +222,6 @@ NPT_Win32SharedVariable::NPT_Win32SharedVariable(NPT_Integer value) :
 +---------------------------------------------------------------------*/
 NPT_Win32SharedVariable::~NPT_Win32SharedVariable()
 {
-    //pthread_cond_destroy(&m_Condition);
-    //pthread_mutex_destroy(&m_Mutex);
 }
 
 /*----------------------------------------------------------------------
@@ -160,10 +230,10 @@ NPT_Win32SharedVariable::~NPT_Win32SharedVariable()
 NPT_Result
 NPT_Win32SharedVariable::SetValue(NPT_Integer value)
 {
-    //pthread_mutex_lock(&m_Mutex);
+    m_Lock.Lock();
     m_Value = value;
-    //pthread_cond_signal(&m_Condition);
-    //pthread_mutex_unlock(&m_Mutex);
+    m_Event.Signal();
+    m_Lock.Unlock();
     
     return NPT_SUCCESS;
 }
@@ -184,13 +254,21 @@ NPT_Win32SharedVariable::GetValue(NPT_Integer& value)
 |       NPT_Win32SharedVariable::WaitUntilEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32SharedVariable::WaitUntilEquals(NPT_Integer /*value*/)
+NPT_Win32SharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout)
 {
-    //pthread_mutex_lock(&m_Mutex);
-    //while (value != m_Value) {
-    //    pthread_cond_wait(&m_Condition, &m_Mutex);
-    //}
-    //pthread_mutex_unlock(&m_Mutex);
+    do {
+        m_Lock.Lock();
+        if (m_Value == value) {
+            break;
+        }
+        m_Event.Reset();
+        m_Lock.Unlock();
+        if (NPT_FAILED(m_Event.Wait(timeout))) {
+            return NPT_FAILURE;
+        }
+    } while (1);
+
+    m_Lock.Unlock();
     
     return NPT_SUCCESS;
 }
@@ -199,13 +277,21 @@ NPT_Win32SharedVariable::WaitUntilEquals(NPT_Integer /*value*/)
 |       NPT_Win32SharedVariable::WaitWhileEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32SharedVariable::WaitWhileEquals(NPT_Integer /*value*/)
+NPT_Win32SharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout)
 {
-    //pthread_mutex_lock(&m_Mutex);
-    //while (value == m_Value) {
-    //    pthread_cond_wait(&m_Condition, &m_Mutex);
-    //}
-    //pthread_mutex_unlock(&m_Mutex);
+    do {
+        m_Lock.Lock();
+        if (m_Value != value) {
+            break;
+        }
+        m_Event.Reset();
+        m_Lock.Unlock();
+        if (NPT_FAILED(m_Event.Wait(timeout))) {
+            return NPT_FAILURE;
+        }
+    } while (1);
+
+    m_Lock.Unlock();
     
     return NPT_SUCCESS;
 }
@@ -400,6 +486,12 @@ NPT_Win32Thread::EntryPoint(void* argument)
 NPT_Result
 NPT_Win32Thread::Start()
 {
+    if (m_ThreadHandle > 0) {
+        // failed
+        NPT_Debug(":: NPT_Win32Thread::Start already started !\n");
+        return NPT_ERROR_INVALID_STATE;
+    }
+
     NPT_Debug(":: NPT_Win32Thread::Start - creating thread\n");
 
     // create the native thread
@@ -456,7 +548,13 @@ NPT_Thread::NPT_Thread(bool detached)
     m_Delegate = new NPT_Win32Thread(this, *this, detached);
 }
 
-
+/*----------------------------------------------------------------------
+|       NPT_Thread::NPT_Thread
++---------------------------------------------------------------------*/
+NPT_Thread::NPT_Thread(NPT_Runnable& target, bool detached)
+{
+    m_Delegate = new NPT_Win32Thread(this, target, detached);
+}
 
 
 

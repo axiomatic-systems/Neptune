@@ -2,7 +2,7 @@
 |
 |      Neptune - Arrays
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
@@ -20,7 +20,7 @@
 /*----------------------------------------------------------------------
 |       constants
 +---------------------------------------------------------------------*/
-const int NPT_ARRAY_INITIAL_MAX_SIZE = 1024;
+const int NPT_ARRAY_INITIAL_MAX_SIZE = 128; // bytes
 
 /*----------------------------------------------------------------------
 |       NPT_Array
@@ -33,25 +33,54 @@ public:
     NPT_Array<T>(): m_Capacity(0), m_ItemCount(0), m_Items(0) {}
     explicit NPT_Array<T>(NPT_Cardinal count);
     NPT_Array<T>(NPT_Cardinal count, const T& item);
+    NPT_Array<T>(const T* items, NPT_Cardinal item_count);
    ~NPT_Array<T>();
     NPT_Array<T>(const NPT_Array<T>& copy);
     NPT_Array<T>& operator=(const NPT_Array<T>& copy);
     bool          operator==(const NPT_Array<T>& other) const;
     bool          operator!=(const NPT_Array<T>& other) const;
     NPT_Cardinal GetItemCount() const { return m_ItemCount; }
-    NPT_Result   Append(const T& item);
+    NPT_Result   Add(const T& item);
     T& operator[](NPT_Ordinal pos)             { return m_Items[pos]; }
     const T& operator[](NPT_Ordinal pos) const { return m_Items[pos]; }
     NPT_Result   Erase(NPT_Ordinal pos);
     NPT_Result   Erase(NPT_Ordinal first, NPT_Ordinal last);
     NPT_Result   Insert(NPT_Ordinal pos, const T& item, NPT_Cardinal count = 1);
-    NPT_Result   Reserve(NPT_Cardinal count);
+	NPT_Result   Reserve(NPT_Cardinal count);
     NPT_Cardinal GetCapacity(NPT_Cardinal count) const;
     NPT_Result   Resize(NPT_Cardinal count);
     NPT_Result   Resize(NPT_Cardinal count, const T& fill);
     NPT_Result   Clear();
 
+	// template list operations
+	// keep these template members defined here because MSV6 does not let
+	// us define them later
+	template <typename X> 
+	NPT_Result Apply(const X& function) const
+	{                                  
+		for (unsigned int i=0; i<m_ItemCount; i++) function(m_Items[i]);
+		return NPT_SUCCESS;
+	}
+	template <typename X> 
+	NPT_Result Find(const X& predicate, NPT_Ordinal& position, NPT_Ordinal n=0) const
+	{
+		for (unsigned int i=0; i<m_ItemCount; i++) {
+			if (predicate(m_Items[i])) {
+				if (n == 0) {
+					position = i;
+					return NPT_SUCCESS;
+				}
+				--n;
+			}
+		}
+		position = 0; // do not leave the result undefined
+		return NPT_ERROR_NO_SUCH_ITEM;
+	}
+
 protected:
+    // methods
+    T* Allocate(NPT_Cardinal count, NPT_Cardinal& allocated);
+
     // members
     NPT_Cardinal m_Capacity;
     NPT_Cardinal m_ItemCount;
@@ -62,7 +91,8 @@ protected:
 |       NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
-NPT_Array<T>::NPT_Array<T>(NPT_Cardinal count) :
+inline
+NPT_Array<T>::NPT_Array(NPT_Cardinal count) :
     m_Capacity(0),
     m_ItemCount(0),
     m_Items(0)
@@ -74,7 +104,8 @@ NPT_Array<T>::NPT_Array<T>(NPT_Cardinal count) :
 |       NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
-NPT_Array<T>::NPT_Array<T>(const NPT_Array<T>& copy) :
+inline
+NPT_Array<T>::NPT_Array(const NPT_Array<T>& copy) :
     m_Capacity(0),
     m_ItemCount(0),
     m_Items(0)
@@ -90,23 +121,40 @@ NPT_Array<T>::NPT_Array<T>(const NPT_Array<T>& copy) :
 |       NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
-NPT_Array<T>::NPT_Array<T>(NPT_Cardinal count, const T& item) :
+inline
+NPT_Array<T>::NPT_Array(NPT_Cardinal count, const T& item) :
     m_Capacity(0),
-    m_ItemCount(0),
+    m_ItemCount(count),
     m_Items(0)    
 {
     Reserve(count);
     for (NPT_Ordinal i=0; i<count; i++) {
         new ((void*)&m_Items[i]) T(item);
     }
-    m_ItemCount = count;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Array<T>::NPT_Array<T>
++---------------------------------------------------------------------*/
+template <typename T>
+inline
+NPT_Array<T>::NPT_Array(const T* items, NPT_Cardinal item_count) :
+    m_Capacity(0),
+    m_ItemCount(item_count),
+    m_Items(0)    
+{
+    Reserve(item_count);
+    for (NPT_Ordinal i=0; i<item_count; i++) {
+        new ((void*)&m_Items[i]) T(items[i]);
+    }
 }
 
 /*----------------------------------------------------------------------
 |       NPT_Array<T>::~NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
-NPT_Array<T>::~NPT_Array<T>()
+inline
+NPT_Array<T>::~NPT_Array()
 {
     // remove all items
     Clear();
@@ -155,6 +203,27 @@ NPT_Array<T>::Clear()
 }
 
 /*----------------------------------------------------------------------
+|       NPT_Array<T>::Allocate
++---------------------------------------------------------------------*/
+template <typename T>
+T*
+NPT_Array<T>::Allocate(NPT_Cardinal count, NPT_Cardinal& allocated) 
+{
+    if (m_Capacity) {
+        allocated = 2*m_Capacity;
+    } else {
+        // start with just enough elements to fill 
+        // NPT_ARRAY_INITIAL_MAX_SIZE worth of memory
+        allocated = NPT_ARRAY_INITIAL_MAX_SIZE/sizeof(T);
+        if (allocated == 0) allocated = 1;
+    }
+    if (allocated < count) allocated = count;
+
+    // allocate the items
+    return (T*)::operator new(allocated*sizeof(T));
+}
+
+/*----------------------------------------------------------------------
 |       NPT_Array<T>::Reserve
 +---------------------------------------------------------------------*/
 template <typename T>
@@ -163,18 +232,9 @@ NPT_Array<T>::Reserve(NPT_Cardinal count)
 {
     if (count <= m_Capacity) return NPT_SUCCESS;
 
-    NPT_Cardinal new_capacity;
-    if (m_Capacity) {
-        new_capacity = 2*m_Capacity;
-    } else {
-        // start with just enough elements to fill 
-        // NPT_ARRAY_INITIAL_MAX_SIZE worth of memory
-        new_capacity = NPT_ARRAY_INITIAL_MAX_SIZE/sizeof(T);
-        if (new_capacity == 0) new_capacity = 1;
-    }
-
     // (re)allocate the items
-    T* new_items = (T*)::operator new(new_capacity*sizeof(T));
+    NPT_Cardinal new_capacity;
+    T* new_items = Allocate(count, new_capacity);
     if (new_items == NULL) {
         return NPT_ERROR_OUT_OF_MEMORY;
     }
@@ -186,8 +246,8 @@ NPT_Array<T>::Reserve(NPT_Cardinal count)
             // destroy the item
             m_Items[i].~T();
         }
-        ::operator delete((void*)m_Items);;
     }
+    ::operator delete((void*)m_Items);
     m_Items = new_items;
     m_Capacity = new_capacity;
 
@@ -195,11 +255,12 @@ NPT_Array<T>::Reserve(NPT_Cardinal count)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Append
+|       NPT_Array<T>::Add
 +---------------------------------------------------------------------*/
 template <typename T>
+inline
 NPT_Result
-NPT_Array<T>::Append(const T& item)
+NPT_Array<T>::Add(const T& item)
 {
     // ensure capacity
     NPT_Result result = Reserve(m_ItemCount+1);
@@ -207,6 +268,101 @@ NPT_Array<T>::Append(const T& item)
 
     // store the item
     new ((void*)&m_Items[m_ItemCount++]) T(item);
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Array<T>::Erase
++---------------------------------------------------------------------*/
+template <typename T>
+inline
+NPT_Result
+NPT_Array<T>::Erase(NPT_Ordinal pos)
+{
+    return Erase(pos, pos);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Array<T>::Erase
++---------------------------------------------------------------------*/
+template <typename T>
+NPT_Result
+NPT_Array<T>::Erase(NPT_Ordinal first, NPT_Ordinal last)
+{
+    // check the bounds
+    if (first >= m_ItemCount ||
+        last  >= m_ItemCount ||
+        first > last) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // shift items to the left
+    NPT_Cardinal interval = last-first+1;
+    NPT_Cardinal shifted = m_ItemCount-last-1;
+    for (NPT_Ordinal i=first; i<first+shifted; i++) {
+        m_Items[i] = m_Items[i+interval];
+    }
+
+    // destruct the remaining items
+    for (NPT_Ordinal i=first+shifted; i<m_ItemCount; i++) {
+        m_Items[i].~T();
+    }
+
+    // update the item count
+    m_ItemCount -= interval;
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Array<T>::Insert
++---------------------------------------------------------------------*/
+template <typename T>
+NPT_Result
+NPT_Array<T>::Insert(NPT_Ordinal where, const T& item, NPT_Cardinal repeat)
+{
+    // check bounds
+    if (where > m_ItemCount || repeat == 0) return NPT_ERROR_INVALID_PARAMETERS;
+
+    NPT_Cardinal needed = m_ItemCount+repeat;
+    if (needed < m_Capacity) {
+        // allocate more memory
+        NPT_Cardinal new_capacity;
+        T* new_items = Allocate(needed, new_capacity);
+        if (new_items == NULL) return NPT_ERROR_OUT_OF_MEMORY;
+        m_Capacity = new_capacity;
+
+        // move the items before the insertion point
+        for (NPT_Ordinal i=0; i<where; i++) {
+            new((void*)&new_items[i])T(m_Items[i]);
+            m_Items[i].~T();
+        }
+
+        // move the items after the insertion point
+        for (NPT_Ordinal i=where; i<m_ItemCount; i++) {
+            new((void*)&new_items[i+repeat])T(m_Items[i]);
+            m_Items[i].~T();
+        }
+
+        // use the new items instead of the current ones
+        ::operator delete((void*)m_Items);
+        m_Items = new_items;
+    } else {
+        // shift items after the insertion point to the right
+        for (NPT_Ordinal i=m_ItemCount; i>where; i--) {
+            new((void*)&m_Items[i+repeat-1])T(m_Items[i-1]);
+			m_Items[i-1].~T();
+        }
+    }
+
+	// insert the new items
+	for (NPT_Cardinal i=where; i<where+repeat; i++) {
+		new((void*)&m_Items[i])T(item);
+	}
+
+	// update the item count
+    m_ItemCount += repeat;
 
     return NPT_SUCCESS;
 }
@@ -244,6 +400,7 @@ NPT_Array<T>::Resize(NPT_Cardinal size, const T& fill)
         for (NPT_Ordinal i=m_ItemCount; i<size; i++) {
             new ((void*)&m_Items[i]) T(fill);
         }
+        m_ItemCount = size;
     }
 
     return NPT_SUCCESS;
@@ -271,6 +428,7 @@ NPT_Array<T>::operator==(const NPT_Array<T>& other) const
 |       NPT_Array<T>::operator!=
 +---------------------------------------------------------------------*/
 template <typename T>
+inline
 bool
 NPT_Array<T>::operator!=(const NPT_Array<T>& other) const
 {

@@ -161,7 +161,7 @@ public:
     NPT_NetworkInterface(const char*           name,
                          const NPT_MacAddress& mac,
                          NPT_Flags             flags);
-   ~NPT_NetworkInterface();
+   ~NPT_NetworkInterface() {}
 
     // methods
     NPT_Result AddAddress(const NPT_NetworkInterfaceAddress& address);

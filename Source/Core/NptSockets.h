@@ -89,13 +89,17 @@ typedef struct {
 class NPT_SocketInterface
 {
  public:
+    virtual ~NPT_SocketInterface() {}
+
     // interface methods
-	virtual NPT_Result Bind(const NPT_SocketAddress& address) = 0;
-	virtual NPT_Result Connect(const NPT_SocketAddress& address,
+    virtual NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) = 0;
+    virtual NPT_Result Connect(const NPT_SocketAddress& address,
                                NPT_Timeout timeout) = 0;
+    virtual NPT_Result WaitForConnection(NPT_Timeout timeout) = 0;
     virtual NPT_Result GetInputStream(NPT_InputStreamReference& stream) = 0;
     virtual NPT_Result GetOutputStream(NPT_OutputStreamReference& stream) = 0;
     virtual NPT_Result GetInfo(NPT_SocketInfo& info) = 0;
+    virtual NPT_Result SetBlockingMode(bool blocking) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -104,10 +108,12 @@ class NPT_SocketInterface
 class NPT_UdpSocketInterface
 {
  public:
+    virtual ~NPT_UdpSocketInterface() {}
+
     // methods
-	virtual NPT_Result Send(const NPT_DataBuffer&    packet, 
+    virtual NPT_Result Send(const NPT_DataBuffer&    packet, 
                             const NPT_SocketAddress* address = NULL) = 0;
-	virtual NPT_Result Receive(NPT_DataBuffer&     packet, 
+    virtual NPT_Result Receive(NPT_DataBuffer&     packet, 
                                NPT_SocketAddress*  address = NULL) = 0;
 };
 
@@ -117,12 +123,15 @@ class NPT_UdpSocketInterface
 class NPT_UdpMulticastSocketInterface
 {
  public:
+    virtual ~NPT_UdpMulticastSocketInterface() {}
+
     // methods
     virtual NPT_Result JoinGroup(const NPT_IpAddress& group, 
                                  const NPT_IpAddress& iface) = 0;
     virtual NPT_Result LeaveGroup(const NPT_IpAddress& group,
                                   const NPT_IpAddress& iface) = 0;
     virtual NPT_Result SetTimeToLive(unsigned char ttl) = 0;
+    virtual NPT_Result SetInterface(const NPT_IpAddress& iface) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -131,6 +140,8 @@ class NPT_UdpMulticastSocketInterface
 class NPT_TcpServerSocketInterface
 {
  public:
+    virtual ~NPT_TcpServerSocketInterface() {}
+
     // interface methods
     virtual NPT_Result Listen(unsigned int max_clients) = 0;
     virtual NPT_Result WaitForNewClient(NPT_Socket*& client) = 0;
@@ -148,13 +159,16 @@ public:
     virtual ~NPT_Socket();
 
     // delegate NPT_SocketInterface methods
-    NPT_Result Bind(const NPT_SocketAddress& address) {             
-        return m_SocketDelegate->Bind(address);                            
+    NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) {             
+        return m_SocketDelegate->Bind(address, reuse_address);                            
     }                                                               
 	NPT_Result Connect(const NPT_SocketAddress& address,            
                        NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
        return m_SocketDelegate->Connect(address, timeout);                 
     }                                                               
+    NPT_Result WaitForConnection(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
+        return m_SocketDelegate->WaitForConnection(timeout);                 
+    } 
     NPT_Result GetInputStream(NPT_InputStreamReference& stream) {   
         return m_SocketDelegate->GetInputStream(stream);                   
     }                                                               
@@ -164,6 +178,9 @@ public:
     NPT_Result GetInfo(NPT_SocketInfo& info) {                      
         return m_SocketDelegate->GetInfo(info);                            
     }                                                               
+    NPT_Result SetBlockingMode(bool blocking) {                      
+        return m_SocketDelegate->SetBlockingMode(blocking);                            
+    }                                                          
 
 protected:
     // constructor
@@ -195,6 +212,9 @@ class NPT_UdpSocket : public NPT_Socket,
     }
 
 protected:
+    // constructor
+    NPT_UdpSocket(NPT_UdpSocketInterface* delegate);
+
     // members
     NPT_UdpSocketInterface* m_UdpSocketDelegate;
 };
@@ -223,6 +243,9 @@ public:
     }                                                          
 	NPT_Result SetTimeToLive(unsigned char ttl) {     
         return m_UdpMulticastSocketDelegate->SetTimeToLive(ttl); 
+    }
+    NPT_Result SetInterface(const NPT_IpAddress& iface) {
+        return m_UdpMulticastSocketDelegate->SetInterface(iface);
     }
 
 protected:

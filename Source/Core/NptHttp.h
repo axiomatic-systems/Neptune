@@ -27,6 +27,7 @@ const unsigned int NPT_HTTP_INVALID_PORT = 0;
 const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH = 2048;
 
 #define NPT_HTTP_PROTOCOL_1_0   "HTTP/1.0"
+#define NPT_HTTP_PROTOCOL_1_1   "HTTP/1.1"
 #define NPT_HTTP_METHOD_GET     "GET"
 #define NPT_HTTP_METHOD_HEAD    "HEAD"
 #define NPT_HTTP_METHOD_POST    "POST"
@@ -64,6 +65,7 @@ class NPT_HttpUrl : public NPT_Uri {
 public:
     // constructors and destructor
     NPT_HttpUrl(const char* url);
+    NPT_HttpUrl(const char* host, NPT_UInt16 port, const char* path);
 
     // methods
     NPT_UInt16        GetPort() const { return m_Port; }
@@ -111,14 +113,15 @@ public:
 
     // methods
     NPT_Result Emit(NPT_OutputStream& stream) const;
-    NPT_List<NPT_HttpHeader>& GetHeaders() { return m_Headers; }
+    NPT_List<NPT_HttpHeader*>& GetHeaders() { return m_Headers; }
     NPT_HttpHeader* GetHeader(const char* name) const;
     NPT_Result SetHeader(const char* name, const char* value);
+    NPT_Result GetHeaderValue(const char* name, NPT_String& value);
     NPT_Result AddHeader(const char* name, const char* value);
 
 private:
     // members
-    NPT_List<NPT_HttpHeader> m_Headers;
+    NPT_List<NPT_HttpHeader*> m_Headers;
 };
 
 /*----------------------------------------------------------------------
@@ -132,8 +135,8 @@ public:
     virtual ~NPT_HttpEntity();
 
     // methods
-    NPT_Result SetInputStream(const NPT_BufferedInputStreamReference& stream);
-    NPT_Result GetInputStream(NPT_BufferedInputStreamReference& stream);
+    NPT_Result SetInputStream(const NPT_InputStreamReference& stream);
+    NPT_Result GetInputStream(NPT_InputStreamReference& stream);
 
     // field access
     NPT_Size          GetContentLength()   { return m_ContentLength;   }
@@ -142,10 +145,10 @@ public:
 
 private:
     // members
-    NPT_BufferedInputStreamReference m_InputStream;
-    NPT_Size                         m_ContentLength;
-    NPT_String                       m_ContentType;
-    NPT_String                       m_ContentEncoding;
+    NPT_InputStreamReference m_InputStream;
+    NPT_Size                 m_ContentLength;
+    NPT_String               m_ContentType;
+    NPT_String               m_ContentEncoding;
 };
 
 /*----------------------------------------------------------------------
@@ -167,6 +170,8 @@ public:
     NPT_HttpEntity* GetEntity() {
         return m_Entity;
     }
+
+    virtual NPT_Result Emit(NPT_OutputStream& stream) const = 0;
 
 protected:
     // constructors
@@ -213,12 +218,16 @@ public:
     // constructors and destructor
              NPT_HttpResponse(NPT_HttpStatusCode status_code,
                               const char*        reason_phrase,
-                              const char*        protocol);
+                              const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     virtual ~NPT_HttpResponse();
 
     // methods
+    NPT_Result         SetStatus(NPT_HttpStatusCode status_code,
+                                 const char*        reason_phrase,
+                                 const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     NPT_HttpStatusCode GetStatusCode()   { return m_StatusCode;   }
     NPT_String&        GetReasonPhrase() { return m_ReasonPhrase; }
+    NPT_Result         Emit(NPT_OutputStream& stream) const;
 
 protected:
     // members

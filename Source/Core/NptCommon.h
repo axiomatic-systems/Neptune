@@ -16,16 +16,28 @@
 #include "NptTypes.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Exception
+|       NPT_ObjectDeleter
 +---------------------------------------------------------------------*/
-class NPT_Exception
-{
+template <class T>
+class NPT_ObjectDeleter {
 public:
-    // methods
-    NPT_Exception(NPT_Result error) : m_Error(error) {}
+    void operator()(T* object) const {
+        delete object;
+    }
+};
 
-    // members
-    NPT_Result m_Error;
+/*----------------------------------------------------------------------
+|       NPT_ObjectComparator
++---------------------------------------------------------------------*/
+template <class T>
+class NPT_ObjectComparator {
+public:
+	NPT_ObjectComparator(T& object) : m_Object(object) {}
+	bool operator()(const T& object) const {
+		return object == m_Object;
+	}
+private:
+	T& m_Object;
 };
 
 /*----------------------------------------------------------------------

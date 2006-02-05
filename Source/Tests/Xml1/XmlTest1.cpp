@@ -19,11 +19,12 @@
 #define CHECK(test, message)                                            \
 do {                                                                    \
     if (!(test)) {                                                      \
-        fprintf(stderr, "FAILED: (%s) line %d\n", (message), __LINE__); \
+        fprintf(stderr, "FAILED: (%s) line %d\n", (const char*)(message), __LINE__); \
         NPT_ASSERT(0);                                                  \
     }                                                                   \
 } while(0)
 
+#ifdef TEST_WRITER
 /*----------------------------------------------------------------------
 |       WriterTest1
 +---------------------------------------------------------------------*/
@@ -50,6 +51,7 @@ WriterTest1()
     
     writer.Serialize(*top, *out_stream);
 }
+#endif
 
 #if defined(_WIN32) && defined(_DEBUG)
 #include <crtdbg.h>
@@ -191,8 +193,8 @@ TestFile(const char* filename)
         return;
     }
 
-	return;
 
+#ifdef TEST_WRITER
     // dump the tree
     NPT_XmlWriter writer(2);
     NPT_File output(NPT_FILE_STANDARD_OUTPUT);
@@ -200,6 +202,7 @@ TestFile(const char* filename)
     NPT_OutputStreamReference output_stream_ref;
     output.GetOutputStream(output_stream_ref);
     writer.Serialize(*tree, *output_stream_ref);
+#endif
 
     // delete the tree
     delete tree;

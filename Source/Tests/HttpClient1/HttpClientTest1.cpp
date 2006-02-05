@@ -13,6 +13,10 @@
 #include "Neptune.h"
 #include "NptDebug.h"
 
+#if defined(WIN32) && defined(_DEBUG)
+#include <crtdbg.h>
+#endif
+
 /*----------------------------------------------------------------------
 |       TestUrlParser
 +---------------------------------------------------------------------*/
@@ -39,17 +43,17 @@ ShowResponse(NPT_HttpResponse* response)
 {
     // show response info
     NPT_Debug("RESPONSE: protocol=%s, code=%d, reason=%s\n",
-              response->GetProtocol(),
+              response->GetProtocol().GetChars(),
               response->GetStatusCode(),
-              response->GetReasonPhrase());
+              response->GetReasonPhrase().GetChars());
 
     // show headers
     NPT_HttpHeaders& headers = response->GetHeaders();
     NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
     while (header) {
         NPT_Debug("%s: %s\n", 
-            (*header)->GetName(),
-            (*header)->GetValue());
+		  (const char*)(*header)->GetName(),
+                  (const char*)(*header)->GetValue());
         ++header;
     }
 
@@ -58,8 +62,8 @@ ShowResponse(NPT_HttpResponse* response)
     if (entity != NULL) {
         NPT_Debug("ENTITY: length=%d, type=%s, encoding=%s\n",
                   entity->GetContentLength(),
-                  entity->GetContentType(),
-                  entity->GetContentEncoding());
+                  entity->GetContentType().GetChars(),
+                  entity->GetContentEncoding().GetChars());
     }
 
     // dump the body
@@ -96,8 +100,6 @@ TestHttp(const char* arg)
     delete response;
 }
 
-#include <crtdbg.h>
-
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -105,7 +107,7 @@ int
 main(int argc, char** argv)
 {
     // setup debugging
-#if defined(_DEBUG)
+#if defined(WIN32) && defined(_DEBUG)
     int flags = _crtDbgFlag       | 
         _CRTDBG_ALLOC_MEM_DF      |
         _CRTDBG_DELAY_FREE_MEM_DF |
@@ -117,7 +119,7 @@ main(int argc, char** argv)
 #endif 
 
     // check args
-#if 0
+#if 1
     if (argc != 2) {
         NPT_Debug("HttpClient: missing URL argument\n");
         return -1;
@@ -147,7 +149,9 @@ main(int argc, char** argv)
 
     TestHttp(argv[1]);
 
+#if defined(WIN32) && defined(_DEBUG)
     _CrtDumpMemoryLeaks();
+#endif
 
     return 0;
 }

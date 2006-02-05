@@ -25,9 +25,9 @@
 |       compatibility wrappers
 +---------------------------------------------------------------------*/
 #if !defined(NPT_CONFIG_HAVE_FOPEN_S)
-static errno_t fopen_s(FILE**      file,
-                       const char* filename,
-                       const char* mode)
+static int fopen_s(FILE**      file,
+                   const char* filename,
+                   const char* mode)
 {
     *file = fopen(filename, mode);
     if (file == NULL) return errno;

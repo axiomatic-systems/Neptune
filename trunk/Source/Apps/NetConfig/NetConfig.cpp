@@ -30,7 +30,7 @@
 /*----------------------------------------------------------------------
 |       globals
 +---------------------------------------------------------------------*/
-struct {
+static struct {
     bool verbose;
 } Options;
 
@@ -88,7 +88,7 @@ main(int argc, char**)
     NPT_List<NPT_NetworkInterface*>::Iterator iface = interfaces.GetFirstItem();
     unsigned int index = 0;
     while (iface) {
-        printf("Interface %d:\n", index);
+        printf("Interface %d: -------------------------------------\n", index);
         printf("  name  = %s\n", (*iface)->GetName().GetChars());
         printf("  flags = %x [ ", (*iface)->GetFlags());
         PrintFlags((*iface)->GetFlags());

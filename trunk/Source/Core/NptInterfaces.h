@@ -67,7 +67,10 @@ class NPT_InterfaceId
 +---------------------------------------------------------------------*/
 class NPT_Polymorphic
 {
- public:
+public:
+    // destructor
+    virtual ~NPT_Polymorphic() {}
+     
     // methods
     virtual NPT_Result GetInterface(const NPT_InterfaceId& id, 
                                     NPT_Interface*&        iface) = 0;
@@ -78,7 +81,10 @@ class NPT_Polymorphic
 +---------------------------------------------------------------------*/
 class NPT_Configurable
 {
- public:
+public:
+    // destructor
+    virtual ~NPT_Configurable() {}
+     
     // methods
     virtual NPT_Result SetProperty(const char* /*name*/, 
                                    const char* /*value*/) { 

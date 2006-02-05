@@ -1147,7 +1147,9 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
 
         return NPT_SUCCESS;
     }
-    if (io_result == NPT_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS && GetSocketError() != EWOULDBLOCK) {   
+    if (io_result == NPT_BSD_SOCKET_ERROR && 
+        GetSocketError() != EINPROGRESS && 
+        GetSocketError() != EWOULDBLOCK) {   
         // put back in original blocking mode
         SetBlockingMode(was_blocking);
 

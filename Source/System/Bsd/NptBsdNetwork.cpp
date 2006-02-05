@@ -133,7 +133,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         if (ioctl(net, SIOCGIFHWADDR, &query) == 0) {
             NPT_MacAddress::Type type;
             unsigned int length = 6; // default to 48 bits
-            printf("***** type = %d\n", query.ifr_addr.sa_family);
+            //printf("***** type = %d\n", query.ifr_addr.sa_family);
             switch (query.ifr_addr.sa_family) {
                 case ARPHRD_ETHER:
                     type = NPT_MacAddress::TYPE_ETHERNET;

@@ -6,7 +6,7 @@ exit 1
 fi
  
 BUILD_ROOT=".."
-DIRS="Neptune Core System Apps/NetPump Tests/Messages1 Tests/Strings1 Tests/Threads1 Tests/Xml1"
+DIRS="Neptune Core System Apps/NetPump Tests/Messages1 Tests/Strings1 Tests/Threads1 Tests/Xml1 Tests/Arrays1 Tests/Misc1 Tests/RingBuffer1 Tests/HttpClient1"
  
 for dir in $DIRS
 do

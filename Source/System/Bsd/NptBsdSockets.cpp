@@ -29,7 +29,7 @@
 #elif defined(__TCS__)
 #include <sockets.h>
 
-#elif defined(PSP)
+#elif defined(__PSP__)
 #include <psptypes.h>
 #include <kernel.h>
 #include <pspnet.h>
@@ -115,7 +115,7 @@ typedef void*  SocketOption;
 typedef int    SocketFd;
 #define GetSocketError() errno
 
-#elif defined(PSP)
+#elif defined(__PSP__)
 typedef SceNetInetSocklen_t socklen_t;
 #define timeval SceNetInetTimeval
 #define inet_addr sceNetInetInetAddr
@@ -257,7 +257,9 @@ MapErrorCode(int error)
 
         case EINPROGRESS:
         case EAGAIN:
+#if defined(EWOULDBLOCK) && (EWOULDBLOCK != EAGAIN)
         case EWOULDBLOCK:
+#endif
             return NPT_ERROR_WOULD_BLOCK;
 
         default:
@@ -283,7 +285,7 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
 
 #if defined(__TCS__)
     Set(getHostByName(name));
-#elif (PSP)
+#elif defined(__PSP__)
     int rid;
     char buf[1024];
     int buflen = sizeof(buf);
@@ -688,7 +690,7 @@ NPT_BsdSocket::SetBlockingMode(bool blocking)
     m_Blocking = blocking;
     return NPT_SUCCESS;
 }
-#elif defined(PSP)
+#elif defined(__PSP__)
 /*----------------------------------------------------------------------
 |       NPT_BsdSocket::SetBlockingMode
 +---------------------------------------------------------------------*/
@@ -1119,7 +1121,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                                 NPT_Timeout              timeout)
 {
     SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
-    bool blocking = m_Blocking;
+    bool was_blocking = m_Blocking;
 
     // set the socket to nonblocking so that we can timeout on connect
     if (NPT_FAILED(SetBlockingMode(false))) {
@@ -1138,7 +1140,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     if (io_result == 0) {
         // immediate connection
         // put back in original blocking mode
-        SetBlockingMode(blocking);
+        SetBlockingMode(was_blocking);
 
         // get socket info
         RefreshInfo();
@@ -1147,7 +1149,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     }
     if (io_result == NPT_BSD_SOCKET_ERROR && GetSocketError() != EINPROGRESS && GetSocketError() != EWOULDBLOCK) {   
         // put back in original blocking mode
-        SetBlockingMode(blocking);
+        SetBlockingMode(was_blocking);
 
         // error
         return MapErrorCode(GetSocketError());
@@ -1164,7 +1166,7 @@ NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
 {
     SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
     int io_result;
-    bool blocking = m_Blocking;
+    bool was_blocking = m_Blocking;
 
     // set the socket to nonblocking so that we can timeout on connect
     if (NPT_FAILED(SetBlockingMode(false))) {
@@ -1194,10 +1196,10 @@ NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
                        NULL : &timeout_value);
 
     // put back in original blocking mode
-    SetBlockingMode(blocking);
+    SetBlockingMode(was_blocking);
 
     if (io_result == 0) {
-        if (!blocking) {
+        if (!was_blocking) {
             return NPT_ERROR_WOULD_BLOCK;
         }
         // timeout
@@ -1261,9 +1263,9 @@ class NPT_BsdTcpServerSocket : public    NPT_TcpServerSocketInterface,
     ~NPT_BsdTcpServerSocket();
 
     // NPT_SocketInterface methods
-    NPT_Result Bind(const NPT_SocketAddress& address) {
+    NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) {
         // inherit
-        return NPT_BsdSocket::Bind(address);
+        return NPT_BsdSocket::Bind(address, reuse_address);
     }
     NPT_Result Connect(const NPT_SocketAddress& address,
                        NPT_Timeout              timeout) {

@@ -25,34 +25,26 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       globals
+|   NPT_PosixSystem
 +---------------------------------------------------------------------*/
-NPT_System System;
-
-/*----------------------------------------------------------------------
-|       NPT_PosixSystem
-+---------------------------------------------------------------------*/
-class NPT_PosixSystem : public NPT_SystemInterface
+class NPT_PosixSystem
 {
 public:
+    // class variables
+    static NPT_PosixSystem System;
+    
     // methods
-                NPT_PosixSystem();
-               ~NPT_PosixSystem();
-    NPT_Result  GetProcessId(NPT_Integer& id);
-    NPT_Result  GetCurrentTimeStamp(NPT_TimeStamp& now);
-    NPT_Result  Sleep(const NPT_TimeInterval& duration);
-    NPT_Result  SleepUntil(const NPT_TimeStamp& when);
-    NPT_Result  SetRandomSeed(unsigned int seed);
-    NPT_Integer GetRandomInteger();
+    NPT_PosixSystem();
+   ~NPT_PosixSystem();
 
-private:
     // members
     pthread_mutex_t m_SleepMutex;
     pthread_cond_t  m_SleepCondition;
 };
+NPT_PosixSystem NPT_PosixSystem::System;
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::NPT_PosixSystem
+|   NPT_PosixSystem::NPT_PosixSystem
 +---------------------------------------------------------------------*/
 NPT_PosixSystem::NPT_PosixSystem()
 {
@@ -61,7 +53,7 @@ NPT_PosixSystem::NPT_PosixSystem()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::~NPT_PosixSystem
+|   NPT_PosixSystem::~NPT_PosixSystem
 +---------------------------------------------------------------------*/
 NPT_PosixSystem::~NPT_PosixSystem()
 {
@@ -70,20 +62,20 @@ NPT_PosixSystem::~NPT_PosixSystem()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::GetProcessId
+|   NPT_System::GetProcessId
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSystem::GetProcessId(NPT_Integer& id)
+NPT_System::GetProcessId(NPT_Integer& id)
 {
     id = getpid();
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::GetCurrentTimeStamp
+|   NPT_System::GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSystem::GetCurrentTimeStamp(NPT_TimeStamp& now)
+NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 {
     struct timeval now_tv;
 
@@ -102,10 +94,10 @@ NPT_PosixSystem::GetCurrentTimeStamp(NPT_TimeStamp& now)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::Sleep
+|   NPT_System::Sleep
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSystem::Sleep(const NPT_TimeInterval& duration)
+NPT_System::Sleep(const NPT_TimeInterval& duration)
 {
     struct timespec time_req;
     struct timespec time_rem;
@@ -125,10 +117,10 @@ NPT_PosixSystem::Sleep(const NPT_TimeInterval& duration)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::SleepUntil
+|   NPT_System::SleepUntil
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSystem::SleepUntil(const NPT_TimeStamp& when)
+NPT_System::SleepUntil(const NPT_TimeStamp& when)
 {
     struct timespec timeout;
     int             result;
@@ -139,8 +131,8 @@ NPT_PosixSystem::SleepUntil(const NPT_TimeStamp& when)
 
     // sleep
     do {
-        result = pthread_cond_timedwait(&m_SleepCondition, 
-                                        &m_SleepMutex, 
+        result = pthread_cond_timedwait(&NPT_PosixSystem::System.m_SleepCondition, 
+                                        &NPT_PosixSystem::System.m_SleepMutex, 
                                         &timeout);
         if (result == ETIMEDOUT) {
             return NPT_SUCCESS;
@@ -151,29 +143,20 @@ NPT_PosixSystem::SleepUntil(const NPT_TimeStamp& when)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixSystem::SetRandomSeed
+|   NPT_System::SetRandomSeed
 +---------------------------------------------------------------------*/
 NPT_Result  
-NPT_PosixSystem::SetRandomSeed(unsigned int seed)
+NPT_System::SetRandomSeed(unsigned int seed)
 {
     srand(seed);
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::NPT_System
+|   NPT_System::GetRandomInteger
 +---------------------------------------------------------------------*/
 NPT_Integer 
-NPT_PosixSystem::GetRandomInteger()
+NPT_System::GetRandomInteger()
 {
     return rand();
 }
-
-/*----------------------------------------------------------------------
-|       NPT_System::NPT_System
-+---------------------------------------------------------------------*/
-NPT_System::NPT_System()
-{
-    m_Delegate = new NPT_PosixSystem();
-}
-

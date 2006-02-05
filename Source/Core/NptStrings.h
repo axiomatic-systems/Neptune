@@ -151,7 +151,7 @@ protected:
     public:
         // class methods
         static Buffer* Allocate(NPT_Size allocated, NPT_Size length) {
-            void* mem = reinterpret_cast<void*>(new char[sizeof(Buffer)+allocated+1]);
+            void* mem = ::operator new(sizeof(Buffer)+allocated+1);
             return new(mem) Buffer(allocated, length);
         }
         static char* Create(NPT_Size allocated, NPT_Size length=0) {

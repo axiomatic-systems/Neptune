@@ -13,7 +13,9 @@
 #include "Neptune.h"
 #include <stdlib.h>
 
+#if defined(WIN32)
 #include <crtdbg.h>
+#endif
 
 const unsigned int BUFFER_SIZE = 17;
 
@@ -78,10 +80,10 @@ WriteChunk(NPT_RingBuffer& buffer)
 |       main
 +---------------------------------------------------------------------*/
 int
-main(int argc, char** argv)
+main(int /*argc*/, char** /*argv*/)
 {
     // setup debugging
-#if defined(_DEBUG)
+#if defined(WIN32) && defined(_DEBUG)
     int flags = _crtDbgFlag       | 
         _CRTDBG_ALLOC_MEM_DF      |
         _CRTDBG_DELAY_FREE_MEM_DF |

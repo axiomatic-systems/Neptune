@@ -153,7 +153,8 @@ class NPT_AtomicVariable : public NPT_AtomicVariableInterface
 +---------------------------------------------------------------------*/
 class NPT_Runnable
 {
- public:
+public:
+    virtual ~NPT_Runnable() {}  
     virtual void Run() = 0;
 };
 

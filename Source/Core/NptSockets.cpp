@@ -88,11 +88,11 @@ NPT_IpAddress::ToString() const
     address.Reserve(16);
     address += NPT_String::FromInteger(m_Address[0]);
     address += '.';
-    address += NPT_String::FromInteger(m_Address[0]);
+    address += NPT_String::FromInteger(m_Address[1]);
     address += '.';
-    address += NPT_String::FromInteger(m_Address[0]);
+    address += NPT_String::FromInteger(m_Address[2]);
     address += '.';
-    address += NPT_String::FromInteger(m_Address[0]);
+    address += NPT_String::FromInteger(m_Address[3]);
 
     return address;
 }

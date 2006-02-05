@@ -86,14 +86,14 @@ NPT_Mutex::NPT_Mutex()
 +---------------------------------------------------------------------*/
 class NPT_PosixSharedVariable : public NPT_SharedVariableInterface
 {
- public:
+public:
     // methods
                NPT_PosixSharedVariable(NPT_Integer value);
               ~NPT_PosixSharedVariable();
     NPT_Result SetValue(NPT_Integer value);
     NPT_Result GetValue(NPT_Integer& value);
-    NPT_Result WaitUntilEquals(NPT_Integer value);
-    NPT_Result WaitWhileEquals(NPT_Integer value);
+    NPT_Result WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout);
+    NPT_Result WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout);
 
  private:
     // members
@@ -151,7 +151,7 @@ NPT_PosixSharedVariable::GetValue(NPT_Integer& value)
 |       NPT_PosixSharedVariable::WaitUntilEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSharedVariable::WaitUntilEquals(NPT_Integer value)
+NPT_PosixSharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout /* timeout */)
 {
     pthread_mutex_lock(&m_Mutex);
     while (value != m_Value) {
@@ -166,7 +166,7 @@ NPT_PosixSharedVariable::WaitUntilEquals(NPT_Integer value)
 |       NPT_PosixSharedVariable::WaitWhileEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSharedVariable::WaitWhileEquals(NPT_Integer value)
+NPT_PosixSharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout /*timeout*/)
 {
     pthread_mutex_lock(&m_Mutex);
     while (value == m_Value) {

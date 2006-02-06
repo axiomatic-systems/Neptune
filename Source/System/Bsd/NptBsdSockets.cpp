@@ -1165,7 +1165,8 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     }
     if (io_result == NPT_BSD_SOCKET_ERROR && 
         GetSocketError() != EINPROGRESS && 
-        GetSocketError() != EWOULDBLOCK) {   
+        GetSocketError() != EWOULDBLOCK &&
+        GetSocketError() != EAGAIN) {   
         // put the fd back in its original blocking mode
         if (was_blocking) m_SocketFdReference->SetBlockingMode(true);
 
@@ -1194,8 +1195,8 @@ NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
 NPT_Result 
 NPT_BsdTcpClientSocket::DoWaitForConnection(NPT_Timeout timeout)
 {
-    SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
-    int      io_result;
+    SocketFd   socket_fd = m_SocketFdReference->GetSocketFd();
+    NPT_Result result = NPT_SUCCESS;
 
     // wait for connection to succeed or fail
     fd_set read_set;
@@ -1214,47 +1215,54 @@ NPT_BsdTcpClientSocket::DoWaitForConnection(NPT_Timeout timeout)
         timeout_value.tv_usec = 1000*(timeout-1000*(timeout/1000));
     };
 
-    io_result = select((int)socket_fd+1, 
-                       &read_set, &write_set, &except_set, 
-                       timeout == NPT_TIMEOUT_INFINITE ? 
-                       NULL : &timeout_value);
-
-    // put the fd back in its original blocking mode
-    if (m_Blocking) m_SocketFdReference->SetBlockingMode(true);
+    int io_result = select((int)socket_fd+1, 
+                           &read_set, &write_set, &except_set, 
+                           timeout == NPT_TIMEOUT_INFINITE ? 
+                           NULL : &timeout_value);
 
     if (io_result == 0) {
         if (timeout == 0) {
             // non-blocking call
-            return NPT_ERROR_WOULD_BLOCK;
+            result = NPT_ERROR_WOULD_BLOCK;
+            goto done;
         } else {
             // timeout
-            return NPT_ERROR_TIMEOUT;
+            result = NPT_ERROR_TIMEOUT;
+            goto done;
         }
     } else if (io_result == NPT_BSD_SOCKET_ERROR) {
-        return MapErrorCode(GetSocketError());
+        result = MapErrorCode(GetSocketError());
+        goto done;
     } else if (FD_ISSET(socket_fd, &read_set)    || 
                FD_ISSET(socket_fd, &write_set)   ||
                FD_ISSET(socket_fd, &except_set)) {
-        int error;
+        int error = 0;
         socklen_t length = sizeof(error);
         // get error status from socket
-        if (getsockopt(socket_fd, 
-                       SOL_SOCKET, 
-                       SO_ERROR, 
-                       (SocketOption)&error, 
-                       &length) == NPT_BSD_SOCKET_ERROR) {
-            return NPT_ERROR_GETSOCKOPT_FAILED;
-        }
-        if (error) {
-            return MapErrorCode(GetSocketError());
+        // (some systems return the error in errno, others
+        //  return it in the buffer passed to getsockopt)
+        io_result = getsockopt(socket_fd, 
+                               SOL_SOCKET, 
+                               SO_ERROR, 
+                               (SocketOption)&error, 
+                               &length);
+        if (io_result == NPT_BSD_SOCKET_ERROR) {
+            result = MapErrorCode(GetSocketError());
+            goto done;
+        } else if (error) {
+            result = MapErrorCode(error);
+            goto done;
         }
     }
     
     // get socket info
     RefreshInfo();
 
-    // done
-    return NPT_SUCCESS;
+done:
+    // put the fd back in its original blocking mode
+    if (m_Blocking) m_SocketFdReference->SetBlockingMode(true);
+
+    return result;
 }
 
 /*----------------------------------------------------------------------

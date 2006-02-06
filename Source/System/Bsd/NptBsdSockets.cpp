@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Sockets :: BSD/Winsock Implementation
+|   Neptune - Sockets :: BSD/Winsock Implementation
 |
-|      (c) 2001-2002 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2002 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 #define __WIN32__
@@ -71,12 +71,12 @@
 #include "NptConstants.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 5;
 
 /*----------------------------------------------------------------------
-|       WinSock adaptation layer
+|   WinSock adaptation layer
 +---------------------------------------------------------------------*/
 #if defined(__WIN32__)
 #include "NptWin32Network.h"
@@ -188,7 +188,7 @@ typedef int    SocketFd;
 #define RESOLVER_TIMEOUT (5 * 1000 * 1000)
 #define RESOLVER_RETRY 5
 
-#else  // normal unix
+#else  // unix-style BSD sockets
 #define NPT_BSD_INVALID_SOCKET (-1)
 #define NPT_BSD_SOCKET_ERROR   (-1)
 #define NPT_BSD_IOCTL_ERROR    (-1)
@@ -202,7 +202,7 @@ typedef int    SocketFd;
 #endif
 
 /*----------------------------------------------------------------------
-|       SocketAddressToInetAddress
+|   SocketAddressToInetAddress
 +---------------------------------------------------------------------*/
 static void
 SocketAddressToInetAddress(const NPT_SocketAddress& socket_address, 
@@ -218,7 +218,7 @@ SocketAddressToInetAddress(const NPT_SocketAddress& socket_address,
 }
 
 /*----------------------------------------------------------------------
-|       InetAddressToSocketAddress
+|   InetAddressToSocketAddress
 +---------------------------------------------------------------------*/
 static void
 InetAddressToSocketAddress(const struct sockaddr_in* inet_address,
@@ -230,7 +230,7 @@ InetAddressToSocketAddress(const struct sockaddr_in* inet_address,
 }
 
 /*----------------------------------------------------------------------
-|       MapErrorCode
+|   MapErrorCode
 +---------------------------------------------------------------------*/
 static NPT_Result 
 MapErrorCode(int error)
@@ -268,7 +268,7 @@ MapErrorCode(int error)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::ResolveName
+|   NPT_IpAddress::ResolveName
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
@@ -314,7 +314,7 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketFd
+|   NPT_BsdSocketFd
 +---------------------------------------------------------------------*/
 class NPT_BsdSocketFd
 {
@@ -327,6 +327,7 @@ public:
 
     // methods
     SocketFd GetSocketFd() { return m_SocketFd; }
+    NPT_Result SetBlockingMode(bool blocking);
 
 private:
     // members
@@ -335,8 +336,55 @@ private:
 
 typedef NPT_Reference<NPT_BsdSocketFd> NPT_BsdSocketFdReference;
 
+#if defined(__WIN32__) || defined(__TCS__)
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketStream
+|   NPT_BsdSocketFd::SetBlockingMode
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketFd::SetBlockingMode(bool blocking)
+{
+    unsigned long args = blocking?0:1;
+    if (ioctlsocket(m_SocketFd, FIONBIO, &args) ==
+        NPT_BSD_IOCTL_ERROR) {
+            return NPT_FAILURE;
+    }
+    return NPT_SUCCESS;
+}
+#elif defined(__PSP__)
+/*----------------------------------------------------------------------
+|   NPT_BsdSocket::SetBlockingMode
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketFd::SetBlockingMode(bool blocking)
+{
+    unsigned long args = blocking?0:1;
+    if (setsockopt(m_SocketFd, SOL_SOCKET, SCE_NET_INET_SO_NBIO, &args, sizeof(args))) {
+        return NPT_FAILURE;
+    }
+    return NPT_SUCCESS;
+}
+#else
+/*----------------------------------------------------------------------
+|   NPT_BsdSocket::SetBlockingMode
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketFd::SetBlockingMode(bool blocking)
+{
+    int flags = fcntl(m_SocketFd, F_GETFL, 0);
+    if (blocking) {
+        flags ^= O_NONBLOCK;
+    } else {
+        flags |= O_NONBLOCK;
+    }
+    if (fcntl(m_SocketFd, F_SETFL, flags)) {
+        return NPT_FAILURE;
+    }
+    return NPT_SUCCESS;
+}
+#endif
+
+/*----------------------------------------------------------------------
+|   NPT_BsdSocketStream
 +---------------------------------------------------------------------*/
 class NPT_BsdSocketStream
 {
@@ -361,7 +409,7 @@ class NPT_BsdSocketStream
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketInputStream
+|   NPT_BsdSocketInputStream
 +---------------------------------------------------------------------*/
 class NPT_BsdSocketInputStream : public NPT_InputStream,
                                  private NPT_BsdSocketStream
@@ -385,7 +433,7 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketInputStream::Read
+|   NPT_BsdSocketInputStream::Read
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocketInputStream::Read(void*     buffer, 
@@ -413,7 +461,7 @@ NPT_BsdSocketInputStream::Read(void*     buffer,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketInputStream::GetSize
+|   NPT_BsdSocketInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
@@ -424,7 +472,7 @@ NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketInputStream::GetAvailable
+|   NPT_BsdSocketInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocketInputStream::GetAvailable(NPT_Size& available)
@@ -441,7 +489,7 @@ NPT_BsdSocketInputStream::GetAvailable(NPT_Size& available)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketOutputStream
+|   NPT_BsdSocketOutputStream
 +---------------------------------------------------------------------*/
 class NPT_BsdSocketOutputStream : public NPT_OutputStream,
                                   private NPT_BsdSocketStream
@@ -463,7 +511,7 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocketOutputStream::Write
+|   NPT_BsdSocketOutputStream::Write
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocketOutputStream::Write(const void*  buffer, 
@@ -493,7 +541,7 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket
+|   NPT_BsdSocket
 +---------------------------------------------------------------------*/
 class NPT_BsdSocket : public NPT_SocketInterface
 {
@@ -508,14 +556,11 @@ class NPT_BsdSocket : public NPT_SocketInterface
 
     // NPT_SocketInterface methods
 	NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true);
-	NPT_Result Connect(const NPT_SocketAddress& address,
-                       NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
-    NPT_Result WaitForConnection(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+	NPT_Result Connect(const NPT_SocketAddress& address, NPT_Timeout timeout);
+    NPT_Result WaitForConnection(NPT_Timeout timeout);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
     NPT_Result GetInfo(NPT_SocketInfo& info);
-
-    // methods
     NPT_Result SetBlockingMode(bool blocking);
 
  protected:
@@ -526,7 +571,7 @@ class NPT_BsdSocket : public NPT_SocketInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::NPT_BsdSocket
+|   NPT_BsdSocket::NPT_BsdSocket
 +---------------------------------------------------------------------*/
 NPT_BsdSocket::NPT_BsdSocket(SocketFd fd) : 
     m_SocketFdReference(new NPT_BsdSocketFd(fd)),
@@ -536,7 +581,7 @@ NPT_BsdSocket::NPT_BsdSocket(SocketFd fd) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::~NPT_BsdSocket
+|   NPT_BsdSocket::~NPT_BsdSocket
 +---------------------------------------------------------------------*/
 NPT_BsdSocket::~NPT_BsdSocket()
 {
@@ -545,7 +590,7 @@ NPT_BsdSocket::~NPT_BsdSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::Bind
+|   NPT_BsdSocket::Bind
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
@@ -578,7 +623,7 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::Connect
+|   NPT_BsdSocket::Connect
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdSocket::Connect(const NPT_SocketAddress&, NPT_Timeout)
@@ -588,7 +633,7 @@ NPT_BsdSocket::Connect(const NPT_SocketAddress&, NPT_Timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::WaitForConnection
+|   NPT_BsdSocket::WaitForConnection
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdSocket::WaitForConnection(NPT_Timeout)
@@ -598,7 +643,7 @@ NPT_BsdSocket::WaitForConnection(NPT_Timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::GetInputStream
+|   NPT_BsdSocket::GetInputStream
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::GetInputStream(NPT_InputStreamReference& stream)
@@ -616,7 +661,7 @@ NPT_BsdSocket::GetInputStream(NPT_InputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::GetOutputStream
+|   NPT_BsdSocket::GetOutputStream
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::GetOutputStream(NPT_OutputStreamReference& stream)
@@ -634,7 +679,7 @@ NPT_BsdSocket::GetOutputStream(NPT_OutputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::GetInfo
+|   NPT_BsdSocket::GetInfo
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::GetInfo(NPT_SocketInfo& info)
@@ -646,7 +691,7 @@ NPT_BsdSocket::GetInfo(NPT_SocketInfo& info)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::RefreshInfo
+|   NPT_BsdSocket::RefreshInfo
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::RefreshInfo()
@@ -675,58 +720,22 @@ NPT_BsdSocket::RefreshInfo()
     return NPT_SUCCESS;
 }
 
-#if defined(__WIN32__) || defined(__TCS__)
 /*----------------------------------------------------------------------
-|       NPT_BsdSocket::SetBlockingMode
+|   NPT_BsdSocket::SetBlockingMode
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdSocket::SetBlockingMode(bool blocking)
 {
-    unsigned long args = (blocking == true) ? 0 : 1;
-    if (ioctlsocket(m_SocketFdReference->GetSocketFd(), FIONBIO, &args) ==
-        NPT_BSD_IOCTL_ERROR) {
-        return NPT_FAILURE;
+    if (m_Blocking != blocking) {
+        m_SocketFdReference->SetBlockingMode(blocking);
+        m_Blocking = blocking;
     }
-    m_Blocking = blocking;
+
     return NPT_SUCCESS;
 }
-#elif defined(__PSP__)
-/*----------------------------------------------------------------------
-|       NPT_BsdSocket::SetBlockingMode
-+---------------------------------------------------------------------*/
-NPT_Result
-NPT_BsdSocket::SetBlockingMode(bool blocking)
-{
-    unsigned long args = (blocking == true) ? 0 : 1;
-    if (setsockopt(m_SocketFdReference->GetSocketFd(), SOL_SOCKET, SCE_NET_INET_SO_NBIO, &args, sizeof(args))) {
-        return NPT_FAILURE;
-    }
-    m_Blocking = blocking;
-    return NPT_SUCCESS;
-}
-#else
-/*----------------------------------------------------------------------
-|       NPT_BsdSocket::SetBlockingMode
-+---------------------------------------------------------------------*/
-NPT_Result
-NPT_BsdSocket::SetBlockingMode(bool blocking)
-{
-    int flags = fcntl(m_SocketFdReference->GetSocketFd(), F_GETFL, 0);
-    if (blocking == true) {
-        flags ^= O_NONBLOCK;
-    } else {
-        flags |= O_NONBLOCK;
-    }
-    if (fcntl(m_SocketFdReference->GetSocketFd(), F_SETFL, flags)) {
-        return NPT_FAILURE;
-    }
-    m_Blocking = blocking;
-    return NPT_SUCCESS;
-}
-#endif
 
 /*----------------------------------------------------------------------
-|       NPT_Socket::~NPT_Socket
+|   NPT_Socket::~NPT_Socket
 +---------------------------------------------------------------------*/
 NPT_Socket::~NPT_Socket()
 {
@@ -734,7 +743,7 @@ NPT_Socket::~NPT_Socket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpSocket
+|   NPT_BsdUdpSocket
 +---------------------------------------------------------------------*/
 class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
                          protected NPT_BsdSocket
@@ -760,18 +769,26 @@ class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpSocket::NPT_BsdUdpSocket
+|   NPT_BsdUdpSocket::NPT_BsdUdpSocket
 +---------------------------------------------------------------------*/
 NPT_BsdUdpSocket::NPT_BsdUdpSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_DGRAM, 0))
 {
+    // set default socket options
+    int option = 1;
+    setsockopt(m_SocketFdReference->GetSocketFd(), 
+               SOL_SOCKET, 
+               SO_BROADCAST, 
+               (SocketOption)&option, 
+               sizeof(option));
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpSocket::Connect
+|   NPT_BsdUdpSocket::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address, NPT_Timeout)
+NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address, 
+                          NPT_Timeout /* ignored */)
 {
     // setup an address structure
     struct sockaddr_in inet_address;
@@ -785,14 +802,6 @@ NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address, NPT_Timeout)
         return MapErrorCode(GetSocketError());
     }
     
-    // set default socket options
-    int option = 1;
-    setsockopt(m_SocketFdReference->GetSocketFd(), 
-               SOL_SOCKET, 
-               SO_BROADCAST, 
-               (SocketOption)&option, 
-               sizeof(option));
-
     // refresh socket info
     RefreshInfo();
 
@@ -800,7 +809,7 @@ NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address, NPT_Timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpSocket::Send
+|   NPT_BsdUdpSocket::Send
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet, 
@@ -841,7 +850,7 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpSocket::Receive
+|   NPT_BsdUdpSocket::Receive
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet, 
@@ -893,7 +902,7 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UdpSocket::NPT_UdpSocket
+|   NPT_UdpSocket::NPT_UdpSocket
 +---------------------------------------------------------------------*/
 NPT_UdpSocket::NPT_UdpSocket()
 {
@@ -903,7 +912,7 @@ NPT_UdpSocket::NPT_UdpSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UdpSocket::NPT_UdpSocket
+|   NPT_UdpSocket::NPT_UdpSocket
 +---------------------------------------------------------------------*/
 NPT_UdpSocket::NPT_UdpSocket(NPT_UdpSocketInterface* delegate) :
     m_UdpSocketDelegate(delegate)
@@ -911,7 +920,7 @@ NPT_UdpSocket::NPT_UdpSocket(NPT_UdpSocketInterface* delegate) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UdpSocket::~NPT_UdpSocket
+|   NPT_UdpSocket::~NPT_UdpSocket
 +---------------------------------------------------------------------*/
 NPT_UdpSocket::~NPT_UdpSocket()
 {
@@ -924,7 +933,7 @@ NPT_UdpSocket::~NPT_UdpSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket
+|   NPT_BsdUdpMulticastSocket
 +---------------------------------------------------------------------*/
 class NPT_BsdUdpMulticastSocket : public    NPT_UdpMulticastSocketInterface,
                                   protected NPT_BsdUdpSocket
@@ -948,21 +957,21 @@ class NPT_BsdUdpMulticastSocket : public    NPT_UdpMulticastSocketInterface,
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket
+|   NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket
 +---------------------------------------------------------------------*/
 NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::~NPT_BsdUdpMulticastSocket
+|   NPT_BsdUdpMulticastSocket::~NPT_BsdUdpMulticastSocket
 +---------------------------------------------------------------------*/
 NPT_BsdUdpMulticastSocket::~NPT_BsdUdpMulticastSocket()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::JoinGroup
+|   NPT_BsdUdpMulticastSocket::JoinGroup
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
@@ -988,7 +997,7 @@ NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::LeaveGroup
+|   NPT_BsdUdpMulticastSocket::LeaveGroup
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
@@ -1014,7 +1023,7 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::SetInterface
+|   NPT_BsdUdpMulticastSocket::SetInterface
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
@@ -1035,7 +1044,7 @@ NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdUdpMulticastSocket::SetTimeToLive
+|   NPT_BsdUdpMulticastSocket::SetTimeToLive
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
@@ -1054,7 +1063,7 @@ NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UdpMulticastSocket::NPT_UdpMulticastSocket
+|   NPT_UdpMulticastSocket::NPT_UdpMulticastSocket
 +---------------------------------------------------------------------*/
 NPT_UdpMulticastSocket::NPT_UdpMulticastSocket() :
     NPT_UdpSocket(NULL)
@@ -1066,7 +1075,7 @@ NPT_UdpMulticastSocket::NPT_UdpMulticastSocket() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UdpMulticastSocket::~NPT_UdpMulticastSocket
+|   NPT_UdpMulticastSocket::~NPT_UdpMulticastSocket
 +---------------------------------------------------------------------*/
 NPT_UdpMulticastSocket::~NPT_UdpMulticastSocket()
 {
@@ -1080,7 +1089,7 @@ NPT_UdpMulticastSocket::~NPT_UdpMulticastSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpClientSocket
+|   NPT_BsdTcpClientSocket
 +---------------------------------------------------------------------*/
 class NPT_BsdTcpClientSocket : protected NPT_BsdSocket
 {
@@ -1094,12 +1103,16 @@ class NPT_BsdTcpClientSocket : protected NPT_BsdSocket
                        NPT_Timeout              timeout);
     NPT_Result WaitForConnection(NPT_Timeout timeout);
 
+protected:
+    // methods
+    NPT_Result DoWaitForConnection(NPT_Timeout timeout);
+
     // friends
     friend class NPT_TcpClientSocket;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket
+|   NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0))
@@ -1107,14 +1120,14 @@ NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
+|   NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpClientSocket::Connect
+|   NPT_BsdTcpClientSocket::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address, 
@@ -1124,8 +1137,10 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     bool was_blocking = m_Blocking;
 
     // set the socket to nonblocking so that we can timeout on connect
-    if (NPT_FAILED(SetBlockingMode(false))) {
-        return NPT_FAILURE;
+    if (m_Blocking) {
+        if (NPT_FAILED(m_SocketFdReference->SetBlockingMode(false))) {
+            return NPT_FAILURE;
+        }
     }
 
     // convert the address
@@ -1139,8 +1154,9 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                         sizeof(inet_address));
     if (io_result == 0) {
         // immediate connection
-        // put back in original blocking mode
-        SetBlockingMode(was_blocking);
+
+        // put the fd back in its original blocking mode
+        if (was_blocking) m_SocketFdReference->SetBlockingMode(true);
 
         // get socket info
         RefreshInfo();
@@ -1150,30 +1166,36 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     if (io_result == NPT_BSD_SOCKET_ERROR && 
         GetSocketError() != EINPROGRESS && 
         GetSocketError() != EWOULDBLOCK) {   
-        // put back in original blocking mode
-        SetBlockingMode(was_blocking);
+        // put the fd back in its original blocking mode
+        if (was_blocking) m_SocketFdReference->SetBlockingMode(true);
 
         // error
         return MapErrorCode(GetSocketError());
     }
 
-    return WaitForConnection(timeout);
+    return DoWaitForConnection(timeout);
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpClientSocket::WaitForConnection
+|   NPT_BsdTcpClientSocket::WaitForConnection
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
 {
-    SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
-    int io_result;
-    bool was_blocking = m_Blocking;
+    // this function can only be called directly for non-blocking sockets
+    if (m_Blocking) return NPT_ERROR_INVALID_STATE;
 
-    // set the socket to nonblocking so that we can timeout on connect
-    if (NPT_FAILED(SetBlockingMode(false))) {
-        return NPT_FAILURE;
-    }
+    return DoWaitForConnection(timeout);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdTcpClientSocket::DoWaitForConnection
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_BsdTcpClientSocket::DoWaitForConnection(NPT_Timeout timeout)
+{
+    SocketFd socket_fd = m_SocketFdReference->GetSocketFd();
+    int      io_result;
 
     // wait for connection to succeed or fail
     fd_set read_set;
@@ -1197,19 +1219,22 @@ NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
                        timeout == NPT_TIMEOUT_INFINITE ? 
                        NULL : &timeout_value);
 
-    // put back in original blocking mode
-    SetBlockingMode(was_blocking);
+    // put the fd back in its original blocking mode
+    if (m_Blocking) m_SocketFdReference->SetBlockingMode(true);
 
     if (io_result == 0) {
-        if (!was_blocking) {
+        if (timeout == 0) {
+            // non-blocking call
             return NPT_ERROR_WOULD_BLOCK;
+        } else {
+            // timeout
+            return NPT_ERROR_TIMEOUT;
         }
-        // timeout
-        return NPT_ERROR_TIMEOUT;
-    }
-    if (FD_ISSET(socket_fd, &read_set) || 
-        FD_ISSET(socket_fd, &write_set)||
-        FD_ISSET(socket_fd, &except_set)) {
+    } else if (io_result == NPT_BSD_SOCKET_ERROR) {
+        return MapErrorCode(GetSocketError());
+    } else if (FD_ISSET(socket_fd, &read_set)    || 
+               FD_ISSET(socket_fd, &write_set)   ||
+               FD_ISSET(socket_fd, &except_set)) {
         int error;
         socklen_t length = sizeof(error);
         // get error status from socket
@@ -1233,7 +1258,7 @@ NPT_BsdTcpClientSocket::WaitForConnection(NPT_Timeout timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TcpClientSocket::NPT_TcpClientSocket
+|   NPT_TcpClientSocket::NPT_TcpClientSocket
 +---------------------------------------------------------------------*/
 NPT_TcpClientSocket::NPT_TcpClientSocket() :
     NPT_Socket(new NPT_BsdTcpClientSocket())
@@ -1241,7 +1266,7 @@ NPT_TcpClientSocket::NPT_TcpClientSocket() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TcpClientSocket::NPT_TcpClientSocket
+|   NPT_TcpClientSocket::NPT_TcpClientSocket
 +---------------------------------------------------------------------*/
 NPT_TcpClientSocket::~NPT_TcpClientSocket()
 {
@@ -1253,7 +1278,7 @@ NPT_TcpClientSocket::~NPT_TcpClientSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpServerSocket
+|   NPT_BsdTcpServerSocket
 +---------------------------------------------------------------------*/
 class NPT_BsdTcpServerSocket : public    NPT_TcpServerSocketInterface,
                                protected NPT_BsdSocket
@@ -1291,7 +1316,7 @@ class NPT_BsdTcpServerSocket : public    NPT_TcpServerSocketInterface,
 
     // NPT_TcpServerSocket methods
     NPT_Result Listen(unsigned int max_clients);
-    NPT_Result WaitForNewClient(NPT_Socket*& client);
+    NPT_Result WaitForNewClient(NPT_Socket*& client, NPT_Timeout timeout);
 
 protected:
     // members
@@ -1302,7 +1327,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket
+|   NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0)),
@@ -1311,14 +1336,14 @@ NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpServerSocket::~NPT_BsdTcpServerSocket
+|   NPT_BsdTcpServerSocket::~NPT_BsdTcpServerSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpServerSocket::~NPT_BsdTcpServerSocket()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpServerSocket::Listen
+|   NPT_BsdTcpServerSocket::Listen
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BsdTcpServerSocket::Listen(unsigned int max_clients)
@@ -1334,10 +1359,11 @@ NPT_BsdTcpServerSocket::Listen(unsigned int max_clients)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BsdTcpServerSocket::WaitForNewClient
+|   NPT_BsdTcpServerSocket::WaitForNewClient
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client)
+NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client, 
+                                         NPT_Timeout  /*timeout*/)
 {
     // check that we are listening for clients
     if (m_ListenMax == 0) {
@@ -1362,7 +1388,7 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TcpServerSocket::NPT_TcpServerSocket
+|   NPT_TcpServerSocket::NPT_TcpServerSocket
 +---------------------------------------------------------------------*/
 NPT_TcpServerSocket::NPT_TcpServerSocket()
 {
@@ -1372,7 +1398,7 @@ NPT_TcpServerSocket::NPT_TcpServerSocket()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TcpServerSocket::NPT_TcpServerSocket
+|   NPT_TcpServerSocket::NPT_TcpServerSocket
 +---------------------------------------------------------------------*/
 NPT_TcpServerSocket::~NPT_TcpServerSocket()
 {

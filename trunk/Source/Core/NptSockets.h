@@ -144,7 +144,8 @@ class NPT_TcpServerSocketInterface
 
     // interface methods
     virtual NPT_Result Listen(unsigned int max_clients) = 0;
-    virtual NPT_Result WaitForNewClient(NPT_Socket*& client) = 0;
+    virtual NPT_Result WaitForNewClient(NPT_Socket*& client, 
+                                        NPT_Timeout  timeout) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -279,8 +280,9 @@ public:
     NPT_Result Listen(unsigned int max_clients) {   
         return m_TcpServerSocketDelegate->Listen(max_clients);
     }
-    NPT_Result WaitForNewClient(NPT_Socket*& client) {
-        return m_TcpServerSocketDelegate->WaitForNewClient(client);
+    NPT_Result WaitForNewClient(NPT_Socket*& client, 
+                                NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
+        return m_TcpServerSocketDelegate->WaitForNewClient(client, timeout);
     }
 
 protected:

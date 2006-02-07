@@ -34,6 +34,9 @@ private:
     class Item;
 
 public:
+    // types
+    typedef T Element;
+
     class Iterator {
     public:
         Iterator() : m_Item(NULL) {}
@@ -120,22 +123,34 @@ public:
 		return NPT_SUCCESS;
 	}
 
-    template <typename X> 
-	NPT_Result Find(const X& predicate, Iterator& i, NPT_Ordinal n=0) const
+    template <typename X, typename P> 
+    NPT_Result ApplyUntil(const X& function, const T& predicate) const
+    {                          
+        Item* item = m_Head;
+        while (item) {
+            NPT_Result result = function(item->m_Data);
+            if (predicate(result)) return NPT_SUCCESS;
+            item = item->m_Next;
+        }
+
+        return NPT_SUCCESS;
+    }
+
+    template <typename P> 
+	Iterator Find(const P& predicate, NPT_Ordinal n=0) const
 	{
 		Item* item = m_Head;
 		while (item) {
 			if (predicate(item->m_Data)) {
 				if (n == 0) {
-					i = Iterator(item);
-					return NPT_SUCCESS;
+					return Iterator(item);
 				}
 				--n;
 			}
 			item = item->m_Next;
 		}
 
-		return NPT_ERROR_NO_SUCH_ITEM;
+		return Iterator(NULL);
 	}
 
     // operators
@@ -468,6 +483,22 @@ NPT_List<T>::PopHead(T& data)
     --m_ItemCount;
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_List<T>::Contains
++---------------------------------------------------------------------*/
+template <typename T>
+bool
+NPT_List<T>::Contains(const T& data) const
+{
+    Item* item = m_Head;
+    while (item) {
+        if (item->m_Data == data) return true;
+        item = item->m_Next;
+    }
+
+    return false;
 }
 
 #endif // _NPT_LIST_H_

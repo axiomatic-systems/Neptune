@@ -325,6 +325,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptStack.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptStreams.h"
 				>
 			</File>

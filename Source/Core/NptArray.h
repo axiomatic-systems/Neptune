@@ -29,6 +29,10 @@ template <typename T>
 class NPT_Array 
 {
 public:
+    // types
+    typedef T Element;
+    typedef T* Iterator;
+
     // methods
     NPT_Array<T>(): m_Capacity(0), m_ItemCount(0), m_Items(0) {}
     explicit NPT_Array<T>(NPT_Cardinal count);
@@ -43,16 +47,22 @@ public:
     NPT_Result   Add(const T& item);
     T& operator[](NPT_Ordinal pos)             { return m_Items[pos]; }
     const T& operator[](NPT_Ordinal pos) const { return m_Items[pos]; }
-    NPT_Result   Erase(NPT_Ordinal pos);
-    NPT_Result   Erase(NPT_Ordinal first, NPT_Ordinal last);
-    NPT_Result   Insert(NPT_Ordinal pos, const T& item, NPT_Cardinal count = 1);
+    NPT_Result   Erase(Iterator which);
+    NPT_Result   Erase(NPT_Ordinal which) { return Erase(&m_Items[which]); }
+    NPT_Result   Erase(Iterator first, Iterator last);
+    NPT_Result   Erase(NPT_Ordinal first, NPT_Ordinal last) { return Erase(&m_Items[first], &m_Items[last]); }
+    NPT_Result   Insert(Iterator where, const T& item, NPT_Cardinal count = 1);
 	NPT_Result   Reserve(NPT_Cardinal count);
     NPT_Cardinal GetCapacity(NPT_Cardinal count) const;
     NPT_Result   Resize(NPT_Cardinal count);
     NPT_Result   Resize(NPT_Cardinal count, const T& fill);
     NPT_Result   Clear();
+    bool         Contains(const T& data) const;
+    Iterator     GetFirstItem() const { return m_ItemCount?&m_Items[0]:NULL; }
+    Iterator     GetLastItem() const  { return m_ItemCount?m_Items[&m_ItemCount-1]:NULL; }
+    Iterator     GetItem(NPT_Ordinal n) { return n<m_ItemCount?&m_Items[n]:NULL; }
 
-	// template list operations
+    // template list operations
 	// keep these template members defined here because MSV6 does not let
 	// us define them later
 	template <typename X> 
@@ -61,20 +71,27 @@ public:
 		for (unsigned int i=0; i<m_ItemCount; i++) function(m_Items[i]);
 		return NPT_SUCCESS;
 	}
-	template <typename X> 
-	NPT_Result Find(const X& predicate, NPT_Ordinal& position, NPT_Ordinal n=0) const
+
+    template <typename X, typename P>
+    NPT_Result ApplyUntil(const X& function, const P& predicate) const
+    {                                  
+        for (unsigned int i=0; i<m_ItemCount; i++) {
+            NPT_Result result = function(m_Items[i]);
+            if (predicate(result)) return NPT_SUCCESS;
+        }
+        return NPT_SUCCESS;
+    }
+
+    template <typename X> 
+	T* Find(const X& predicate, NPT_Ordinal n=0) const
 	{
 		for (unsigned int i=0; i<m_ItemCount; i++) {
 			if (predicate(m_Items[i])) {
-				if (n == 0) {
-					position = i;
-					return NPT_SUCCESS;
-				}
+				if (n == 0) return &m_Items[i];
 				--n;
 			}
 		}
-		position = 0; // do not leave the result undefined
-		return NPT_ERROR_NO_SUCH_ITEM;
+		return NULL;
 	}
 
 protected:
@@ -278,9 +295,9 @@ NPT_Array<T>::Add(const T& item)
 template <typename T>
 inline
 NPT_Result
-NPT_Array<T>::Erase(NPT_Ordinal pos)
+NPT_Array<T>::Erase(Iterator which)
 {
-    return Erase(pos, pos);
+    return Erase(which, which);
 }
 
 /*----------------------------------------------------------------------
@@ -288,24 +305,29 @@ NPT_Array<T>::Erase(NPT_Ordinal pos)
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_Array<T>::Erase(NPT_Ordinal first, NPT_Ordinal last)
+NPT_Array<T>::Erase(Iterator first, Iterator last)
 {
+    // check parameters
+    if (first == NULL || last == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
     // check the bounds
-    if (first >= m_ItemCount ||
-        last  >= m_ItemCount ||
-        first > last) {
+    NPT_Ordinal first_index = NPT_POINTER_TO_LONG(first-m_Items);
+    NPT_Ordinal last_index  = NPT_POINTER_TO_LONG(last-m_Items);
+    if (first_index >= m_ItemCount ||
+        last_index  >= m_ItemCount ||
+        first_index > last_index) {
         return NPT_ERROR_INVALID_PARAMETERS;
     }
 
     // shift items to the left
-    NPT_Cardinal interval = last-first+1;
-    NPT_Cardinal shifted = m_ItemCount-last-1;
-    for (NPT_Ordinal i=first; i<first+shifted; i++) {
+    NPT_Cardinal interval = last_index-first_index+1;
+    NPT_Cardinal shifted = m_ItemCount-last_index-1;
+    for (NPT_Ordinal i=first_index; i<first_index+shifted; i++) {
         m_Items[i] = m_Items[i+interval];
     }
 
     // destruct the remaining items
-    for (NPT_Ordinal i=first+shifted; i<m_ItemCount; i++) {
+    for (NPT_Ordinal i=first_index+shifted; i<m_ItemCount; i++) {
         m_Items[i].~T();
     }
 
@@ -320,10 +342,11 @@ NPT_Array<T>::Erase(NPT_Ordinal first, NPT_Ordinal last)
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
-NPT_Array<T>::Insert(NPT_Ordinal where, const T& item, NPT_Cardinal repeat)
+NPT_Array<T>::Insert(Iterator where, const T& item, NPT_Cardinal repeat)
 {
     // check bounds
-    if (where > m_ItemCount || repeat == 0) return NPT_ERROR_INVALID_PARAMETERS;
+    NPT_Ordinal where_index = where?NPT_POINTER_TO_LONG(where-m_Items):m_ItemCount;
+    if (where > &m_Items[m_ItemCount] || repeat == 0) return NPT_ERROR_INVALID_PARAMETERS;
 
     NPT_Cardinal needed = m_ItemCount+repeat;
     if (needed < m_Capacity) {
@@ -334,13 +357,13 @@ NPT_Array<T>::Insert(NPT_Ordinal where, const T& item, NPT_Cardinal repeat)
         m_Capacity = new_capacity;
 
         // move the items before the insertion point
-        for (NPT_Ordinal i=0; i<where; i++) {
+        for (NPT_Ordinal i=0; i<where_index; i++) {
             new((void*)&new_items[i])T(m_Items[i]);
             m_Items[i].~T();
         }
 
         // move the items after the insertion point
-        for (NPT_Ordinal i=where; i<m_ItemCount; i++) {
+        for (NPT_Ordinal i=where_index; i<m_ItemCount; i++) {
             new((void*)&new_items[i+repeat])T(m_Items[i]);
             m_Items[i].~T();
         }
@@ -350,14 +373,14 @@ NPT_Array<T>::Insert(NPT_Ordinal where, const T& item, NPT_Cardinal repeat)
         m_Items = new_items;
     } else {
         // shift items after the insertion point to the right
-        for (NPT_Ordinal i=m_ItemCount; i>where; i--) {
+        for (NPT_Ordinal i=m_ItemCount; i>where_index; i--) {
             new((void*)&m_Items[i+repeat-1])T(m_Items[i-1]);
 			m_Items[i-1].~T();
         }
     }
 
 	// insert the new items
-	for (NPT_Cardinal i=where; i<where+repeat; i++) {
+	for (NPT_Cardinal i=where_index; i<where_index+repeat; i++) {
 		new((void*)&m_Items[i])T(item);
 	}
 
@@ -404,6 +427,20 @@ NPT_Array<T>::Resize(NPT_Cardinal size, const T& fill)
     }
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Array<T>::Contains
++---------------------------------------------------------------------*/
+template <typename T>
+bool
+NPT_Array<T>::Contains(const T& data) const
+{
+    for (NPT_Ordinal i=0; i<m_ItemCount; i++) {
+        if (m_Items[i] == data) return true;
+    }
+
+    return false;
 }
 
 /*----------------------------------------------------------------------

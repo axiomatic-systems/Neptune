@@ -195,11 +195,8 @@ NPT_XmlElementNode*
 NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n)
 {
     NPT_List<NPT_XmlNode*>::Iterator item;
-    if (NPT_SUCCEEDED(m_Children.Find(NPT_XmlTagFinder(tag, namespc), item, n))) {
-        return (*item)->AsElementNode();
-    } else {
-        return NULL;
-    }
+    item = m_Children.Find(NPT_XmlTagFinder(tag, namespc), n);
+    return item?(*item)->AsElementNode():NULL;
 }
 
 /*----------------------------------------------------------------------
@@ -256,11 +253,8 @@ const NPT_String*
 NPT_XmlElementNode::GetText(NPT_Ordinal n) const
 {
     NPT_List<NPT_XmlNode*>::Iterator node;
-    if (NPT_SUCCEEDED(m_Children.Find(NPT_XmlTextFinder(), node, n))) {
-        return &(*node)->AsTextNode()->GetString();
-    } else {
-        return NULL;
-    }
+    node = m_Children.Find(NPT_XmlTextFinder(), n);
+    return node?&(*node)->AsTextNode()->GetString():NULL;
 }
 
 /*----------------------------------------------------------------------

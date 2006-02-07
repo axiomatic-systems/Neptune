@@ -14,6 +14,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
+#include "NptResults.h"
 
 /*----------------------------------------------------------------------
 |       NPT_ObjectDeleter
@@ -57,6 +58,58 @@ NPT_Result NPT_ContainerFind(T&                   container,
         return NPT_ERROR_NO_SUCH_ITEM;
     }
 }
+
+/*----------------------------------------------------------------------
+|       NPT_UntilResultEqual
++---------------------------------------------------------------------*/
+class NPT_UntilResultEqual
+{
+public:
+    // methods
+    NPT_UntilResultEqual(NPT_Result condition_result, 
+                         NPT_Result return_value = NPT_SUCCESS) :
+      m_ConditionResult(condition_result),
+      m_ReturnValue(return_value) {}
+    bool operator()(NPT_Result result, NPT_Result& return_value) const {
+        if (result == m_ConditionResult) {
+            return_value = m_ReturnValue;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+private:
+    // members
+    NPT_Result m_ConditionResult;
+    NPT_Result m_ReturnValue;
+};
+
+/*----------------------------------------------------------------------
+|       NPT_UntilResultNotEqual
++---------------------------------------------------------------------*/
+class NPT_UntilResultNotEqual
+{
+public:
+    // methods
+    NPT_UntilResultNotEqual(NPT_Result condition_result, 
+                            NPT_Result return_value = NPT_SUCCESS) :
+      m_ConditionResult(condition_result),
+      m_ReturnValue(return_value) {}
+    bool operator()(NPT_Result result, NPT_Result& return_value) const {
+        if (result != m_ConditionResult) {
+            return_value = m_ReturnValue;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+private:
+    // members
+    NPT_Result m_ConditionResult;
+    NPT_Result m_ReturnValue;
+};
 
 /*----------------------------------------------------------------------
 |       NPT_PropertyValue

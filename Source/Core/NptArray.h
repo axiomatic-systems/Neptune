@@ -77,9 +77,10 @@ public:
     {                                  
         for (unsigned int i=0; i<m_ItemCount; i++) {
             NPT_Result result = function(m_Items[i]);
-            if (predicate(result)) return NPT_SUCCESS;
+            NPT_Result return_value;
+            if (predicate(result, return_value)) return return_value;
         }
-        return NPT_SUCCESS;
+        return NPT_ERROR_NO_SUCH_ITEM;
     }
 
     template <typename X> 

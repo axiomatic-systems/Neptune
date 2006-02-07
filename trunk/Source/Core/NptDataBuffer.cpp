@@ -98,7 +98,8 @@ NPT_DataBuffer::SetBuffer(NPT_Byte* buffer, NPT_Size buffer_size)
     m_BufferIsLocal = false;
     m_Buffer = buffer;
     m_BufferSize = buffer_size;
-
+    m_DataSize = 0;
+    
     return NPT_SUCCESS;
 }
 
@@ -167,7 +168,7 @@ NPT_DataBuffer::ReallocateBuffer(NPT_Size size)
     // allocate a new buffer
     NPT_Byte* newBuffer = new NPT_Byte[size];
 
-    // copy the contents of the previous buffer ,is any
+    // copy the contents of the previous buffer, if any
 	if (m_Buffer && m_DataSize) {
             NPT_CopyMemory(newBuffer, m_Buffer, m_DataSize);
 	}

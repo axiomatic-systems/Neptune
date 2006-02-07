@@ -41,6 +41,24 @@ private:
 };
 
 /*----------------------------------------------------------------------
+|       NPT_ContainerFind
++---------------------------------------------------------------------*/
+template <typename T, typename P>
+NPT_Result NPT_ContainerFind(T&                   container, 
+                             const P&             predicate, 
+                             typename T::Element& item, 
+                             NPT_Ordinal          n=0) 
+{
+    container::Iterator found = container.Find(predicate, n);
+    if (found) {
+        item = *found;
+        return NPT_SUCCESS;
+    } else {
+        return NPT_ERROR_NO_SUCH_ITEM;
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_PropertyValue
 +---------------------------------------------------------------------*/
 class NPT_PropertyValue

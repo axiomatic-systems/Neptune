@@ -43,12 +43,23 @@ public:
         A_Count--;
     }
     bool Check() { return _c == &_a; }
-    bool operator==(const A& other) {
+    bool operator==(const A& other) const {
         return _a == other._a && _b == other._b;
     }
     int _a;
     char _b;
     int* _c;
+};
+
+static int ApplyCounter = 0;
+class Test1 {
+public: 
+    NPT_Result operator()(const A& a) const {
+        ApplyCounter++;
+        A aa(3,4);
+        if (a == aa) return NPT_ERROR_OUT_OF_MEMORY;
+        return NPT_SUCCESS;
+    }
 };
 
 /*----------------------------------------------------------------------
@@ -84,7 +95,27 @@ main(int /*argc*/, char** /*argv*/)
 	NPT_ASSERT(a_list.GetItemCount() == 3);
 	NPT_ASSERT(*a_list.GetLastItem() == A(1,2));
 
-	a_list.Insert(NPT_List<A>::Iterator(NULL), A(3,4));
+    // test ApplyUntil 
+    ApplyCounter = 0;
+    bool applied;
+    NPT_Result result = a_list.ApplyUntil(Test1(), NPT_UntilResultEquals(NPT_ERROR_OUT_OF_MEMORY), &applied);
+    NPT_ASSERT(applied == true);
+    NPT_ASSERT(result == NPT_SUCCESS);
+    NPT_ASSERT(ApplyCounter == 2);
+
+    ApplyCounter = 0;
+    result = a_list.ApplyUntil(Test1(), NPT_UntilResultNotEquals(NPT_SUCCESS), &applied);
+    NPT_ASSERT(applied == true);
+    NPT_ASSERT(result == NPT_ERROR_OUT_OF_MEMORY);
+    NPT_ASSERT(ApplyCounter == 2);
+
+    ApplyCounter = 0;
+    result = a_list.ApplyUntil(Test1(), NPT_UntilResultEquals(NPT_FAILURE), &applied);
+    NPT_ASSERT(applied == false);
+    NPT_ASSERT(result == NPT_SUCCESS);
+    NPT_ASSERT(ApplyCounter == 3);
+
+    a_list.Insert(NPT_List<A>::Iterator(NULL), A(3,4));
 	NPT_ASSERT(a_list.GetItemCount() == 4);
 	NPT_ASSERT(*a_list.GetLastItem() == A(3,4));
 

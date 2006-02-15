@@ -50,7 +50,7 @@ NPT_Result NPT_ContainerFind(T&                   container,
                              typename T::Element& item, 
                              NPT_Ordinal          n=0) 
 {
-    container::Iterator found = container.Find(predicate, n);
+    typename T::Iterator found = container.Find(predicate, n);
     if (found) {
         item = *found;
         return NPT_SUCCESS;
@@ -60,14 +60,14 @@ NPT_Result NPT_ContainerFind(T&                   container,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UntilResultEqual
+|       NPT_UntilResultEquals
 +---------------------------------------------------------------------*/
-class NPT_UntilResultEqual
+class NPT_UntilResultEquals
 {
 public:
     // methods
-    NPT_UntilResultEqual(NPT_Result condition_result, 
-                         NPT_Result return_value = NPT_SUCCESS) :
+    NPT_UntilResultEquals(NPT_Result condition_result, 
+                          NPT_Result return_value = NPT_SUCCESS) :
       m_ConditionResult(condition_result),
       m_ReturnValue(return_value) {}
     bool operator()(NPT_Result result, NPT_Result& return_value) const {
@@ -86,19 +86,17 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UntilResultNotEqual
+|       NPT_UntilResultNotEquals
 +---------------------------------------------------------------------*/
-class NPT_UntilResultNotEqual
+class NPT_UntilResultNotEquals
 {
 public:
     // methods
-    NPT_UntilResultNotEqual(NPT_Result condition_result, 
-                            NPT_Result return_value = NPT_SUCCESS) :
-      m_ConditionResult(condition_result),
-      m_ReturnValue(return_value) {}
+    NPT_UntilResultNotEquals(NPT_Result condition_result) :
+      m_ConditionResult(condition_result) {}
     bool operator()(NPT_Result result, NPT_Result& return_value) const {
         if (result != m_ConditionResult) {
-            return_value = m_ReturnValue;
+            return_value = result;
             return true;
         } else {
             return false;
@@ -108,7 +106,6 @@ public:
 private:
     // members
     NPT_Result m_ConditionResult;
-    NPT_Result m_ReturnValue;
 };
 
 /*----------------------------------------------------------------------

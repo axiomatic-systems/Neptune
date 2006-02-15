@@ -10,24 +10,25 @@
 #######################################################################
 # sources and object files
 #######################################################################
-NPT_MODULE_SOURCES = \
-	NptStreams.cpp 		        \
-	NptCommon.cpp			\
-	NptDebug.cpp			\
-	NptStrings.cpp			\
-	NptMessaging.cpp		\
-	NptRingBuffer.cpp		\
-	NptSockets.cpp			\
-	NptSystem.cpp			\
-	NptSimpleMessageQueue.cpp	\
-	NptThreads.cpp			\
-	NptTime.cpp			\
-	NptXml.cpp			\
-	NptUri.cpp			\
-	NptHttp.cpp			\
-	NptUtils.cpp		        \
-	NptDataBuffer.cpp		\
-	NptBufferedStreams.cpp		\
+NPT_MODULE_SOURCES =          \
+	NptStreams.cpp 		      \
+	NptCommon.cpp			  \
+	NptDebug.cpp			  \
+	NptStrings.cpp			  \
+	NptMessaging.cpp		  \
+	NptRingBuffer.cpp		  \
+	NptSockets.cpp			  \
+	NptNetwork.cpp			  \
+	NptSystem.cpp			  \
+	NptSimpleMessageQueue.cpp \
+	NptThreads.cpp			  \
+	NptTime.cpp			      \
+	NptXml.cpp			      \
+	NptUri.cpp		      	  \
+	NptHttp.cpp			      \
+	NptUtils.cpp		      \
+	NptDataBuffer.cpp		  \
+	NptBufferedStreams.cpp	  \
 	NptBase64.cpp
 
 NPT_MODULE_OBJECTS = $(NPT_MODULE_SOURCES:.cpp=.o)

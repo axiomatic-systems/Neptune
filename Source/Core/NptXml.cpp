@@ -229,8 +229,8 @@ const NPT_String*
 NPT_XmlElementNode::GetAttribute(const char* name, const char* namespc) const
 {
     NPT_List<NPT_XmlAttribute*>::Iterator attribute;
-    if (NPT_SUCCEEDED(m_Attributes.Find(NPT_XmlAttributeFinder(name, namespc), 
-                                        attribute))) { 
+    attribute = m_Attributes.Find(NPT_XmlAttributeFinder(name, namespc));
+    if (attribute) { 
         return &(*attribute)->GetValue();
     } else {
         return NULL;

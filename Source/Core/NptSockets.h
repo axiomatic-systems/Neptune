@@ -68,6 +68,7 @@ public:
     NPT_IpPort GetPort() const { 
         return m_Port; 
     }
+    NPT_String ToString() const;
 
 private:
     // members

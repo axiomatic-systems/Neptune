@@ -17,7 +17,7 @@
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <net/if.h>
-#include <net/if_arp.h>
+//#include <net/if_arp.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -30,6 +30,16 @@
 #include "NptNetwork.h"
 #include "NptUtils.h"
 #include "NptConstants.h"
+
+/*----------------------------------------------------------------------
+|       platform adaptation
++---------------------------------------------------------------------*/
+#if !defined(IFHWADDRLEN)
+#define IFHWADDRLEN 6 // default to 48 bits
+#endif
+#if !defined(ARPHRD_ETHER)
+#define ARPHRD_ETHER 1
+#endif
 
 /*----------------------------------------------------------------------
 |       NPT_NetworkInterface::GetNetworkInterfaces
@@ -83,9 +93,11 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
             sizeof(sockaddr) : entry->ifr_addr.sa_len;
 #else
         switch (entry->ifr_addr.sa_family) {
+#if defined(AF_INET6)
             case AF_INET6:
                 address_length = sizeof(struct sockaddr_in6);
                 break;
+#endif // defined(AF_INET6)
                 
             default:
                 address_length = sizeof(struct sockaddr);
@@ -117,9 +129,11 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         if (query.ifr_flags & IFF_LOOPBACK) {
             flags |= NPT_NETWORK_INTERFACE_FLAG_LOOPBACK;
         }
+#if defined(IFF_POINTOPOINT)
         if (query.ifr_flags & IFF_POINTOPOINT) {
             flags |= NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT;
         }
+#endif // defined(IFF_POINTOPOINT)
         if (query.ifr_flags & IFF_PROMISC) {
             flags |= NPT_NETWORK_INTERFACE_FLAG_PROMISCUOUS;
         }
@@ -131,34 +145,42 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         NPT_MacAddress mac;
 #if defined(SIOCGIFHWADDR)
         if (ioctl(net, SIOCGIFHWADDR, &query) == 0) {
-            NPT_MacAddress::Type type;
-            unsigned int length = 6; // default to 48 bits
-            //printf("***** type = %d\n", query.ifr_addr.sa_family);
+            NPT_MacAddress::Type mac_addr_type;
+            unsigned int         mac_addr_length = IFHWADDRLEN;
             switch (query.ifr_addr.sa_family) {
+#if defined(ARPHRD_ETHER)
                 case ARPHRD_ETHER:
-                    type = NPT_MacAddress::TYPE_ETHERNET;
+                    mac_addr_type = NPT_MacAddress::TYPE_ETHERNET;
                     break;
-                    
+#endif
+
+#if defined(ARPHRD_LOOPBACK)
                 case ARPHRD_LOOPBACK:
-                    type = NPT_MacAddress::TYPE_LOOPBACK;
+                    mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK;
                     length = 0;
                     break;
+#endif
                           
+#if defined(ARPHRD_PPP)
                 case ARPHRD_PPP:
-                    type = NPT_MacAddress::TYPE_PPP;
-                    length = 0;
+                    mac_addr_type = NPT_MacAddress::TYPE_PPP;
+                    mac_addr_length = 0;
                     break;
+#endif
                     
+#if defined(ARPHRD_IEEE80211)
                 case ARPHRD_IEEE80211:
-                    type = NPT_MacAddress::TYPE_IEEE_802_11;
+                    mac_addr_type = NPT_MacAddress::TYPE_IEEE_802_11;
                     break;
+#endif
                                    
                 default:
-                    type = NPT_MacAddress::TYPE_UNKNOWN;
+                    mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
+                    mac_addr_length = sizeof(query.ifr_addr.sa_data);
                     break;
             }
                 
-            mac.SetAddress(type, (const unsigned char*)query.ifr_addr.sa_data, length);
+            mac.SetAddress(mac_addr_type, (const unsigned char*)query.ifr_addr.sa_data, mac_addr_length);
         }
 #endif
 

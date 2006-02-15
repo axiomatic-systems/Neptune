@@ -55,6 +55,7 @@ SDK: dirs libNeptune.a
 	@cp $(NPT_SOURCE_ROOT)/Core/NptSelectableMessageQueue.h $(NPT_SDK_INCLUDE_DIR)
 	@cp $(NPT_SOURCE_ROOT)/Core/NptSimpleMessageQueue.h $(NPT_SDK_INCLUDE_DIR)
 	@cp $(NPT_SOURCE_ROOT)/Core/NptSockets.h $(NPT_SDK_INCLUDE_DIR)
+	@cp $(NPT_SOURCE_ROOT)/Core/NptNetwork.h $(NPT_SDK_INCLUDE_DIR)
 	@cp $(NPT_SOURCE_ROOT)/Core/NptStrings.h $(NPT_SDK_INCLUDE_DIR)
 	@cp $(NPT_SOURCE_ROOT)/Core/NptSystem.h $(NPT_SDK_INCLUDE_DIR)
 	@cp $(NPT_SOURCE_ROOT)/Core/NptThreads.h $(NPT_SDK_INCLUDE_DIR)

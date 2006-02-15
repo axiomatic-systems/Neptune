@@ -631,3 +631,45 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
 
     return NPT_SUCCESS;
 }
+
+/*----------------------------------------------------------------------
+|       NPT_HttpServer::NPT_HttpServer
++---------------------------------------------------------------------*/
+NPT_HttpServer::NPT_HttpServer() : m_Port(NPT_HTTP_DEFAULT_PORT)
+{
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HttpServer::~NPT_HttpServer
++---------------------------------------------------------------------*/
+NPT_HttpServer::~NPT_HttpServer()
+{
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HttpServer::WaitForRequest
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpServer::WaitForRequest(NPT_HttpRequest*& request, NPT_Timeout timeout)
+{
+    // setup default values
+    request = NULL;
+
+    // wait for a connection
+    NPT_TcpServerSocket server;
+    NPT_Socket*         client;
+    NPT_Debug("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...\n", m_Port);
+    NPT_CHECK(server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, m_Port)));
+    NPT_CHECK(server.WaitForNewClient(client, timeout));
+
+#if defined(NPT_DEBUG)
+    if (client == NULL) return NPT_ERROR_INTERNAL;
+    NPT_SocketInfo client_info;
+    client->GetInfo(client_info);
+    NPT_Debug("NPT_HttpServer::WaitForRequest - client connected (%s)\n",
+              client_info.local_address.ToString().GetChars(),
+              client_info.remote_address.ToString().GetChars());
+#endif // NPT_DEBUG
+
+    return NPT_SUCCESS;
+}

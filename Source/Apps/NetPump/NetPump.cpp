@@ -361,8 +361,6 @@ GetEndPointStreams(EndPoint*                  endpoint,
 static NPT_Result
 GetEndPointUdpSocket(EndPoint* endpoint, NPT_UdpSocket*& udp_socket)
 {
-    NPT_Result result = NPT_FAILURE;
-
     // default return values
     if (udp_socket) udp_socket = NULL;
 

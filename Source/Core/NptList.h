@@ -124,17 +124,20 @@ public:
 	}
 
     template <typename X, typename P> 
-    NPT_Result ApplyUntil(const X& function, const T& predicate) const
+    NPT_Result ApplyUntil(const X& function, const P& predicate, bool* match = NULL) const
     {                          
         Item* item = m_Head;
         while (item) {
-            NPT_Result result = function(item->m_Data);
             NPT_Result return_value;
-            if (predicate(result, return_value)) return return_value;
+            if (predicate(function(item->m_Data), return_value)) {
+                if (match) *match = true;
+                return return_value;
+            }
             item = item->m_Next;
         }
-
-        return NPT_ERROR_NO_SUCH_ITEM;
+        
+        if (match) *match = false;
+        return NPT_SUCCESS;
     }
 
     template <typename P> 

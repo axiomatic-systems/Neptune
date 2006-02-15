@@ -52,6 +52,23 @@ private:
 };
 
 /*----------------------------------------------------------------------
+|       NPT_XmlAttributeFinderWithPrefix
++---------------------------------------------------------------------*/
+class NPT_XmlAttributeFinderWithPrefix
+{
+public:
+    NPT_XmlAttributeFinderWithPrefix(const char* prefix, const char* name) : 
+      m_Prefix(prefix), m_Name(name) {}
+      bool operator()(const NPT_XmlAttribute* const & attribute) const {
+          return attribute->m_Prefix == m_Prefix && attribute->m_Name == m_Name;
+      }
+
+private:
+    const char* m_Prefix;
+    const char* m_Name;
+};
+
+/*----------------------------------------------------------------------
 |       NPT_XmlTagFinder
 +---------------------------------------------------------------------*/
 class NPT_XmlTagFinder
@@ -203,23 +220,40 @@ NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n
 |       NPT_XmlElementNode::AddAttribute
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlElementNode::AddAttribute(const char* prefix,
-                                 const char* name, 
-                                 const char* value)
-{
-    if (name == NULL || value == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-    return m_Attributes.Add(new NPT_XmlAttribute(prefix, name, value));
-}
-
-/*----------------------------------------------------------------------
-|       NPT_XmlElementNode::AddAttribute
-+---------------------------------------------------------------------*/
-NPT_Result
 NPT_XmlElementNode::AddAttribute(const char* name, 
                                  const char* value)
 {
     if (name == NULL || value == NULL) return NPT_ERROR_INVALID_PARAMETERS;
     return m_Attributes.Add(new NPT_XmlAttribute(name, value));
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlElementNode::SetAttribute
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_XmlElementNode::SetAttribute(const char* prefix,
+                                 const char* name, 
+                                 const char* value)
+{
+    if (name == NULL || value == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    /* see if this attribute is already set */
+    NPT_List<NPT_XmlAttribute*>::Iterator attribute;
+    attribute = m_Attributes.Find(NPT_XmlAttributeFinderWithPrefix(prefix, name));
+    if (attribute) {
+        // an attribute with this name and prefix already exists
+        return NPT_SUCCESS;
+    }
+    return m_Attributes.Add(new NPT_XmlAttribute(prefix, name, value));
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlElementNode::SetAttribute
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_XmlElementNode::SetAttribute(const char* name, const char* value)
+{
+    return SetAttribute(NULL, name, value);
 }
 
 /*----------------------------------------------------------------------

@@ -133,7 +133,7 @@ TestSerializer()
 
     // with one attribute
     output.SetSize(0);
-    top->AddAttribute("attr1", "b&w");
+    top->SetAttribute("attr1", "b&w");
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
@@ -163,6 +163,20 @@ TestSerializer()
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
     CHECK(check == "<top xmlns=\"http://namespace.com\"/>", check);
+
+    // test attribute prefixes
+    output.SetSize(0);
+    delete top;
+    top = new NPT_XmlElementNode("top");
+    top->SetAttribute(NULL,  "foo", "6");
+    top->SetAttribute("ns1", "foo", "3");
+    top->SetAttribute("ns2", "foo", "4");
+    top->SetAttribute("ns1", "foo", "5");
+    writer.Serialize(*top, output);
+    output.GetSize(size);
+    check.Assign((const char*)output.GetData(), size);
+    CHECK(check == "<top foo=\"6\" ns1:foo=\"3\" ns2:foo=\"4\"/>", check);
+
 }
 
 /*----------------------------------------------------------------------

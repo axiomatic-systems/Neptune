@@ -72,6 +72,7 @@
 
 /* cygwin */
 #if defined(__CYGWIN__)
+#undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
 #endif
 
 /* linux */

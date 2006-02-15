@@ -253,4 +253,22 @@ protected:
     // members
 };
 
+/*----------------------------------------------------------------------
+|       NPT_HttpServer
++---------------------------------------------------------------------*/
+class NPT_HttpServer {
+public:
+    // constructors and destructor
+    NPT_HttpServer();
+    virtual ~NPT_HttpServer();
+
+    // methods
+    NPT_Result WaitForRequest(NPT_HttpRequest*& request,
+                              NPT_Timeout       timeout = NPT_TIMEOUT_INFINITE);
+
+protected:
+    // members
+    NPT_UInt16 m_Port;
+};
+
 #endif // _NPT_HTTP_H_

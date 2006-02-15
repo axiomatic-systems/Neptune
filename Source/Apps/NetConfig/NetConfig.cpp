@@ -30,9 +30,6 @@
 /*----------------------------------------------------------------------
 |       globals
 +---------------------------------------------------------------------*/
-static struct {
-    bool verbose;
-} Options;
 
 /*----------------------------------------------------------------------
 |       PrintUsageAndExit
@@ -93,7 +90,7 @@ main(int argc, char**)
         printf("  flags = %x [ ", (*iface)->GetFlags());
         PrintFlags((*iface)->GetFlags());
         printf("]\n");
-        printf("  mac   = %s\n", (*iface)->GetMacAddress().ToString().GetChars());
+        printf("  mac   = %s (type=%d)\n", (*iface)->GetMacAddress().ToString().GetChars(), (*iface)->GetMacAddress().GetType());
         
         // print all addresses
         NPT_List<NPT_NetworkInterfaceAddress>::Iterator nwifaddr = 

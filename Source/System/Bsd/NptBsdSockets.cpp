@@ -51,8 +51,6 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
-#include <net/if.h>
-#include <net/if_arp.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>

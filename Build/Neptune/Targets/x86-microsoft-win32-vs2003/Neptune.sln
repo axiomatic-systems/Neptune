@@ -92,6 +92,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ListsTest1", "..\..\..\Test
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscTest1", "..\..\..\Tests\Misc1\Targets\x86-microsoft-win32-vs2003\MiscTest1.vcproj", "{F91CB4EB-8441-4427-80FC-FCF1D63C3866}"
+	ProjectSection(ProjectDependencies) = postProject
+		{155EC08C-3291-411A-B79E-CE7DFE1E6E8A} = {155EC08C-3291-411A-B79E-CE7DFE1E6E8A}
+		{CAAF1793-EB01-454C-BD58-6811D7942A08} = {CAAF1793-EB01-454C-BD58-6811D7942A08}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpServerTest1", "..\..\..\Tests\HttpServer1\Targets\x86-microsoft-win32-vs2003\HttpServerTest1.vcproj", "{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{155EC08C-3291-411A-B79E-CE7DFE1E6E8A} = {155EC08C-3291-411A-B79E-CE7DFE1E6E8A}
+		{CAAF1793-EB01-454C-BD58-6811D7942A08} = {CAAF1793-EB01-454C-BD58-6811D7942A08}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -166,6 +178,14 @@ Global
 		{AB6911DF-1EB4-4D37-B4A5-AD577761C188}.Debug.Build.0 = Debug|Win32
 		{AB6911DF-1EB4-4D37-B4A5-AD577761C188}.Release.ActiveCfg = Release|Win32
 		{AB6911DF-1EB4-4D37-B4A5-AD577761C188}.Release.Build.0 = Release|Win32
+		{F91CB4EB-8441-4427-80FC-FCF1D63C3866}.Debug.ActiveCfg = Debug|Win32
+		{F91CB4EB-8441-4427-80FC-FCF1D63C3866}.Debug.Build.0 = Debug|Win32
+		{F91CB4EB-8441-4427-80FC-FCF1D63C3866}.Release.ActiveCfg = Release|Win32
+		{F91CB4EB-8441-4427-80FC-FCF1D63C3866}.Release.Build.0 = Release|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Debug.ActiveCfg = Debug|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Debug.Build.0 = Debug|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Release.ActiveCfg = Release|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Release.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

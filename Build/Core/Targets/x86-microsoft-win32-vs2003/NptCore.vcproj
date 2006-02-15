@@ -100,6 +100,9 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptBase64.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptBufferedStreams.cpp">
 			</File>
 			<File
@@ -116,6 +119,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptMessaging.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptNetwork.cpp">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptQueue.cpp">
@@ -163,6 +169,9 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptArray.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptBase64.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptBufferedStreams.h">

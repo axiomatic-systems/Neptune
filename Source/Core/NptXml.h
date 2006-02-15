@@ -55,6 +55,7 @@ class NPT_XmlAttribute
 
     // friends
     friend class NPT_XmlAttributeFinder;
+    friend class NPT_XmlAttributeFinderWithPrefix;
 };
 
 /*----------------------------------------------------------------------
@@ -149,9 +150,10 @@ class NPT_XmlElementNode : public NPT_XmlNode
                                      const char* namespc = NULL,
                                      NPT_Ordinal n=0);
     NPT_Result              AddChild(NPT_XmlNode* child);
-    NPT_Result              AddAttribute(const char* name, const char* value);
-    NPT_Result              AddAttribute(const char* prefix,
+    NPT_Result              SetAttribute(const char* prefix,
                                          const char* name, 
+                                         const char* value);
+    NPT_Result              SetAttribute(const char* name, 
                                          const char* value);
     NPT_Result              AddText(const char* text); 
     NPT_List<NPT_XmlAttribute*>& 
@@ -178,6 +180,8 @@ protected:
     void SetNamespaceParent(NPT_XmlElementNode* parent);
     void RelinkNamespaceMaps();
 
+    NPT_Result AddAttribute(const char* name, const char* value);
+
     // members  
     NPT_String                  m_Prefix;
     NPT_String                  m_Tag;
@@ -191,6 +195,8 @@ protected:
     friend class NPT_XmlSerializer;
     friend class NPT_XmlWriter;
     friend class NPT_XmlNodeWriter;
+    friend class NPT_XmlParser;
+    friend class NPT_XmlProcessor;
 };
 
 /*----------------------------------------------------------------------

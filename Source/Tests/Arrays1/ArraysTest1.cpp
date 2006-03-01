@@ -166,4 +166,23 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(c_array.GetItemCount() == 4);
 
     c_array.Apply(NPT_ObjectDeleter<A>());
+
+    NPT_Array<int> i_array;
+    NPT_ASSERT(NPT_SUCCEEDED(i_array.Resize(4, 0)));
+    NPT_ASSERT(i_array.GetItemCount() == 4);
+    i_array[0] = 3;
+    i_array[1] = 7;
+    i_array[2] = 9;
+    i_array[3] = 12;
+    
+    NPT_Array<int> j_array = i_array;
+    NPT_ASSERT(i_array == j_array);
+    i_array[2] = 7;
+    NPT_ASSERT(i_array != j_array);
+    NPT_ASSERT(!(i_array == j_array));
+    i_array[2] = 9;
+    NPT_ASSERT(i_array == j_array);
+    j_array.Add(12);
+    NPT_ASSERT(i_array != j_array);
+    NPT_ASSERT(!(i_array == j_array));
 }

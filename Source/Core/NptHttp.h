@@ -2,7 +2,7 @@
 |
 |      Neptune - HTTP Protocol
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -139,6 +139,9 @@ public:
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
 
     // field access
+    NPT_Result        SetContentType(const char* type);
+    NPT_Result        SetContentEncoding(const char* encoding);
+    NPT_Result        SetContentLength(NPT_Size length);
     NPT_Size          GetContentLength()   { return m_ContentLength;   }
     const NPT_String& GetContentType()     { return m_ContentType;     }
     const NPT_String& GetContentEncoding() { return m_ContentEncoding; }

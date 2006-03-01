@@ -83,6 +83,21 @@ TestNamespaces()
     CHECK(*child2->GetNamespaceUri("ns1") == "http://blabla", "");
     CHECK(*child2->GetNamespace() == "http://blabla", "");
 
+    // testing a child with a namespace defined in parent
+    NPT_XmlElementNode* child3 = new NPT_XmlElementNode("ns1", "child3");
+    child2->AddChild(child3);
+    CHECK(child3->GetNamespaceUri(""), "");
+    CHECK(*(child3->GetNamespaceUri("")) == "http://namespace1.com", "");
+    CHECK(child3->GetNamespaceUri("ns1"), "");
+    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla", "");
+    CHECK(*child3->GetNamespace() == "http://blabla", "");
+
+    // testing adding a namespace in a node which namespace is defined in parent
+    child3->SetNamespaceUri("ns3", "http://foofoo");
+    CHECK(child3->GetNamespaceUri("ns1"), "");
+    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla", "");
+    CHECK(*child3->GetNamespace() == "http://blabla", "");
+
     const char* xml1 = 
         "<top>"
         "  <child1 xmlns:foo='blabla'><cc1 foo:attr1='0'/></child1>"
@@ -107,6 +122,9 @@ TestNamespaces()
     NPT_Size size;
     output.GetSize(size);
     printf(NPT_String((const char*)output.GetData(), size).GetChars());
+
+    delete top;
+    delete root;
 }
 
 /*----------------------------------------------------------------------
@@ -177,6 +195,26 @@ TestSerializer()
     check.Assign((const char*)output.GetData(), size);
     CHECK(check == "<top foo=\"6\" ns1:foo=\"3\" ns2:foo=\"4\"/>", check);
 
+    delete top;
+
+}
+/*----------------------------------------------------------------------
+|       TestAttributes
++---------------------------------------------------------------------*/
+static void
+TestAttributes()
+{
+    const char* xml = 
+        "<element foo='blabla'><cc1 attr1='0'/></element>";
+    NPT_XmlParser parser;
+    NPT_XmlNode* root = NULL;
+    NPT_Result result = parser.Parse(xml, root);
+    CHECK(NPT_SUCCEEDED(result), "");
+    CHECK(root != NULL, "");
+    CHECK(root->AsElementNode() != NULL, "");
+    const NPT_String* a = root->AsElementNode()->GetAttribute("foo");
+    CHECK(*a == "blabla", "");
+    delete root;
 }
 
 /*----------------------------------------------------------------------
@@ -249,6 +287,7 @@ main(int argc, char** argv)
         return 0;
     }
 
+    TestAttributes();
     TestNamespaces();
     TestSerializer();
 

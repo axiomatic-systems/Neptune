@@ -81,16 +81,41 @@ ShowResponse(NPT_HttpResponse* response)
 }
 
 /*----------------------------------------------------------------------
-|       TestHttp
+|       TestHttpGet
 +---------------------------------------------------------------------*/
 static void 
-TestHttp(const char* arg)
+TestHttpGet(const char* arg)
 {
     NPT_HttpUrl url(arg);
     NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
     NPT_HttpClient client;
     NPT_HttpResponse* response;
 
+    NPT_Result result = client.SendRequest(request, response);
+    NPT_Debug("SendRequest returned %d\n", result);
+    if (NPT_FAILED(result)) return;
+
+    ShowResponse(response);
+
+    delete response;
+}
+
+/*----------------------------------------------------------------------
+|       TestHttpPost
++---------------------------------------------------------------------*/
+static void 
+TestHttpPost(const char* arg)
+{
+    NPT_HttpUrl url(arg);
+    NPT_HttpRequest request(url, NPT_HTTP_METHOD_POST);
+    NPT_HttpClient client;
+    NPT_HttpResponse* response;
+
+    NPT_HttpEntity* body_entity = new NPT_HttpEntity();
+    NPT_InputStreamReference body_stream(new NPT_MemoryStream("hello blabla", 12));
+    body_entity->SetInputStream(body_stream);
+
+    request.SetEntity(body_entity);
     NPT_Result result = client.SendRequest(request, response);
     NPT_Debug("SendRequest returned %d\n", result);
     if (NPT_FAILED(result)) return;
@@ -147,7 +172,7 @@ main(int argc, char** argv)
     TestUrlParser("http://foo.bar/blabla");
 #endif
 
-    TestHttp(argv[1]);
+    TestHttpPost(argv[1]);
 
 #if defined(WIN32) && defined(_DEBUG)
     _CrtDumpMemoryLeaks();

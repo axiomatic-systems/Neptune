@@ -63,23 +63,31 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       Fail
-+---------------------------------------------------------------------*/
-static void
-Fail()
-{
-    printf("FAIL ##################################\n");
-    exit(1);
-}
-
-/*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	NPT_List<A> a_list;
+    NPT_List<A> a_list;
+    a_list.Add(A(1,2));
+    a_list.Add(A(2,3));
+    a_list.Add(A(3,4));
+    NPT_ASSERT(a_list.GetItemCount() == 3);
+    NPT_ASSERT(a_list.Contains(A(2,3)));
+    NPT_ASSERT(!a_list.Contains(A(7,8)));
+    A a;
+    NPT_ASSERT(NPT_SUCCEEDED(a_list.PopHead(a)));
+    NPT_ASSERT(a == A(1,2));
+    NPT_ASSERT(a_list.GetItemCount() == 2);
+    NPT_ASSERT(NPT_SUCCEEDED(a_list.Get(0, a)));
+    NPT_ASSERT(a == A(2,3));
+    A* pa = NULL;
+    NPT_ASSERT(NPT_SUCCEEDED(a_list.Get(0,pa)));
+    NPT_ASSERT(pa != NULL);
+    NPT_ASSERT(*pa == A(2,3));
+    NPT_ASSERT(a_list.GetItem(1) == ++a_list.GetFirstItem());
 
+    a_list.Clear();
 	NPT_ASSERT(a_list.GetItemCount() == 0);
 	a_list.Insert(a_list.GetFirstItem(), A(7,9));
 	NPT_ASSERT(a_list.GetItemCount() == 1);
@@ -87,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	a_list.Add(A(1, 2));
 	NPT_ASSERT(a_list.GetItemCount() == 2);
-	NPT_ASSERT(A_Count == 2);
+	NPT_ASSERT(A_Count == 3);
 	NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
 	NPT_ASSERT(*a_list.GetLastItem()  == A(1,2));
 	
@@ -130,7 +138,24 @@ main(int /*argc*/, char** /*argv*/)
 	a_list.Erase(a_list.GetItem(1));
 	NPT_ASSERT(a_list.GetItemCount() == 5);
 	NPT_ASSERT(*a_list.GetItem(1) == A(9,10));
-	NPT_ASSERT(A_Count == a_list.GetItemCount());
+	NPT_ASSERT(A_Count == 1+a_list.GetItemCount());
+
+    // NPT_Stack test
+    NPT_Stack<int> i_stack;
+    int i=0;
+    NPT_ASSERT(NPT_FAILED(i_stack.Pop(i)));
+    NPT_ASSERT(NPT_FAILED(i_stack.Peek(i)));
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(4)));
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(5)));
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(6)));
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
+    NPT_ASSERT(i == 6);
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Peek(i)));
+    NPT_ASSERT(i == 5);
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
+    NPT_ASSERT(i == 5);
+    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
+    NPT_ASSERT(i == 4);
 
 	return 0;
 }

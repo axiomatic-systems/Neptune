@@ -83,7 +83,7 @@ public:
             }
         }
         if (match) *match = false;
-        return NPT_ERROR_NO_SUCH_ITEM;
+        return NPT_SUCCESS;
     }
 
     template <typename X> 
@@ -424,6 +424,7 @@ NPT_Array<T>::Resize(NPT_Cardinal size, const T& fill)
     if (size < m_ItemCount) {
         return Resize(size);
     } else if (size > m_ItemCount) {
+        Reserve(size);
         for (NPT_Ordinal i=m_ItemCount; i<size; i++) {
             new ((void*)&m_Items[i]) T(fill);
         }

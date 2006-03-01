@@ -39,19 +39,22 @@ class NPT_XmlAttribute
     NPT_XmlAttribute(const char* name, const char* value);
     NPT_XmlAttribute(const char* prefix, const char* name, const char* value) :
         m_Prefix(prefix), m_Name(name), m_Value(value) {}
-    NPT_XmlAttribute(const NPT_XmlAttribute& attribute) :
-        m_Prefix(attribute.m_Prefix), 
-        m_Name(attribute.m_Name), 
-        m_Value(attribute.m_Value) {}
     const NPT_String& GetPrefix() const { return m_Prefix; }
     const NPT_String& GetName()   const { return m_Name;   }
     const NPT_String& GetValue()  const { return m_Value;  }
+    void              SetValue(const char* value) { m_Value = value; }
 
  private:
     // members
     NPT_String m_Prefix;
     NPT_String m_Name;
     NPT_String m_Value;
+
+    NPT_XmlAttribute(const NPT_XmlAttribute& attribute) :
+        m_Prefix(attribute.m_Prefix), 
+        m_Name(attribute.m_Name), 
+        m_Value(attribute.m_Value) {}
+    NPT_XmlAttribute& operator=(const NPT_XmlAttribute& a);
 
     // friends
     friend class NPT_XmlAttributeFinder;

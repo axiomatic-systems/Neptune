@@ -2,7 +2,7 @@
 |
 |      Neptune - Data Buffer
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/

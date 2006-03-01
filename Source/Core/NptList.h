@@ -90,9 +90,9 @@ public:
                  NPT_List<T>(const NPT_List<T>& list);
                 ~NPT_List<T>();
     NPT_Result   Add(const T& data);
-    NPT_Result   Insert(Iterator where, const T& data);
+    NPT_Result   Insert(const Iterator where, const T& data);
     NPT_Result   Remove(const T& data, bool all=false);
-    NPT_Result   Erase(Iterator position);
+    NPT_Result   Erase(const Iterator position);
     NPT_Result   PopHead(T& data);
     bool         Contains(const T& data) const;
     NPT_Result   Clear();
@@ -106,7 +106,7 @@ public:
     // item manipulation
     NPT_Result   Add(Item& item);
     NPT_Result   Detach(Item& item);
-    NPT_Result   Insert(Iterator where, Item& item);
+    NPT_Result   Insert(const Iterator where, Item& item);
 
     // list operations
 	// keep these template members defined here because MSV6 does not let
@@ -158,12 +158,15 @@ public:
 	}
 
     // operators
-    void operator=(const NPT_List<T>& list);
+    void operator=(const NPT_List<T>& other);
+    bool operator==(const NPT_List<T>& other) const;
+    bool operator!=(const NPT_List<T>& other) const;
 
-private:
+protected:
     // types
     class Item 
     {
+    public:
         // methods
         Item(const T& data) : m_Next(0), m_Prev(0), m_Data(data) {}
 
@@ -173,8 +176,8 @@ private:
         T     m_Data;
 
         // friends
-        friend class NPT_List<T>;
-        friend class NPT_List<T>::Iterator;
+        //friend class NPT_List<T>;
+        //friend class NPT_List<T>::Iterator;
     };
 
     // members
@@ -228,6 +231,39 @@ NPT_List<T>::operator=(const NPT_List<T>& list)
         Add(item->m_Data);
         item = item->m_Next;
     }
+}
+
+/*----------------------------------------------------------------------
+|       NPT_List<T>::operator==
++---------------------------------------------------------------------*/
+template <typename T>
+bool
+NPT_List<T>::operator==(const NPT_List<T>& other) const
+{
+    // quick test
+    if (m_ItemCount != other.m_ItemCount) return false;
+
+    // compare all elements one by one
+    Item* our_item = list.m_Head;
+    Item* their_item = other.m_Head;
+    while (our_item && their_item) {
+        if (*our_item != *their_item) return false;
+        our_item   = our_item->m_Next;
+        their_item = their_item->m_Next;
+    }
+    
+    return our_item == NULL && their_item == NULL;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_List<T>::operator!=
++---------------------------------------------------------------------*/
+template <typename T>
+inline
+bool
+NPT_List<T>::operator!=(const NPT_List<T>& other) const
+{
+    return !(*this == other);
 }
 
 /*----------------------------------------------------------------------

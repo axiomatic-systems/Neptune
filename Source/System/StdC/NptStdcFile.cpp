@@ -15,6 +15,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include "NptUtils.h"
 #include "NptFile.h"
 #include "NptThreads.h"
 #include "NptInterfaces.h"
@@ -30,7 +31,7 @@ static int fopen_s(FILE**      file,
                    const char* mode)
 {
     *file = fopen(filename, mode);
-    if (file == NULL) return errno;
+    if (*file == NULL) return errno;
     return 0;
 }
 #endif // defined(NPT_CONFIG_HAVE_FOPEN_S
@@ -300,11 +301,11 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 
     // check for special names
     const char* name = (const char*)m_Name;
-    if (!strcmp(name, NPT_FILE_STANDARD_INPUT)) {
+    if (NPT_StringsEqual(name, NPT_FILE_STANDARD_INPUT)) {
         file = stdin;
-    } else if (!strcmp(name, NPT_FILE_STANDARD_OUTPUT)) {
+    } else if (NPT_StringsEqual(name, NPT_FILE_STANDARD_OUTPUT)) {
         file = stdout;
-    } else if (!strcmp(name, NPT_FILE_STANDARD_ERROR)) {
+    } else if (NPT_StringsEqual(name, NPT_FILE_STANDARD_ERROR)) {
         file = stderr;
     } else {
         // compute mode

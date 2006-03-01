@@ -60,9 +60,15 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Neptune;..\..\..\..\Source\Config"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
+				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -207,6 +213,9 @@
 				RelativePath="..\..\..\..\Source\Core\NptList.h">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptMap.h">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptMessaging.h">
 			</File>
 			<File
@@ -234,6 +243,9 @@
 				RelativePath="..\..\..\..\Source\Core\NptSockets.h">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptStack.h">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptStreams.h">
 			</File>
 			<File
@@ -258,7 +270,7 @@
 				RelativePath="..\..\..\..\Source\Core\NptUtils.h">
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\NptVersion.h">
+				RelativePath="..\..\..\..\Source\Neptune\NptVersion.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptXml.h">

@@ -131,9 +131,9 @@ NPT_Result
 NPT_HttpHeader::Emit(NPT_OutputStream& stream) const
 {
     stream.WriteString(m_Name);
-    stream.Write(": ", 2);
+    stream.WriteFully(": ", 2);
     stream.WriteString(m_Value);
-    stream.Write(NPT_HTTP_LINE_TERMINATOR, 2);
+    stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("%s: %s\n", (const char*)m_Name, (const char*)m_Value);
 
@@ -316,6 +316,45 @@ NPT_Result
 NPT_HttpEntity::SetInputStream(const NPT_InputStreamReference& stream)
 {
     m_InputStream = stream;
+
+    // get the content length from the stream
+    m_ContentLength = 0;
+    if (!stream.IsNull()) {
+        if (NPT_FAILED(stream->GetSize(m_ContentLength))) {
+            m_ContentLength = 0;
+        }
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HttpEntity::SetContentLength
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetContentLength(NPT_Size length)
+{
+    m_ContentLength = length;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HttpEntity::SetContentType
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetContentType(const char* type)
+{
+    m_ContentType = type;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_HttpEntity::SetContentEncoding
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetContentEncoding(const char* encoding)
+{
+    m_ContentEncoding = encoding;
     return NPT_SUCCESS;
 }
 
@@ -381,11 +420,11 @@ NPT_HttpRequest::Emit(NPT_OutputStream& stream) const
     //NPT_Debug("NPT_HttpRequest::Emit ++\n");
     // write the request line
     stream.WriteString(m_Method);
-    stream.Write(" ", 1);
+    stream.WriteFully(" ", 1);
     stream.WriteString(NPT_Uri::Encode(m_Url.GetPath()));
-    stream.Write(" ", 1);
+    stream.WriteFully(" ", 1);
     stream.WriteString(m_Protocol);
-    stream.Write(NPT_HTTP_LINE_TERMINATOR, 2);
+    stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("%s %s %s\n", 
 	   //   (const char*)m_Method, 
@@ -396,7 +435,7 @@ NPT_HttpRequest::Emit(NPT_OutputStream& stream) const
     m_Headers.Emit(stream);
 
     // finish with an empty line
-    stream.Write(NPT_HTTP_LINE_TERMINATOR, 2);
+    stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("NPT_HttpRequest::Emit --\n");
 
@@ -445,11 +484,11 @@ NPT_HttpResponse::Emit(NPT_OutputStream& stream) const
     //NPT_Debug("NPT_HttpResponse::Emit ++\n");
     // write the request line
     stream.WriteString(m_Protocol);
-    stream.Write(" ", 1);
+    stream.WriteFully(" ", 1);
     stream.WriteString(NPT_String::FromInteger(m_StatusCode));
-    stream.Write(" ", 1);
+    stream.WriteFully(" ", 1);
     stream.WriteString(m_ReasonPhrase);
-    stream.Write(NPT_HTTP_LINE_TERMINATOR, 2);
+    stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("%s %s %s\n", 
     //    (const char*)m_Protocol,
@@ -460,7 +499,7 @@ NPT_HttpResponse::Emit(NPT_OutputStream& stream) const
     m_Headers.Emit(stream);
 
     // finish with an empty line
-    stream.Write(NPT_HTTP_LINE_TERMINATOR, 2);
+    stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("NPT_HttpResponse::Emit --\n");
 
@@ -587,16 +626,47 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
     NPT_CHECK(connection.GetOutputStream(output_stream));
 
     // add any headers that may be missing
-    request.GetHeaders().SetHeader(NPT_HTTP_HEADER_CONNECTION, "close");
-    request.GetHeaders().SetHeader(NPT_HTTP_HEADER_HOST, request.GetUrl().GetHost());
-    request.GetHeaders().SetHeader(NPT_HTTP_HEADER_USER_AGENT, 
-                                   "Neptune/" NPT_NEPTUNE_VERSION_STRING);
+    NPT_HttpHeaders& headers = request.GetHeaders();
+    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close");
+    headers.SetHeader(NPT_HTTP_HEADER_HOST, request.GetUrl().GetHost());
+    headers.SetHeader(NPT_HTTP_HEADER_USER_AGENT, 
+                      "Neptune/" NPT_NEPTUNE_VERSION_STRING);
+
+    // get the request entity to set additional headers
+    NPT_InputStreamReference body_stream;
+    NPT_HttpEntity* entity = request.GetEntity();
+    if (entity && NPT_SUCCEEDED(entity->GetInputStream(body_stream))) {
+        // content length
+        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
+            NPT_String::FromInteger(entity->GetContentLength()));
+
+        // content type
+        NPT_String content_type = entity->GetContentType();
+        if (!content_type.IsEmpty()) {
+            headers.SetHeader(NPT_HTTP_HEADER_CONTENT_TYPE, content_type);
+        }
+
+        // content encoding
+        NPT_String content_encoding = entity->GetContentEncoding();
+        if (!content_encoding.IsEmpty()) {
+            headers.SetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING, content_encoding);
+        }
+    } else {
+        // force content length to 0 is there is no message body
+        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, "0");
+    }
 
     // create a buffered stream for this socket stream
     //m_ConnectionStream = new NPT_BufferedByteStream(stream);
 
     NPT_Debug("SendRequest: will connect to %s:%d\n", (const char*)request.GetUrl().GetHost(), request.GetUrl().GetPort());
+    // send request headers
     request.Emit(*output_stream);
+
+    // send request body
+    if (!body_stream.IsNull()) {
+        NPT_CHECK(NPT_StreamToStreamCopy(body_stream.AsPointer(), output_stream.AsPointer()));
+    }
 
     // flush the output stream so that everything is sent to the server
     output_stream->Flush();
@@ -619,7 +689,7 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
     //}
 
     // create an entity if one is expected in the response
-    if (request.GetMethod() == NPT_HTTP_METHOD_GET) {
+    if (request.GetMethod() == NPT_HTTP_METHOD_GET || request.GetMethod() == NPT_HTTP_METHOD_POST) {
         NPT_HttpEntity* entity = new NPT_HttpEntity(response->GetHeaders());
         //NPT_BufferedInputStreamReference isr(buffered_input_stream);
         entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);

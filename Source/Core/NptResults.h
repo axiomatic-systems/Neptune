@@ -2,7 +2,7 @@
 |
 |      Neptune - Result Codes
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -13,33 +13,40 @@
 /*----------------------------------------------------------------------
 |       macros
 +---------------------------------------------------------------------*/
-#define NPT_CHECK(x)                 \
-do {                                            \
-    NPT_Result _result = (x);                   \
-    if (_result != NPT_SUCCESS) return _result; \
+#define NPT_CHECK(x)                \
+do {                                \
+    NPT_Result _result = (x);       \
+    if (_result != NPT_SUCCESS) {   \
+        return _result;             \
+    }                               \
 } while(0)
+
+#define NPT_FAILED(result)              ((result) != NPT_SUCCESS)
+#define NPT_SUCCEEDED(result)           ((result) == NPT_SUCCESS)
 
 /*----------------------------------------------------------------------
 |       result codes
 +---------------------------------------------------------------------*/
 /** Result indicating that the operation or call succeeded */
 #define NPT_SUCCESS                     0
+
 /** Result indicating an unspecififed failure condition */
 #define NPT_FAILURE                     (-1)
 
-#define NPT_FAILED(result)              ((result) != NPT_SUCCESS)
-#define NPT_SUCCEEDED(result)           ((result) == NPT_SUCCESS)
+#if !defined(NPT_ERROR_BASE)
+#define NPT_ERROR_BASE -20000
+#endif
 
 // error bases
-const int NPT_ERROR_BASE_GENERAL        = 0;
-const int NPT_ERROR_BASE_LIST           = -100;
-const int NPT_ERROR_BASE_FILE           = -200;
-const int NPT_ERROR_BASE_IO             = -300;
-const int NPT_ERROR_BASE_SOCKET         = -400;
-const int NPT_ERROR_BASE_INTERFACES     = -500;
-const int NPT_ERROR_BASE_XML            = -600;
-const int NPT_ERROR_BASE_UNIX           = -700;
-const int NPT_ERROR_BASE_HTTP           = -800;
+const int NPT_ERROR_BASE_GENERAL        = NPT_ERROR_BASE-0;
+const int NPT_ERROR_BASE_LIST           = NPT_ERROR_BASE-100;
+const int NPT_ERROR_BASE_FILE           = NPT_ERROR_BASE-200;
+const int NPT_ERROR_BASE_IO             = NPT_ERROR_BASE-300;
+const int NPT_ERROR_BASE_SOCKET         = NPT_ERROR_BASE-400;
+const int NPT_ERROR_BASE_INTERFACES     = NPT_ERROR_BASE-500;
+const int NPT_ERROR_BASE_XML            = NPT_ERROR_BASE-600;
+const int NPT_ERROR_BASE_UNIX           = NPT_ERROR_BASE-700;
+const int NPT_ERROR_BASE_HTTP           = NPT_ERROR_BASE-800;
 
 // general errors
 const int NPT_ERROR_INVALID_PARAMETERS  = NPT_ERROR_BASE_GENERAL - 2;

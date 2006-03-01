@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="NetEcho"
-	ProjectGUID="{7228CB90-1ACE-43A3-A013-D437BF0E50F3}"
+	Name="MapsTest1"
+	ProjectGUID="{257C9F75-2708-4136-BFA9-621ACD0B9BD1}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Neptune"
+				AdditionalIncludeDirectories="..\..\..\..\..\Source\Neptune;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -32,11 +32,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib"
-				OutputFile="$(OutDir)/NetEcho.exe"
+				OutputFile="$(OutDir)/MapsTest1.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/NetEcho.pdb"
+				ProgramDatabaseFile="$(OutDir)/MapsTest1.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -68,9 +67,8 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Neptune"
+				AdditionalIncludeDirectories="..\..\..\..\..\Source\Neptune;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -80,8 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib"
-				OutputFile="$(OutDir)/NetEcho.exe"
+				OutputFile="$(OutDir)/MapsTest1.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -118,13 +115,8 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\..\..\Source\Apps\NetEcho\NetEcho.cpp">
+				RelativePath="..\..\..\..\..\Source\Tests\Maps1\MapsTest1.cpp">
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 		</Filter>
 	</Files>
 	<Globals>

@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="Neptune"
 	ProjectGUID="{12AFF2E5-6D95-4809-9728-9551677C078A}"
+	RootNamespace="Neptune"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -60,8 +61,12 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="4"
+				StringPooling="TRUE"
+				ExceptionHandling="FALSE"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"

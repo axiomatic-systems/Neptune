@@ -241,7 +241,9 @@ NPT_XmlElementNode::SetAttribute(const char* prefix,
     NPT_List<NPT_XmlAttribute*>::Iterator attribute;
     attribute = m_Attributes.Find(NPT_XmlAttributeFinderWithPrefix(prefix, name));
     if (attribute) {
-        // an attribute with this name and prefix already exists
+        // an attribute with this name and prefix already exists, 
+        // change its value
+        (*attribute)->SetValue(value); 
         return NPT_SUCCESS;
     }
     return m_Attributes.Add(new NPT_XmlAttribute(prefix, name, value));
@@ -347,15 +349,15 @@ NPT_XmlElementNode::SetNamespaceUri(const char* prefix, const char* uri)
 const NPT_String*
 NPT_XmlElementNode::GetNamespaceUri(const char* prefix) const
 {
-    NPT_XmlNamespaceMap* namespace_map = 
-        m_NamespaceMap? 
-        m_NamespaceMap:
-        (m_NamespaceParent?
-         m_NamespaceParent->m_NamespaceMap:
-         NULL);
+    if (m_NamespaceMap) {
+        // look in our namespace map first
+        const NPT_String* namespc = m_NamespaceMap->GetNamespaceUri(prefix);
+        if (namespc) return namespc;
+    } 
 
-    if (namespace_map) {
-        return namespace_map->GetNamespaceUri(prefix);
+    // look into our parent's namespace map
+    if (m_NamespaceParent) {
+        return m_NamespaceParent->GetNamespaceUri(prefix);
     } else {
         return NULL;
     }

@@ -37,14 +37,17 @@ const int NPT_ERROR_EOS          = NPT_ERROR_BASE_IO - 2;
 class NPT_InputStream
 {
  public:
-    // constructor and destructors
+    // constructor and destructor
     virtual ~NPT_InputStream() {};
 
     // methods
     virtual NPT_Result Read(void*     buffer, 
                             NPT_Size  bytes_to_read, 
                             NPT_Size* bytes_read = NULL) = 0;
+    virtual NPT_Result ReadFully(void*     buffer, 
+                                 NPT_Size  bytes_to_read);
     virtual NPT_Result Seek(NPT_Offset offset) = 0;
+    virtual NPT_Result Skip(NPT_Offset offset);
     virtual NPT_Result Tell(NPT_Offset& offset) = 0;
     virtual NPT_Result GetSize(NPT_Size& size) = 0;
     virtual NPT_Result GetAvailable(NPT_Size& available) = 0;
@@ -58,13 +61,15 @@ typedef NPT_Reference<NPT_InputStream> NPT_InputStreamReference;
 class NPT_OutputStream
 {
 public:
-    // constructor and destructors
+    // constructor and destructor
     virtual ~NPT_OutputStream() {};
 
     // methods
     virtual NPT_Result Write(const void* buffer, 
                              NPT_Size    bytes_to_write, 
                              NPT_Size*   bytes_written = NULL) = 0;
+    virtual NPT_Result WriteFully(const void* buffer, 
+                                  NPT_Size    bytes_to_write);
     virtual NPT_Result WriteString(const char* string_buffer);
     virtual NPT_Result WriteLine(const char* line_buffer);
     virtual NPT_Result Seek(NPT_Offset offset) = 0;
@@ -73,6 +78,14 @@ public:
 };
 
 typedef NPT_Reference<NPT_OutputStream> NPT_OutputStreamReference;
+
+/*----------------------------------------------------------------------
+|    NPT_StreamToStreamCopy
++---------------------------------------------------------------------*/
+NPT_Result NPT_StreamToStreamCopy(NPT_InputStream*  from, 
+                                  NPT_OutputStream* to,
+                                  NPT_Offset        offset = 0,
+                                  NPT_Size          size   = 0 /* 0 means the entire stream */);
 
 /*----------------------------------------------------------------------
 |    NPT_DelegatingInputStream

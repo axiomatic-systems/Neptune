@@ -17,6 +17,65 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
+|       NPT_InputStream::ReadFully
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadFully(void* buffer, NPT_Size bytes_to_read)
+{
+    // shortcut
+    if (bytes_to_read == 0) return NPT_SUCCESS;
+
+    // read until failure
+    NPT_Size bytes_read;
+    while (bytes_to_read) {
+        NPT_Result result = Read(buffer, bytes_to_read, &bytes_read);
+        if (NPT_FAILED(result)) return result;
+        if (bytes_read == 0) return NPT_FAILURE;
+        NPT_ASSERT(bytes_read <= bytes_to_read);
+        bytes_to_read -= bytes_read;
+        buffer = (void*)(((NPT_Byte*)buffer)+bytes_read);
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_InputStream::Skip
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::Skip(NPT_Size count)
+{
+    // get the current location
+    NPT_Offset position;
+    NPT_CHECK(Tell(position));
+
+    // seek ahead
+    return Seek(position+count);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_OutputStream::WriteFully
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteFully(const void* buffer, NPT_Size bytes_to_write)
+{
+    // shortcut
+    if (bytes_to_write == 0) return NPT_SUCCESS;
+
+    // write until failure
+    NPT_Size bytes_written;
+    while (bytes_to_write) {
+        NPT_Result result = Write(buffer, bytes_to_write, &bytes_written);
+        if (NPT_FAILED(result)) return result;
+        if (bytes_written == 0) return NPT_FAILURE;
+        NPT_ASSERT(bytes_written <= bytes_to_write);
+        bytes_to_write -= bytes_written;
+        buffer = (const void*)(((const NPT_Byte*)buffer)+bytes_written);
+    }
+
+    return NPT_SUCCESS;
+}
+/*----------------------------------------------------------------------
 |       NPT_OutputStream::WriteString
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -29,7 +88,7 @@ NPT_OutputStream::WriteString(const char* buffer)
     }
 
     // write the string
-    return Write((const void*)buffer, string_length, NULL);
+    return WriteFully((const void*)buffer, string_length);
 }
 
 /*----------------------------------------------------------------------
@@ -39,7 +98,7 @@ NPT_Result
 NPT_OutputStream::WriteLine(const char* buffer)
 {
     NPT_CHECK(WriteString(buffer));
-    NPT_CHECK(Write((const void*)"\r\n", 2, NULL));
+    NPT_CHECK(WriteFully((const void*)"\r\n", 2));
 
     return NPT_SUCCESS;
 }
@@ -163,4 +222,62 @@ NPT_MemoryStream::SetSize(NPT_Size size)
     if (m_WriteOffset > size) m_WriteOffset = size;
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_MemoryStream::SetSize
++---------------------------------------------------------------------*/
+const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 4096; // copy 4k at a time
+NPT_Result 
+NPT_StreamToStreamCopy(NPT_InputStream*  from, 
+                       NPT_OutputStream* to,
+                       NPT_Offset        offset /* = 0 */,
+                       NPT_Size          size   /* = 0, 0 means the entire stream */)
+{
+    // check parameters
+    if (from == NULL || to == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    // seek into the input if required
+    if (offset) {
+        NPT_CHECK(from->Seek(offset));
+    }
+
+    // allocate a buffer for the transfer
+    NPT_Size bytes_transfered = 0;
+    NPT_Byte* buffer = new NPT_Byte[NPT_STREAM_COPY_BUFFER_SIZE];
+    NPT_Result result = NPT_SUCCESS;
+    if (buffer == NULL) return NPT_ERROR_OUT_OF_MEMORY;
+
+    // copy until an error occurs or the end of stream is reached
+    for (;;) {
+        // read some data
+        NPT_Size   bytes_to_read = NPT_STREAM_COPY_BUFFER_SIZE;
+        NPT_Size   bytes_read = 0;
+        if (size) {
+            // a max size was specified
+            if (bytes_to_read > size-bytes_transfered) {
+                bytes_to_read = size-bytes_transfered;
+            }
+        }
+        result = from->Read(buffer, bytes_to_read, &bytes_read);
+        if (NPT_FAILED(result)) {
+            if (result == NPT_ERROR_EOS) result = NPT_SUCCESS;
+            break;
+        }
+        if (bytes_read == 0) continue;
+        
+        // write the data
+        result = to->WriteFully(buffer, bytes_read);
+        if (NPT_FAILED(result)) break;
+
+        // update the counts
+        if (size) {
+            bytes_transfered += bytes_read;
+            if (bytes_transfered >= size) break;
+        }
+    }
+
+    // free the buffer and return
+    delete[] buffer;
+    return result;
 }

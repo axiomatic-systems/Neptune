@@ -336,7 +336,8 @@ GetEndPointStreams(EndPoint*                  endpoint,
                                     NPT_FILE_OPEN_MODE_UNBUFFERED));
             } else {
                 NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_WRITE | 
-                                    NPT_FILE_OPEN_MODE_CREATE));
+                                    NPT_FILE_OPEN_MODE_CREATE|
+                                    NPT_FILE_OPEN_MODE_UNBUFFERED));
             }
 
             // get the streams

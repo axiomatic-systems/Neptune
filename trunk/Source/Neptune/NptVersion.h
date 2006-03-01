@@ -2,7 +2,7 @@
 |
 |      Neptune - Version Info
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -13,6 +13,6 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
-#define NPT_NEPTUNE_VERSION_STRING "0.4.1"
+#define NPT_NEPTUNE_VERSION_STRING "0.5.3"
 
 #endif // _NPT_VERSION_H_

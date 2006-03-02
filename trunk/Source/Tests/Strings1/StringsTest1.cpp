@@ -38,7 +38,7 @@ CompareTest(const char* name, const char* a, const char* b, int result, int expe
 /*----------------------------------------------------------------------
 |       EqualTest
 +---------------------------------------------------------------------*/
-void
+static void
 EqualTest(const char* name, const char* a, const char* b, const char* expected)
 {
     printf("op %s on %s, result = %s ", name, a, b);
@@ -53,7 +53,7 @@ EqualTest(const char* name, const char* a, const char* b, const char* expected)
 /*----------------------------------------------------------------------
 |       StringTest
 +---------------------------------------------------------------------*/
-void
+static void
 StringTest(const char* name, const char* a, const char* expected)
 {
     printf("%s: %s", name, a);
@@ -68,7 +68,7 @@ StringTest(const char* name, const char* a, const char* expected)
 /*----------------------------------------------------------------------
 |       IntTest
 +---------------------------------------------------------------------*/
-void
+static void
 IntTest(const char* name, int a, int expected)
 {
     printf("%s: %d", name, a);

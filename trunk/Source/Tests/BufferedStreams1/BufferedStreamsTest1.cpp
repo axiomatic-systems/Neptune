@@ -13,16 +13,18 @@
 #include "Neptune.h"
 #include <stdlib.h>
 
+#if defined(_DEBUG) && defined(WIN32)
 #include <crtdbg.h>
+#endif
 
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
 int
-main(int argc, char** argv)
+main(int /*argc*/, char** /*argv*/)
 {
     // setup debugging
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined(WIN32)
     int flags = _crtDbgFlag       | 
         _CRTDBG_ALLOC_MEM_DF      |
         _CRTDBG_DELAY_FREE_MEM_DF |
@@ -33,6 +35,7 @@ main(int argc, char** argv)
     //freopen("CONOUT$", "w", stdout);
 #endif 
 
+#if 0
     const char* b0 = "";
     const char* b1 = "\n";
     const char* b2 = "\r";
@@ -48,6 +51,7 @@ main(int argc, char** argv)
     const char* b7 = "aaa\r\n";
 
     printf("BufferedInputStream test1 passed\n");
+#endif
 
     return 0;
 }

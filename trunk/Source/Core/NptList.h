@@ -30,7 +30,7 @@ const int NPT_ERROR_LIST_OPERATION_ABORTED = NPT_ERROR_BASE_LIST - 1;
 template <typename T> 
 class NPT_List 
 {
-private:
+protected:
     class Item;
 
 public:
@@ -244,10 +244,10 @@ NPT_List<T>::operator==(const NPT_List<T>& other) const
     if (m_ItemCount != other.m_ItemCount) return false;
 
     // compare all elements one by one
-    Item* our_item = list.m_Head;
+    Item* our_item = other.m_Head;
     Item* their_item = other.m_Head;
     while (our_item && their_item) {
-        if (*our_item != *their_item) return false;
+        if (our_item->m_Data != their_item->m_Data) return false;
         our_item   = our_item->m_Next;
         their_item = their_item->m_Next;
     }

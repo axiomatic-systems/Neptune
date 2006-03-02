@@ -81,7 +81,7 @@ TestHttp()
 |       main
 +---------------------------------------------------------------------*/
 int
-main(int argc, char** argv)
+main(int /*argc*/, char** /*argv*/)
 {
     // setup debugging
 #if defined(WIN32) && defined(_DEBUG)

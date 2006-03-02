@@ -50,9 +50,9 @@ Receive()
     }
     NPT_String addr_string = address.GetIpAddress().ToString();
     printf("received packet, size=%d, from %s:%d\n",
-           buffer.GetDataSize(),
+           (int)buffer.GetDataSize(),
            (const char*)addr_string,
-           address.GetPort());
+           (int)address.GetPort());
 }
 
 /*----------------------------------------------------------------------
@@ -68,7 +68,8 @@ Send()
     buffer.SetDataSize(1024);
     NPT_IpAddress address;
     address.ResolveName("localhost");
-    NPT_Result result = sender.Send(buffer, &NPT_SocketAddress(address, 9123));
+    NPT_SocketAddress socket_address(address, 9123);
+    NPT_Result result = sender.Send(buffer, &socket_address);
     if (NPT_FAILED(result)) {
         fprintf(stderr, "Send() failed(%d)\n", result);
         return;
@@ -82,9 +83,11 @@ int
 main(int argc, char** argv)
 {
     if (argc >= 2) {
-        //if (!strcmp(argv[1], "send")
-        //Receive();
-        Send();
+        if (NPT_StringsEqual(argv[1], "send")) {
+            Receive();
+        } else {
+            Send();
+        }
     } else {
     }
     return 0;

@@ -1,0 +1,23 @@
+### compiler flags
+
+c_compiler_compliance_flags = '-pedantic'
+cxx_compiler_warnings       = '-Werror -Wall -W -Wundef -Wno-long-long'
+c_compiler_warnings         = cxx_compiler_warnings + ' -Wmissing-prototypes -Wmissing-declarations'
+c_compiler_defines          = '-D_REENTRANT'
+
+if env['build_config'] == 'Debug':
+    c_compiler_flags = '-g -DATX_DEBUG'    
+else:
+    c_compiler_flags = '-O3'
+
+env['CPPFLAGS'] = ' '.join([c_compiler_defines])
+env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_compiler_warnings])
+env['CXXFLAGS'] = ' '.join([c_compiler_compliance_flags, c_compiler_flags, cxx_compiler_warnings])
+
+### Atomix System Files
+env.Append(ATX_SYSTEM_SOURCES=['AtxStdcDebug.c', 'AtxBsdSockets.c', 'AtxStdcFile.c'])
+env.Append(ATX_EXTRA_LIBS='m')
+
+### Neptune System Files
+env.Append(NPT_SYSTEM_SOURCES=['NptStdcDebug.cpp', 'NptBsdSockets.cpp', 'NptStdcFile.cpp',      \
+                               'NptPosixSystem.cpp', 'NptPosixThreads.cpp', 'NptPosixQueue.cpp'])

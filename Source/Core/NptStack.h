@@ -21,7 +21,7 @@
 |       NPT_Stack
 +---------------------------------------------------------------------*/
 template <typename T> 
-class NPT_Stack : public NPT_List<T> 
+class NPT_Stack : public NPT_List<T>
 {
 public:
     // methods
@@ -30,16 +30,20 @@ public:
     }
 
     NPT_Result Peek(T& value) {
-        if (m_ItemCount == 0) return NPT_ERROR_NO_SUCH_ITEM;
-        value = m_Tail->m_Data;
+        // NOTE: we must use the this-> accessor here because the standard
+        // requires it when the member to look up is in a parent template
+        if (this->m_ItemCount == 0) return NPT_ERROR_NO_SUCH_ITEM;
+        value = this->m_Tail->m_Data;
         return NPT_SUCCESS;
     }
 
     NPT_Result Pop(T& value) {
-        if (m_ItemCount == 0) return NPT_ERROR_NO_SUCH_ITEM;
-        Iterator tail = GetLastItem();
+        // NOTE: we must use the this-> accessor here because the standard
+        // requires it when the member to look up is in a parent template
+        if (this->m_ItemCount == 0) return NPT_ERROR_NO_SUCH_ITEM;
+        typename NPT_List<T>::Iterator tail = this->GetLastItem();
         value = *tail;
-        return Erase(tail);
+        return this->Erase(tail);
     }
 };
 

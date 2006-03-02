@@ -140,6 +140,22 @@ main(int /*argc*/, char** /*argv*/)
 	NPT_ASSERT(*a_list.GetItem(1) == A(9,10));
 	NPT_ASSERT(A_Count == 1+a_list.GetItemCount());
 
+    NPT_List<int> i1_list;
+    NPT_List<int> i2_list;
+    NPT_ASSERT(i1_list == i2_list);
+    i1_list.Add(3);
+    NPT_ASSERT(i1_list != i2_list);
+    NPT_ASSERT(!(i1_list == i2_list));
+    i2_list.Add(3);
+    NPT_ASSERT(i1_list == i2_list);
+    i2_list.Add(4);
+    NPT_ASSERT(i1_list != i2_list);
+    i1_list.Add(4);
+    i1_list.Add(5);
+    i2_list.Add(6);
+    NPT_ASSERT(i1_list != i2_list);
+  
+
     // NPT_Stack test
     NPT_Stack<int> i_stack;
     int i=0;

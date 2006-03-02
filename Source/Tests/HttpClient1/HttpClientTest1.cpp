@@ -112,7 +112,7 @@ TestHttpPost(const char* arg)
     NPT_HttpResponse* response;
 
     NPT_HttpEntity* body_entity = new NPT_HttpEntity();
-    NPT_InputStreamReference body_stream(new NPT_MemoryStream("hello blabla", 12));
+    NPT_InputStreamReference body_stream(new NPT_MemoryStream((void*)"hello blabla", 12));
     body_entity->SetInputStream(body_stream);
 
     request.SetEntity(body_entity);
@@ -172,6 +172,7 @@ main(int argc, char** argv)
     TestUrlParser("http://foo.bar/blabla");
 #endif
 
+    TestHttpGet(argv[1]);
     TestHttpPost(argv[1]);
 
 #if defined(WIN32) && defined(_DEBUG)

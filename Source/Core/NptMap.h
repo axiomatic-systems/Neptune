@@ -15,7 +15,7 @@
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptResults.h"
-#include "NptMap.h"
+#include "NptList.h"
 
 /*----------------------------------------------------------------------
 |       NPT_Map
@@ -36,7 +36,7 @@ public:
         const V& GetValue() const { return m_Value; }
 
         // operators 
-        bool operator==(const Entry& other) {
+        bool operator==(const Entry& other) const {
             return m_Key == other.m_Key && m_Value == other.m_Value;
         }
 
@@ -61,7 +61,7 @@ public:
 
     // methods
     NPT_Result   Put(const K& key, const V& value);
-    NPT_Result   Get(const K& key, const V*& value) const;
+    NPT_Result   Get(const K& key, V*& value) const;
     bool         HasKey(const K& key) const { return GetEntry(key) != NULL; }
     bool         HasValue(const V& value) const;
     NPT_Result   Erase(const K& key);
@@ -76,9 +76,11 @@ public:
     bool                operator!=(const NPT_Map<K,V>& other) const;
 
 private:
+    // types
+    typedef typename NPT_List<Entry*>::Iterator ListIterator;
+
     // methods
     Entry* GetEntry(const K& key) const;
-    V& UseValue() { return m_Value; }
 
     // members
     NPT_List<Entry*> m_Entries;
@@ -125,7 +127,7 @@ template <typename K, typename V>
 typename NPT_Map<K,V>::Entry*
 NPT_Map<K,V>::GetEntry(const K& key) const
 {
-    NPT_List<Entry*>::Iterator entry = m_Entries.GetFirstItem();
+    typename NPT_List<Entry*>::Iterator entry = m_Entries.GetFirstItem();
     while (entry) {
         if ((*entry)->GetKey() == key) {
             return *entry;
@@ -162,7 +164,7 @@ NPT_Map<K,V>::Put(const K& key, const V& value)
 template <typename K, typename V>
 inline
 NPT_Result
-NPT_Map<K,V>::Get(const K& key, const V*& value) const
+NPT_Map<K,V>::Get(const K& key, V*& value) const
 {
     Entry* entry = GetEntry(key);
     if (entry == NULL) {
@@ -171,7 +173,7 @@ NPT_Map<K,V>::Get(const K& key, const V*& value) const
         return NPT_ERROR_NO_SUCH_ITEM;
     } else {
         // found an entry with that key
-        value = &entry->GetValue();
+        value = &entry->m_Value;
         return NPT_SUCCESS;
     }
 }
@@ -183,9 +185,9 @@ template <typename K, typename V>
 bool
 NPT_Map<K,V>::HasValue(const V& value) const
 {
-    NPT_List<Entry*>::Iterator entry = m_Entries.GetFirstItem();
+    ListIterator entry = m_Entries.GetFirstItem();
     while (entry) {
-        if ((*entry)->GetValue() == value) {
+        if (value == (*entry)->m_Value) {
             return true;
         }
         ++entry;
@@ -208,7 +210,7 @@ NPT_Map<K,V>::operator=(const NPT_Map<K,V>& copy)
     Clear();
 
     // copy all entries one by one
-    NPT_List<Entry*>::Iterator entry = copy.m_Entries.GetFirstItem();
+    ListIterator entry = copy.m_Entries.GetFirstItem();
     while (entry) {
         m_Entries.Add(new Entry((*entry)->GetKey(), (*entry)->GetValue()));
         ++entry;
@@ -225,7 +227,7 @@ inline
 NPT_Result
 NPT_Map<K,V>::Erase(const K& key)
 {
-    NPT_List<Entry*>::Iterator entry = m_Entries.GetFirstItem();
+    ListIterator entry = m_Entries.GetFirstItem();
     while (entry) {
         if ((*entry)->GetKey() == key) {
             m_Entries.Erase(entry);
@@ -248,7 +250,7 @@ NPT_Map<K,V>::operator==(const NPT_Map<K,V>& other) const
     if (m_Entries.GetItemCount() != other.m_Entries.GetItemCount()) return false;
 
     // compare all entries to all other entries
-    NPT_List<Entry*>::Iterator entry = m_Entries.GetFirstItem();
+    ListIterator entry = m_Entries.GetFirstItem();
     while (entry) {
         V* value;
         if (NPT_SUCCEEDED(other.Get((*entry)->m_Key, value))) {

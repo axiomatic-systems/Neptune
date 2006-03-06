@@ -64,19 +64,21 @@ ShowResponse(NPT_HttpResponse* response)
                   entity->GetContentLength(),
                   entity->GetContentType().GetChars(),
                   entity->GetContentEncoding().GetChars());
-    }
 
-    // dump the body
-    NPT_InputStreamReference stream;
-    entity->GetInputStream(stream);
-    NPT_OutputStreamReference output;
-    NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
-    standard_out.Open(NPT_FILE_OPEN_MODE_WRITE);
-    standard_out.GetOutputStream(output);
-    NPT_Size bytes_read;
-    char buffer[1024];
-    while (NPT_SUCCEEDED(stream->Read(buffer, sizeof(buffer), &bytes_read))) {
-        output->Write(buffer, bytes_read);
+        NPT_DataBuffer body;
+        NPT_Result result =entity->Load(body);
+        if (NPT_FAILED(result)) {
+            NPT_Debug("ERROR: failed to load entity (%d)\n", result);
+        } else {
+            NPT_Debug("BODY: loaded %d bytes\n", (int)body.GetDataSize());
+
+            // dump the body
+            NPT_OutputStreamReference output;
+            NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
+            standard_out.Open(NPT_FILE_OPEN_MODE_WRITE);
+            standard_out.GetOutputStream(output);
+            output->Write(body.GetData(), body.GetDataSize());
+        }
     }
 }
 

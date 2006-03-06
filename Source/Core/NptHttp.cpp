@@ -329,6 +329,19 @@ NPT_HttpEntity::SetInputStream(const NPT_InputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
+|       NPT_HttpEntity::Load
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpEntity::Load(NPT_DataBuffer& buffer)
+{
+    // check that we have an input stream
+    if (m_InputStream.IsNull()) return NPT_FAILURE;
+
+    // load the stream into the buffer
+    return m_InputStream->Load(buffer, m_ContentLength);
+}
+
+/*----------------------------------------------------------------------
 |       NPT_HttpEntity::SetContentLength
 +---------------------------------------------------------------------*/
 NPT_Result 

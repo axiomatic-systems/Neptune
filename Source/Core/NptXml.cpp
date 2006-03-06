@@ -1494,7 +1494,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
     if (!incremental) m_Tree = NULL;
 
     // provide a default return node in case of error
-    node = NULL;
+    node = m_Tree;
 
     // use a  buffer on the stack
     char buffer[256];
@@ -1527,7 +1527,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
     node = m_Tree;
 
     if (incremental) {
-        return NPT_SUCCESS;
+        return result;
     } else {
         return m_Tree?NPT_SUCCESS:NPT_FAILURE;
     }

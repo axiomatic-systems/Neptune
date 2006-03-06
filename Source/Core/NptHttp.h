@@ -137,6 +137,7 @@ public:
     // methods
     NPT_Result SetInputStream(const NPT_InputStreamReference& stream);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
+    NPT_Result Load(NPT_DataBuffer& buffer);
 
     // field access
     NPT_Result        SetContentType(const char* type);

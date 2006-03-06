@@ -37,6 +37,11 @@ const unsigned int NPT_FILE_OPEN_MODE_UNBUFFERED = 0x10;
 #define NPT_FILE_STANDARD_ERROR  "@STDERR"
 
 /*----------------------------------------------------------------------
+|       class references
++---------------------------------------------------------------------*/
+class NPT_DataBuffer;
+
+/*----------------------------------------------------------------------
 |       NPT_FileInterface
 +---------------------------------------------------------------------*/
 class NPT_FileInterface
@@ -65,11 +70,17 @@ public:
 class NPT_File : public NPT_FileInterface
 {
 public:
+    // class methods
+    static NPT_Result Load(const char* filename, NPT_DataBuffer& buffer);
+
     // constructors and destructor
     NPT_File(const char* name);
    ~NPT_File() { delete m_Delegate; }
 
     // methods
+    NPT_Result Load(NPT_DataBuffer& buffer);
+
+    // NPT_FileInterface methods
     NPT_Result Open(OpenMode mode) {
         return m_Delegate->Open(mode);
     }

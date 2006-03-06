@@ -121,6 +121,9 @@
 				RelativePath="..\..\..\..\Source\Core\NptDebug.cpp">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptFile.cpp">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptHttp.cpp">
 			</File>
 			<File

@@ -188,7 +188,7 @@ NPT_StdcFileInputStream::GetAvailable(NPT_Size& available)
 {
     long offset = ftell(m_FileReference->GetFile());
     if (offset >= 0 && (NPT_Size)offset <= m_Size) {
-        available = m_Size = offset;
+        available = m_Size - offset;
         return NPT_SUCCESS;
     } else {
         available = 0;

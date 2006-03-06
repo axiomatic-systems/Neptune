@@ -13,6 +13,6 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
-#define NPT_NEPTUNE_VERSION_STRING "0.5.3"
+#define NPT_NEPTUNE_VERSION_STRING "0.5.4"
 
 #endif // _NPT_VERSION_H_

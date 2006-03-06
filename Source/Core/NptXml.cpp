@@ -1483,54 +1483,95 @@ NPT_XmlParser::~NPT_XmlParser()
 |       NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::Parse(NPT_InputStream& stream, NPT_XmlNode*& node)
+NPT_XmlParser::Parse(NPT_InputStream& stream, 
+                     NPT_Size&        size,
+                     NPT_XmlNode*&    node,
+                     bool             incremental /* = false */)
 {       
     NPT_Result result;
 
-    // if there is a current tree, reset it
-    m_Tree = NULL;
+    // reset the tree unless we're in incremental mode
+    if (!incremental) m_Tree = NULL;
+
+    // provide a default return node in case of error
+    node = NULL;
 
     // use a  buffer on the stack
     char buffer[256];
 
-    // read a buffer a parse it until the end of the stream
+    // read a buffer and parse it until the end of the stream
+    NPT_Size max_bytes_to_read = size;
+    size = 0;
     do {
-        NPT_Size   bytes_read;
-
+        NPT_Size bytes_read;
+        NPT_Size bytes_to_read = sizeof(buffer);
+        if (max_bytes_to_read != 0 && 
+            size+bytes_to_read > max_bytes_to_read) {
+            bytes_to_read = max_bytes_to_read-size;
+        }
 	    result = stream.Read(buffer, sizeof(buffer), &bytes_read);
 	    if (NPT_SUCCEEDED(result)) {
+            // update the counter
+            size += bytes_read;
+
 	        // parse the buffer
 	        NPT_CHECK(m_Processor->ProcessBuffer(buffer, bytes_read));
 	    } else {
+            if (result == NPT_ERROR_WOULD_BLOCK && incremental) break;
             if (result != NPT_ERROR_EOS) return result;
 	    }
-    } while(NPT_SUCCEEDED(result));
+    } while(NPT_SUCCEEDED(result) && 
+            (max_bytes_to_read != 0 && size < max_bytes_to_read));
 
     // return a tree if we have one 
     node = m_Tree;
 
-    return m_Tree?NPT_SUCCESS:NPT_FAILURE;
+    if (incremental) {
+        return NPT_SUCCESS;
+    } else {
+        return m_Tree?NPT_SUCCESS:NPT_FAILURE;
+    }
 }
 
 /*----------------------------------------------------------------------
 |       NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::Parse(const char* xml, NPT_XmlNode*& node)
+NPT_XmlParser::Parse(NPT_InputStream& stream, 
+                     NPT_XmlNode*&    node,
+                     bool             incremental /* = false */)
+{
+    NPT_Size max_read = 0; // no limit
+    return Parse(stream, max_read, node, incremental);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlParser::Parse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_XmlParser::Parse(const char*   xml, 
+                     NPT_XmlNode*& node, 
+                     bool          incremental /* = false */)
 {       
     NPT_Size size = NPT_StringLength(xml);
 
-    return Parse(xml, size, node);
+    return Parse(xml, size, node, incremental);
 }
 
 /*----------------------------------------------------------------------
 |       NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::Parse(const char* xml, NPT_Size size, NPT_XmlNode*& node)
+NPT_XmlParser::Parse(const char*   xml, 
+                     NPT_Size      size, 
+                     NPT_XmlNode*& node,
+                     bool          incremental /* = false */)
 { 
-    // if there is a current tree, reset it
-    m_Tree = NULL;
+    // reset the tree unless we're in incremental mode
+    if (!incremental) m_Tree = NULL;
+
+    // provide a default return node in case of error
+    node = NULL;
 
     // parse the buffer
     NPT_CHECK(m_Processor->ProcessBuffer(xml, size));
@@ -1538,7 +1579,11 @@ NPT_XmlParser::Parse(const char* xml, NPT_Size size, NPT_XmlNode*& node)
     // return a tree if we have one 
     node = m_Tree;
 
-    return m_Tree?NPT_SUCCESS:NPT_FAILURE;
+    if (incremental) {
+        return NPT_SUCCESS;
+    } else {
+        return m_Tree?NPT_SUCCESS:NPT_FAILURE;
+    }
 }
 
 /*----------------------------------------------------------------------

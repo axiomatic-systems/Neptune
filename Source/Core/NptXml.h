@@ -242,11 +242,21 @@ class NPT_XmlParser
     // methods
              NPT_XmlParser();
     virtual ~NPT_XmlParser();
-    virtual  NPT_Result Parse(const char* xml, NPT_XmlNode*& tree);
-    virtual  NPT_Result Parse(const char* xml, NPT_Size size,
-			                  NPT_XmlNode*& tree);
-    virtual  NPT_Result Parse(NPT_InputStream& stream, NPT_XmlNode*& tree);
-
+    virtual  NPT_Result Parse(const char*   xml, 
+                              NPT_XmlNode*& tree,
+                              bool          incremental=false);
+    virtual  NPT_Result Parse(const char*   xml, 
+                              NPT_Size      size,
+			                  NPT_XmlNode*& tree,
+                              bool          incremental=false);
+    virtual  NPT_Result Parse(NPT_InputStream& stream, 
+                              NPT_XmlNode*&    tree,
+                              bool             incremental=false);
+    virtual  NPT_Result Parse(NPT_InputStream& stream, 
+                              NPT_Size&        size,
+                              NPT_XmlNode*&    tree,
+                              bool             incremental=false);
+    
  protected:
     // NPT_XmlHandler methods
     NPT_Result OnStartElement(const char* name);

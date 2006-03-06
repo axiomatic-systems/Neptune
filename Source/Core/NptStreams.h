@@ -41,6 +41,7 @@ class NPT_InputStream
     virtual ~NPT_InputStream() {};
 
     // methods
+    virtual NPT_Result Load(NPT_DataBuffer& buffer, NPT_Size max_read = 0);
     virtual NPT_Result Read(void*     buffer, 
                             NPT_Size  bytes_to_read, 
                             NPT_Size* bytes_read = NULL) = 0;

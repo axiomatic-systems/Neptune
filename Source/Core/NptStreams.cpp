@@ -17,6 +17,78 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+const NPT_Size NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK = 4096;
+
+/*----------------------------------------------------------------------
+|   NPT_InputStream::Load
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
+{
+    NPT_Result result;
+    NPT_Size   total_bytes_read;
+
+    // reset the buffer
+    buffer.SetDataSize(0);
+
+    // try to get the stream size
+    NPT_Size size;
+    if (NPT_SUCCEEDED(GetSize(size))) { 
+        // make sure we don't read more than max_read
+        if (max_read && max_read < size) size = max_read;
+    } else {
+        size = max_read;
+    } 
+
+    // read the data from the file
+    total_bytes_read = 0;
+    do {
+        NPT_Size  available = 0;
+        NPT_Size  bytes_to_read;
+        NPT_Size  bytes_read;
+        NPT_Byte* data;
+
+        /* check if we know how much data is available */
+        result = GetAvailable(available);
+        if (NPT_SUCCEEDED(result)) {
+            // we know how much is available
+            bytes_to_read = available;
+        } else {
+            bytes_to_read = NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK;
+        }
+
+        // stop if we've read everything
+        if (bytes_to_read == 0) break;
+
+        // allocate space in the buffer
+        NPT_Size buffer_size = buffer.GetBufferSize();
+        NPT_Size needed = total_bytes_read+bytes_to_read;
+        if (buffer_size < needed) {
+            // try doubling the buffer to accomodate for the new size
+            NPT_Size new_buffer_size = buffer_size*2;
+            if (new_buffer_size < needed) new_buffer_size = needed;
+            NPT_CHECK(buffer.SetBufferSize(new_buffer_size));
+        }
+
+        // read the data
+        data = buffer.UseData()+total_bytes_read;
+        result = Read((void*)data, bytes_to_read, &bytes_read);
+        if (NPT_SUCCEEDED(result) && bytes_read != 0) {
+            total_bytes_read += bytes_read;
+            buffer.SetDataSize(total_bytes_read);
+        }
+    } while(NPT_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
+
+    if (result == NPT_ERROR_EOS) {
+        return NPT_SUCCESS;
+    } else {
+        return result;
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_InputStream::ReadFully
 +---------------------------------------------------------------------*/
 NPT_Result

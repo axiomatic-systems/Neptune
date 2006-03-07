@@ -42,6 +42,9 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
         size = max_read;
     } 
 
+    // pre-allocate the buffer
+    if (size) NPT_CHECK(buffer.GrowBuffer(size));
+
     // read the data from the file
     total_bytes_read = 0;
     do {
@@ -62,15 +65,8 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
         // stop if we've read everything
         if (bytes_to_read == 0) break;
 
-        // allocate space in the buffer
-        NPT_Size buffer_size = buffer.GetBufferSize();
-        NPT_Size needed = total_bytes_read+bytes_to_read;
-        if (buffer_size < needed) {
-            // try doubling the buffer to accomodate for the new size
-            NPT_Size new_buffer_size = buffer_size*2;
-            if (new_buffer_size < needed) new_buffer_size = needed;
-            NPT_CHECK(buffer.SetBufferSize(new_buffer_size));
-        }
+        // ensure that the buffer has enough space
+        NPT_CHECK(buffer.GrowBuffer(total_bytes_read+bytes_to_read));
 
         // read the data
         data = buffer.UseData()+total_bytes_read;
@@ -246,15 +242,7 @@ NPT_MemoryStream::Write(const void* data,
                         NPT_Size    bytes_to_write, 
                         NPT_Size*   bytes_written)
 {
-    NPT_Size space_available = m_Buffer.GetBufferSize();
-    NPT_Size space_needed = m_WriteOffset+bytes_to_write;
-    if (space_needed > space_available) {
-        NPT_Size allocate = space_available?
-                            space_available*2: // try to double
-                            1024;              // start with 1k
-        if (allocate < space_needed) allocate = space_needed;
-        NPT_CHECK(m_Buffer.SetBufferSize(allocate));
-    }
+    NPT_CHECK(m_Buffer.GrowBuffer(m_WriteOffset+bytes_to_write));
 
     NPT_CopyMemory(m_Buffer.UseData()+m_WriteOffset, data, bytes_to_write);
     m_WriteOffset += bytes_to_write;

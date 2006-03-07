@@ -39,29 +39,29 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
 {
     // create a socket to talk to the TCP/IP stack
     SOCKET net;
-	if((net = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, 0)) == INVALID_SOCKET) {
+    if((net = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, 0)) == INVALID_SOCKET) {
         return NPT_FAILURE;
-   	}
+    }
 
-	// get a list of interfaces
-	INTERFACE_INFO query[32];  // get up to 32 interfaces 
-	DWORD bytes_returned;
-	int io_result = WSAIoctl(net, 
+    // get a list of interfaces
+    INTERFACE_INFO query[32];  // get up to 32 interfaces 
+    DWORD bytes_returned;
+    int io_result = WSAIoctl(net, 
                              SIO_GET_INTERFACE_LIST, NULL, 0, &query,
                              sizeof(query), &bytes_returned, NULL, NULL);
     if (io_result == SOCKET_ERROR) {
-		closesocket(net);
-		return NPT_FAILURE;
-	}
+        closesocket(net);
+        return NPT_FAILURE;
+    }
 
     // we don't need the socket anymore
-	closesocket(net);
+    closesocket(net);
 
-	// Display interface information
-	int interface_count = (bytes_returned/sizeof(INTERFACE_INFO));
+    // Display interface information
+    int interface_count = (bytes_returned/sizeof(INTERFACE_INFO));
     unsigned int iface_index = 0;
-	for (int i=0; i<interface_count; i++) {
-		SOCKADDR_IN* address;
+    for (int i=0; i<interface_count; i++) {
+        SOCKADDR_IN* address;
         NPT_Flags    flags = 0;
 
         // primary address
@@ -69,11 +69,11 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         NPT_IpAddress primary_address(ntohl(address->sin_addr.s_addr));
 
         // netmask
-		address = (SOCKADDR_IN*)&query[i].iiNetmask;
+        address = (SOCKADDR_IN*)&query[i].iiNetmask;
         NPT_IpAddress netmask(ntohl(address->sin_addr.s_addr));
 
         // broadcast address
-		address = (SOCKADDR_IN*)&query[i].iiBroadcastAddress;
+        address = (SOCKADDR_IN*)&query[i].iiBroadcastAddress;
         NPT_IpAddress broadcast_address(ntohl(address->sin_addr.s_addr));
 
         // ignore interfaces that are not up
@@ -81,16 +81,16 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
             continue;
         }
         if (query[i].iiFlags & IFF_BROADCAST) {
-			flags |= NPT_NETWORK_INTERFACE_FLAG_BROADCAST;
+            flags |= NPT_NETWORK_INTERFACE_FLAG_BROADCAST;
         }
         if (query[i].iiFlags & IFF_MULTICAST) {
-			flags |= NPT_NETWORK_INTERFACE_FLAG_MULTICAST;
+            flags |= NPT_NETWORK_INTERFACE_FLAG_MULTICAST;
         }
         if (query[i].iiFlags & IFF_LOOPBACK) {
-			flags |= NPT_NETWORK_INTERFACE_FLAG_LOOPBACK;
+            flags |= NPT_NETWORK_INTERFACE_FLAG_LOOPBACK;
         }
         if (query[i].iiFlags & IFF_POINTTOPOINT) {
-			flags |= NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT;
+            flags |= NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT;
         }
 
         // mac address (no support for this for now
@@ -118,7 +118,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
 
         // increment the index (used for generating the name
         iface_index++;
-	}
+    }
 
     return NPT_SUCCESS;
 }

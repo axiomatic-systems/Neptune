@@ -296,16 +296,3 @@ NPT_Map<K,V>::operator[](const K& key)
 }
 
 #endif // _NPT_MAP_H_
-
-
-
-
-
-
-
-
-
-
-
-
-

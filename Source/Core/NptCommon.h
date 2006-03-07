@@ -33,12 +33,12 @@ public:
 template <class T>
 class NPT_ObjectComparator {
 public:
-	NPT_ObjectComparator(T& object) : m_Object(object) {}
-	bool operator()(const T& object) const {
-		return object == m_Object;
-	}
+    NPT_ObjectComparator(T& object) : m_Object(object) {}
+    bool operator()(const T& object) const {
+        return object == m_Object;
+    }
 private:
-	T& m_Object;
+    T& m_Object;
 };
 
 /*----------------------------------------------------------------------
@@ -131,16 +131,4 @@ class NPT_PropertyValue
 };
 
 #endif // _NPT_COMMON_H_
-
-
-
-
-
-
-
-
-
-
-
-
 

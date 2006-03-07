@@ -31,7 +31,7 @@ NPT_IpAddress::NPT_IpAddress()
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress(unsigned long address)
 {
-	Set(address);
+    Set(address);
 }
 
 /*----------------------------------------------------------------------

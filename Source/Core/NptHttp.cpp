@@ -631,6 +631,7 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
     NPT_SocketAddress address(server_address, request.GetUrl().GetPort());
 
     // connect to the server
+    NPT_Debug("SendRequest: will connect to %s:%d\n", (const char*)request.GetUrl().GetHost(), request.GetUrl().GetPort());
     NPT_TcpClientSocket connection;
     NPT_CHECK(connection.Connect(address, timeout));
 
@@ -669,12 +670,16 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
         headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, "0");
     }
 
-    // create a buffered stream for this socket stream
-    //m_ConnectionStream = new NPT_BufferedByteStream(stream);
+    // create a memory stream to buffer the headers
+    NPT_MemoryStream header_stream;
 
-    NPT_Debug("SendRequest: will connect to %s:%d\n", (const char*)request.GetUrl().GetHost(), request.GetUrl().GetPort());
-    // send request headers
-    request.Emit(*output_stream);
+    // emit the request headers into the header buffer
+    request.Emit(header_stream);
+
+    // send the headers
+    NPT_Size headers_size;
+    header_stream.GetSize(headers_size);
+    NPT_CHECK(output_stream->WriteFully(header_stream.GetData(), headers_size));
 
     // send request body
     if (!body_stream.IsNull()) {
@@ -709,9 +714,9 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
         response->SetEntity(entity);
     }
 
-    // unbuffer the stream 
+    // unbuffer the stream
     buffered_input_stream->SetBufferSize(0);
-
+    
     return NPT_SUCCESS;
 }
 

@@ -55,12 +55,13 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
     NPT_Map<NPT_String,A> a_map;
-    A* a;
+    A* a = NULL;
 
     NPT_ASSERT(a_map.GetEntryCount() == 0);
     NPT_ASSERT(a_map.HasKey("hello") == false);
     NPT_ASSERT(!a_map.HasValue(A(1,2)));
     NPT_ASSERT(NPT_FAILED(a_map.Get("bla", a)));
+    NPT_ASSERT(a == NULL);
 
     a_map.Put("hello", A(1,2));
     NPT_ASSERT(a_map.GetEntryCount() == 1);

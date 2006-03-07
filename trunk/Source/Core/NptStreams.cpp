@@ -152,7 +152,7 @@ NPT_OutputStream::WriteString(const char* buffer)
     // shortcut
     NPT_Size string_length;
     if (buffer == NULL || (string_length = NPT_StringLength(buffer)) == 0) {
-	    return NPT_SUCCESS;
+        return NPT_SUCCESS;
     }
 
     // write the string

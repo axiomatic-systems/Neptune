@@ -36,12 +36,3 @@ protected:
 };
 
 #endif // _NPT_SYSTEM_H_
-
-
-
-
-
-
-
-
-

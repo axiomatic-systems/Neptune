@@ -196,12 +196,3 @@ class NPT_Thread : public NPT_ThreadInterface
 
 
 #endif // _NPT_THREADS_H_
-
-
-
-
-
-
-
-
-

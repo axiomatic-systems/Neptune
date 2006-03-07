@@ -164,7 +164,7 @@ public:
     NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) {             
         return m_SocketDelegate->Bind(address, reuse_address);                            
     }                                                               
-	NPT_Result Connect(const NPT_SocketAddress& address,            
+    NPT_Result Connect(const NPT_SocketAddress& address,            
                        NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
        return m_SocketDelegate->Connect(address, timeout);                 
     }                                                               
@@ -204,11 +204,11 @@ class NPT_UdpSocket : public NPT_Socket,
     virtual ~NPT_UdpSocket();
 
     // delegate NPT_UdpSocketInterface methods
-	NPT_Result Send(const NPT_DataBuffer&    packet,           
+    NPT_Result Send(const NPT_DataBuffer&    packet,           
                     const NPT_SocketAddress* address = NULL) {
         return m_UdpSocketDelegate->Send(packet, address);              
     }                                                         
-	NPT_Result Receive(NPT_DataBuffer&     packet,            
+    NPT_Result Receive(NPT_DataBuffer&     packet,            
                        NPT_SocketAddress*  address = NULL) {  
         return m_UdpSocketDelegate->Receive(packet, address);           
     }
@@ -243,7 +243,7 @@ public:
                           NPT_IpAddress::Any) {                 
         return m_UdpMulticastSocketDelegate->LeaveGroup(group, iface);
     }                                                          
-	NPT_Result SetTimeToLive(unsigned char ttl) {     
+    NPT_Result SetTimeToLive(unsigned char ttl) {     
         return m_UdpMulticastSocketDelegate->SetTimeToLive(ttl); 
     }
     NPT_Result SetInterface(const NPT_IpAddress& iface) {
@@ -292,12 +292,3 @@ protected:
 };
 
 #endif // _NPT_SOCKETS_H_
-
-
-
-
-
-
-
-
-

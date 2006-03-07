@@ -66,12 +66,3 @@ operator-(const NPT_TimeStamp& t1, const NPT_TimeStamp& t2)
 typedef NPT_TimeStamp NPT_TimeInterval;
 
 #endif // _NPT_TIME_H_
-
-
-
-
-
-
-
-
-

@@ -440,9 +440,9 @@ NPT_HttpRequest::Emit(NPT_OutputStream& stream) const
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
     //NPT_Debug("%s %s %s\n", 
-	   //   (const char*)m_Method, 
-	   //   (const char*)NPT_Uri::Encode(m_Url.GetPath()), 
-	   //   (const char*)m_Protocol);
+       //   (const char*)m_Method, 
+       //   (const char*)NPT_Uri::Encode(m_Url.GetPath()), 
+       //   (const char*)m_Protocol);
 
     // emit headers
     m_Headers.Emit(stream);

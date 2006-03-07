@@ -52,7 +52,7 @@ NPT_Debug(const char* format, ...)
     va_start(args, format);
 
 #if (_MSC_VER >= 1400)
-	_vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer)-1, format, args);
+    _vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer)-1, format, args);
 #else
     _vsnprintf(buffer, sizeof(buffer)-1, format, args);
 #endif

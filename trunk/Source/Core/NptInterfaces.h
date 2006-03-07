@@ -101,16 +101,3 @@ public:
 };
 
 #endif // _NPT_INTERFACES_H_
-
-
-
-
-
-
-
-
-
-
-
-
-

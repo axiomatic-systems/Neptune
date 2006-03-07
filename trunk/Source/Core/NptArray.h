@@ -52,7 +52,7 @@ public:
     NPT_Result   Erase(Iterator first, Iterator last);
     NPT_Result   Erase(NPT_Ordinal first, NPT_Ordinal last) { return Erase(&m_Items[first], &m_Items[last]); }
     NPT_Result   Insert(Iterator where, const T& item, NPT_Cardinal count = 1);
-	NPT_Result   Reserve(NPT_Cardinal count);
+    NPT_Result   Reserve(NPT_Cardinal count);
     NPT_Cardinal GetCapacity(NPT_Cardinal count) const;
     NPT_Result   Resize(NPT_Cardinal count);
     NPT_Result   Resize(NPT_Cardinal count, const T& fill);
@@ -63,14 +63,14 @@ public:
     Iterator     GetItem(NPT_Ordinal n) { return n<m_ItemCount?&m_Items[n]:NULL; }
 
     // template list operations
-	// keep these template members defined here because MSV6 does not let
-	// us define them later
-	template <typename X> 
-	NPT_Result Apply(const X& function) const
-	{                                  
-		for (unsigned int i=0; i<m_ItemCount; i++) function(m_Items[i]);
-		return NPT_SUCCESS;
-	}
+    // keep these template members defined here because MSV6 does not let
+    // us define them later
+    template <typename X> 
+    NPT_Result Apply(const X& function) const
+    {                                  
+        for (unsigned int i=0; i<m_ItemCount; i++) function(m_Items[i]);
+        return NPT_SUCCESS;
+    }
 
     template <typename X, typename P>
     NPT_Result ApplyUntil(const X& function, const P& predicate, bool* match = NULL) const
@@ -87,16 +87,16 @@ public:
     }
 
     template <typename X> 
-	T* Find(const X& predicate, NPT_Ordinal n=0) const
-	{
-		for (unsigned int i=0; i<m_ItemCount; i++) {
-			if (predicate(m_Items[i])) {
-				if (n == 0) return &m_Items[i];
-				--n;
-			}
-		}
-		return NULL;
-	}
+    T* Find(const X& predicate, NPT_Ordinal n=0) const
+    {
+        for (unsigned int i=0; i<m_ItemCount; i++) {
+            if (predicate(m_Items[i])) {
+                if (n == 0) return &m_Items[i];
+                --n;
+            }
+        }
+        return NULL;
+    }
 
 protected:
     // methods
@@ -379,16 +379,16 @@ NPT_Array<T>::Insert(Iterator where, const T& item, NPT_Cardinal repeat)
         // shift items after the insertion point to the right
         for (NPT_Ordinal i=m_ItemCount; i>where_index; i--) {
             new((void*)&m_Items[i+repeat-1])T(m_Items[i-1]);
-			m_Items[i-1].~T();
+            m_Items[i-1].~T();
         }
     }
 
-	// insert the new items
-	for (NPT_Cardinal i=where_index; i<where_index+repeat; i++) {
-		new((void*)&m_Items[i])T(item);
-	}
+    // insert the new items
+    for (NPT_Cardinal i=where_index; i<where_index+repeat; i++) {
+        new((void*)&m_Items[i])T(item);
+    }
 
-	// update the item count
+    // update the item count
     m_ItemCount += repeat;
 
     return NPT_SUCCESS;

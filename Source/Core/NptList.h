@@ -71,18 +71,18 @@ public:
         bool operator!=(const Iterator& other) const {
             return m_Item != other.m_Item;
         }
-		void operator=(const Iterator& other) {
-			m_Item = other.m_Item;
-		}
-		void operator=(Item* item) {
-			m_Item = item;
-		}
+        void operator=(const Iterator& other) {
+            m_Item = other.m_Item;
+        }
+        void operator=(Item* item) {
+            m_Item = item;
+        }
 
     private:
         Item* m_Item;
 
-		// friends
-		friend class NPT_List<T>;
+        // friends
+        friend class NPT_List<T>;
     };
 
     // methods
@@ -109,19 +109,19 @@ public:
     NPT_Result   Insert(const Iterator where, Item& item);
 
     // list operations
-	// keep these template members defined here because MSV6 does not let
-	// us define them later
+    // keep these template members defined here because MSV6 does not let
+    // us define them later
     template <typename X> 
-	NPT_Result Apply(const X& function) const
-	{                          
-		Item* item = m_Head;
-		while (item) {
-			function(item->m_Data);
-			item = item->m_Next;
-		}
+    NPT_Result Apply(const X& function) const
+    {                          
+        Item* item = m_Head;
+        while (item) {
+            function(item->m_Data);
+            item = item->m_Next;
+        }
 
-		return NPT_SUCCESS;
-	}
+        return NPT_SUCCESS;
+    }
 
     template <typename X, typename P> 
     NPT_Result ApplyUntil(const X& function, const P& predicate, bool* match = NULL) const
@@ -141,21 +141,21 @@ public:
     }
 
     template <typename P> 
-	Iterator Find(const P& predicate, NPT_Ordinal n=0) const
-	{
-		Item* item = m_Head;
-		while (item) {
-			if (predicate(item->m_Data)) {
-				if (n == 0) {
-					return Iterator(item);
-				}
-				--n;
-			}
-			item = item->m_Next;
-		}
+    Iterator Find(const P& predicate, NPT_Ordinal n=0) const
+    {
+        Item* item = m_Head;
+        while (item) {
+            if (predicate(item->m_Data)) {
+                if (n == 0) {
+                    return Iterator(item);
+                }
+                --n;
+            }
+            item = item->m_Next;
+        }
 
-		return Iterator(NULL);
-	}
+        return Iterator(NULL);
+    }
 
     // operators
     void operator=(const NPT_List<T>& other);
@@ -332,15 +332,15 @@ template <typename T>
 typename NPT_List<T>::Iterator
 NPT_List<T>::GetItem(NPT_Ordinal n) const
 {
-	Iterator result;
-	if (n >= m_ItemCount) return result;
-	
-	result = m_Head;
-	for (unsigned int i=0; i<n; i++) {
-		++result;
-	}
+    Iterator result;
+    if (n >= m_ItemCount) return result;
+    
+    result = m_Head;
+    for (unsigned int i=0; i<n; i++) {
+        ++result;
+    }
 
-	return result;
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -391,11 +391,11 @@ template <typename T>
 NPT_Result
 NPT_List<T>::Erase(Iterator position) 
 {
-	if (!position) return NPT_ERROR_NO_SUCH_ITEM;
-	Detach(*position.m_Item);
-	delete position.m_Item;
+    if (!position) return NPT_ERROR_NO_SUCH_ITEM;
+    Detach(*position.m_Item);
+    delete position.m_Item;
 
-	return NPT_SUCCESS;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -419,12 +419,12 @@ NPT_List<T>::Remove(const T& data, bool all)
             // destroy the item
             delete item;
 
-            if (!all) return 1;
+            if (!all) return NPT_SUCCESS;
         }
         item = item->m_Next;
     }
  
-    return matches?matches:NPT_ERROR_NO_SUCH_ITEM;
+    return matches?NPT_SUCCESS:NPT_ERROR_NO_SUCH_ITEM;
 }
 
 /*----------------------------------------------------------------------

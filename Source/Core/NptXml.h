@@ -247,7 +247,7 @@ class NPT_XmlParser
                               bool          incremental=false);
     virtual  NPT_Result Parse(const char*   xml, 
                               NPT_Size      size,
-			                  NPT_XmlNode*& tree,
+                              NPT_XmlNode*& tree,
                               bool          incremental=false);
     virtual  NPT_Result Parse(NPT_InputStream& stream, 
                               NPT_XmlNode*&    tree,
@@ -326,12 +326,3 @@ private:
 };
 
 #endif // _NPT_XML_H_
-
-
-
-
-
-
-
-
-

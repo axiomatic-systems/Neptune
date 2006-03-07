@@ -307,7 +307,7 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
     }
     NPT_CopyMemory(m_Address, host_entry->h_addr, 4);
 #endif
-	
+    
     return NPT_SUCCESS;
 }
 
@@ -519,10 +519,10 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
 {
     ssize_t nb_written;
 
-	nb_written = send(m_SocketFdReference->GetSocketFd(), 
-					  (SocketConstBuffer)buffer, 
-					  bytes_to_write, 
-					  0);
+    nb_written = send(m_SocketFdReference->GetSocketFd(), 
+                      (SocketConstBuffer)buffer, 
+                      bytes_to_write, 
+                      0);
 
     if (nb_written > 0) {
         if (bytes_written) *bytes_written = nb_written;
@@ -602,8 +602,8 @@ class NPT_BsdSocket : public NPT_SocketInterface
     NPT_Result RefreshInfo();
 
     // NPT_SocketInterface methods
-	NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true);
-	NPT_Result Connect(const NPT_SocketAddress& address, NPT_Timeout timeout);
+    NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true);
+    NPT_Result Connect(const NPT_SocketAddress& address, NPT_Timeout timeout);
     NPT_Result WaitForConnection(NPT_Timeout timeout);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
@@ -808,7 +808,7 @@ class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
     // NPT_UdpSocketInterface methods
     NPT_Result Send(const NPT_DataBuffer&    packet, 
                     const NPT_SocketAddress* address);
-	NPT_Result Receive(NPT_DataBuffer&     packet, 
+    NPT_Result Receive(NPT_DataBuffer&     packet, 
                        NPT_SocketAddress*  address);
 
     // friends

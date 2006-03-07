@@ -38,6 +38,7 @@ NPT_File::Load(const char* filename, NPT_DataBuffer& buffer)
 /*----------------------------------------------------------------------
 |   NPT_File::Load
 +---------------------------------------------------------------------*/
+NPT_Result
 NPT_File::Load(NPT_DataBuffer& buffer)
 {
     NPT_InputStreamReference input;

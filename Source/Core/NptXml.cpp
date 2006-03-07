@@ -1509,19 +1509,19 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
             size+bytes_to_read > max_bytes_to_read) {
             bytes_to_read = max_bytes_to_read-size;
         }
-	    result = stream.Read(buffer, sizeof(buffer), &bytes_read);
-	    if (NPT_SUCCEEDED(result)) {
+        result = stream.Read(buffer, sizeof(buffer), &bytes_read);
+        if (NPT_SUCCEEDED(result)) {
             // update the counter
             size += bytes_read;
 
-	        // parse the buffer
-	        NPT_CHECK(m_Processor->ProcessBuffer(buffer, bytes_read));
-	    } else {
+            // parse the buffer
+            NPT_CHECK(m_Processor->ProcessBuffer(buffer, bytes_read));
+        } else {
             if (result == NPT_ERROR_WOULD_BLOCK && incremental) break;
             if (result != NPT_ERROR_EOS) return result;
-	    }
+        }
     } while(NPT_SUCCEEDED(result) && 
-            (max_bytes_to_read != 0 && size < max_bytes_to_read));
+            (max_bytes_to_read == 0 || size < max_bytes_to_read));
 
     // return a tree if we have one 
     node = m_Tree;

@@ -41,7 +41,7 @@ NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 #if (_MSC_VER >= 1400)
     _ftime_s(&time_stamp);
 #else
-	_ftime(&time_stamp);
+    _ftime(&time_stamp);
 #endif
     now.m_Seconds     = (long)time_stamp.time;
     now.m_NanoSeconds = (long)time_stamp.millitm*1000000;

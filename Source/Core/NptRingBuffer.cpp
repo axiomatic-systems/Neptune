@@ -166,9 +166,9 @@ NPT_RingBuffer::Read(void* buffer, NPT_Size byte_count)
 unsigned char
 NPT_RingBuffer::ReadByte()
 {
-	  unsigned char result = *m_Out++;
+    unsigned char result = *m_Out++;
     if (m_Out == m_Data.end) m_Out = m_Data.start;
-   	return result;
+    return result;
 }
 
 /*----------------------------------------------------------------------+

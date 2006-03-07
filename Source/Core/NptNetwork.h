@@ -186,12 +186,3 @@ private:
 
 
 #endif // _NPT_NETWORK_H_
-
-
-
-
-
-
-
-
-

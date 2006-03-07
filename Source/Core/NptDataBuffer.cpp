@@ -183,9 +183,9 @@ NPT_DataBuffer::ReallocateBuffer(NPT_Size size)
     NPT_Byte* newBuffer = new NPT_Byte[size];
 
     // copy the contents of the previous buffer, if any
-	if (m_Buffer && m_DataSize) {
+    if (m_Buffer && m_DataSize) {
             NPT_CopyMemory(newBuffer, m_Buffer, m_DataSize);
-	}
+    }
 
     // destroy the previous buffer
     delete[] m_Buffer;

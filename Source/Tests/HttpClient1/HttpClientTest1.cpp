@@ -17,6 +17,7 @@
 #include <crtdbg.h>
 #endif
 
+#if defined(TEST_URL)
 /*----------------------------------------------------------------------
 |       TestUrlParser
 +---------------------------------------------------------------------*/
@@ -34,6 +35,7 @@ TestUrlParser(const char* url)
         NPT_Debug("  --> Invalid URL\n");
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 |       ShowResponse
@@ -102,6 +104,7 @@ TestHttpGet(const char* arg)
     delete response;
 }
 
+#if defined(TEST_POST)
 /*----------------------------------------------------------------------
 |       TestHttpPost
 +---------------------------------------------------------------------*/
@@ -126,6 +129,7 @@ TestHttpPost(const char* arg)
 
     delete response;
 }
+#endif
 
 /*----------------------------------------------------------------------
 |       main
@@ -153,7 +157,7 @@ main(int argc, char** argv)
     }
 #endif
 
-#if 1
+#if defined(TEST_URL)
     // test URL parsing
     TestUrlParser(NULL);
     TestUrlParser("");
@@ -175,7 +179,9 @@ main(int argc, char** argv)
 #endif
 
     TestHttpGet(argv[1]);
+#if defined(TEST_POST)
     TestHttpPost(argv[1]);
+#endif
 
 #if defined(WIN32) && defined(_DEBUG)
     _CrtDumpMemoryLeaks();

@@ -118,6 +118,20 @@ NPT_DataBuffer::SetBufferSize(NPT_Size buffer_size)
 }
 
 /*----------------------------------------------------------------------
+|       NPT_DataBuffer::GrowBuffer
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_DataBuffer::GrowBuffer(NPT_Size size)
+{
+    if (size <= m_BufferSize) return NPT_SUCCESS;
+
+    // try doubling the buffer to accomodate for the new size
+    NPT_Size new_size = m_BufferSize*2;
+    if (new_size < size) new_size = size;
+    return SetBufferSize(new_size);
+}
+
+/*----------------------------------------------------------------------
 |       NPT_DataBuffer::SetDataSize
 +---------------------------------------------------------------------*/
 NPT_Result

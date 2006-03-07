@@ -103,10 +103,3 @@ protected:
 };
 
 #endif // _NPT_FILE_H_ 
-
-
-
-
-
-
-

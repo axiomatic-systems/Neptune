@@ -97,12 +97,3 @@ extern void NPT_SetMemory(void* dest, int c, NPT_Size size);
 #endif
 
 #endif // _NPT_UTILS_H_
-
-
-
-
-
-
-
-
-

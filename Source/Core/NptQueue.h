@@ -34,7 +34,7 @@ class NPT_GenericQueue
     virtual           ~NPT_GenericQueue() {}
     virtual NPT_Result Push(NPT_QueueItem* item) = 0; 
     virtual NPT_Result Pop(NPT_QueueItem*& item, 
-                           bool     blocking = true) = 0;
+                           bool            blocking = true) = 0;
 
  protected:
     // methods

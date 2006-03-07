@@ -555,15 +555,3 @@ NPT_Thread::NPT_Thread(NPT_Runnable& target, bool detached)
 {
     m_Delegate = new NPT_Win32Thread(this, target, detached);
 }
-
-
-
-
-
-
-
-
-
-
-
-

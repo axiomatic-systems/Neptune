@@ -355,7 +355,7 @@ NPT_BsdSocketFd::SetBlockingMode(bool blocking)
 NPT_Result
 NPT_BsdSocketFd::SetBlockingMode(bool blocking)
 {
-    unsigned long args = blocking?0:1;
+    int args = blocking?0:1;
     if (setsockopt(m_SocketFd, SOL_SOCKET, SCE_NET_INET_SO_NBIO, &args, sizeof(args))) {
         return NPT_FAILURE;
     }
@@ -506,6 +506,7 @@ public:
     NPT_Result Tell(NPT_Offset& where) {
         return NPT_BsdSocketStream::Tell(where);
     }
+    NPT_Result Flush();
 };
 
 /*----------------------------------------------------------------------
@@ -533,6 +534,54 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
         } else {
             return MapErrorCode(GetSocketError());
         }
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdSocketOutputStream::Flush
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketOutputStream::Flush()
+{
+    int args = 0;
+    int size = sizeof(args);
+
+    // get the value of the nagle algorithm
+    if (getsockopt(m_SocketFdReference->GetSocketFd(), 
+                  IPPROTO_TCP, 
+                  TCP_NODELAY, 
+                  (char*)&args, 
+                  &size)) {
+        return NPT_FAILURE;
+    }
+
+    // return now if nagle was already off
+    if (args == 1) return NPT_SUCCESS;
+
+    // disable the nagle algorithm
+    args = 1;
+    if (setsockopt(m_SocketFdReference->GetSocketFd(), 
+                   IPPROTO_TCP, 
+                   TCP_NODELAY, 
+                   (const char*)&args, 
+                   sizeof(args))) {
+        return NPT_FAILURE;
+    }
+
+    // send an empty buffer to flush
+    char dummy;
+    send(m_SocketFdReference->GetSocketFd(), &dummy, 0, 0); 
+
+    // restore the nagle algorithm to its original setting
+    args = 0;
+    if (setsockopt(m_SocketFdReference->GetSocketFd(), 
+                   IPPROTO_TCP, 
+                   TCP_NODELAY, 
+                   (const char*)&args, 
+                   sizeof(args))) {
+        return NPT_FAILURE;
     }
 
     return NPT_SUCCESS;

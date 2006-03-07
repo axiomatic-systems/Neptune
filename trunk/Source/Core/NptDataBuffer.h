@@ -34,6 +34,7 @@ class NPT_DataBuffer
     virtual NPT_Result SetBuffer(NPT_Byte* buffer, NPT_Size bufferSize);
     virtual NPT_Result SetBufferSize(NPT_Size bufferSize);
     virtual NPT_Size   GetBufferSize() const { return m_BufferSize; }
+    virtual NPT_Result GrowBuffer(NPT_Size size);
 
     // data handling methods
     virtual const NPT_Byte* GetData() const { return m_Buffer; }

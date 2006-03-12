@@ -24,7 +24,7 @@ public:
 
         // sleep a while
         NPT_TimeInterval duration(1.2f);
-        NPT_System::GetSystem()->Sleep(duration);       
+        NPT_System::Sleep(duration);       
 
         NPT_Debug("Thread1::Run - end\n");
     }
@@ -43,7 +43,7 @@ public:
 
         // sleep a while
         NPT_TimeInterval duration(2.1f);
-        NPT_System::GetSystem()->Sleep(duration);
+        NPT_System::Sleep(duration);
 
         NPT_Debug("Thread2::Run - waiting for variable == 3\n");
         m_SharedVariable->WaitUntilEquals(3);
@@ -69,19 +69,19 @@ public:
 
         // sleep a while
         NPT_TimeInterval duration(3.1f);
-        NPT_System::GetSystem()->Sleep(duration);
+        NPT_System::Sleep(duration);
 
         NPT_Debug("Thread3::Run - setting shared var to 1\n");
         m_SharedVariable->SetValue(1);
 
          // sleep a while
-        NPT_System::GetSystem()->Sleep(duration);
+        NPT_System::Sleep(duration);
 
         NPT_Debug("Thread3::Run - setting shared var to 2\n");
         m_SharedVariable->SetValue(2);
 
          // sleep a while
-        NPT_System::GetSystem()->Sleep(duration);      
+        NPT_System::Sleep(duration);      
 
         NPT_Debug("Thread3::Run - setting shared var to 3\n");
         m_SharedVariable->SetValue(3);
@@ -102,7 +102,7 @@ public:
 
         // sleep a while
         NPT_TimeInterval duration(4.3f);
-        NPT_System::GetSystem()->Sleep(duration);
+        NPT_System::Sleep(duration);
 
         NPT_Debug("Thread4::Run - end\n");
     }
@@ -119,9 +119,12 @@ main(int argc, char** argv)
 
     NPT_SharedVariable shv1(0);
     NPT_Thread* thread1 = new Thread1();
-    NPT_Thread* thread2 = new NPT_Thread(true, new Thread2(&shv1));
-    NPT_Thread* thread3 = new Thread3(&shv1);
-    NPT_Thread* thread4 = new NPT_Thread(false, new Thread4());
+    Thread2 t2(&shv1);
+    NPT_Thread* thread2 = new NPT_Thread(t2, true);
+    Thread3 t3(&shv1);
+    NPT_Thread* thread3 = new Thread3(t3);
+    Thread4 t4;
+    NPT_Thread* thread4 = new NPT_Thread(t4, false);
 
     NPT_Debug("starting thread1...\n");
     thread1->Start();
@@ -145,7 +148,7 @@ main(int argc, char** argv)
     
     // sleep a while
     NPT_TimeInterval duration(15UL);
-    NPT_System::GetSystem()->Sleep(duration);
+    NPT_System::Sleep(duration);
 
     NPT_Debug("- program done -\n");
 

@@ -51,6 +51,7 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -466,7 +467,7 @@ NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
 {
     // generic socket streams have no size
     size = 0;
-    return NPT_SUCCESS;
+    return NPT_ERROR_NOT_SUPPORTED;
 }
 
 /*----------------------------------------------------------------------
@@ -545,8 +546,8 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
 NPT_Result
 NPT_BsdSocketOutputStream::Flush()
 {
-    int args = 0;
-    int size = sizeof(args);
+    int       args = 0;
+    socklen_t size = sizeof(args);
 
     // get the value of the nagle algorithm
     if (getsockopt(m_SocketFdReference->GetSocketFd(), 

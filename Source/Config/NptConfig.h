@@ -50,6 +50,11 @@
 #endif /* NPT_CONFIG_HAVE_STDIO_H */
 
 /*----------------------------------------------------------------------
+|   standard C++ runtime
++---------------------------------------------------------------------*/
+#define NPT_CONFIG_HAVE_NEW_H
+
+/*----------------------------------------------------------------------
 |   sockets
 +---------------------------------------------------------------------*/
 #define NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
@@ -113,6 +118,13 @@ typedef __w64 long NPT_PointerLong;
 #define NPT_POINTER_TO_LONG(_p) ((long)(NPT_PointerLong) (_p) )
 #define NPT_CONFIG_HAVE_FOPEN_S
 #endif
+#endif
+
+/* Symbian */
+#if defined(__SYMBIAN32__)
+#undef NPT_CONFIG_HAVE_NEW_H
+#include "e32std.h"
+#define explicit
 #endif
 
 /*----------------------------------------------------------------------

@@ -40,6 +40,7 @@ const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH = 2048;
 #define NPT_HTTP_HEADER_CONTENT_ENCODING    "Content-Encoding"
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
+const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
 
 #define NPT_HTTP_LINE_TERMINATOR "\r\n"
 
@@ -64,6 +65,7 @@ public:
 class NPT_HttpUrl : public NPT_Uri {
 public:
     // constructors and destructor
+    NPT_HttpUrl() : NPT_Uri("http:") {}
     NPT_HttpUrl(const char* url);
     NPT_HttpUrl(const char* host, NPT_UInt16 port, const char* path);
 
@@ -71,13 +73,18 @@ public:
     NPT_UInt16        GetPort() const { return m_Port; }
     const NPT_String& GetHost() const { return m_Host; }
     const NPT_String& GetPath() const { return m_Path; }
-    bool IsValid()              const { return m_Port != NPT_HTTP_INVALID_PORT; }
+    bool              IsValid() const { return m_Port != NPT_HTTP_INVALID_PORT; }
+    NPT_Result        SetHost(const char* host);
+    NPT_Result        SetPath(const char* path);
 
 private:
     // members
     NPT_String m_Host;
     NPT_UInt16 m_Port;
     NPT_String m_Path;
+
+    // methods
+    void RebuildUri();
 };
 
 /*----------------------------------------------------------------------
@@ -135,9 +142,11 @@ public:
     virtual ~NPT_HttpEntity();
 
     // methods
-    NPT_Result SetInputStream(const NPT_InputStreamReference& stream);
+    NPT_Result SetInputStream(const NPT_InputStreamReference& stream,
+                              bool update_content_length = false);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result Load(NPT_DataBuffer& buffer);
+    NPT_Result SetHeaders(const NPT_HttpHeaders& headers);
 
     // field access
     NPT_Result        SetContentType(const char* type);
@@ -174,7 +183,8 @@ public:
     NPT_HttpEntity* GetEntity() {
         return m_Entity;
     }
-
+    virtual NPT_Result ParseHeaders(NPT_BufferedInputStream& stream,
+                                    NPT_Timeout              timeout = NPT_TIMEOUT_INFINITE);
     virtual NPT_Result Emit(NPT_OutputStream& stream) const = 0;
 
 protected:
@@ -192,8 +202,16 @@ protected:
 +---------------------------------------------------------------------*/
 class NPT_HttpRequest : public NPT_HttpMessage {
 public:
+    // class methods
+    static NPT_Result Parse(NPT_BufferedInputStream& stream, 
+                            NPT_HttpRequest*&        request,
+                            NPT_Timeout              timeout = NPT_TIMEOUT_INFINITE);
+
     // constructors and destructor
              NPT_HttpRequest(const NPT_HttpUrl& url,
+                             const char*        method,
+                             const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
+             NPT_HttpRequest(const char*        url,
                              const char*        method,
                              const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     virtual ~NPT_HttpRequest();
@@ -267,8 +285,10 @@ public:
     virtual ~NPT_HttpServer();
 
     // methods
-    NPT_Result WaitForRequest(NPT_HttpRequest*& request,
-                              NPT_Timeout       timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result WaitForRequest(NPT_HttpRequest*&          request,
+                              NPT_OutputStreamReference& stream,
+                              NPT_Timeout                timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result SendResponse(NPT_HttpResponse& response, NPT_OutputStream& stream);
 
 protected:
     // members

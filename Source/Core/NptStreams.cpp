@@ -289,17 +289,14 @@ NPT_MemoryStream::SetSize(NPT_Size size)
 +---------------------------------------------------------------------*/
 const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 4096; // copy 4k at a time
 NPT_Result 
-NPT_StreamToStreamCopy(NPT_InputStream*  from, 
-                       NPT_OutputStream* to,
+NPT_StreamToStreamCopy(NPT_InputStream&  from, 
+                       NPT_OutputStream& to,
                        NPT_Offset        offset /* = 0 */,
                        NPT_Size          size   /* = 0, 0 means the entire stream */)
 {
-    // check parameters
-    if (from == NULL || to == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-
     // seek into the input if required
     if (offset) {
-        NPT_CHECK(from->Seek(offset));
+        NPT_CHECK(from.Seek(offset));
     }
 
     // allocate a buffer for the transfer
@@ -319,7 +316,7 @@ NPT_StreamToStreamCopy(NPT_InputStream*  from,
                 bytes_to_read = size-bytes_transfered;
             }
         }
-        result = from->Read(buffer, bytes_to_read, &bytes_read);
+        result = from.Read(buffer, bytes_to_read, &bytes_read);
         if (NPT_FAILED(result)) {
             if (result == NPT_ERROR_EOS) result = NPT_SUCCESS;
             break;
@@ -327,7 +324,7 @@ NPT_StreamToStreamCopy(NPT_InputStream*  from,
         if (bytes_read == 0) continue;
         
         // write the data
-        result = to->WriteFully(buffer, bytes_read);
+        result = to.WriteFully(buffer, bytes_read);
         if (NPT_FAILED(result)) break;
 
         // update the counts

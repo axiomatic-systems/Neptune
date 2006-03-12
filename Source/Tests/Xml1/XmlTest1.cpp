@@ -196,8 +196,27 @@ TestSerializer()
     CHECK(check == "<top foo=\"6\" ns1:foo=\"3\" ns2:foo=\"4\"/>", check);
 
     delete top;
-
 }
+
+/*----------------------------------------------------------------------
+|       TestRegression
++---------------------------------------------------------------------*/
+static void
+TestRegression()
+{
+    // test for a bug found when the XML parser would try
+    // to compare a null prefix
+    NPT_XmlElementNode* element = new NPT_XmlElementNode("hello");
+    element->SetAttribute("ns", "foo", "6");
+    element->SetAttribute("foo", "5");
+    element->SetAttribute("ns", "foo", "7");
+    element->SetAttribute("foo", "8");
+    NPT_ASSERT(*element->GetAttribute("foo") == "8");
+    NPT_ASSERT(*element->GetAttribute("foo", "ns") == "7");
+    
+    delete element;
+}
+
 /*----------------------------------------------------------------------
 |       TestAttributes
 +---------------------------------------------------------------------*/
@@ -287,6 +306,7 @@ main(int argc, char** argv)
         return 0;
     }
 
+    TestRegression();
     TestAttributes();
     TestNamespaces();
     TestSerializer();

@@ -68,9 +68,15 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				OmitFramePointers="TRUE"
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Neptune"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"

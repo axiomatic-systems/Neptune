@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="NetEcho"
 	ProjectGUID="{7228CB90-1ACE-43A3-A013-D437BF0E50F3}"
+	RootNamespace="NetEcho"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

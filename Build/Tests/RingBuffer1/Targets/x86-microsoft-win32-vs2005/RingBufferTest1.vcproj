@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="RingBufferTest1"
 	ProjectGUID="{59C1FCBE-7987-41F2-A0EB-E0114D5B2972}"
+	RootNamespace="RingBufferTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -120,7 +121,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Neptune;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -143,6 +144,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

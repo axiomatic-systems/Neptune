@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="StringsTest1"
 	ProjectGUID="{569179D6-7767-4840-9708-D1ADAFB012DB}"
+	RootNamespace="StringsTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -144,6 +145,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

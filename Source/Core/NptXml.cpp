@@ -58,7 +58,7 @@ class NPT_XmlAttributeFinderWithPrefix
 {
 public:
     NPT_XmlAttributeFinderWithPrefix(const char* prefix, const char* name) : 
-      m_Prefix(prefix), m_Name(name) {}
+      m_Prefix(prefix?prefix:""), m_Name(name) {}
       bool operator()(const NPT_XmlAttribute* const & attribute) const {
           return attribute->m_Prefix == m_Prefix && attribute->m_Name == m_Name;
       }
@@ -1684,9 +1684,8 @@ NPT_XmlParser::OnEndElement(const char* name)
 |       NPT_XmlParser::OnCharacterData
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
+NPT_XmlParser::OnCharacterData(const char* data, unsigned long /*size*/)
 { 
-    NPT_COMPILER_UNUSED(size);
     NPT_XML_Debug_1("\nNPT_XmlParser::OnCharacterData: %s\n", data);
     
     // check that we have a current element

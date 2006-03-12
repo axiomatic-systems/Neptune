@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="HttpClientTest1"
 	ProjectGUID="{589435E9-3451-45B0-83BD-E5FD0D875CBB}"
+	RootNamespace="HttpClientTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

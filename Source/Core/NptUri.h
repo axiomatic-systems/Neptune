@@ -29,6 +29,7 @@ public:
     // class methods
     static NPT_String Encode(const char* uri);
     static NPT_String Decode(const char* uri);
+    static SchemeId   ParseScheme(const NPT_String& scheme);
 
     // methods
     NPT_Uri(const char* uri);
@@ -42,6 +43,7 @@ public:
     SchemeId GetSchemeId() const {
         return m_SchemeId;
     }
+    const NPT_String& GetSpecific() { return m_Specific; }
 
 protected:
     // members

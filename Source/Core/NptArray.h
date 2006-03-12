@@ -13,7 +13,10 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
+#include "NptConfig.h"
+#if defined(NPT_CONFIG_HAVE_NEW_H)
 #include <new>
+#endif
 #include "NptTypes.h"
 #include "NptResults.h"
 

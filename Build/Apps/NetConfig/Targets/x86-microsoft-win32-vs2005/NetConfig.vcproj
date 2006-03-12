@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="NetConfig"
 	ProjectGUID="{0E80CEA0-5817-4B9C-B2D8-733D955A7673}"
+	RootNamespace="NetConfig"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

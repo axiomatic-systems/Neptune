@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="NetPing"
 	ProjectGUID="{9C1CAC88-8D92-4743-8330-CE8E7836D3BF}"
+	RootNamespace="NetPing"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

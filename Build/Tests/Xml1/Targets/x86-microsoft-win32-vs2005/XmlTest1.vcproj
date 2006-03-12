@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="XmlTest1"
 	ProjectGUID="{21C242CD-B371-4970-94BE-7ED2522872BA}"
+	RootNamespace="XmlTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -143,6 +144,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 				Profile="false"
 			/>

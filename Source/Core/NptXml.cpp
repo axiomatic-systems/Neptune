@@ -1217,23 +1217,23 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
             if (NPT_XML_CHAR_IS_NAME_CHAR(c) || (c == '[')) {
                 m_Name.Append(c);
 
-                const unsigned char* buffer = m_Name.GetBuffer();
+                const unsigned char* nb = m_Name.GetBuffer();
                 if (m_Name.GetSize() == 2) {
-                    if (buffer[0] == '-' &&
-                        buffer[1] == '-') {
+                    if (nb[0] == '-' &&
+                        nb[1] == '-') {
                         m_Text.Reset();
                         m_Name.Reset();
                         SetState(STATE_IN_COMMENT, CONTEXT_NONE);
                         break;
                     }
                 } else if (m_Name.GetSize() == 7) {
-                    if (buffer[0] == '[' &&
-                        buffer[1] == 'C' &&
-                        buffer[2] == 'D' &&
-                        buffer[3] == 'A' &&
-                        buffer[4] == 'T' &&
-                        buffer[5] == 'A' &&
-                        buffer[6] == '[') {
+                    if (nb[0] == '[' &&
+                        nb[1] == 'C' &&
+                        nb[2] == 'D' &&
+                        nb[3] == 'A' &&
+                        nb[4] == 'T' &&
+                        nb[5] == 'A' &&
+                        nb[6] == '[') {
                         m_Text.Reset();
                         m_Name.Reset();
                         SetState(STATE_IN_CDATA, CONTEXT_NONE);

@@ -9,7 +9,8 @@ PLATFORM_TO_TARGET_MAP = {
     'linux-i386' : 'x86-unknown-linux',
     'linux2'     : 'x86-unknown-linux',
     'win32'      : 'x86-microsoft-win32',
-    'cygwin'     : 'x86-unknown-cygwin'
+    'cygwin'     : 'x86-unknown-cygwin',
+    'darwin'     : 'powerpc-apple-macos'
 }
     
 def DefaultTarget():

@@ -88,7 +88,7 @@ main(int /*argc*/, char** /*argv*/)
 {
     printf(":: testing empty string\n");
     NPT_String s;
-    printf("sizeof(s)=%d, chars = '%s'\n", sizeof(s), s.GetChars());
+    printf("sizeof(s)=%d, chars = '%s'\n", (int)sizeof(s), s.GetChars());
 
     printf(":: testing allocation, new and delete\n");
     NPT_String* n0 = new NPT_String("Hello");

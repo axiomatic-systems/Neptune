@@ -17,7 +17,7 @@ class TestServerMessageHandler
 {
 public:
     // destructor
-    virtual ~TestServerMessageHandler();
+    virtual ~TestServerMessageHandler() {}
     
     // methods
     virtual void OnTestCommand(NPT_MessageReceiver* /*receiver*/, int /*id*/) {}
@@ -68,7 +68,7 @@ class TestClientMessageHandler
 {
 public:
     // destructor
-    virtual ~TestClientMessageHandler();
+    virtual ~TestClientMessageHandler() {}
     
     // methods
     virtual void OnReply(int /*id*/) {}

@@ -39,7 +39,7 @@ Receive()
     buffer.SetDataSize(4096);
     NPT_Result result = receiver.Bind(NPT_SocketAddress(NPT_IpAddress::Any, 9123));
     if (NPT_FAILED(result)) {
-        fprintf(stderr, "Bind() failed (%s)\n", result);
+        fprintf(stderr, "Bind() failed (%d)\n", result);
         return;
     }
     NPT_SocketAddress address;

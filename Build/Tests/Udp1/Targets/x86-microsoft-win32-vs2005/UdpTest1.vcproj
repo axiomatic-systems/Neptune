@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="UdpTest1"
 	ProjectGUID="{C025608F-9193-4040-B2F8-941746648CE2}"
+	RootNamespace="UdpTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -182,7 +184,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\Source\Tests\UdpTest1\UdpTest1.cpp"
+				RelativePath="..\..\..\..\..\Source\Tests\Udp1\UdpTest1.cpp"
 				>
 			</File>
 		</Filter>

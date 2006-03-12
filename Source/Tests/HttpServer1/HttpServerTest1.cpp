@@ -48,16 +48,14 @@ ShowRequest(NPT_HttpRequest* request)
     }
 
     // dump the body
-    NPT_InputStreamReference stream;
-    entity->GetInputStream(stream);
-    NPT_OutputStreamReference output;
-    NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
-    standard_out.Open(NPT_FILE_OPEN_MODE_WRITE);
-    standard_out.GetOutputStream(output);
-    NPT_Size bytes_read;
-    char buffer[1024];
-    while (NPT_SUCCEEDED(stream->Read(buffer, sizeof(buffer), &bytes_read))) {
-        output->Write(buffer, bytes_read);
+    if (entity && entity->GetContentLength()) {
+        NPT_InputStreamReference input;
+        entity->GetInputStream(input);
+        NPT_OutputStreamReference output;
+        NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
+        standard_out.Open(NPT_FILE_OPEN_MODE_WRITE);
+        standard_out.GetOutputStream(output);
+        NPT_StreamToStreamCopy(*input, *output);
     }
 }
 
@@ -67,14 +65,18 @@ ShowRequest(NPT_HttpRequest* request)
 static void 
 TestHttp()
 {
-    NPT_HttpServer   server;
-    NPT_HttpRequest* request;
+    NPT_HttpServer            server;
+    NPT_HttpRequest*          request;
+    NPT_OutputStreamReference stream;
 
-    NPT_Result result = server.WaitForRequest(request);
+    NPT_Result result = server.WaitForRequest(request, stream);
     NPT_Debug("WaitForRequest returned %d\n", result);
     if (NPT_FAILED(result)) return;
 
     ShowRequest(request);
+
+    NPT_HttpResponse response(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
+    server.SendResponse(response, *stream);
 }
 
 /*----------------------------------------------------------------------

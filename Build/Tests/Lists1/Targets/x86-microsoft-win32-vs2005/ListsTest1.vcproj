@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ListsTest1"
 	ProjectGUID="{AB6911DF-1EB4-4D37-B4A5-AD577761C188}"
+	RootNamespace="ListsTest1"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -143,6 +144,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

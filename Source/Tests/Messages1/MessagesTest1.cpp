@@ -19,6 +19,9 @@
 class FooServerMessageHandler
 {
 public:
+    // destructor
+    virtual ~FooServerMessageHandler() {}
+    
     // methods
     virtual void OnBarCmd1(NPT_MessageReceiver* /*receiver*/, int /*info*/) {
     }
@@ -133,6 +136,9 @@ NPT_Message::Type FooServerBarCmd4Message::MessageType = "FooServerBarCmd4 Messa
 class FooClientMessageHandler
 {
 public:
+    // destructor
+    virtual ~FooClientMessageHandler() {}
+    
     // methods
     virtual void OnBarNotification1(int /*info*/) {
     }

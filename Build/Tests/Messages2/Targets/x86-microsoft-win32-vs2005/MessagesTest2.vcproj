@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="MessagesTest2"
 	ProjectGUID="{B6D74CB4-CAB6-40E4-A5DB-BC54A8038FBD}"
+	RootNamespace="MessagesTest2"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -121,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Neptune;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -145,6 +146,7 @@
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool

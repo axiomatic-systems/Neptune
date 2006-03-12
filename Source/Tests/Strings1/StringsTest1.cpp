@@ -424,5 +424,6 @@ main(int /*argc*/, char** /*argv*/)
     in0.Insert("yaya", 3);
     StringTest("Insert at 3", in0, "yoyyayaohello");
 
+    printf("------------------------- done -----\n");
     return 0;
 }

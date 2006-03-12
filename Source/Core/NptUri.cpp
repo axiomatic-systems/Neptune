@@ -30,14 +30,23 @@ NPT_Uri::NPT_Uri(const char* uri) :
             m_Specific = scheme+1;
 
             // compute the scheme id
-            if (m_Scheme == "http") {
-                m_SchemeId = SCHEME_ID_HTTP;
-            } else {
-                m_SchemeId = SCHEME_ID_UNKNOWN;
-            }
+            m_SchemeId = ParseScheme(m_Scheme);
             return;
         }
         scheme++;
+    }
+}
+
+/*----------------------------------------------------------------------
+|       NPT_Uri::ParseScheme
++---------------------------------------------------------------------*/
+NPT_Uri::SchemeId
+NPT_Uri::ParseScheme(const NPT_String& scheme)
+{
+    if (scheme == "http") {
+        return SCHEME_ID_HTTP;
+    } else {
+        return SCHEME_ID_UNKNOWN;
     }
 }
 

@@ -104,10 +104,8 @@ class LibraryModule(Module):
         
 def Application(name, dir):
     DeclareBuildDir(dir)
-    sdk_libs = ['NptCore', 'NptSystem', 'NptCore', 'NptSystem']
-    sdk_incs = ['NptSystem', 'NptCore']
-    libs = GetLibraries(sdk_libs)
-    cpp_path = GetIncludeDirs(sdk_incs)
+    libs = GetLibraries('Neptune')
+    cpp_path = GetIncludeDirs('Neptune')
     
     prog = env.Program(name, 
                        GlobSources(dir, ['*.c', '*.cpp']), 
@@ -130,14 +128,12 @@ if os.path.exists(target_config_file):
 #######################################################
 # modules
 #######################################################
-LibraryModule(name               = 'NptCore', 
-              build_source_dirs  = 'Core',
+LibraryModule(name               = 'Neptune', 
+              build_source_dirs  = ['Core', 'System/StdC','System/Bsd','System/Posix'],
               include_dirs       = ['Config','Neptune'])
            
-LibraryModule(name               = 'NptSystem', 
-              build_source_dirs  = ['System/StdC','System/Bsd','System/Posix'],
-              included_modules   = 'NptCore')
- 
-Application('NetPump', 'Source/Apps/NetPump')
+for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho']:
+    Application(app, 'Source/Apps/'+app)
+    
 for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Messages1', 'Messages2', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1']:
     Application(test+'Test', 'Source/Tests/'+test)

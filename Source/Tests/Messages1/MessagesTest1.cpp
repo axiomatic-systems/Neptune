@@ -23,14 +23,11 @@ public:
     virtual ~FooServerMessageHandler() {}
     
     // methods
-    virtual void OnBarCmd1(NPT_MessageReceiver* /*receiver*/, int /*info*/) {
-    }
+    virtual void OnBarCmd1(NPT_MessageReceiver* /*receiver*/, int /*info*/) {}
     virtual void OnBarCmd2(NPT_MessageReceiver* /*receiver*/, 
-                           int /*info1*/, int /*info2*/) {
-    }
+                           int /*info1*/, int /*info2*/) { }
     virtual void OnBarCmd3(NPT_MessageReceiver* /*receiver*/, 
-                           int /*info1*/, int /*info2*/, int /*info3*/) {
-    }
+                           int /*info1*/, int /*info2*/, int /*info3*/) {}
 };
 
 /*----------------------------------------------------------------------
@@ -140,10 +137,8 @@ public:
     virtual ~FooClientMessageHandler() {}
     
     // methods
-    virtual void OnBarNotification1(int /*info*/) {
-    }
-    virtual void OnBarNotification2(int /*info1*/, int /*info2*/) {
-    }
+    virtual void OnBarNotification1(int /*info*/) {}
+    virtual void OnBarNotification2(int /*info1*/, int /*info2*/) {}
 };
 
 /*----------------------------------------------------------------------
@@ -405,9 +400,4 @@ main(int /*argc*/, char** /*argv*/)
 
     printf("MessagesTest1:: end\n");
 }
-
-
-
-
-
 

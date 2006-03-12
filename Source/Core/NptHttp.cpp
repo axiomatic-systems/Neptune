@@ -855,9 +855,9 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
 
     // create an entity if one is expected in the response
     if (request.GetMethod() == NPT_HTTP_METHOD_GET || request.GetMethod() == NPT_HTTP_METHOD_POST) {
-        NPT_HttpEntity* entity = new NPT_HttpEntity(response->GetHeaders());
-        entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);
-        response->SetEntity(entity);
+        NPT_HttpEntity* response_entity = new NPT_HttpEntity(response->GetHeaders());
+        response_entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);
+        response->SetEntity(response_entity);
     }
     
     return NPT_SUCCESS;

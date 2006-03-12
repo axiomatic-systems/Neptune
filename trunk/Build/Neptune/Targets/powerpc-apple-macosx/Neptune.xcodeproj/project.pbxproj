@@ -115,76 +115,76 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30450709C2C3EA00B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30450F09C2C41200B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30451709C2C43700B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30457009C2C82600B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30457909C2C85C00B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30458F09C2C8E300B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA30459C09C2C93000B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA3045A909C2C98000B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 		CA3045B609C2CA0300B49383 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = D2AAC045055464E500DB518D /* Neptune */;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
 			remoteInfo = Neptune;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CA3043BB09C2BE7800B49383 /* NptConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NptConfig.h; path = ../../../../../Source/Config/NptConfig.h; sourceTree = SOURCE_ROOT; };
+		CA3043BB09C2BE7800B49383 /* NptConfig.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = NptConfig.h; path = ../../../../Source/Config/NptConfig.h; sourceTree = SOURCE_ROOT; };
 		CA3043BF09C2BEA000B49383 /* NetConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NetConfig.cpp; sourceTree = "<group>"; };
 		CA3043C109C2BEA000B49383 /* NetEcho.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NetEcho.cpp; sourceTree = "<group>"; };
 		CA3043C309C2BEA000B49383 /* NetPing.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NetPing.cpp; sourceTree = "<group>"; };
@@ -272,12 +272,12 @@
 		CA30450509C2C3E400B49383 /* NetPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPing; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA30450D09C2C40B00B49383 /* NetEcho */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetEcho; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA30451509C2C43200B49383 /* NetConfig */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetConfig; sourceTree = BUILT_PRODUCTS_DIR; };
-		CA30456E09C2C82100B49383 /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = XmlTest1; path = build/Debug/XmlTest1; sourceTree = "<group>"; };
-		CA30457709C2C85700B49383 /* StringsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = StringsTest1; path = build/Debug/StringsTest1; sourceTree = "<group>"; };
-		CA30458D09C2C8DF00B49383 /* ArraysTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ArraysTest1; path = build/Debug/ArraysTest1; sourceTree = "<group>"; };
-		CA30459A09C2C92B00B49383 /* ThreadsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ThreadsTest1; path = build/Debug/ThreadsTest1; sourceTree = "<group>"; };
-		CA3045A709C2C97C00B49383 /* MapsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MapsTest1; path = build/Debug/MapsTest1; sourceTree = "<group>"; };
-		CA3045B409C2C9FF00B49383 /* HttpClientTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = HttpClientTest1; path = build/Debug/HttpClientTest1; sourceTree = "<group>"; };
+		CA30456E09C2C82100B49383 /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XmlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA30457709C2C85700B49383 /* StringsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StringsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA30458D09C2C8DF00B49383 /* ArraysTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ArraysTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA30459A09C2C92B00B49383 /* ThreadsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ThreadsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA3045A709C2C97C00B49383 /* MapsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MapsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA3045B409C2C9FF00B49383 /* HttpClientTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpClientTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2AAC046055464E500DB518D /* libNeptune.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNeptune.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -437,7 +437,7 @@
 				CA3043C409C2BEA000B49383 /* NetPump */,
 			);
 			name = Apps;
-			path = ../../../../../Source/Apps;
+			path = ../../../../Source/Apps;
 			sourceTree = SOURCE_ROOT;
 		};
 		CA3043BE09C2BEA000B49383 /* NetConfig */ = {
@@ -531,7 +531,7 @@
 				CA30440009C2BEC900B49383 /* NptXml.h */,
 			);
 			name = Core;
-			path = ../../../../../Source/Core;
+			path = ../../../../Source/Core;
 			sourceTree = SOURCE_ROOT;
 		};
 		CA30440109C2BEC900B49383 /* Neptune */ = {
@@ -542,7 +542,7 @@
 				CA30440409C2BEC900B49383 /* NptVersion.h */,
 			);
 			name = Neptune;
-			path = ../../../../../Source/Neptune;
+			path = ../../../../Source/Neptune;
 			sourceTree = SOURCE_ROOT;
 		};
 		CA30440509C2BEC900B49383 /* System */ = {
@@ -553,7 +553,7 @@
 				CA30441209C2BEC900B49383 /* StdC */,
 			);
 			name = System;
-			path = ../../../../../Source/System;
+			path = ../../../../Source/System;
 			sourceTree = SOURCE_ROOT;
 		};
 		CA30440609C2BEC900B49383 /* Bsd */ = {
@@ -604,7 +604,7 @@
 				CA30443A09C2BEC900B49383 /* Xml1 */,
 			);
 			name = Tests;
-			path = ../../../../../Source/Tests;
+			path = ../../../../Source/Tests;
 			sourceTree = SOURCE_ROOT;
 		};
 		CA30442009C2BEC900B49383 /* Arrays1 */ = {

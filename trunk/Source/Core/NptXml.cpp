@@ -1571,7 +1571,7 @@ NPT_XmlParser::Parse(const char*   xml,
     if (!incremental) m_Tree = NULL;
 
     // provide a default return node in case of error
-    node = NULL;
+    node = m_Tree;
 
     // parse the buffer
     NPT_CHECK(m_Processor->ProcessBuffer(xml, size));

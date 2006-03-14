@@ -369,7 +369,7 @@ NPT_HttpEntity::GetInputStream(NPT_InputStreamReference& stream)
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_HttpEntity::SetInputStream(const NPT_InputStreamReference& stream,
-                               bool                            update_content_length /* = false */)
+                               bool update_content_length /* = false */)
 {
     m_InputStream = stream;
 

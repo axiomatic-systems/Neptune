@@ -13,6 +13,17 @@
 /*----------------------------------------------------------------------
 |       macros
 +---------------------------------------------------------------------*/
+#if defined(NPT_DEBUG)
+#include "NptDebug.h"
+#define NPT_CHECK(x)                \
+do {                                \
+    NPT_Result _result = (x);       \
+    if (_result != NPT_SUCCESS) {   \
+        NPT_Debug("@@@ NPT_CHECK failed file %s line %d, result=%d\n", __FILE__, __LINE__, _result); \
+        return _result;             \
+    }                               \
+} while(0)
+#else
 #define NPT_CHECK(x)                \
 do {                                \
     NPT_Result _result = (x);       \
@@ -20,6 +31,7 @@ do {                                \
         return _result;             \
     }                               \
 } while(0)
+#endif
 
 #define NPT_FAILED(result)              ((result) != NPT_SUCCESS)
 #define NPT_SUCCEEDED(result)           ((result) == NPT_SUCCESS)

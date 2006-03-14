@@ -84,6 +84,7 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EWOULDBLOCK  WSAEWOULDBLOCK
 #define EINPROGRESS  WSAEINPROGRESS
 #define ECONNREFUSED WSAECONNREFUSED
+#define ECONNABORTED WSAECONNABORTED
 #define ECONNRESET   WSAECONNRESET
 #define ETIMEDOUT    WSAETIMEDOUT
 #define ENETRESET    WSAENETRESET
@@ -238,6 +239,9 @@ MapErrorCode(int error)
         case ECONNRESET:
         case ENETRESET:
             return NPT_ERROR_CONNECTION_RESET;
+
+        case ECONNABORTED:
+            return NPT_ERROR_CONNECTION_ABORTED;
 
         case ECONNREFUSED:
             return NPT_ERROR_CONNECTION_REFUSED;

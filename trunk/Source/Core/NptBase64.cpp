@@ -78,16 +78,17 @@ NPT_Base64::Decode(const char*     base64,
                     // pad at char 3
                     if (codes[3] == NPT_BASE64_PAD_BYTE) {
                         // double padding
-                        buffer[data_size++] = (codes[0]<<18)|(codes[1]<<12);
+                        unsigned int packed = (codes[0]<<2)|(codes[1]>>4);
+                        buffer[data_size++] = (unsigned char)packed;
                     } else {
                         // invalid padding
                         return NPT_ERROR_INVALID_FORMAT;
                     }
                 } else if (codes[3] == NPT_BASE64_PAD_BYTE) {
                     // single padding
-                    unsigned int packed = (codes[0]<<18)|(codes[1]<<12)|(codes[2]<<6);
-                    buffer[data_size++] = (unsigned char)(packed >> 16);
-                    buffer[data_size++] = (unsigned char)(packed >>  8);
+                    unsigned int packed = (codes[0]<<10)|(codes[1]<<4)|(codes[2]>>2);
+                    buffer[data_size++] = (unsigned char)(packed >> 8);
+                    buffer[data_size++] = (unsigned char)(packed     );
                 } else {
                     // no padding
                     unsigned int packed = (codes[0]<<18)|(codes[1]<<12)|(codes[2]<<6)|codes[3];
@@ -119,7 +120,7 @@ NPT_Base64::Encode(const NPT_Byte* data,
                    bool            url_safe /* = false */)
 {
     unsigned int block_count = 0;
-    unsigned int            i = 0;
+    unsigned int           i = 0;
 
     // reserve space for the string
     base64.Reserve(4*((size+3)/3) + 2*(max_blocks_per_line?(size/(3*max_blocks_per_line)):0));

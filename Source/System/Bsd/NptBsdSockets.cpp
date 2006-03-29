@@ -1215,15 +1215,15 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
 
         return NPT_SUCCESS;
     }
-    if (io_result == NPT_BSD_SOCKET_ERROR && 
-        GetSocketError() != EINPROGRESS && 
-        GetSocketError() != EWOULDBLOCK &&
-        GetSocketError() != EAGAIN) {   
-        // put the fd back in its original blocking mode
-        if (was_blocking) m_SocketFdReference->SetBlockingMode(true);
+    if (io_result == NPT_BSD_SOCKET_ERROR) {
+        NPT_Result result = MapErrorCode(GetSocketError());
+        if (result != NPT_ERROR_WOULD_BLOCK) {
+            // put the fd back in its original blocking mode
+            if (was_blocking) m_SocketFdReference->SetBlockingMode(true);
 
-        // error
-        return MapErrorCode(GetSocketError());
+            // error
+            return result;
+        }
     }
 
     return DoWaitForConnection(timeout);

@@ -56,6 +56,7 @@ NPT_Debug(const char* format, ...)
 #else
     _vsnprintf(buffer, sizeof(buffer)-1, format, args);
 #endif
+    buffer[NPT_DEBUG_MAX_BUFFER-1] = 0;
     NPT_Print(buffer);
 
     va_end(args);

@@ -78,9 +78,43 @@ NPT_DataBuffer::NPT_DataBuffer(const NPT_DataBuffer& other) :
 +---------------------------------------------------------------------*/
 NPT_DataBuffer::~NPT_DataBuffer()
 {
+    Clear();
+}
+
+/*----------------------------------------------------------------------
+|       NPT_DataBuffer::Clear
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_DataBuffer::Clear()
+{
     if (m_BufferIsLocal) {
         delete[] m_Buffer;
     }
+    m_Buffer = NULL;
+    m_DataSize = 0;
+    m_BufferSize = 0;
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_DataBuffer::operator=
++---------------------------------------------------------------------*/
+NPT_DataBuffer&
+NPT_DataBuffer::operator=(const NPT_DataBuffer& copy)
+{
+    // do nothing if we're assigning to ourselves
+    if (this != &copy) {
+        Clear();
+
+        m_BufferIsLocal = true;
+        m_BufferSize    = copy.m_BufferSize;
+        m_DataSize      = copy.m_DataSize;
+
+        m_Buffer = new NPT_Byte[m_BufferSize];
+        NPT_CopyMemory(m_Buffer, copy.m_Buffer, m_BufferSize);
+    }
+    return *this;
 }
 
 /*----------------------------------------------------------------------
@@ -89,10 +123,7 @@ NPT_DataBuffer::~NPT_DataBuffer()
 NPT_Result
 NPT_DataBuffer::SetBuffer(NPT_Byte* buffer, NPT_Size buffer_size)
 {
-    if (m_BufferIsLocal) {
-        // destroy the local buffer
-        delete[] m_Buffer;
-    }
+    Clear();
 
     // we're now using an external buffer
     m_BufferIsLocal = false;
@@ -184,7 +215,7 @@ NPT_DataBuffer::ReallocateBuffer(NPT_Size size)
 
     // copy the contents of the previous buffer, if any
     if (m_Buffer && m_DataSize) {
-            NPT_CopyMemory(newBuffer, m_Buffer, m_DataSize);
+        NPT_CopyMemory(newBuffer, m_Buffer, m_DataSize);
     }
 
     // destroy the previous buffer

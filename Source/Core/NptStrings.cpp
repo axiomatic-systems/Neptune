@@ -261,7 +261,10 @@ NPT_String::operator=(const char* str)
 NPT_String&
 NPT_String::operator=(const NPT_String& str)
 {
-    Assign(str.GetChars(), str.GetLength());
+    // do nothing if we're assigning to ourselves
+    if (this != &str) {
+        Assign(str.GetChars(), str.GetLength());
+    }
     return *this;
 }
 

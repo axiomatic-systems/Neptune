@@ -52,6 +52,13 @@ public:
         friend class NPT_Map<K,V>;
     };
 
+    class EntryValueDeleter {
+    public:
+        void operator()(Entry* entry) const {
+            delete entry->GetValue();
+        }
+    };
+
     // constructors
     NPT_Map<K,V>() {}
     NPT_Map<K,V>(const NPT_Map<K,V>& copy);

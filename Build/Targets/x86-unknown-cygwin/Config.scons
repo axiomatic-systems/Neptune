@@ -15,9 +15,9 @@ env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_com
 env['CXXFLAGS'] = ' '.join([c_compiler_compliance_flags, c_compiler_flags, cxx_compiler_warnings])
 
 ### Atomix System Files
-env.Append(ATX_SYSTEM_SOURCES=['AtxStdcDebug.c', 'AtxBsdSockets.c', 'AtxStdcFile.c'])
-env.Append(ATX_EXTRA_LIBS='m')
+env['ATX_SYSTEM_SOURCES']=['AtxStdcDebug.c', 'AtxBsdSockets.c', 'AtxStdcFile.c']
+env['ATX_EXTRA_LIBS']='m'
 
 ### Neptune System Files
-env.Append(NPT_SYSTEM_SOURCES=['NptStdcDebug.cpp', 'NptBsdSockets.cpp', 'NptStdcFile.cpp',      \
-                               'NptPosixSystem.cpp', 'NptPosixThreads.cpp', 'NptPosixQueue.cpp'])
+env['NPT_SYSTEM_SOURCES']=['NptStdcDebug.cpp', 'NptBsdSockets.cpp', 'NptStdcFile.cpp',      \
+                           'NptPosixSystem.cpp', 'NptPosixThreads.cpp', 'NptPosixQueue.cpp']

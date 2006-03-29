@@ -143,6 +143,7 @@ NPT_OutputStream::WriteFully(const void* buffer, NPT_Size bytes_to_write)
 
     return NPT_SUCCESS;
 }
+
 /*----------------------------------------------------------------------
 |       NPT_OutputStream::WriteString
 +---------------------------------------------------------------------*/

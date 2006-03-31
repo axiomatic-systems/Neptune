@@ -8,7 +8,7 @@ from glob import glob
 def GlobSources(dir, patterns):
     root = GetBuildPath('#'+ROOT)+'/'+dir+'/'
     files = []
-    for pattern in patterns:
+    for pattern in Split(patterns):
         files += glob(root+pattern)
     return [dir+'/'+os.path.basename(x) for x in  files]
 
@@ -65,6 +65,7 @@ class Module:
 class LibraryModule(Module):
     def __init__(self, name, 
                  build_source_dirs, 
+                 build_source_files = {},
                  source_root = 'Source',
                  build_source_pattern=['*.c', '*.cpp'], 
                  build_include_dirs = [], 
@@ -89,6 +90,12 @@ class LibraryModule(Module):
         for dir in Split(self.build_source_dirs):
             DeclareBuildDir(dir)
             sources += GlobSources(dir, build_source_pattern)
+
+        # add cherry-picked files
+        for dir in build_source_files.keys():
+            pattern = build_source_files[dir]
+            DeclareBuildDir(dir)
+            sources += GlobSources(dir, pattern)
             
         # calculate our build include path
         cpp_path = GetIncludeDirs(Split(self.build_include_dirs) + Split(self.build_source_dirs) + Split(self.included_modules))
@@ -118,6 +125,7 @@ def Application(name, dir):
 Import("env")
 
 ROOT = "."
+env['NPT_EXTRA_LIBS'] = ''
 
 ### try to read in any target specific configuration
 target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
@@ -129,8 +137,10 @@ if os.path.exists(target_config_file):
 # modules
 #######################################################
 LibraryModule(name               = 'Neptune', 
-              build_source_dirs  = ['Core', 'System/StdC','System/Bsd','System/Posix'],
-              include_dirs       = ['Config','Neptune'])
+              build_source_dirs  = ['Core'],
+              build_source_files = env['NPT_SYSTEM_SOURCES'],
+              include_dirs       = ['Config','Neptune'],
+              linked_modules     = env['NPT_EXTRA_LIBS'])
            
 for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho']:
     Application(app, 'Source/Apps/'+app)

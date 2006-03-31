@@ -1,3 +1,10 @@
+### compiler tool chain
+env['AR'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ar'
+env['RANLIB'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ranlib'
+env['CC'] = 'c:/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-gcc'
+env['CXX'] = 'c:/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-g++'
+env['LINK'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-g++'
+
 ### compiler flags
 
 c_compiler_compliance_flags = '-pedantic'
@@ -15,4 +22,5 @@ env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_com
 env['CXXFLAGS'] = ' '.join([c_compiler_compliance_flags, c_compiler_flags, cxx_compiler_warnings])
 
 ### Neptune System Files
-env['NPT_SYSTEM_SOURCES']={'Source/System/StdC':'*.cpp', 'Source/System/Bsd':'*.cpp', 'Source/System/Posix':'*.cpp'}
+env['NPT_SYSTEM_SOURCES']={'Source/System/StdC':'*.cpp', 'Source/System/Bsd':'NptBsdSockets.cpp', 'Source/System/PS3':'*.cpp'}
+env['NPT_EXTRA_LIBS']='net'

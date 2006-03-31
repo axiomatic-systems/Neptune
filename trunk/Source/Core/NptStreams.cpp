@@ -53,13 +53,18 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
         NPT_Size  bytes_read;
         NPT_Byte* data;
 
-        /* check if we know how much data is available */
+        // check if we know how much data is available
         result = GetAvailable(available);
-        if (NPT_SUCCEEDED(result)) {
+        if (NPT_SUCCEEDED(result) && available) {
             // we know how much is available
             bytes_to_read = available;
         } else {
             bytes_to_read = NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK;
+        }
+
+        // make sure we don't read more than what was asked
+        if (size != 0 && total_bytes_read+bytes_to_read>size) {
+            bytes_to_read = size-total_bytes_read;
         }
 
         // stop if we've read everything

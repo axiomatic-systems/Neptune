@@ -208,12 +208,12 @@ public:
                             NPT_Timeout              timeout = NPT_TIMEOUT_INFINITE);
 
     // constructors and destructor
-             NPT_HttpRequest(const NPT_HttpUrl& url,
-                             const char*        method,
-                             const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
-             NPT_HttpRequest(const char*        url,
-                             const char*        method,
-                             const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
+    NPT_HttpRequest(const NPT_HttpUrl& url,
+                    const char*        method,
+                    const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
+    NPT_HttpRequest(const char*        url,
+                    const char*        method,
+                    const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     virtual ~NPT_HttpRequest();
 
     // methods

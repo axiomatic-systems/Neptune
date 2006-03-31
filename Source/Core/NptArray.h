@@ -195,7 +195,7 @@ NPT_Array<T>&
 NPT_Array<T>::operator=(const NPT_Array<T>& copy)
 {
     // do nothing if we're assigning to ourselves
-    if (this == &copy) return copy;
+    if (this == &copy) return *this;
 
     // destroy all elements
     Clear();

@@ -244,7 +244,7 @@ NPT_List<T>::operator==(const NPT_List<T>& other) const
     if (m_ItemCount != other.m_ItemCount) return false;
 
     // compare all elements one by one
-    Item* our_item = other.m_Head;
+    Item* our_item = m_Head;
     Item* their_item = other.m_Head;
     while (our_item && their_item) {
         if (our_item->m_Data != their_item->m_Data) return false;

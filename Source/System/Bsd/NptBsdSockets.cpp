@@ -11,6 +11,8 @@
 |   includes
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
+
+// Win32 includes
 #define __WIN32__
 #endif
 #if defined(__WIN32__)
@@ -27,9 +29,13 @@
 #include <windows.h>
 
 #elif defined(__TCS__)
+
+// Trimedia includes
 #include <sockets.h>
 
 #elif defined(__PSP__)
+
+// PSP includes
 #include <psptypes.h>
 #include <kernel.h>
 #include <pspnet.h>
@@ -44,7 +50,26 @@
 #include <pspnet/sys/select.h>
 #include <pspnet/netinet/in.h>
 
+#elif defined(__PPU__)
+
+// PS3 includes
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/select.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <netdb.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <netex/net.h>
+#include <netex/netset.h>
+#include <netex/errno.h>
+
 #else
+
+// default includes
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -55,11 +80,12 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
-#endif // defined(__WIN32__)
-
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+
+#endif 
+
 
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -79,6 +105,7 @@ const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 5;
 +---------------------------------------------------------------------*/
 #if defined(__WIN32__)
 #include "NptWin32Network.h"
+// force a reference to the initializer so that the linker does not optimize it out
 static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer; 
 
 #define EWOULDBLOCK  WSAEWOULDBLOCK
@@ -91,6 +118,7 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EADDRINUSE   WSAEADDRINUSE
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
+#define EAGAIN       WSAEWOULDBLOCK 
 
 #define NPT_BSD_INVALID_SOCKET INVALID_SOCKET
 #define NPT_BSD_SOCKET_ERROR SOCKET_ERROR
@@ -106,6 +134,9 @@ typedef char*  SocketOption;
 typedef SOCKET SocketFd;
 #define GetSocketError() WSAGetLastError()
 
+/*----------------------------------------------------------------------
+|   Trimedia adaptation layer
++---------------------------------------------------------------------*/
 #elif defined(__TCS__)  // trimedia PSOS w/ Target TCP
 #define NPT_BSD_INVALID_SOCKET (-1)
 #define NPT_BSD_SOCKET_ERROR   (-1)
@@ -115,6 +146,9 @@ typedef void*  SocketOption;
 typedef int    SocketFd;
 #define GetSocketError() errno
 
+/*----------------------------------------------------------------------
+|   PSP adaptation layer
++---------------------------------------------------------------------*/
 #elif defined(__PSP__)
 typedef SceNetInetSocklen_t socklen_t;
 #define timeval SceNetInetTimeval
@@ -188,6 +222,50 @@ typedef int    SocketFd;
 #define RESOLVER_TIMEOUT (5 * 1000 * 1000)
 #define RESOLVER_RETRY 5
 
+/*----------------------------------------------------------------------
+|       PS3 adaptation layer
++---------------------------------------------------------------------*/
+#elif defined(__PPU__)
+#undef EWOULDBLOCK    
+#undef ECONNREFUSED  
+#undef ECONNABORTED  
+#undef ECONNRESET    
+#undef ETIMEDOUT     
+#undef ENETRESET     
+#undef EADDRINUSE    
+#undef ENETDOWN      
+#undef ENETUNREACH   
+#undef EAGAIN        
+#undef EINTR	     
+#undef EINPROGRESS
+
+#define EWOULDBLOCK   SYS_NET_EWOULDBLOCK 
+#define ECONNREFUSED  SYS_NET_ECONNREFUSED
+#define ECONNABORTED  SYS_NET_ECONNABORTED
+#define ECONNRESET    SYS_NET_ECONNRESET
+#define ETIMEDOUT     SYS_NET_ETIMEDOUT
+#define ENETRESET     SYS_NET_ENETRESET
+#define EADDRINUSE    SYS_NET_EADDRINUSE
+#define ENETDOWN      SYS_NET_ENETDOWN
+#define ENETUNREACH   SYS_NET_ENETUNREACH
+#define EAGAIN        SYS_NET_EAGAIN
+#define EINTR	      SYS_NET_EINTR
+#define EINPROGRESS   SYS_NET_EINPROGRESS
+
+typedef void*  SocketBuffer;
+typedef const void*  SocketConstBuffer;
+typedef void*  SocketOption;
+typedef int    SocketFd;
+#define GetSocketError() sys_net_errno
+#define closesocket  socketclose
+#define select socketselect
+#define NPT_BSD_INVALID_SOCKET (-1)
+#define NPT_BSD_SOCKET_ERROR   (-1)
+#define NPT_BSD_IOCTL_ERROR    (-1)
+
+/*----------------------------------------------------------------------
+|       Default adaptation layer
++---------------------------------------------------------------------*/
 #else  // unix-style BSD sockets
 #define NPT_BSD_INVALID_SOCKET (-1)
 #define NPT_BSD_SOCKET_ERROR   (-1)
@@ -353,7 +431,7 @@ NPT_BsdSocketFd::SetBlockingMode(bool blocking)
     }
     return NPT_SUCCESS;
 }
-#elif defined(__PSP__)
+#elif defined(__PSP__) || defined(__PPU__)
 /*----------------------------------------------------------------------
 |   NPT_BsdSocket::SetBlockingMode
 +---------------------------------------------------------------------*/
@@ -361,7 +439,7 @@ NPT_Result
 NPT_BsdSocketFd::SetBlockingMode(bool blocking)
 {
     int args = blocking?0:1;
-    if (setsockopt(m_SocketFd, SOL_SOCKET, SCE_NET_INET_SO_NBIO, &args, sizeof(args))) {
+    if (setsockopt(m_SocketFd, SOL_SOCKET, SO_NBIO, &args, sizeof(args))) {
         return NPT_FAILURE;
     }
     return NPT_SUCCESS;
@@ -474,6 +552,16 @@ NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
     return NPT_ERROR_NOT_SUPPORTED;
 }
 
+#if defined(__PPU__)
+/*----------------------------------------------------------------------
+|   NPT_BsdSocketInputStream::GetAvailable
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketInputStream::GetAvailable(NPT_Size&)
+{
+    return NPT_ERROR_NOT_SUPPORTED;
+}
+#else
 /*----------------------------------------------------------------------
 |   NPT_BsdSocketInputStream::GetAvailable
 +---------------------------------------------------------------------*/
@@ -490,6 +578,7 @@ NPT_BsdSocketInputStream::GetAvailable(NPT_Size& available)
         return NPT_SUCCESS;
     }
 }
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_BsdSocketOutputStream

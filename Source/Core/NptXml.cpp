@@ -43,7 +43,12 @@ public:
     NPT_XmlAttributeFinder(const char* name, const char* namespc) : 
       m_Name(name), m_Namespace(namespc) {}
     bool operator()(const NPT_XmlAttribute* const & attribute) const {
-        return attribute->m_Name == m_Name;
+        if (m_Namespace) {
+            // TODO: check for a namespace match
+            return attribute->m_Name == m_Name;
+        } else {
+            return attribute->m_Name == m_Name && attribute->m_Prefix.IsEmpty();
+        }
     }
 
 private:

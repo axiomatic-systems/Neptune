@@ -10,7 +10,8 @@ PLATFORM_TO_TARGET_MAP = {
     'linux2'     : 'x86-unknown-linux',
     'win32'      : 'x86-microsoft-win32',
     'cygwin'     : 'x86-unknown-cygwin',
-    'darwin'     : 'powerpc-apple-macos'
+    'darwin'     : 'powerpc-apple-macos',
+    'ps3'        : 'ppu-sony-ps3'
 }
     
 def DefaultTarget():
@@ -29,7 +30,7 @@ options.AddOptions(
     ListOption('build_configs', 'build configurations', 'Debug', names=['Debug', 'Release'])
 )
 
-env = Environment(options=options)
+env = Environment(options=options).Copy()
 Help(options.GenerateHelpText(env))
 
 

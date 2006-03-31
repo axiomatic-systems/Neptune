@@ -193,7 +193,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top foo=\"6\" ns1:foo=\"3\" ns2:foo=\"4\"/>", check);
+    CHECK(check == "<top foo=\"6\" ns1:foo=\"5\" ns2:foo=\"4\"/>", check);
 
     delete top;
 }

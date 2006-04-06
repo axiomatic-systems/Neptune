@@ -94,6 +94,7 @@ private:
     // friends
     friend class NPT_XmlWriter;
     friend class NPT_XmlNodeWriter;
+    friend class NPT_XmlNodeCanonicalWriter;
 };
 
 /*----------------------------------------------------------------------
@@ -149,9 +150,9 @@ class NPT_XmlElementNode : public NPT_XmlNode
                             NPT_XmlElementNode(const char* prefix, const char* tag);
     virtual                ~NPT_XmlElementNode();
     NPT_List<NPT_XmlNode*>& GetChildren() { return m_Children; }
-    NPT_XmlElementNode*     GetChild(const char* tag, 
-                                     const char* namespc = NULL,
-                                     NPT_Ordinal n=0);
+    const NPT_XmlElementNode* GetChild(const char* tag, 
+                                       const char* namespc = NULL,
+                                       NPT_Ordinal n=0) const;
     NPT_Result              AddChild(NPT_XmlNode* child);
     NPT_Result              SetAttribute(const char* prefix,
                                          const char* name, 
@@ -198,6 +199,7 @@ protected:
     friend class NPT_XmlSerializer;
     friend class NPT_XmlWriter;
     friend class NPT_XmlNodeWriter;
+    friend class NPT_XmlNodeCanonicalWriter;
     friend class NPT_XmlParser;
     friend class NPT_XmlProcessor;
 };
@@ -240,7 +242,7 @@ class NPT_XmlParser
 {
  public:
     // methods
-             NPT_XmlParser();
+             NPT_XmlParser(bool keep_whitespace = false);
     virtual ~NPT_XmlParser();
     virtual  NPT_Result Parse(const char*   xml, 
                               NPT_XmlNode*& tree,
@@ -263,11 +265,13 @@ class NPT_XmlParser
     NPT_Result OnElementAttribute(const char* name, const char* value);
     NPT_Result OnEndElement(const char* name);
     NPT_Result OnCharacterData(const char* data, unsigned long size);
+    void       RemoveIgnorableWhitespace();
 
     // members
     NPT_XmlProcessor*   m_Processor;
     NPT_XmlElementNode* m_Tree;
     NPT_XmlElementNode* m_CurrentElement;
+    bool                m_KeepWhitespace;
 
     // friends
     friend class NPT_XmlProcessor;
@@ -281,7 +285,8 @@ class NPT_XmlSerializer
 public:
     // methods
                        NPT_XmlSerializer(NPT_OutputStream* output,
-                                         NPT_Cardinal      indentation = 0);
+                                         NPT_Cardinal      indentation = 0,
+                                         bool              shrink_empty_elements = true);
     virtual           ~NPT_XmlSerializer();
     virtual NPT_Result StartDocument();
     virtual NPT_Result EndDocument();
@@ -306,6 +311,7 @@ protected:
     NPT_Cardinal      m_Indentation;
     NPT_String        m_IndentationPrefix;
     bool              m_ElementHasText;
+    bool              m_ShrinkEmptyElements;
 };
 
 /*----------------------------------------------------------------------
@@ -323,6 +329,16 @@ public:
 private:
     // members
     NPT_Cardinal m_Indentation;
+};
+
+/*----------------------------------------------------------------------
+|       NPT_XmlCanonicalizer
++---------------------------------------------------------------------*/
+class NPT_XmlCanonicalizer
+{
+public:
+    // methods
+    NPT_Result Serialize(NPT_XmlNode& node, NPT_OutputStream& stream);
 };
 
 #endif // _NPT_XML_H_

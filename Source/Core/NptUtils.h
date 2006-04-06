@@ -96,4 +96,10 @@ extern unsigned long NPT_StringLength(const char* s);
 extern void NPT_SetMemory(void* dest, int c, NPT_Size size);
 #endif
 
+#if defined(NPT_CONFIG_HAVE_MEMCMP)
+#define NPT_MemoryEqual(s1, s2, n) (memcmp((s1), (s2), (n)) == 0) 
+#else 
+extern int NPT_MemoryEqual(const void* s1, const void* s2, unsigned long n); 
+#endif
+
 #endif // _NPT_UTILS_H_

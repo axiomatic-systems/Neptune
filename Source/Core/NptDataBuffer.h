@@ -30,8 +30,9 @@ class NPT_DataBuffer
     NPT_DataBuffer(const NPT_DataBuffer& other);
     virtual ~NPT_DataBuffer();
 
-    // operator
+    // operators
     NPT_DataBuffer& operator=(const NPT_DataBuffer& copy);
+    bool            operator==(const NPT_DataBuffer& other) const;
 
     // data buffer handling methods
     virtual NPT_Result SetBuffer(NPT_Byte* buffer, NPT_Size bufferSize);
@@ -44,7 +45,7 @@ class NPT_DataBuffer
     virtual NPT_Byte*       UseData() { return m_Buffer; };
     virtual NPT_Size        GetDataSize() const { return m_DataSize; }
     virtual NPT_Result      SetDataSize(NPT_Size size);
-    virtual NPT_Result      SetData(NPT_Byte* data, NPT_Size dataSize);
+    virtual NPT_Result      SetData(const NPT_Byte* data, NPT_Size dataSize);
 
  private:
     NPT_Result Clear();

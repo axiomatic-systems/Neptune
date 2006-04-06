@@ -153,6 +153,9 @@ public:
     NPT_MemoryStream(void* data, NPT_Size size);
     virtual ~NPT_MemoryStream() {}
 
+    // accessors
+    const NPT_DataBuffer& GetBuffer() const { return m_Buffer; }
+
     // NPT_InputStream methods
     NPT_Result Read(void*     buffer, 
                     NPT_Size  bytes_to_read, 

@@ -14,6 +14,7 @@
 #include "NptTypes.h"
 #include "NptXml.h"
 #include "NptUtils.h"
+#include "NptMap.h"
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
@@ -33,6 +34,12 @@
 #define NPT_XML_Debug_3(s,x0,x1,x2)
 #define NPT_XML_Debug_4(s,x0,x1,x2,x3)
 #endif
+
+/*----------------------------------------------------------------------
+|       constants
++---------------------------------------------------------------------*/
+static const NPT_String 
+NPT_XmlNamespaceUri_Xml("http://www.w3.org/XML/1998/namespace");
 
 /*----------------------------------------------------------------------
 |       NPT_XmlAttributeFinder
@@ -213,8 +220,8 @@ NPT_XmlElementNode::AddChild(NPT_XmlNode* child)
 /*----------------------------------------------------------------------
 |       NPT_XmlElementNode::GetChild
 +---------------------------------------------------------------------*/
-NPT_XmlElementNode*
-NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n)
+const NPT_XmlElementNode*
+NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n) const
 {
     NPT_List<NPT_XmlNode*>::Iterator item;
     item = m_Children.Find(NPT_XmlTagFinder(tag, namespc), n);
@@ -364,6 +371,15 @@ NPT_XmlElementNode::GetNamespaceUri(const char* prefix) const
     if (m_NamespaceParent) {
         return m_NamespaceParent->GetNamespaceUri(prefix);
     } else {
+        // check if this is a well-known namespace
+        if (prefix[0] == 'x' && 
+            prefix[1] == 'm' && 
+            prefix[2] == 'l' && 
+            prefix[3] == '\0') {
+            return &NPT_XmlNamespaceUri_Xml;
+        }
+
+        // not found
         return NULL;
     }
 }
@@ -911,6 +927,21 @@ static const unsigned char NPT_XmlCharMap[256] = {
 #endif // defined(NPT_XML_USE_CHAR_MAP)
 
 /*----------------------------------------------------------------------
+|       NPT_XmlStringIsWhitespace
++---------------------------------------------------------------------*/
+static bool
+NPT_XmlStringIsWhitespace(const char* s, NPT_Size size)
+{
+    for (NPT_Size x=0; x<size; x++) {
+        if (!NPT_XML_CHAR_IS_WHITESPACE((int)s[x])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/*----------------------------------------------------------------------
 |       NPT_XmlProcessor class
 +---------------------------------------------------------------------*/
 class NPT_XmlProcessor {
@@ -940,7 +971,7 @@ private:
         STATE_IN_VALUE,
         STATE_IN_TAG_START,
         STATE_IN_EMPTY_TAG_END,
-        STATE_IN_TEXT,
+        STATE_IN_CONTENT,
         STATE_IN_PROCESSING_INSTRUCTION_START,
         STATE_IN_PROCESSING_INSTRUCTION,
         STATE_IN_PROCESSING_INSTRUCTION_END,
@@ -978,7 +1009,7 @@ private:
           case STATE_IN_VALUE: return "IN_VALUE";
           case STATE_IN_TAG_START: return "IN_TAG_START";
           case STATE_IN_EMPTY_TAG_END: return "IN_EMPTY_TAG_END";
-          case STATE_IN_TEXT: return "IN_TEXT";
+          case STATE_IN_CONTENT: return "IN_CONTENT";
           case STATE_IN_PROCESSING_INSTRUCTION_START: return "IN_PROCESSING_INSTRUCTION_START";
           case STATE_IN_PROCESSING_INSTRUCTION: return "IN_PROCESSING_INSTRUCTION";
           case STATE_IN_PROCESSING_INSTRUCTION_END: return "IN_PROCESSING_INSTRUCTION_END";
@@ -1030,6 +1061,7 @@ private:
 
     NPT_Result ResolveEntity(NPT_XmlAccumulator& source,
                              NPT_XmlAccumulator& destination);
+    NPT_Result FlushPendingText();
 };
 
 /*----------------------------------------------------------------------
@@ -1098,6 +1130,20 @@ NPT_XmlProcessor::ResolveEntity(NPT_XmlAccumulator& source,
 }
 
 /*----------------------------------------------------------------------
+|       NPT_XmlProcessor::FlushPendingText
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_XmlProcessor::FlushPendingText()
+{
+    if (m_Text.GetSize() > 0) {
+        NPT_CHECK(m_Parser->OnCharacterData(m_Text.GetString(),
+                                            m_Text.GetSize()));
+        m_Text.Reset();
+    }
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |       NPT_XmlProcessor::ProcessBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -1126,14 +1172,6 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
               case CONTEXT_NONE:
                 if (c == '<') {
                     SetState(STATE_IN_TAG_START);
-                } else if (NPT_XML_CHAR_IS_CONTENT_CHAR(c)) {
-                    m_Text.Reset();
-                    m_Text.Append(c);
-                    SetState(STATE_IN_TEXT);
-                } else if (c == '&') {
-                    m_Text.Reset();
-                    m_Entity.Reset();
-                    SetState(STATE_IN_ENTITY_REF);
                 } else {
                     return NPT_ERROR_INVALID_SYNTAX;
                 }
@@ -1141,10 +1179,9 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
                 
               case CONTEXT_ATTRIBUTE:
                 if (c == '/') {
-                    SetState(STATE_IN_EMPTY_TAG_END);
+                    SetState(STATE_IN_EMPTY_TAG_END, CONTEXT_NONE);
                 } else if (c == '>') {
-                    m_Text.Reset();
-                    SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                    SetState(STATE_IN_CONTENT, CONTEXT_NONE);
                 } else if (NPT_XML_CHAR_IS_NAME_CHAR(c)) {
                     m_Name.Reset();
                     m_Name.Append(c);
@@ -1156,9 +1193,9 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
               case CONTEXT_CLOSE_TAG:
                 if (c == '>') {
+                    NPT_CHECK(FlushPendingText());
                     NPT_CHECK(m_Parser->OnEndElement(m_Name.GetString()));
-                    m_Text.Reset();
-                    SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                    SetState(STATE_IN_CONTENT, CONTEXT_NONE);
                 } else {
                     return NPT_ERROR_INVALID_SYNTAX;
                 }
@@ -1179,19 +1216,18 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
                 if (c == '=') {
                     m_Value.Reset();
                     SetState(STATE_IN_VALUE_START);
-                } else {
+                } else if (!NPT_XML_CHAR_IS_WHITESPACE(c)) {
                     return NPT_ERROR_INVALID_SYNTAX;
                 }
                 break;
 
               case CONTEXT_OPEN_TAG:
-                if (c == '>' || 
-                    c == '/' ||
-                    NPT_XML_CHAR_IS_WHITESPACE(c)) {
+                if (c == '>' || c == '/' || NPT_XML_CHAR_IS_WHITESPACE(c)) {
+                    NPT_CHECK(FlushPendingText());
                     NPT_CHECK(m_Parser->OnStartElement(m_Name.GetString()));
                     m_Name.Reset();
                     if (c == '>') {
-                        SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                        SetState(STATE_IN_CONTENT, CONTEXT_NONE);
                     } else if (c == '/') {
                         SetState(STATE_IN_EMPTY_TAG_END);
                     } else {
@@ -1204,8 +1240,9 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
               case CONTEXT_CLOSE_TAG:
                 if (c == '>') {
+                    NPT_CHECK(FlushPendingText());
                     NPT_CHECK(m_Parser->OnEndElement(m_Name.GetString()));
-                    SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                    SetState(STATE_IN_CONTENT, CONTEXT_NONE);
                 } else if (NPT_XML_CHAR_IS_WHITESPACE(c)) {
                     SetState(STATE_IN_WHITESPACE);
                 } else {
@@ -1226,7 +1263,6 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
                 if (m_Name.GetSize() == 2) {
                     if (nb[0] == '-' &&
                         nb[1] == '-') {
-                        m_Text.Reset();
                         m_Name.Reset();
                         SetState(STATE_IN_COMMENT, CONTEXT_NONE);
                         break;
@@ -1239,7 +1275,6 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
                         nb[4] == 'T' &&
                         nb[5] == 'A' &&
                         nb[6] == '[') {
-                        m_Text.Reset();
                         m_Name.Reset();
                         SetState(STATE_IN_CDATA, CONTEXT_NONE);
                         break;
@@ -1261,6 +1296,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
             break;
 
           case STATE_IN_VALUE_START:
+            if (NPT_XML_CHAR_IS_WHITESPACE(c)) break;
             if (c == '"') {
                 m_Value.Reset();
                 SetState(STATE_IN_VALUE, CONTEXT_VALUE_DOUBLE_QUOTE);
@@ -1306,9 +1342,9 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_EMPTY_TAG_END:
             if (c == '>') {
+                NPT_CHECK(FlushPendingText());
                 NPT_CHECK(m_Parser->OnEndElement(NULL));
-                m_Text.Reset();
-                SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                SetState(STATE_IN_CONTENT, CONTEXT_NONE);
             } else {
                 return NPT_ERROR_INVALID_SYNTAX;
             }
@@ -1331,7 +1367,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
               case CONTEXT_NONE:
                 if (c == ';') {
                     NPT_CHECK(ResolveEntity(m_Entity, m_Text));
-                    SetState(STATE_IN_TEXT);
+                    SetState(STATE_IN_CONTENT);
                 } else if (NPT_XML_CHAR_IS_ENTITY_REF_CHAR(c)) {
                     m_Entity.Append(c);
                 } else {
@@ -1364,17 +1400,14 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_COMMENT_END_2:
             if (c == '>') {
-                SetState(STATE_IN_WHITESPACE, CONTEXT_NONE);
+                SetState(STATE_IN_CONTENT, CONTEXT_NONE);
             } else {
                 return NPT_ERROR_INVALID_SYNTAX;
             }
             break;
 
-          case STATE_IN_TEXT:
+          case STATE_IN_CONTENT:
             if (c == '<') {
-                NPT_CHECK(m_Parser->OnCharacterData(m_Text.GetString(),
-                                                    m_Text.GetSize()));
-                m_Text.Reset();
                 SetState(STATE_IN_TAG_START, CONTEXT_NONE);
             } else if (c == '&') {
                 m_Entity.Reset();
@@ -1444,10 +1477,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
           case STATE_IN_CDATA_END_2:
             if (c == '>') {
-                NPT_CHECK(m_Parser->OnCharacterData(m_Text.GetString(),
-                                                    m_Text.GetSize()));
-                m_Text.Reset();
-                SetState(STATE_IN_TEXT, CONTEXT_NONE);
+                SetState(STATE_IN_CONTENT, CONTEXT_NONE);
             } else {
                 m_Text.Append("]]");
                 m_Text.Append(c);
@@ -1469,9 +1499,10 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 /*----------------------------------------------------------------------
 |       NPT_XmlParser::NPT_XmlParser
 +---------------------------------------------------------------------*/
-NPT_XmlParser::NPT_XmlParser() :
+NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
     m_Tree(NULL),
-    m_CurrentElement(NULL)
+    m_CurrentElement(NULL),
+    m_KeepWhitespace(keep_whitespace)
 {
     m_Processor = new NPT_XmlProcessor(this);
 }
@@ -1604,6 +1635,7 @@ NPT_XmlParser::OnStartElement(const char* name)
 
     // add node to tree
     if (m_CurrentElement) {
+        // add the new node
         m_CurrentElement->AddChild(node);
     }
     m_CurrentElement = node;
@@ -1676,6 +1708,8 @@ NPT_XmlParser::OnEndElement(const char* name)
             }
         }
     }
+
+    // pop up the stack
     NPT_XmlNode* parent = m_CurrentElement->GetParent();
     if (parent == NULL) {
         m_Tree = m_CurrentElement;
@@ -1689,17 +1723,26 @@ NPT_XmlParser::OnEndElement(const char* name)
 |       NPT_XmlParser::OnCharacterData
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::OnCharacterData(const char* data, unsigned long /*size*/)
+NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
 { 
     NPT_XML_Debug_1("\nNPT_XmlParser::OnCharacterData: %s\n", data);
     
     // check that we have a current element
     if (m_CurrentElement == NULL) {
-        return NPT_ERROR_XML_INVALID_NESTING;
+        // we do not allow non-whitespace outside an element content
+        if (!NPT_XmlStringIsWhitespace(data, size)) {
+            return NPT_ERROR_XML_INVALID_NESTING;
+        }
+
+        // ignore whitespace
+        return NPT_SUCCESS;
     }
 
-    // add the text to the current element
-    m_CurrentElement->AddText(data);
+    // ignore whitespace if applicable
+    if (m_KeepWhitespace || !NPT_XmlStringIsWhitespace(data, size)) {
+        // add the text to the current element
+        m_CurrentElement->AddText(data);
+    }
 
     return NPT_SUCCESS;
 }
@@ -1712,9 +1755,9 @@ class NPT_XmlAttributeWriter
 public:
     NPT_XmlAttributeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
     void operator()(NPT_XmlAttribute*& attribute) const {
-        m_Serializer.Attribute(attribute->GetPrefix().GetChars(),
-                               attribute->GetName().GetChars(),
-                               attribute->GetValue().GetChars());
+        m_Serializer.Attribute(attribute->GetPrefix(),
+                               attribute->GetName(),
+                               attribute->GetValue());
     }
 
 private:
@@ -1731,8 +1774,9 @@ public:
     NPT_XmlNodeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
     void operator()(NPT_XmlNode*& node) const {
         if (NPT_XmlElementNode* element = node->AsElementNode()) {
-            m_Serializer.StartElement(element->GetPrefix().GetChars(),
-                element->GetTag().GetChars());
+            const NPT_String& prefix = element->GetPrefix();
+            const NPT_String& tag    = element->GetTag();
+            m_Serializer.StartElement(prefix, tag);
             element->GetAttributes().Apply(NPT_XmlAttributeWriter(m_Serializer));
 
             // emit namespace attributes
@@ -1752,10 +1796,9 @@ public:
             }
 
             element->GetChildren().Apply(NPT_XmlNodeWriter(m_Serializer));
-            m_Serializer.EndElement(element->GetPrefix().GetChars(),
-                element->GetTag().GetChars());
+            m_Serializer.EndElement(prefix, tag);
         } else if (NPT_XmlTextNode* text = node->AsTextNode()) {
-            m_Serializer.Text(text->GetString().GetChars());
+            m_Serializer.Text(text->GetString());
         }
     }
 
@@ -1765,15 +1808,285 @@ private:
 };
 
 /*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter
++---------------------------------------------------------------------*/
+class NPT_XmlNodeCanonicalWriter
+{
+public:
+    // types
+    struct MapChainLink {
+        MapChainLink(MapChainLink* parent) : m_Parent(parent) {}
+        MapChainLink*                   m_Parent;
+        NPT_Map<NPT_String, NPT_String> m_RenderedNamespaces;
+    };
+
+    // constructor
+    NPT_XmlNodeCanonicalWriter(NPT_XmlSerializer& serializer, 
+                               MapChainLink*      map_chain = NULL) : 
+        m_MapChain(map_chain),
+        m_Serializer(serializer) {}
+    void operator()(NPT_XmlNode*& node) const;
+
+private:
+    // types
+    struct SortedAttributeList {
+        // types
+        struct Entry {
+            const NPT_String*       m_NamespaceUri;
+            const NPT_XmlAttribute* m_Attribute;
+        };
+
+        // methods
+        void Add(const NPT_String* namespace_uri, 
+                 const NPT_XmlAttribute* attribute);
+        void Emit(NPT_XmlSerializer& serializer);
+
+        // members
+        NPT_List<Entry> m_Entries;
+    };
+
+    struct SortedNamespaceList {
+        // types
+        struct Entry {
+            const NPT_String* m_NamespacePrefix;
+            const NPT_String* m_NamespaceUri;
+        };
+
+        // methods
+        void Add(const NPT_String* prefix, const NPT_String* uri);
+        void Emit(NPT_XmlSerializer& serializer);
+
+        // members
+        NPT_List<Entry> m_Entries;
+    };
+
+    // methods
+    const NPT_String* GetNamespaceRenderedForPrefix(const NPT_String& prefix) const;
+
+    // members
+    MapChainLink*      m_MapChain;
+    NPT_XmlSerializer& m_Serializer;
+};
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add
++---------------------------------------------------------------------*/
+void
+NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add(
+    const NPT_String*       namespace_uri,
+    const NPT_XmlAttribute* attribute)
+{
+    // transform empty strings into NULL pointers
+    if (namespace_uri && namespace_uri->IsEmpty()) namespace_uri = NULL;
+
+    // find the namespace insertion position
+    NPT_List<Entry>::Iterator entry = m_Entries.GetFirstItem();
+    for (; entry; ++entry) {
+        // decide if we insert now or move on
+        const NPT_String* other_namespace_uri = entry->m_NamespaceUri;
+        if (namespace_uri &&
+            (other_namespace_uri == NULL || *namespace_uri > *other_namespace_uri)) {
+            // this namespace uri is greater than the other, skip
+            continue;
+        } else if ((namespace_uri == NULL && other_namespace_uri == NULL) ||
+                   (namespace_uri && other_namespace_uri && 
+                   *namespace_uri == *other_namespace_uri)) {
+            // namespace uris match, compare the names
+            const NPT_XmlAttribute* other_attribute = entry->m_Attribute;
+            if (attribute->GetName() > other_attribute->GetName()) continue;
+        }
+        break;
+    }
+    
+    Entry new_entry = {namespace_uri, attribute};
+    m_Entries.Insert(entry, new_entry);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit
++---------------------------------------------------------------------*/
+void
+NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit(NPT_XmlSerializer& serializer)
+{
+    for (NPT_List<Entry>::Iterator i = m_Entries.GetFirstItem(); i; ++i) {
+        serializer.Attribute(i->m_Attribute->GetPrefix(),
+                             i->m_Attribute->GetName(),
+                             i->m_Attribute->GetValue());
+    }
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add
++---------------------------------------------------------------------*/
+void
+NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add(const NPT_String* prefix,
+                                                     const NPT_String* uri)
+{
+    // find the namespace insertion position
+    NPT_List<Entry>::Iterator entry = m_Entries.GetFirstItem();
+    if (prefix && !prefix->IsEmpty()) {
+        for (; entry; ++entry) {
+            // decide if we insert now or move on
+            if (entry->m_NamespacePrefix && *prefix <= *entry->m_NamespacePrefix) {
+                break;
+            }
+        }
+    } else {
+        prefix = NULL;
+    }
+
+    Entry new_entry = {prefix, uri};
+    m_Entries.Insert(entry, new_entry);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit
++---------------------------------------------------------------------*/
+void
+NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit(NPT_XmlSerializer& serializer)
+{
+    for (NPT_List<Entry>::Iterator i = m_Entries.GetFirstItem(); i; ++i) {
+        const NPT_String* key   = i->m_NamespacePrefix;
+        const NPT_String* value = i->m_NamespaceUri;
+        if (key == NULL) {
+            serializer.Attribute(NULL, "xmlns", *value);
+        } else if (*key != "xml" || *value != NPT_XmlNamespaceUri_Xml) {
+            serializer.Attribute("xmlns", *key, *value);
+        }
+    }
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix
++---------------------------------------------------------------------*/
+const NPT_String*
+NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix(const NPT_String& prefix) const
+{
+    for (MapChainLink* link = m_MapChain;
+         link;
+         link = link->m_Parent) {
+        NPT_String* uri;
+        if (NPT_SUCCEEDED(link->m_RenderedNamespaces.Get(prefix, uri))) {
+            return uri;
+        }
+    }
+
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_XmlNodeCanonicalWriter::operator()
++---------------------------------------------------------------------*/
+void
+NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
+{
+    MapChainLink map_link(m_MapChain);
+
+    if (NPT_XmlElementNode* element = node->AsElementNode()) {
+        const NPT_String& prefix = element->GetPrefix();
+        const NPT_String& tag    = element->GetTag();
+
+        // process namespaces
+        const NPT_String* namespace_uri = element->GetNamespace();
+        const NPT_String* rendered = GetNamespaceRenderedForPrefix(prefix);
+        if (namespace_uri && namespace_uri->IsEmpty()) namespace_uri = NULL;
+        if (prefix.IsEmpty()) {
+            // default namespace
+            if (rendered == NULL) {
+                // default namespace not rendered
+                if (namespace_uri) {
+                    map_link.m_RenderedNamespaces.Put("", *namespace_uri);
+                }
+            } else {
+                // default namespace already rendered
+                if (*rendered != (namespace_uri?*namespace_uri:"")) {
+                    // the rendered default namespace had a different uri
+                    map_link.m_RenderedNamespaces.Put("", namespace_uri?*namespace_uri:"");
+                } 
+            }
+        } else {
+            // explicit namespace
+            // NOTE: namespace_uri should not be an empty string, but we test just
+            // in case the XML document is not compliant
+            if (namespace_uri && (rendered == NULL || *rendered != *namespace_uri)) {
+                // namespace prefix not rendered or rendered with a different value
+                map_link.m_RenderedNamespaces.Put(prefix, *namespace_uri);
+            }
+        }
+
+		// process attributes
+		SortedAttributeList prefixed_attributes;
+		SortedAttributeList naked_attributes;
+        for (NPT_List<NPT_XmlAttribute*>::Iterator attribute = element->GetAttributes().GetFirstItem();
+             attribute;
+             ++attribute) {
+             const NPT_String& a_prefix = (*attribute)->GetPrefix();
+             if (a_prefix.IsEmpty()) {
+                 // naked attribute
+                 naked_attributes.Add(NULL, *attribute);
+             } else {
+                // decide if we need to render this namespace declaration
+                namespace_uri = element->GetNamespaceUri(a_prefix);
+                if (namespace_uri) {
+                    rendered = GetNamespaceRenderedForPrefix(a_prefix);;
+                    if (rendered == NULL || *rendered != *namespace_uri) {
+                        // namespace not rendered or rendered with a different value
+                        map_link.m_RenderedNamespaces.Put(a_prefix, *namespace_uri);
+                    }
+                    prefixed_attributes.Add(namespace_uri, *attribute);
+                }
+             }
+        }
+
+        // start of element
+        m_Serializer.StartElement(prefix, tag);
+                    
+        // namespace declarations
+        if (map_link.m_RenderedNamespaces.GetEntryCount()) {
+            SortedNamespaceList namespaces;
+            NPT_List<NPT_Map<NPT_String, NPT_String>::Entry*>::Iterator entry = 
+                map_link.m_RenderedNamespaces.GetEntries().GetFirstItem();
+            while (entry) {
+                const NPT_String& key   = (*entry)->GetKey();
+                const NPT_String& value = (*entry)->GetValue();
+                namespaces.Add(&key, &value);
+                ++entry;
+            }
+            namespaces.Emit(m_Serializer);
+        }
+
+        // attributes
+        naked_attributes.Emit(m_Serializer);
+        prefixed_attributes.Emit(m_Serializer);
+
+        // children
+        MapChainLink* chain;
+        if (map_link.m_RenderedNamespaces.GetEntryCount()) {
+            chain = &map_link;
+        } else {
+            chain = m_MapChain;
+        }
+        element->GetChildren().Apply(NPT_XmlNodeCanonicalWriter(m_Serializer, chain));
+
+        // end of element
+        m_Serializer.EndElement(prefix, tag);
+    } else if (NPT_XmlTextNode* text = node->AsTextNode()) {
+        m_Serializer.Text(text->GetString());
+    }
+}
+
+/*----------------------------------------------------------------------
 |       NPT_XmlSerializer::NPT_XmlSerializer
 +---------------------------------------------------------------------*/
 NPT_XmlSerializer::NPT_XmlSerializer(NPT_OutputStream* output,
-                                     NPT_Cardinal      indentation) :
+                                     NPT_Cardinal      indentation,
+                                     bool              shrink_empty_elements) :
     m_Output(output),
     m_ElementPending(false),
     m_Depth(0),
     m_Indentation(indentation),
-    m_ElementHasText(false)
+    m_ElementHasText(false),
+    m_ShrinkEmptyElements(shrink_empty_elements)
 {
 }
 
@@ -1930,18 +2243,22 @@ NPT_XmlSerializer::EndElement(const char* prefix, const char* name)
     if (m_ElementPending) {
         // this element has no children
         m_ElementPending = false;
-        return m_Output->Write("/>", 2);
-    } else {
-        if (m_Indentation && !m_ElementHasText) OutputIndentation(false);
-        m_ElementHasText = false;
-        m_Output->Write("</", 2);
-        if (prefix && prefix[0]) {
-            m_Output->WriteString(prefix);
-            m_Output->Write(":", 1);
+        if (m_ShrinkEmptyElements) {
+            return m_Output->Write("/>", 2);
+        } else {
+            m_Output->Write(">",1);
         }
-        m_Output->WriteString(name);
-        return m_Output->Write(">", 1);
+    } 
+
+    if (m_Indentation && !m_ElementHasText) OutputIndentation(false);
+    m_ElementHasText = false;
+    m_Output->Write("</", 2);
+    if (prefix && prefix[0]) {
+        m_Output->WriteString(prefix);
+        m_Output->Write(":", 1);
     }
+    m_Output->WriteString(name);
+    return m_Output->Write(">", 1);
 }
 
 /*----------------------------------------------------------------------
@@ -2011,3 +2328,19 @@ NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
     return NPT_SUCCESS;
 }
 
+/*----------------------------------------------------------------------
+|       NPT_XmlCanonicalizer::Serialize
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_XmlCanonicalizer::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
+{
+    // create a serialzer with no indentiation and no shrinking of empty elements
+    NPT_XmlSerializer serializer(&output, 0, false);
+
+    // serialize the node
+    NPT_XmlNodeCanonicalWriter node_writer(serializer);
+    NPT_XmlNode* node_pointer = &node;
+    node_writer(node_pointer);
+
+    return NPT_SUCCESS;
+}

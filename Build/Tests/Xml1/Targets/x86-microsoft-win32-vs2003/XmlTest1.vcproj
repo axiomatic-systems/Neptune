@@ -123,6 +123,9 @@
 			<File
 				RelativePath="..\..\..\..\..\Source\Tests\Xml1\XmlTest1.cpp">
 			</File>
+			<File
+				RelativePath="..\..\..\..\..\Source\Tests\Xml1\XmlTest1Data.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

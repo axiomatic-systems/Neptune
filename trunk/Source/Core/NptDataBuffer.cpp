@@ -118,6 +118,20 @@ NPT_DataBuffer::operator=(const NPT_DataBuffer& copy)
 }
 
 /*----------------------------------------------------------------------
+|       NPT_DataBuffer::operator==
++---------------------------------------------------------------------*/
+bool
+NPT_DataBuffer::operator==(const NPT_DataBuffer& other) const
+{
+    // check that the sizes match
+    if (m_DataSize != other.m_DataSize) return false;
+
+    return NPT_MemoryEqual(m_Buffer,
+                           other.m_Buffer,
+                           m_DataSize);
+}
+
+/*----------------------------------------------------------------------
 |       NPT_DataBuffer::SetBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -185,7 +199,7 @@ NPT_DataBuffer::SetDataSize(NPT_Size size)
 |       NPT_DataBuffer::SetData
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_DataBuffer::SetData(NPT_Byte* data, NPT_Size size)
+NPT_DataBuffer::SetData(const NPT_Byte* data, NPT_Size size)
 {
     if (size > m_BufferSize) {
         if (m_BufferIsLocal) {

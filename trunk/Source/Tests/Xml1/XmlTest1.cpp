@@ -199,6 +199,43 @@ TestSerializer()
 }
 
 /*----------------------------------------------------------------------
+|       TestCanonicalizer
++---------------------------------------------------------------------*/
+static void
+TestCanonicalizer()
+{
+    extern const char* xml_cano_1[];
+
+    NPT_XmlParser parser(true); // do not ignore whitespaces
+    NPT_XmlNode* root;
+
+    for (unsigned int i=0; xml_cano_1[i]; i+=2) {
+        const char* xml_in = xml_cano_1[i];
+        const char* xml_out = xml_cano_1[i+1];
+        NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml_in, root)));
+        NPT_ASSERT(root);
+
+        NPT_XmlCanonicalizer canonicalizer;
+        NPT_MemoryStream buffer1;
+        NPT_Result result = canonicalizer.Serialize(*root, buffer1);
+
+        NPT_String str((const char*)buffer1.GetData(), buffer1.GetDataSize());
+        NPT_Debug("%s", str.GetChars());
+        NPT_ASSERT(str == xml_out);
+
+        delete root;
+
+        NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(str, root)));
+        NPT_ASSERT(root);
+        NPT_MemoryStream buffer2;
+        result = canonicalizer.Serialize(*root, buffer2);
+        NPT_ASSERT(buffer1.GetBuffer() == buffer2.GetBuffer());
+
+        delete root;
+    }
+}
+
+/*----------------------------------------------------------------------
 |       TestRegression
 +---------------------------------------------------------------------*/
 static void
@@ -215,6 +252,117 @@ TestRegression()
     NPT_ASSERT(*element->GetAttribute("foo", "ns") == "7");
     
     delete element;
+}
+
+/*----------------------------------------------------------------------
+|       TestWhitespace
++---------------------------------------------------------------------*/
+static void
+TestWhitespace()
+{
+    const char* xml = 
+"<doc>\r\n"
+"   <clean>   </clean>\r\n"
+"   <dirty>   A   B   </dirty>\r\n"
+"   <mixed>\r\n"
+"      A\r\n"
+"      <clean>   </clean>\r\n"
+"      B\r\n"
+"      <dirty>   A   B   </dirty>\r\n"
+"      C\r\n"
+"   </mixed>\r\n"
+"</doc>\r\n";
+
+    const char* expect1 = 
+"<doc><clean/><dirty>   A   B   </dirty><mixed>\n"
+"      A\n"
+"      <clean/>\n"
+"      B\n"
+"      <dirty>   A   B   </dirty>\n"
+"      C\n"
+"   </mixed></doc>";
+
+    const char* expect2 = 
+"<doc>\n"
+"   <clean>   </clean>\n"
+"   <dirty>   A   B   </dirty>\n"
+"   <mixed>\n"
+"      A\n"
+"      <clean>   </clean>\n"
+"      B\n"
+"      <dirty>   A   B   </dirty>\n"
+"      C\n"
+"   </mixed>\n"
+"</doc>";
+
+    NPT_XmlParser parser1; // ignore whitespace (default)
+    NPT_XmlNode* root;
+    NPT_ASSERT(NPT_SUCCEEDED(parser1.Parse(xml, root)));
+    NPT_ASSERT(root);
+
+    NPT_XmlWriter writer;
+    NPT_MemoryStream buffer;
+    writer.Serialize(*root, buffer);
+    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect1, NPT_StringLength(expect1)));
+
+    delete root;
+
+    NPT_XmlParser parser2(true); // keep whitespace
+    NPT_ASSERT(NPT_SUCCEEDED(parser2.Parse(xml, root)));
+    NPT_ASSERT(root);
+
+    buffer.SetSize(0);
+    writer.Serialize(*root, buffer);
+    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect2, NPT_StringLength(expect2)));
+
+    delete root;
+}
+
+/*----------------------------------------------------------------------
+|       TestComments
++---------------------------------------------------------------------*/
+static void
+TestComments()
+{
+    const char* xml = 
+        "<!-- comment outside the element -->\n"
+        "<doc> blabla <!-- --> foo <!-- you <g> &foo -> &bar --> blibli</doc>";
+    const char* expect = "<doc> blabla  foo  blibli</doc>";
+
+    NPT_XmlParser parser;
+    NPT_XmlNode* root;
+    NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml, root)));
+    NPT_ASSERT(root);
+
+    NPT_XmlWriter writer;
+    NPT_MemoryStream buffer;
+    writer.Serialize(*root, buffer);
+    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
+
+    delete root;
+}
+
+/*----------------------------------------------------------------------
+|       TestCdata
++---------------------------------------------------------------------*/
+static void
+TestCdata()
+{
+    const char* xml = 
+        "<doc> blabla <![CDATA[  < [[  Smith ]] >   ]]> blibli</doc>";
+    const char* expect = "<doc> blabla   &lt; [[  Smith ]] &gt;    blibli</doc>";
+
+    NPT_XmlParser parser;
+    NPT_XmlNode* root;
+    NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml, root)));
+    NPT_ASSERT(root);
+
+    NPT_XmlWriter writer;
+    NPT_MemoryStream buffer;
+    writer.Serialize(*root, buffer);
+    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
+
+    delete root;
 }
 
 /*----------------------------------------------------------------------
@@ -307,9 +455,13 @@ main(int argc, char** argv)
     }
 
     TestRegression();
+    TestComments();
+    TestCdata();
+    TestWhitespace();
     TestAttributes();
     TestNamespaces();
     TestSerializer();
+    TestCanonicalizer();
 
     return 0;
 }

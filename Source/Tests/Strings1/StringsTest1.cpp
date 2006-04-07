@@ -22,6 +22,7 @@ static void
 Fail()
 {
     printf("##################################\n");
+    NPT_ASSERT(0);
     //exit(1);
 }
 
@@ -205,6 +206,11 @@ main(int /*argc*/, char** /*argv*/)
     r2 += "b";
     StringTest("string r not changed", r, "12345678");
     StringTest("string r2 not changed", r2, "123456ab");
+    NPT_String rr0 = "hello";
+    rr0.Reserve(0);
+    StringTest("string rr0 not changed", rr0, "hello");
+    rr0.Reserve(100);
+    StringTest("string rr0 not changed", rr0, "hello");
 
     printf(":: testing substring");
     NPT_String sup("abcdefghijklmnopqrstub");

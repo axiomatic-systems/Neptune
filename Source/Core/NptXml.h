@@ -150,9 +150,9 @@ class NPT_XmlElementNode : public NPT_XmlNode
                             NPT_XmlElementNode(const char* prefix, const char* tag);
     virtual                ~NPT_XmlElementNode();
     NPT_List<NPT_XmlNode*>& GetChildren() { return m_Children; }
-    const NPT_XmlElementNode* GetChild(const char* tag, 
-                                       const char* namespc = NULL,
-                                       NPT_Ordinal n=0) const;
+    NPT_XmlElementNode* GetChild(const char* tag, 
+                                 const char* namespc = NULL,
+                                 NPT_Ordinal n=0) const;
     NPT_Result              AddChild(NPT_XmlNode* child);
     NPT_Result              SetAttribute(const char* prefix,
                                          const char* name, 

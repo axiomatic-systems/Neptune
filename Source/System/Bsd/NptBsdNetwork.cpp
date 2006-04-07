@@ -236,10 +236,3 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
     
     return NPT_SUCCESS;
 }
-
-
-
-
-
-
-

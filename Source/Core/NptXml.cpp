@@ -220,7 +220,7 @@ NPT_XmlElementNode::AddChild(NPT_XmlNode* child)
 /*----------------------------------------------------------------------
 |       NPT_XmlElementNode::GetChild
 +---------------------------------------------------------------------*/
-const NPT_XmlElementNode*
+NPT_XmlElementNode*
 NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n) const
 {
     NPT_List<NPT_XmlNode*>::Iterator item;

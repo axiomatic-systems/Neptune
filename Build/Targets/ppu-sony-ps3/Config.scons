@@ -1,12 +1,12 @@
 ### compiler tool chain
-env['AR'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ar'
-env['RANLIB'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-ranlib'
-env['CC'] = 'c:/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-gcc'
-env['CXX'] = 'c:/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-g++'
-env['LINK'] = '/c/develop/ps3/cell/host-win32/ppu/bin/ppu-lv2-g++'
+env['ENV']['PATH'] += os.environ['PATH']
+env['AR']     = 'ppu-lv2-ar'
+env['RANLIB'] = 'ppu-lv2-ranlib'
+env['CC']     = 'ppu-lv2-gcc'
+env['CXX']    = 'ppu-lv2-g++'
+env['LINK']   = 'ppu-lv2-g++'
 
 ### compiler flags
-
 c_compiler_compliance_flags = '-pedantic'
 cxx_compiler_warnings       = '-Werror -Wall -W -Wundef -Wno-long-long'
 c_compiler_warnings         = cxx_compiler_warnings + ' -Wmissing-prototypes -Wmissing-declarations'
@@ -22,5 +22,5 @@ env['CCFLAGS']  = ' '.join([c_compiler_compliance_flags, c_compiler_flags, c_com
 env['CXXFLAGS'] = ' '.join([c_compiler_compliance_flags, c_compiler_flags, cxx_compiler_warnings])
 
 ### Neptune System Files
-env['NPT_SYSTEM_SOURCES']={'Source/System/StdC':'*.cpp', 'Source/System/Bsd':'NptBsdSockets.cpp', 'Source/System/PS3':'*.cpp'}
+env['NPT_SYSTEM_SOURCES']={'Source/System/StdC':'*.cpp', 'Source/System/Bsd':'NptBsdSockets.cpp', 'Source/System/PS3':'*.cpp', 'Source/System/Null':'NptNullNetwork.cpp'}
 env['NPT_EXTRA_LIBS']='net'

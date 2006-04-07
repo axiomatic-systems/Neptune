@@ -214,7 +214,6 @@ NPT_DataBuffer::SetData(const NPT_Byte* data, NPT_Size size)
     return NPT_SUCCESS;
 }
 
-
 /*----------------------------------------------------------------------
 |       NPT_DataBuffer::ReallocateBuffer
 +---------------------------------------------------------------------*/

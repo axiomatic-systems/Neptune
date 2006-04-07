@@ -191,6 +191,16 @@ inline void
 NPT_String::PrepareToAppend(NPT_Size length, NPT_Size allocate)
 {
     NPT_ASSERT(allocate >= length);
+    Reserve(allocate);
+    GetBuffer()->SetLength(length);
+}
+
+/*----------------------------------------------------------------------
+|       NPT_String::Reserve
++---------------------------------------------------------------------*/
+void
+NPT_String::Reserve(NPT_Size allocate)
+{
     if (m_Chars == NULL || GetBuffer()->GetAllocated() < allocate) {
         // the buffer is too small, we need to allocate a new one.
         NPT_Size needed = allocate;
@@ -198,7 +208,8 @@ NPT_String::PrepareToAppend(NPT_Size length, NPT_Size allocate)
             NPT_Size grow = GetBuffer()->GetAllocated()*2;
             if (grow > allocate) needed = grow;
         }
-        char* copy = Buffer::Create(needed);
+        NPT_Size length = GetLength();
+        char* copy = Buffer::Create(needed, length);
         if (m_Chars != NULL) {
             CopyString(copy, m_Chars);
             delete GetBuffer();
@@ -207,16 +218,6 @@ NPT_String::PrepareToAppend(NPT_Size length, NPT_Size allocate)
         }
         m_Chars = copy;
     }
-    GetBuffer()->SetLength(length);
-}
-
-/*----------------------------------------------------------------------
-|       NPT_String::Reserve
-+---------------------------------------------------------------------*/
-void
-NPT_String::Reserve(NPT_Size length)
-{
-    PrepareToAppend(GetLength(), length);
 }
 
 /*----------------------------------------------------------------------

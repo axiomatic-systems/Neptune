@@ -10,11 +10,11 @@ PLATFORM_TO_TARGET_MAP = {
     'linux2'     : 'x86-unknown-linux',
     'win32'      : 'x86-microsoft-win32',
     'cygwin'     : 'x86-unknown-cygwin',
-    'darwin'     : 'powerpc-apple-macosx',
+    'darwin'     : 'powerpc-apple-macosx'
 }
-    
+  
 CROSS_PLATFORMS = ['ppu-sony-ps3']
-
+  
 def DefaultTarget():
     if PLATFORM_TO_TARGET_MAP.has_key(sys.platform):
         return PLATFORM_TO_TARGET_MAP[sys.platform]
@@ -39,4 +39,4 @@ Help(options.GenerateHelpText(env))
 for build_config in env['build_configs']:
     env['build_config'] = build_config
     print '********** Configuring Build Target =', env['target'], '/', build_config, '********'  
-    SConscript('Build.scons', build_dir='Targets/'+env['target']+'/'+build_config, exports='env', duplicate=0)
+    SConscript('Build.scons', build_dir='SCons/Targets/'+env['target']+'/'+build_config, exports='env', duplicate=0)

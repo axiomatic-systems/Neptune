@@ -64,7 +64,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <netex/net.h>
-#include <netex/netset.h>
 #include <netex/errno.h>
 
 #else
@@ -98,7 +97,7 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 5;
+const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 20;
 
 /*----------------------------------------------------------------------
 |   WinSock adaptation layer
@@ -107,6 +106,10 @@ const int NPT_TCP_SERVER_SOCKET_DEFAULT_LISTEN_COUNT = 5;
 #include "NptWin32Network.h"
 // force a reference to the initializer so that the linker does not optimize it out
 static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer; 
+
+#if defined(SetPort)
+#undef SetPort
+#endif
 
 #define EWOULDBLOCK  WSAEWOULDBLOCK
 #define EINPROGRESS  WSAEINPROGRESS
@@ -120,31 +123,31 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define ENETUNREACH  WSAENETUNREACH
 #define EAGAIN       WSAEWOULDBLOCK 
 
-#define NPT_BSD_INVALID_SOCKET INVALID_SOCKET
-#define NPT_BSD_SOCKET_ERROR SOCKET_ERROR
-#define NPT_BSD_IOCTL_ERROR SOCKET_ERROR
-#if defined(SetPort)
-#undef SetPort
-#endif
-typedef int    ssize_t;
-typedef int    socklen_t;
-typedef char*  SocketBuffer;
+typedef int         ssize_t;
+typedef int         socklen_t;
+typedef char*       SocketBuffer;
 typedef const char* SocketConstBuffer;
-typedef char*  SocketOption;
-typedef SOCKET SocketFd;
-#define GetSocketError() WSAGetLastError()
+typedef char*       SocketOption;
+typedef SOCKET      SocketFd;
+
+#define GetSocketError()                 WSAGetLastError()
+#define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s) == INVALID_SOCKET)
+#define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) == SOCKET_ERROR)
+#define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e) == SOCKET_ERROR)
 
 /*----------------------------------------------------------------------
 |   Trimedia adaptation layer
 +---------------------------------------------------------------------*/
 #elif defined(__TCS__)  // trimedia PSOS w/ Target TCP
-#define NPT_BSD_INVALID_SOCKET (-1)
-#define NPT_BSD_SOCKET_ERROR   (-1)
-typedef void*  SocketBuffer;
+typedef void*       SocketBuffer;
 typedef const void* SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() errno
+typedef void*       SocketOption;
+typedef int         SocketFd;
+
+#define GetSocketError()                 errno
+#define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s)  < 0)
+#define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) != 0)
+#define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e)  < 0)
 
 /*----------------------------------------------------------------------
 |   PSP adaptation layer
@@ -185,9 +188,7 @@ typedef SceNetInetSocklen_t socklen_t;
 #define IP_ADD_MEMBERSHIP SCE_NET_INET_IP_ADD_MEMBERSHIP
 #define IP_MULTICAST_IF SCE_NET_INET_IP_MULTICAST_IF
 #define IP_MULTICAST_TTL SCE_NET_INET_IP_MULTICAST_TTL
-//#define SO_REUSEPORT SCE_NET_INET_SO_REUSEPORT
 #define SO_REUSEADDR SCE_NET_INET_SO_REUSEADDR
-//#define SO_REUSEADDR SCE_NET_INET_SO_REUSEPORT
 #define INADDR_ANY SCE_NET_INET_INADDR_ANY
 #define ip_mreq SceNetInetIpMreq
 #ifdef fd_set
@@ -211,16 +212,18 @@ typedef SceNetInetSocklen_t socklen_t;
 #endif
 #define FD_ISSET SceNetInetFD_ISSET
 
-#define NPT_BSD_INVALID_SOCKET (-1)
-#define NPT_BSD_SOCKET_ERROR   (-1)
-#define NPT_BSD_IOCTL_ERROR    (-1)
-typedef void*  SocketBuffer;
-typedef const void* SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() sceNetInetGetErrno()
 #define RESOLVER_TIMEOUT (5 * 1000 * 1000)
-#define RESOLVER_RETRY 5
+#define RESOLVER_RETRY    5
+
+typedef void*       SocketBuffer;
+typedef const void* SocketConstBuffer;
+typedef void*       SocketOption;
+typedef int         SocketFd;
+
+#define GetSocketError()                 sceNetInetGetErrno()
+#define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s) < 0)
+#define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) < 0)
+#define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e) < 0)
 
 /*----------------------------------------------------------------------
 |       PS3 adaptation layer
@@ -252,31 +255,46 @@ typedef int    SocketFd;
 #define EINTR	      SYS_NET_EINTR
 #define EINPROGRESS   SYS_NET_EINPROGRESS
 
-typedef void*  SocketBuffer;
+typedef void*        SocketBuffer;
 typedef const void*  SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() sys_net_errno
+typedef void*        SocketOption;
+typedef int          SocketFd;
+
 #define closesocket  socketclose
-#define select socketselect
-#define NPT_BSD_INVALID_SOCKET (-1)
-#define NPT_BSD_SOCKET_ERROR   (-1)
-#define NPT_BSD_IOCTL_ERROR    (-1)
+#define select       socketselect
+
+#define GetSocketError()                 sys_net_errno
+#define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s) < 0)
+#define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) < 0)
+#define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e) < 0)
+
+// network initializer 
+static struct NPT_Ps3NetworkInitializer {
+    NPT_Ps3NetworkInitializer() {
+        sys_net_initialize_network();
+    }
+    ~NPT_Ps3NetworkInitializer() {
+        sys_net_finalize_network();
+    }
+} Ps3NetworkInitializer;
 
 /*----------------------------------------------------------------------
 |       Default adaptation layer
 +---------------------------------------------------------------------*/
-#else  // unix-style BSD sockets
-#define NPT_BSD_INVALID_SOCKET (-1)
-#define NPT_BSD_SOCKET_ERROR   (-1)
-#define NPT_BSD_IOCTL_ERROR    (-1)
-typedef void*  SocketBuffer;
+#else  
+typedef void*       SocketBuffer;
 typedef const void* SocketConstBuffer;
-typedef void*  SocketOption;
-typedef int    SocketFd;
-#define GetSocketError() errno
+typedef void*       SocketOption;
+typedef int         SocketFd;
+
 #define closesocket  close
 #define ioctlsocket  ioctl
+
+#define GetSocketError()                 errno
+#define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s)  < 0)
+#define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) != 0)
+#define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e)  < 0)
+
 #endif
 
 /*----------------------------------------------------------------------
@@ -425,9 +443,8 @@ NPT_Result
 NPT_BsdSocketFd::SetBlockingMode(bool blocking)
 {
     unsigned long args = blocking?0:1;
-    if (ioctlsocket(m_SocketFd, FIONBIO, &args) ==
-        NPT_BSD_IOCTL_ERROR) {
-            return NPT_FAILURE;
+    if (ioctlsocket(m_SocketFd, FIONBIO, &args)) {
+        return NPT_FAILURE;
     }
     return NPT_SUCCESS;
 }
@@ -570,7 +587,7 @@ NPT_BsdSocketInputStream::GetAvailable(NPT_Size& available)
 {
     unsigned long ready = 0;
     int io_result = ioctlsocket(m_SocketFdReference->GetSocketFd(), FIONREAD, &ready); 
-    if (io_result == NPT_BSD_IOCTL_ERROR) {
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
         available = 0;
         return NPT_FAILURE;
     } else {
@@ -939,7 +956,7 @@ NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address,
     int io_result = connect(m_SocketFdReference->GetSocketFd(), 
                             (struct sockaddr *)&inet_address, 
                             sizeof(inet_address));
-    if (io_result == NPT_BSD_SOCKET_ERROR) { 
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) { 
         return MapErrorCode(GetSocketError());
     }
     
@@ -983,7 +1000,7 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
     }
 
     // check result
-    if (io_result == NPT_BSD_SOCKET_ERROR) {
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
         return MapErrorCode(GetSocketError());
     }
 
@@ -1019,7 +1036,9 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
                              &inet_address_length);
 
         // convert the address format
-        if (io_result != NPT_BSD_SOCKET_ERROR) {
+        if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+        }
+        if (!NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
             if (inet_address_length == sizeof(inet_address)) {
                 InetAddressToSocketAddress(&inet_address, *address);
             }
@@ -1032,13 +1051,12 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
     }
 
     // check result
-    if (io_result == NPT_BSD_SOCKET_ERROR) {
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
         packet.SetDataSize(0);
         return MapErrorCode(GetSocketError());
-    } else {
-        packet.SetDataSize(io_result);
-    }
+    } 
 
+    packet.SetDataSize(io_result);
     return NPT_SUCCESS;
 }
 
@@ -1304,7 +1322,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
 
         return NPT_SUCCESS;
     }
-    if (io_result == NPT_BSD_SOCKET_ERROR) {
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
         NPT_Result result = MapErrorCode(GetSocketError());
         if (result != NPT_ERROR_WOULD_BLOCK) {
             // put the fd back in its original blocking mode
@@ -1371,7 +1389,7 @@ NPT_BsdTcpClientSocket::DoWaitForConnection(NPT_Timeout timeout)
             result = NPT_ERROR_TIMEOUT;
             goto done;
         }
-    } else if (io_result == NPT_BSD_SOCKET_ERROR) {
+    } else if (NPT_BSD_SOCKET_SELECT_FAILED(io_result)) {
         result = MapErrorCode(GetSocketError());
         goto done;
     } else if (FD_ISSET(socket_fd, &read_set)    || 
@@ -1387,7 +1405,7 @@ NPT_BsdTcpClientSocket::DoWaitForConnection(NPT_Timeout timeout)
                                SO_ERROR, 
                                (SocketOption)&error, 
                                &length);
-        if (io_result == NPT_BSD_SOCKET_ERROR) {
+        if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
             result = MapErrorCode(GetSocketError());
             goto done;
         } else if (error) {
@@ -1526,7 +1544,7 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client,
     socket_fd = accept(m_SocketFdReference->GetSocketFd(), 
                        (struct sockaddr*)&inet_address, 
                        &namelen); 
-    if (socket_fd == NPT_BSD_INVALID_SOCKET) {
+    if (NPT_BSD_SOCKET_IS_INVALID(socket_fd)) {
         client = NULL;
         return MapErrorCode(GetSocketError());
     }

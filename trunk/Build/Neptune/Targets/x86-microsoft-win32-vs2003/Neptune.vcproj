@@ -290,6 +290,9 @@
 				RelativePath="..\..\..\..\Source\Core\NptSystem.h">
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Tests\Harness\NptTestHarness.h">
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptThreads.h">
 			</File>
 			<File

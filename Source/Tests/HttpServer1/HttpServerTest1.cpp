@@ -77,6 +77,8 @@ TestHttp()
 
     NPT_HttpResponse response(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
     server.SendResponse(response, *stream);
+
+    delete request;
 }
 
 /*----------------------------------------------------------------------

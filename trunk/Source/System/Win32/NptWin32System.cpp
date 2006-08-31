@@ -1,16 +1,21 @@
 /*****************************************************************
 |
-|      Neptune - System :: Win32 Implementation
+|   Neptune - System :: Win32 Implementation
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
+#if defined(_XBOX)
+#include <xtl.h>
+#else
 #include <windows.h>
+#endif
+
 #include <sys/timeb.h>
 
 #include "NptConfig.h"
@@ -20,7 +25,7 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       NPT_System::GetProcessId
+|   NPT_System::GetProcessId
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_System::GetProcessId(NPT_Integer& id)
@@ -31,7 +36,7 @@ NPT_System::GetProcessId(NPT_Integer& id)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::GetCurrentTimeStamp
+|   NPT_System::GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
@@ -50,7 +55,7 @@ NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::Sleep
+|   NPT_System::Sleep
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_System::Sleep(const NPT_TimeInterval& duration)
@@ -62,7 +67,7 @@ NPT_System::Sleep(const NPT_TimeInterval& duration)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::SleepUntil
+|   NPT_System::SleepUntil
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_System::SleepUntil(const NPT_TimeStamp& when)
@@ -78,7 +83,7 @@ NPT_System::SleepUntil(const NPT_TimeStamp& when)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::SetRandomSeed
+|   NPT_System::SetRandomSeed
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_System::SetRandomSeed(unsigned int seed)
@@ -88,7 +93,7 @@ NPT_System::SetRandomSeed(unsigned int seed)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_System::NPT_System
+|   NPT_System::NPT_System
 +---------------------------------------------------------------------*/
 NPT_Integer 
 NPT_System::GetRandomInteger()

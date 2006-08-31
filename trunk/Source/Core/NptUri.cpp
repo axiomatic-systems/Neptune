@@ -1,20 +1,20 @@
 /*****************************************************************
 |
-|      Neptune - URI
+|   Neptune - URI
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptUri.h"
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Uri::NPT_Uri
+|   NPT_Uri::NPT_Uri
 +---------------------------------------------------------------------*/
 NPT_Uri::NPT_Uri(const char* uri) :
     m_Uri(uri)
@@ -38,7 +38,7 @@ NPT_Uri::NPT_Uri(const char* uri) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Uri::ParseScheme
+|   NPT_Uri::ParseScheme
 +---------------------------------------------------------------------*/
 NPT_Uri::SchemeId
 NPT_Uri::ParseScheme(const NPT_String& scheme)
@@ -51,7 +51,7 @@ NPT_Uri::ParseScheme(const NPT_String& scheme)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Uri::Encode
+|   NPT_Uri::Encode
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_Uri::Encode(const char* uri)
@@ -65,6 +65,8 @@ NPT_Uri::Encode(const char* uri)
     encoded.Reserve(NPT_StringLength(uri));
 
     // process each character
+    char escaped[3];
+    escaped[0] = '%';
     while (unsigned char c = *uri++) {
         if (c == '<'   ||
             c == '>'   || 
@@ -77,10 +79,8 @@ NPT_Uri::Encode(const char* uri)
             c == '#'   ||
             c == '%'   ||
             c <= 0x20  ||
-            c >= 0x7B) {
+            c >= 0x7B) {  // this includes { } and | 
             // needs to be escaped
-            char escaped[3];
-            escaped[0] = '%';
             NPT_ByteToHex(c, &escaped[1]);
             encoded.Append(escaped, 3);
         } else {
@@ -93,7 +93,7 @@ NPT_Uri::Encode(const char* uri)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Uri::Decode
+|   NPT_Uri::Decode
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_Uri::Decode(const char* uri)

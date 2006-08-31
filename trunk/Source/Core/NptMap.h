@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Maps
+|   Neptune - Maps
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,14 +11,14 @@
 #define _NPT_MAP_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptResults.h"
 #include "NptList.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Map
+|   NPT_Map
 +---------------------------------------------------------------------*/
 template <typename K, typename V> 
 class NPT_Map 
@@ -94,7 +94,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::NPT_Map<K,V>
+|   NPT_Map<K,V>::NPT_Map<K,V>
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 NPT_Map<K,V>::NPT_Map(const NPT_Map<K,V>& copy)
@@ -103,7 +103,7 @@ NPT_Map<K,V>::NPT_Map(const NPT_Map<K,V>& copy)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::~NPT_Map<K,V>
+|   NPT_Map<K,V>::~NPT_Map<K,V>
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -114,7 +114,7 @@ NPT_Map<K,V>::~NPT_Map()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::Clear
+|   NPT_Map<K,V>::Clear
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -128,7 +128,7 @@ NPT_Map<K,V>::Clear()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::GetEntry
+|   NPT_Map<K,V>::GetEntry
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 typename NPT_Map<K,V>::Entry*
@@ -146,7 +146,7 @@ NPT_Map<K,V>::GetEntry(const K& key) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::Put
+|   NPT_Map<K,V>::Put
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -166,7 +166,7 @@ NPT_Map<K,V>::Put(const K& key, const V& value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::Get
+|   NPT_Map<K,V>::Get
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -186,7 +186,7 @@ NPT_Map<K,V>::Get(const K& key, V*& value) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::HasValue
+|   NPT_Map<K,V>::HasValue
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 bool
@@ -204,7 +204,7 @@ NPT_Map<K,V>::HasValue(const V& value) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::operator=
+|   NPT_Map<K,V>::operator=
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 const NPT_Map<K,V>&
@@ -227,7 +227,7 @@ NPT_Map<K,V>::operator=(const NPT_Map<K,V>& copy)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::Erase
+|   NPT_Map<K,V>::Erase
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -247,7 +247,7 @@ NPT_Map<K,V>::Erase(const K& key)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::operator==
+|   NPT_Map<K,V>::operator==
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 bool
@@ -274,7 +274,7 @@ NPT_Map<K,V>::operator==(const NPT_Map<K,V>& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::operator!=
+|   NPT_Map<K,V>::operator!=
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline
@@ -285,7 +285,7 @@ NPT_Map<K,V>::operator!=(const NPT_Map<K,V>& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Map<K,V>::operator[]
+|   NPT_Map<K,V>::operator[]
 +---------------------------------------------------------------------*/
 template <typename K, typename V>
 inline

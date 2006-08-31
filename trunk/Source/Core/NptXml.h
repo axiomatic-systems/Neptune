@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Xml Support
+|   Neptune - Xml Support
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_XML_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptList.h"
@@ -19,18 +19,21 @@
 #include "NptStreams.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_ERROR_XML_INVALID_NESTING = NPT_ERROR_BASE_XML - 0;
 const int NPT_ERROR_XML_TAG_MISMATCH    = NPT_ERROR_BASE_XML - 1;
 
+#define NPT_XML_ANY_NAMESPACE "*"
+#define NPT_XML_NO_NAMESPACE  NULL
+
 /*----------------------------------------------------------------------
-|       forward declarations
+|   forward declarations
 +---------------------------------------------------------------------*/
 class NPT_XmlProcessor;
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAttribute
+|   NPT_XmlAttribute
 +---------------------------------------------------------------------*/
 class NPT_XmlAttribute
 {
@@ -62,7 +65,7 @@ class NPT_XmlAttribute
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNamespaceMap
+|   NPT_XmlNamespaceMap
 +---------------------------------------------------------------------*/
 class NPT_XmlNamespaceMap
 {
@@ -98,7 +101,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNode
+|   NPT_XmlNode
 +---------------------------------------------------------------------*/
 class NPT_XmlElementNode;
 class NPT_XmlTextNode;
@@ -140,7 +143,7 @@ class NPT_XmlNode
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode
+|   NPT_XmlElementNode
 +---------------------------------------------------------------------*/
 class NPT_XmlElementNode : public NPT_XmlNode
 {
@@ -150,9 +153,11 @@ class NPT_XmlElementNode : public NPT_XmlNode
                             NPT_XmlElementNode(const char* prefix, const char* tag);
     virtual                ~NPT_XmlElementNode();
     NPT_List<NPT_XmlNode*>& GetChildren() { return m_Children; }
-    NPT_XmlElementNode* GetChild(const char* tag, 
-                                 const char* namespc = NULL,
-                                 NPT_Ordinal n=0) const;
+    const NPT_List<NPT_XmlNode*>& 
+                            GetChildren() const { return m_Children; }
+    NPT_XmlElementNode*     GetChild(const char* tag, 
+                                     const char* namespc = NPT_XML_NO_NAMESPACE,
+                                     NPT_Ordinal n=0) const;
     NPT_Result              AddChild(NPT_XmlNode* child);
     NPT_Result              SetAttribute(const char* prefix,
                                          const char* name, 
@@ -162,12 +167,19 @@ class NPT_XmlElementNode : public NPT_XmlNode
     NPT_Result              AddText(const char* text); 
     NPT_List<NPT_XmlAttribute*>& 
                             GetAttributes() { return m_Attributes; }
+    const NPT_List<NPT_XmlAttribute*>&
+                            GetAttributes() const { return m_Attributes; }
     const NPT_String*       GetAttribute(const char* name,
-                                         const char* namespc = NULL) const;
+                                         const char* namespc = NPT_XML_NO_NAMESPACE) const;
     const NPT_String&       GetPrefix() const { return m_Prefix; }
     const NPT_String&       GetTag()    const { return m_Tag;    }
     const NPT_String*       GetText(NPT_Ordinal n=0) const;
-    
+
+    // bring all the namespace definitions used in this element of one of its descendants
+    // into the namespace map of this element so that it may be serialized as a
+    // standalone element without any prefixes with undefined namespace uris
+    NPT_Result              MakeStandalone();
+
     // namespace methods   
     const NPT_String* GetNamespace() const;
     NPT_Result        SetNamespaceUri(const char* prefix, const char* uri);
@@ -202,10 +214,11 @@ protected:
     friend class NPT_XmlNodeCanonicalWriter;
     friend class NPT_XmlParser;
     friend class NPT_XmlProcessor;
+    friend class NPT_XmlNamespaceCollapser;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlTextNode
+|   NPT_XmlTextNode
 +---------------------------------------------------------------------*/
 class NPT_XmlTextNode : public NPT_XmlNode
 {
@@ -236,13 +249,13 @@ class NPT_XmlTextNode : public NPT_XmlNode
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser
+|   NPT_XmlParser
 +---------------------------------------------------------------------*/
 class NPT_XmlParser
 {
  public:
     // methods
-             NPT_XmlParser(bool keep_whitespace = false);
+             NPT_XmlParser(bool keep_whitespace = true);
     virtual ~NPT_XmlParser();
     virtual  NPT_Result Parse(const char*   xml, 
                               NPT_XmlNode*& tree,
@@ -278,7 +291,7 @@ class NPT_XmlParser
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer
+|   NPT_XmlSerializer
 +---------------------------------------------------------------------*/
 class NPT_XmlSerializer
 {
@@ -315,7 +328,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlWriter
+|   NPT_XmlWriter
 +---------------------------------------------------------------------*/
 class NPT_XmlWriter
 {
@@ -332,7 +345,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlCanonicalizer
+|   NPT_XmlCanonicalizer
 +---------------------------------------------------------------------*/
 class NPT_XmlCanonicalizer
 {

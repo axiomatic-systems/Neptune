@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Toplevel Include
+|   Neptune - Toplevel Include
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,12 +11,12 @@
 #define _NEPTUNE_H_
 
 /*----------------------------------------------------------------------
-|       flags
+|   flags
 +---------------------------------------------------------------------*/
 #define NPT_EXTERNAL_USE /* do not expose internal definitions */
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptCommon.h"
 #include "NptResults.h"

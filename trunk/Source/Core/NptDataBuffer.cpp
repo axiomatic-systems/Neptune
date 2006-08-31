@@ -1,21 +1,21 @@
 /*****************************************************************
 |
-|      Neptune - Data Buffer
+|   Neptune - Data Buffer
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptDataBuffer.h"
 #include "NptUtils.h"
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::NPT_DataBuffer
+|   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
 NPT_DataBuffer::NPT_DataBuffer() :
     m_BufferIsLocal(true),
@@ -26,42 +26,42 @@ NPT_DataBuffer::NPT_DataBuffer() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::NPT_DataBuffer
+|   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
 NPT_DataBuffer::NPT_DataBuffer(NPT_Size bufferSize) :
     m_BufferIsLocal(true),
-    m_Buffer(new NPT_Byte[bufferSize]),
+    m_Buffer(bufferSize?new NPT_Byte[bufferSize]:NULL),
     m_BufferSize(bufferSize),
     m_DataSize(0)
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::NPT_DataBuffer
+|   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
-NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size dataSize) :
+NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size data_size) :
     m_BufferIsLocal(true),
-    m_Buffer(new NPT_Byte[dataSize]),
-    m_BufferSize(dataSize),
-    m_DataSize(dataSize)
+    m_Buffer(data_size?new NPT_Byte[data_size]:NULL),
+    m_BufferSize(data_size),
+    m_DataSize(data_size)
 {
-    NPT_CopyMemory(m_Buffer, data, dataSize);
+    if (data_size) NPT_CopyMemory(m_Buffer, data, data_size);
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::NPT_DataBuffer
+|   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
-NPT_DataBuffer::NPT_DataBuffer(void* data, NPT_Size dataSize, bool copy) :
+NPT_DataBuffer::NPT_DataBuffer(void* data, NPT_Size data_size, bool copy) :
     m_BufferIsLocal(copy),
-    m_Buffer(copy?new NPT_Byte[dataSize]:(NPT_Byte*)data),
-    m_BufferSize(dataSize),
-    m_DataSize(dataSize)
+    m_Buffer(copy?(data_size?new NPT_Byte[data_size]:NULL):(NPT_Byte*)data),
+    m_BufferSize(data_size),
+    m_DataSize(data_size)
 {
-    if (copy) NPT_CopyMemory(m_Buffer, data, dataSize);
+    if (copy && data_size) NPT_CopyMemory(m_Buffer, data, data_size);
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::NPT_DataBuffer
+|   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
 NPT_DataBuffer::NPT_DataBuffer(const NPT_DataBuffer& other) :
     m_BufferIsLocal(true),
@@ -69,12 +69,14 @@ NPT_DataBuffer::NPT_DataBuffer(const NPT_DataBuffer& other) :
     m_BufferSize(other.m_DataSize),
     m_DataSize(other.m_DataSize)
 {
-    m_Buffer = new NPT_Byte[m_BufferSize];
-    NPT_CopyMemory(m_Buffer, other.m_Buffer, m_BufferSize);
+    if (m_BufferSize) {
+        m_Buffer = new NPT_Byte[m_BufferSize];
+        NPT_CopyMemory(m_Buffer, other.m_Buffer, m_BufferSize);
+    }
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::~NPT_DataBuffer
+|   NPT_DataBuffer::~NPT_DataBuffer
 +---------------------------------------------------------------------*/
 NPT_DataBuffer::~NPT_DataBuffer()
 {
@@ -82,7 +84,7 @@ NPT_DataBuffer::~NPT_DataBuffer()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::Clear
+|   NPT_DataBuffer::Clear
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::Clear()
@@ -98,7 +100,7 @@ NPT_DataBuffer::Clear()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::operator=
+|   NPT_DataBuffer::operator=
 +---------------------------------------------------------------------*/
 NPT_DataBuffer&
 NPT_DataBuffer::operator=(const NPT_DataBuffer& copy)
@@ -118,7 +120,7 @@ NPT_DataBuffer::operator=(const NPT_DataBuffer& copy)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::operator==
+|   NPT_DataBuffer::operator==
 +---------------------------------------------------------------------*/
 bool
 NPT_DataBuffer::operator==(const NPT_DataBuffer& other) const
@@ -132,7 +134,7 @@ NPT_DataBuffer::operator==(const NPT_DataBuffer& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::SetBuffer
+|   NPT_DataBuffer::SetBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::SetBuffer(NPT_Byte* buffer, NPT_Size buffer_size)
@@ -149,7 +151,7 @@ NPT_DataBuffer::SetBuffer(NPT_Byte* buffer, NPT_Size buffer_size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::SetBufferSize
+|   NPT_DataBuffer::SetBufferSize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::SetBufferSize(NPT_Size buffer_size)
@@ -163,10 +165,10 @@ NPT_DataBuffer::SetBufferSize(NPT_Size buffer_size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::GrowBuffer
+|   NPT_DataBuffer::Reserve
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_DataBuffer::GrowBuffer(NPT_Size size)
+NPT_DataBuffer::Reserve(NPT_Size size)
 {
     if (size <= m_BufferSize) return NPT_SUCCESS;
 
@@ -177,7 +179,7 @@ NPT_DataBuffer::GrowBuffer(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::SetDataSize
+|   NPT_DataBuffer::SetDataSize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::SetDataSize(NPT_Size size)
@@ -196,7 +198,7 @@ NPT_DataBuffer::SetDataSize(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::SetData
+|   NPT_DataBuffer::SetData
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::SetData(const NPT_Byte* data, NPT_Size size)
@@ -205,7 +207,7 @@ NPT_DataBuffer::SetData(const NPT_Byte* data, NPT_Size size)
         if (m_BufferIsLocal) {
             NPT_CHECK(ReallocateBuffer(size));
         } else {
-            return NPT_FAILURE;
+            return NPT_ERROR_INVALID_STATE;
         }
     }
     NPT_CopyMemory(m_Buffer, data, size);
@@ -215,13 +217,13 @@ NPT_DataBuffer::SetData(const NPT_Byte* data, NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer::ReallocateBuffer
+|   NPT_DataBuffer::ReallocateBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_DataBuffer::ReallocateBuffer(NPT_Size size)
 {
     // check that the existing data fits
-    if (m_DataSize > size) return NPT_FAILURE;
+    if (m_DataSize > size) return NPT_ERROR_INVALID_PARAMETERS;
 
     // allocate a new buffer
     NPT_Byte* newBuffer = new NPT_Byte[size];

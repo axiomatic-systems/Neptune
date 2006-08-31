@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Files :: Standard C Implementation
+|   Neptune - Files :: Standard C Implementation
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <stdio.h>
 #include <errno.h>
@@ -23,7 +23,7 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       compatibility wrappers
+|   compatibility wrappers
 +---------------------------------------------------------------------*/
 #if !defined(NPT_CONFIG_HAVE_FOPEN_S)
 static int fopen_s(FILE**      file,
@@ -37,7 +37,7 @@ static int fopen_s(FILE**      file,
 #endif // defined(NPT_CONFIG_HAVE_FOPEN_S
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileWrapper
+|   NPT_StdcFileWrapper
 +---------------------------------------------------------------------*/
 class NPT_StdcFileWrapper
 {
@@ -64,7 +64,7 @@ private:
 typedef NPT_Reference<NPT_StdcFileWrapper> NPT_StdcFileReference;
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileStream
+|   NPT_StdcFileStream
 +---------------------------------------------------------------------*/
 class NPT_StdcFileStream
 {
@@ -74,8 +74,8 @@ public:
       m_FileReference(file) {}
 
     // NPT_FileInterface methods
-    NPT_Result Seek(NPT_Offset offset);
-    NPT_Result Tell(NPT_Offset& offset);
+    NPT_Result Seek(NPT_Position offset);
+    NPT_Result Tell(NPT_Position& offset);
 
 protected:
     // constructors and destructors
@@ -86,10 +86,10 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileStream::Seek
+|   NPT_StdcFileStream::Seek
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_StdcFileStream::Seek(NPT_Offset offset)
+NPT_StdcFileStream::Seek(NPT_Position offset)
 {
     size_t result;
 
@@ -102,17 +102,17 @@ NPT_StdcFileStream::Seek(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileStream::Tell
+|   NPT_StdcFileStream::Tell
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_StdcFileStream::Tell(NPT_Offset& offset)
+NPT_StdcFileStream::Tell(NPT_Position& offset)
 {
     offset = ftell(m_FileReference->GetFile());
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileInputStream
+|   NPT_StdcFileInputStream
 +---------------------------------------------------------------------*/
 class NPT_StdcFileInputStream : public NPT_InputStream,
                                 private NPT_StdcFileStream
@@ -127,10 +127,10 @@ public:
     NPT_Result Read(void*     buffer, 
                     NPT_Size  bytes_to_read, 
                     NPT_Size* bytes_read);
-    NPT_Result Seek(NPT_Offset offset) {
+    NPT_Result Seek(NPT_Position offset) {
         return NPT_StdcFileStream::Seek(offset);
     }
-    NPT_Result Tell(NPT_Offset& offset) {
+    NPT_Result Tell(NPT_Position& offset) {
         return NPT_StdcFileStream::Tell(offset);
     }
     NPT_Result GetSize(NPT_Size& size);
@@ -142,7 +142,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileInputStream::Read
+|   NPT_StdcFileInputStream::Read
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFileInputStream::Read(void*     buffer, 
@@ -171,7 +171,7 @@ NPT_StdcFileInputStream::Read(void*     buffer,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileInputStream::GetSize
+|   NPT_StdcFileInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFileInputStream::GetSize(NPT_Size& size)
@@ -181,7 +181,7 @@ NPT_StdcFileInputStream::GetSize(NPT_Size& size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileInputStream::GetAvailable
+|   NPT_StdcFileInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFileInputStream::GetAvailable(NPT_Size& available)
@@ -197,7 +197,7 @@ NPT_StdcFileInputStream::GetAvailable(NPT_Size& available)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileOutputStream
+|   NPT_StdcFileOutputStream
 +---------------------------------------------------------------------*/
 class NPT_StdcFileOutputStream : public NPT_OutputStream,
                                  private NPT_StdcFileStream
@@ -211,16 +211,16 @@ public:
     NPT_Result Write(const void* buffer, 
                      NPT_Size    bytes_to_write, 
                      NPT_Size*   bytes_written);
-    NPT_Result Seek(NPT_Offset offset) {
+    NPT_Result Seek(NPT_Position offset) {
         return NPT_StdcFileStream::Seek(offset);
     }
-    NPT_Result Tell(NPT_Offset& offset) {
+    NPT_Result Tell(NPT_Position& offset) {
         return NPT_StdcFileStream::Tell(offset);
     }
 };
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFileOutputStream::Write
+|   NPT_StdcFileOutputStream::Write
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFileOutputStream::Write(const void* buffer, 
@@ -241,7 +241,7 @@ NPT_StdcFileOutputStream::Write(const void* buffer,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile
+|   NPT_StdcFile
 +---------------------------------------------------------------------*/
 class NPT_StdcFile: public NPT_FileInterface
 {
@@ -266,7 +266,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::NPT_StdcFile
+|   NPT_StdcFile::NPT_StdcFile
 +---------------------------------------------------------------------*/
 NPT_StdcFile::NPT_StdcFile(const char* name) :
     m_Name(name),
@@ -276,7 +276,7 @@ NPT_StdcFile::NPT_StdcFile(const char* name) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::~NPT_StdcFile
+|   NPT_StdcFile::~NPT_StdcFile
 +---------------------------------------------------------------------*/
 NPT_StdcFile::~NPT_StdcFile()
 {
@@ -284,7 +284,7 @@ NPT_StdcFile::~NPT_StdcFile()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::Open
+|   NPT_StdcFile::Open
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFile::Open(NPT_File::OpenMode mode)
@@ -366,7 +366,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::Close
+|   NPT_StdcFile::Close
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_StdcFile::Close()
@@ -381,7 +381,7 @@ NPT_StdcFile::Close()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::GetSize
+|   NPT_StdcFile::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_StdcFile::GetSize(NPT_Size& size)
@@ -399,7 +399,7 @@ NPT_StdcFile::GetSize(NPT_Size& size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::GetInputStream
+|   NPT_StdcFile::GetInputStream
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_StdcFile::GetInputStream(NPT_InputStreamReference& stream)
@@ -422,7 +422,7 @@ NPT_StdcFile::GetInputStream(NPT_InputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StdcFile::GetOutputStream
+|   NPT_StdcFile::GetOutputStream
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_StdcFile::GetOutputStream(NPT_OutputStreamReference& stream)
@@ -445,7 +445,7 @@ NPT_StdcFile::GetOutputStream(NPT_OutputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_File::NPT_File
+|   NPT_File::NPT_File
 +---------------------------------------------------------------------*/
 NPT_File::NPT_File(const char* name)
 {

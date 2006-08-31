@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Constants
+|   Neptune - Constants
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_CONSTANTS_H_
 
 /*----------------------------------------------------------------------
-|       constants       
+|   constants       
 +---------------------------------------------------------------------*/
 #ifndef NULL
 #define NULL 0

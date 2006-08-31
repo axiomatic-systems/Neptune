@@ -73,7 +73,7 @@
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="FALSE"
+				BufferSecurityCheck="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				DisableLanguageExtensions="FALSE"
 				RuntimeTypeInfo="TRUE"
@@ -288,9 +288,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptSystem.h">
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\Tests\Harness\NptTestHarness.h">
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptThreads.h">

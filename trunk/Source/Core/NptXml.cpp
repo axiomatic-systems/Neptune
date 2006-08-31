@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Xml Support
+|   Neptune - Xml Support
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -18,7 +18,7 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       local compilation flags
+|   local compilation flags
 +---------------------------------------------------------------------*/
 //#define NPT_XML_PARSER_DEBUG
 #ifdef NPT_XML_PARSER_DEBUG
@@ -36,44 +36,65 @@
 #endif
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 static const NPT_String 
 NPT_XmlNamespaceUri_Xml("http://www.w3.org/XML/1998/namespace");
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAttributeFinder
+|   NPT_XmlAttributeFinder
 +---------------------------------------------------------------------*/
 class NPT_XmlAttributeFinder
 {
 public:
-    NPT_XmlAttributeFinder(const char* name, const char* namespc) : 
-      m_Name(name), m_Namespace(namespc) {}
+    // if 'namespc' is NULL, we're looking for ANY namespace
+    // if 'namespc' is '\0', we're looking for NO namespace
+    // if 'namespc' is non-empty, look for that SPECIFIC namespace
+    NPT_XmlAttributeFinder(const NPT_XmlElementNode& element, 
+                           const char*               name, 
+                           const char*               namespc) : 
+      m_Element(element), m_Name(name), m_Namespace(namespc) {}
+
     bool operator()(const NPT_XmlAttribute* const & attribute) const {
-        if (m_Namespace) {
-            // TODO: check for a namespace match
-            return attribute->m_Name == m_Name;
+        if (attribute->m_Name == m_Name) {
+            if (m_Namespace) {
+                const NPT_String& prefix = attribute->GetPrefix();
+                if (m_Namespace[0] == '\0') {
+                    // match if the attribute has NO namespace
+                    return prefix.IsEmpty();
+                } else {
+                    // match if the attribute has the SPECIFIC namespace
+                    // we're looking for
+                    const NPT_String* namespc = m_Element.GetNamespaceUri(prefix);
+                    return namespc && *namespc == m_Namespace;
+                }
+            } else {
+                // ANY namespace will match
+                return true;
+            }
         } else {
-            return attribute->m_Name == m_Name && attribute->m_Prefix.IsEmpty();
+            return false;
         }
     }
 
 private:
-    const char* m_Name;
-    const char* m_Namespace;
+    const NPT_XmlElementNode& m_Element;
+    const char*               m_Name;
+    const char*               m_Namespace;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAttributeFinderWithPrefix
+|   NPT_XmlAttributeFinderWithPrefix
 +---------------------------------------------------------------------*/
 class NPT_XmlAttributeFinderWithPrefix
 {
 public:
     NPT_XmlAttributeFinderWithPrefix(const char* prefix, const char* name) : 
       m_Prefix(prefix?prefix:""), m_Name(name) {}
-      bool operator()(const NPT_XmlAttribute* const & attribute) const {
-          return attribute->m_Prefix == m_Prefix && attribute->m_Name == m_Name;
-      }
+
+    bool operator()(const NPT_XmlAttribute* const & attribute) const {
+        return attribute->m_Prefix == m_Prefix && attribute->m_Name == m_Name;
+    }
 
 private:
     const char* m_Prefix;
@@ -81,21 +102,34 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlTagFinder
+|   NPT_XmlTagFinder
 +---------------------------------------------------------------------*/
 class NPT_XmlTagFinder
 {
 public:
+    // if 'namespc' is NULL, we're looking for ANY namespace
+    // if 'namespc' is '\0', we're looking for NO namespace
+    // if 'namespc' is non-empty, look for that SPECIFIC namespace
     NPT_XmlTagFinder(const char* tag, const char* namespc) : 
       m_Tag(tag), m_Namespace(namespc) {}
+
     bool operator()(const NPT_XmlNode* const & node) const {
         const NPT_XmlElementNode* element = node->AsElementNode();
         if (element && element->m_Tag == m_Tag) {
             if (m_Namespace) {
-                // look for a specific namespace
-                return true; // TODO
+                // look for a SPECIFIC namespace or NO namespace
+                const NPT_String* namespc = element->GetNamespace();
+                if (namespc) {
+                    // the element has a namespace, match if it is equal to
+                    // what we're looking for
+                    return *namespc == m_Namespace;
+                } else {
+                    // the element does not have a namespace, match if we're
+                    // looking for NO namespace
+                    return m_Namespace[0] == '\0';
+                }
             } else {
-                // any namespace will match
+                // ANY namespace will match
                 return true;
             }
         } else {
@@ -109,7 +143,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlTextFinder
+|   NPT_XmlTextFinder
 +---------------------------------------------------------------------*/
 class NPT_XmlTextFinder
 {
@@ -120,7 +154,59 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAttribute::NPT_XmlAttribute
+|   NPT_XmlNamespaceCollapser
++---------------------------------------------------------------------*/
+class NPT_XmlNamespaceCollapser
+{
+public:
+    NPT_XmlNamespaceCollapser(NPT_XmlElementNode* element) : 
+      m_Root(element) {}
+
+    void operator()(NPT_XmlNode*& node) const {
+        NPT_XmlElementNode* element = node->AsElementNode();
+        if (element == NULL) return;
+
+        // collapse the namespace for this element
+        CollapseNamespace(element, element->GetPrefix());
+
+        // collapse the namespaces for the attributes
+        NPT_List<NPT_XmlAttribute*>::Iterator item = element->GetAttributes().GetFirstItem();
+        while (item) {
+            NPT_XmlAttribute* attribute = *item;
+            CollapseNamespace(element, attribute->GetPrefix());
+            ++item;
+        }
+
+        // recurse to the children
+        element->GetChildren().Apply(*this);
+    }
+
+private:
+    // methods
+    void CollapseNamespace(NPT_XmlElementNode* element, const NPT_String& prefix) const;
+
+    // members
+    NPT_XmlElementNode* m_Root;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_XmlNamespaceCollapser::CollapseNamespace
++---------------------------------------------------------------------*/
+void
+NPT_XmlNamespaceCollapser::CollapseNamespace(NPT_XmlElementNode* element, 
+                                             const NPT_String&   prefix) const
+{
+    if (m_Root->m_NamespaceMap == NULL ||
+        m_Root->m_NamespaceMap->GetNamespaceUri(prefix) == NULL &&
+        prefix != "xml") {
+        // the root element does not have that prefix in the map
+        const NPT_String* uri = element->GetNamespaceUri(prefix);
+        if (uri) m_Root->SetNamespaceUri(prefix, uri->GetChars());
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_XmlAttribute::NPT_XmlAttribute
 +---------------------------------------------------------------------*/
 NPT_XmlAttribute::NPT_XmlAttribute(const char* name, const char* value) :
     m_Value(value)
@@ -138,7 +224,7 @@ NPT_XmlAttribute::NPT_XmlAttribute(const char* name, const char* value) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::NPT_XmlElementNode
+|   NPT_XmlElementNode::NPT_XmlElementNode
 +---------------------------------------------------------------------*/
 NPT_XmlElementNode::NPT_XmlElementNode(const char* prefix, const char* tag) :
     NPT_XmlNode(ELEMENT),
@@ -150,7 +236,7 @@ NPT_XmlElementNode::NPT_XmlElementNode(const char* prefix, const char* tag) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::NPT_XmlElementNode
+|   NPT_XmlElementNode::NPT_XmlElementNode
 +---------------------------------------------------------------------*/
 NPT_XmlElementNode::NPT_XmlElementNode(const char* tag) :
     NPT_XmlNode(ELEMENT),
@@ -170,7 +256,7 @@ NPT_XmlElementNode::NPT_XmlElementNode(const char* tag) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::~NPT_XmlElementNode
+|   NPT_XmlElementNode::~NPT_XmlElementNode
 +---------------------------------------------------------------------*/
 NPT_XmlElementNode::~NPT_XmlElementNode()
 {
@@ -180,7 +266,7 @@ NPT_XmlElementNode::~NPT_XmlElementNode()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::SetParent
+|   NPT_XmlElementNode::SetParent
 +---------------------------------------------------------------------*/
 void
 NPT_XmlElementNode::SetParent(NPT_XmlNode* parent)
@@ -207,7 +293,7 @@ NPT_XmlElementNode::SetParent(NPT_XmlNode* parent)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::AddChild
+|   NPT_XmlElementNode::AddChild
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::AddChild(NPT_XmlNode* child)
@@ -218,18 +304,27 @@ NPT_XmlElementNode::AddChild(NPT_XmlNode* child)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetChild
+|   NPT_XmlElementNode::GetChild
 +---------------------------------------------------------------------*/
 NPT_XmlElementNode*
 NPT_XmlElementNode::GetChild(const char* tag, const char* namespc, NPT_Ordinal n) const
 {
+    // remap the requested namespace to match the semantics of the finder
+    // and allow for "" to also mean NO namespace
+    if (namespc == NULL || namespc[0] == '\0') {
+        namespc = ""; // for the finder, empty string means NO namespace
+    } else if (namespc[0] == '*' && namespc[1] == '\0') {
+        namespc = NULL; // for the finder, NULL means ANY namespace
+    }
+
+    // find the child
     NPT_List<NPT_XmlNode*>::Iterator item;
     item = m_Children.Find(NPT_XmlTagFinder(tag, namespc), n);
     return item?(*item)->AsElementNode():NULL;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::AddAttribute
+|   NPT_XmlElementNode::AddAttribute
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::AddAttribute(const char* name, 
@@ -240,7 +335,7 @@ NPT_XmlElementNode::AddAttribute(const char* name,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::SetAttribute
+|   NPT_XmlElementNode::SetAttribute
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::SetAttribute(const char* prefix,
@@ -262,7 +357,7 @@ NPT_XmlElementNode::SetAttribute(const char* prefix,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::SetAttribute
+|   NPT_XmlElementNode::SetAttribute
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::SetAttribute(const char* name, const char* value)
@@ -271,13 +366,22 @@ NPT_XmlElementNode::SetAttribute(const char* name, const char* value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetAttribute
+|   NPT_XmlElementNode::GetAttribute
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlElementNode::GetAttribute(const char* name, const char* namespc) const
 {
+    // remap the requested namespace to match the semantics of the finder
+    // and allow for "" to also mean NO namespace
+    if (namespc == NULL || namespc[0] == '\0') {
+        namespc = ""; // for the finder, empty string means NO namespace
+    } else if (namespc[0] == '*' && namespc[1] == '\0') {
+        namespc = NULL; // for the finder, NULL means ANY namespace
+    }
+
+    // find the attribute
     NPT_List<NPT_XmlAttribute*>::Iterator attribute;
-    attribute = m_Attributes.Find(NPT_XmlAttributeFinder(name, namespc));
+    attribute = m_Attributes.Find(NPT_XmlAttributeFinder(*this, name, namespc));
     if (attribute) { 
         return &(*attribute)->GetValue();
     } else {
@@ -286,7 +390,7 @@ NPT_XmlElementNode::GetAttribute(const char* name, const char* namespc) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::AddText
+|   NPT_XmlElementNode::AddText
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::AddText(const char* text)
@@ -295,7 +399,7 @@ NPT_XmlElementNode::AddText(const char* text)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetText
+|   NPT_XmlElementNode::GetText
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlElementNode::GetText(NPT_Ordinal n) const
@@ -306,7 +410,20 @@ NPT_XmlElementNode::GetText(NPT_Ordinal n) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::RelinkNamespaceMaps
+|   NPT_XmlElementNode::MakeStandalone
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_XmlElementNode::MakeStandalone()
+{
+    NPT_XmlNamespaceCollapser collapser(this);
+    NPT_XmlNode* node_pointer = this;
+    collapser(node_pointer);
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_XmlElementNode::RelinkNamespaceMaps
 +---------------------------------------------------------------------*/
 void
 NPT_XmlElementNode::RelinkNamespaceMaps()
@@ -331,7 +448,7 @@ NPT_XmlElementNode::RelinkNamespaceMaps()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::SetNamespaceParent
+|   NPT_XmlElementNode::SetNamespaceParent
 +---------------------------------------------------------------------*/
 void
 NPT_XmlElementNode::SetNamespaceParent(NPT_XmlElementNode* parent)
@@ -341,7 +458,7 @@ NPT_XmlElementNode::SetNamespaceParent(NPT_XmlElementNode* parent)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::SetNamespaceUri
+|   NPT_XmlElementNode::SetNamespaceUri
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlElementNode::SetNamespaceUri(const char* prefix, const char* uri)
@@ -356,7 +473,7 @@ NPT_XmlElementNode::SetNamespaceUri(const char* prefix, const char* uri)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetNamespaceUri
+|   NPT_XmlElementNode::GetNamespaceUri
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlElementNode::GetNamespaceUri(const char* prefix) const
@@ -364,7 +481,13 @@ NPT_XmlElementNode::GetNamespaceUri(const char* prefix) const
     if (m_NamespaceMap) {
         // look in our namespace map first
         const NPT_String* namespc = m_NamespaceMap->GetNamespaceUri(prefix);
-        if (namespc) return namespc;
+        if (namespc) {
+            if (namespc->IsEmpty()) {
+                return NULL;
+            } else {
+                return namespc;
+            }
+        }
     } 
 
     // look into our parent's namespace map
@@ -385,7 +508,7 @@ NPT_XmlElementNode::GetNamespaceUri(const char* prefix) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetNamespace
+|   NPT_XmlElementNode::GetNamespace
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlElementNode::GetNamespace() const
@@ -394,7 +517,7 @@ NPT_XmlElementNode::GetNamespace() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlElementNode::GetNamespacePrefix
+|   NPT_XmlElementNode::GetNamespacePrefix
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlElementNode::GetNamespacePrefix(const char* uri) const
@@ -414,7 +537,7 @@ NPT_XmlElementNode::GetNamespacePrefix(const char* uri) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlTextNode::NPT_XmlTextNode
+|   NPT_XmlTextNode::NPT_XmlTextNode
 +---------------------------------------------------------------------*/
 NPT_XmlTextNode::NPT_XmlTextNode(TokenType token_type, const char* text) :
     NPT_XmlNode(TEXT),
@@ -424,7 +547,7 @@ NPT_XmlTextNode::NPT_XmlTextNode(TokenType token_type, const char* text) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator
+|   NPT_XmlAccumulator
 +---------------------------------------------------------------------*/
 class NPT_XmlAccumulator {
 public:
@@ -449,7 +572,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::NPT_XmlAccumulator
+|   NPT_XmlAccumulator::NPT_XmlAccumulator
 +---------------------------------------------------------------------*/
 NPT_XmlAccumulator::NPT_XmlAccumulator() :
     m_Buffer(NULL),
@@ -459,7 +582,7 @@ NPT_XmlAccumulator::NPT_XmlAccumulator() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::~NPT_XmlAccumulator
+|   NPT_XmlAccumulator::~NPT_XmlAccumulator
 +---------------------------------------------------------------------*/
 NPT_XmlAccumulator::~NPT_XmlAccumulator()
 {
@@ -467,7 +590,7 @@ NPT_XmlAccumulator::~NPT_XmlAccumulator()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::Allocate
+|   NPT_XmlAccumulator::Allocate
 +---------------------------------------------------------------------*/
 void
 NPT_XmlAccumulator::Allocate(NPT_Size size)
@@ -488,7 +611,7 @@ NPT_XmlAccumulator::Allocate(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::Append
+|   NPT_XmlAccumulator::Append
 +---------------------------------------------------------------------*/
 inline void
 NPT_XmlAccumulator::Append(char c)
@@ -499,7 +622,7 @@ NPT_XmlAccumulator::Append(char c)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::Append
+|   NPT_XmlAccumulator::Append
 +---------------------------------------------------------------------*/
 void
 NPT_XmlAccumulator::Append(const char* s)
@@ -509,7 +632,7 @@ NPT_XmlAccumulator::Append(const char* s)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::AppendUTF8
+|   NPT_XmlAccumulator::AppendUTF8
 +---------------------------------------------------------------------*/
 inline void
 NPT_XmlAccumulator::AppendUTF8(unsigned int c)
@@ -539,7 +662,7 @@ NPT_XmlAccumulator::AppendUTF8(unsigned int c)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAccumulator::GetString
+|   NPT_XmlAccumulator::GetString
 +---------------------------------------------------------------------*/
 inline const char*
 NPT_XmlAccumulator::GetString()
@@ -551,7 +674,7 @@ NPT_XmlAccumulator::GetString()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap
+|   NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap
 +---------------------------------------------------------------------*/
 NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap()
 {
@@ -559,7 +682,7 @@ NPT_XmlNamespaceMap::~NPT_XmlNamespaceMap()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNamespaceMap::SetNamespaceUri
+|   NPT_XmlNamespaceMap::SetNamespaceUri
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlNamespaceMap::SetNamespaceUri(const char* prefix, const char* uri)
@@ -579,7 +702,7 @@ NPT_XmlNamespaceMap::SetNamespaceUri(const char* prefix, const char* uri)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNamespaceMap::GetNamespaceUri
+|   NPT_XmlNamespaceMap::GetNamespaceUri
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlNamespaceMap::GetNamespaceUri(const char* prefix)
@@ -598,7 +721,7 @@ NPT_XmlNamespaceMap::GetNamespaceUri(const char* prefix)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNamespaceMap::GetNamespacePrefix
+|   NPT_XmlNamespaceMap::GetNamespacePrefix
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlNamespaceMap::GetNamespacePrefix(const char* uri)
@@ -617,7 +740,7 @@ NPT_XmlNamespaceMap::GetNamespacePrefix(const char* uri)
 }
 
 /*----------------------------------------------------------------------
-|       character map
+|   character map
 |
 | flags:
 | 1  --> any char
@@ -890,7 +1013,7 @@ static const unsigned char NPT_XmlCharMap[256] = {
 #endif // defined(NPT_XML_USE_CHAR_MAP)
 
 /*----------------------------------------------------------------------
-|       macros
+|   macros
 +---------------------------------------------------------------------*/
 #if defined (NPT_XML_USE_CHAR_MAP)
 #define NPT_XML_CHAR_IS_ANY_CHAR(c)        (NPT_XmlCharMap[c] & 1)
@@ -927,7 +1050,7 @@ static const unsigned char NPT_XmlCharMap[256] = {
 #endif // defined(NPT_XML_USE_CHAR_MAP)
 
 /*----------------------------------------------------------------------
-|       NPT_XmlStringIsWhitespace
+|   NPT_XmlStringIsWhitespace
 +---------------------------------------------------------------------*/
 static bool
 NPT_XmlStringIsWhitespace(const char* s, NPT_Size size)
@@ -942,7 +1065,7 @@ NPT_XmlStringIsWhitespace(const char* s, NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlProcessor class
+|   NPT_XmlProcessor class
 +---------------------------------------------------------------------*/
 class NPT_XmlProcessor {
 public:
@@ -1065,7 +1188,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlProcessor::NPT_XmlProcessor
+|   NPT_XmlProcessor::NPT_XmlProcessor
 +---------------------------------------------------------------------*/
 NPT_XmlProcessor::NPT_XmlProcessor(NPT_XmlParser* parser) :
     m_Parser(parser),
@@ -1076,7 +1199,7 @@ NPT_XmlProcessor::NPT_XmlProcessor(NPT_XmlParser* parser) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlProcessor::ResolveEntity
+|   NPT_XmlProcessor::ResolveEntity
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlProcessor::ResolveEntity(NPT_XmlAccumulator& source,
@@ -1116,7 +1239,7 @@ NPT_XmlProcessor::ResolveEntity(NPT_XmlAccumulator& source,
             if (digit == -1) {
                 // invalid char, leave the entity unparsed
                 destination.Append(source.GetString());
-                return NPT_FAILURE;
+                return NPT_ERROR_INVALID_SYNTAX;
             }
             parsed = base*parsed+digit;
         }
@@ -1130,7 +1253,7 @@ NPT_XmlProcessor::ResolveEntity(NPT_XmlAccumulator& source,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlProcessor::FlushPendingText
+|   NPT_XmlProcessor::FlushPendingText
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlProcessor::FlushPendingText()
@@ -1144,7 +1267,7 @@ NPT_XmlProcessor::FlushPendingText()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlProcessor::ProcessBuffer
+|   NPT_XmlProcessor::ProcessBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
@@ -1497,7 +1620,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 }       
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::NPT_XmlParser
+|   NPT_XmlParser::NPT_XmlParser
 +---------------------------------------------------------------------*/
 NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
     m_Tree(NULL),
@@ -1508,7 +1631,7 @@ NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::~NPT_XmlParser
+|   NPT_XmlParser::~NPT_XmlParser
 +---------------------------------------------------------------------*/
 NPT_XmlParser::~NPT_XmlParser()
 {
@@ -1516,7 +1639,7 @@ NPT_XmlParser::~NPT_XmlParser()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::Parse
+|   NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlParser::Parse(NPT_InputStream& stream, 
@@ -1570,7 +1693,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::Parse
+|   NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlParser::Parse(NPT_InputStream& stream, 
@@ -1582,7 +1705,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::Parse
+|   NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlParser::Parse(const char*   xml, 
@@ -1595,7 +1718,7 @@ NPT_XmlParser::Parse(const char*   xml,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::Parse
+|   NPT_XmlParser::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlParser::Parse(const char*   xml, 
@@ -1623,7 +1746,7 @@ NPT_XmlParser::Parse(const char*   xml,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::OnStartElement
+|   NPT_XmlParser::OnStartElement
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlParser::OnStartElement(const char* name)
@@ -1644,7 +1767,7 @@ NPT_XmlParser::OnStartElement(const char* name)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::OnElementAttribute
+|   NPT_XmlParser::OnElementAttribute
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlParser::OnElementAttribute(const char* name, const char* value)
@@ -1673,7 +1796,7 @@ NPT_XmlParser::OnElementAttribute(const char* name, const char* value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::OnEndElement
+|   NPT_XmlParser::OnEndElement
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlParser::OnEndElement(const char* name)
@@ -1720,7 +1843,7 @@ NPT_XmlParser::OnEndElement(const char* name)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlParser::OnCharacterData
+|   NPT_XmlParser::OnCharacterData
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
@@ -1748,7 +1871,7 @@ NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlAttributeWriter
+|   NPT_XmlAttributeWriter
 +---------------------------------------------------------------------*/
 class NPT_XmlAttributeWriter
 {
@@ -1766,18 +1889,19 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeWriter
+|   NPT_XmlNodeWriter
 +---------------------------------------------------------------------*/
 class NPT_XmlNodeWriter
 {
 public:
-    NPT_XmlNodeWriter(NPT_XmlSerializer& serializer) : m_Serializer(serializer) {}
+    NPT_XmlNodeWriter(NPT_XmlSerializer& serializer) : 
+      m_Serializer(serializer), m_AttributeWriter(serializer) {}
     void operator()(NPT_XmlNode*& node) const {
         if (NPT_XmlElementNode* element = node->AsElementNode()) {
             const NPT_String& prefix = element->GetPrefix();
             const NPT_String& tag    = element->GetTag();
             m_Serializer.StartElement(prefix, tag);
-            element->GetAttributes().Apply(NPT_XmlAttributeWriter(m_Serializer));
+            element->GetAttributes().Apply(m_AttributeWriter);
 
             // emit namespace attributes
             if (element->m_NamespaceMap) {
@@ -1795,7 +1919,7 @@ public:
                 }
             }
 
-            element->GetChildren().Apply(NPT_XmlNodeWriter(m_Serializer));
+            element->GetChildren().Apply(*this);
             m_Serializer.EndElement(prefix, tag);
         } else if (NPT_XmlTextNode* text = node->AsTextNode()) {
             m_Serializer.Text(text->GetString());
@@ -1805,10 +1929,11 @@ public:
 private:
     // members
     NPT_XmlSerializer& m_Serializer;
+    NPT_XmlAttributeWriter m_AttributeWriter;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter
+|   NPT_XmlNodeCanonicalWriter
 +---------------------------------------------------------------------*/
 class NPT_XmlNodeCanonicalWriter
 {
@@ -1869,7 +1994,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add
+|   NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add
 +---------------------------------------------------------------------*/
 void
 NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add(
@@ -1903,7 +2028,7 @@ NPT_XmlNodeCanonicalWriter::SortedAttributeList::Add(
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit
+|   NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit
 +---------------------------------------------------------------------*/
 void
 NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit(NPT_XmlSerializer& serializer)
@@ -1916,7 +2041,7 @@ NPT_XmlNodeCanonicalWriter::SortedAttributeList::Emit(NPT_XmlSerializer& seriali
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add
+|   NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add
 +---------------------------------------------------------------------*/
 void
 NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add(const NPT_String* prefix,
@@ -1940,7 +2065,7 @@ NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Add(const NPT_String* prefix,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit
+|   NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit
 +---------------------------------------------------------------------*/
 void
 NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit(NPT_XmlSerializer& serializer)
@@ -1957,7 +2082,7 @@ NPT_XmlNodeCanonicalWriter::SortedNamespaceList::Emit(NPT_XmlSerializer& seriali
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix
+|   NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix
 +---------------------------------------------------------------------*/
 const NPT_String*
 NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix(const NPT_String& prefix) const
@@ -1975,7 +2100,7 @@ NPT_XmlNodeCanonicalWriter::GetNamespaceRenderedForPrefix(const NPT_String& pref
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlNodeCanonicalWriter::operator()
+|   NPT_XmlNodeCanonicalWriter::operator()
 +---------------------------------------------------------------------*/
 void
 NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
@@ -2014,9 +2139,9 @@ NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
             }
         }
 
-		// process attributes
-		SortedAttributeList prefixed_attributes;
-		SortedAttributeList naked_attributes;
+        // process attributes
+        SortedAttributeList prefixed_attributes;
+        SortedAttributeList naked_attributes;
         for (NPT_List<NPT_XmlAttribute*>::Iterator attribute = element->GetAttributes().GetFirstItem();
              attribute;
              ++attribute) {
@@ -2076,7 +2201,7 @@ NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::NPT_XmlSerializer
+|   NPT_XmlSerializer::NPT_XmlSerializer
 +---------------------------------------------------------------------*/
 NPT_XmlSerializer::NPT_XmlSerializer(NPT_OutputStream* output,
                                      NPT_Cardinal      indentation,
@@ -2091,14 +2216,14 @@ NPT_XmlSerializer::NPT_XmlSerializer(NPT_OutputStream* output,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::~NPT_XmlSerializer
+|   NPT_XmlSerializer::~NPT_XmlSerializer
 +---------------------------------------------------------------------*/
 NPT_XmlSerializer::~NPT_XmlSerializer()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::StartDocument
+|   NPT_XmlSerializer::StartDocument
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlSerializer::StartDocument()
@@ -2107,7 +2232,7 @@ NPT_XmlSerializer::StartDocument()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::EndDocument
+|   NPT_XmlSerializer::EndDocument
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_XmlSerializer::EndDocument()
@@ -2116,7 +2241,7 @@ NPT_XmlSerializer::EndDocument()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::EscapeChar
+|   NPT_XmlSerializer::EscapeChar
 +---------------------------------------------------------------------*/
 void  
 NPT_XmlSerializer::EscapeChar(unsigned char c, char* text)
@@ -2135,7 +2260,7 @@ NPT_XmlSerializer::EscapeChar(unsigned char c, char* text)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::ProcessPending
+|   NPT_XmlSerializer::ProcessPending
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::ProcessPending()
@@ -2146,7 +2271,7 @@ NPT_XmlSerializer::ProcessPending()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::OutputEscapedString
+|   NPT_XmlSerializer::OutputEscapedString
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::OutputEscapedString(const char* text, bool attribute)
@@ -2193,7 +2318,7 @@ NPT_XmlSerializer::OutputEscapedString(const char* text, bool attribute)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::OutputIndentation
+|   NPT_XmlSerializer::OutputIndentation
 +---------------------------------------------------------------------*/
 void
 NPT_XmlSerializer::OutputIndentation(bool start)
@@ -2214,7 +2339,7 @@ NPT_XmlSerializer::OutputIndentation(bool start)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::StartElement
+|   NPT_XmlSerializer::StartElement
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::StartElement(const char* prefix, const char* name)
@@ -2233,7 +2358,7 @@ NPT_XmlSerializer::StartElement(const char* prefix, const char* name)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::EndElement
+|   NPT_XmlSerializer::EndElement
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::EndElement(const char* prefix, const char* name)
@@ -2262,7 +2387,7 @@ NPT_XmlSerializer::EndElement(const char* prefix, const char* name)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::Attribute
+|   NPT_XmlSerializer::Attribute
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::Attribute(const char* prefix, const char* name, const char* value)
@@ -2279,7 +2404,7 @@ NPT_XmlSerializer::Attribute(const char* prefix, const char* name, const char* v
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::Text
+|   NPT_XmlSerializer::Text
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::Text(const char* text)
@@ -2290,7 +2415,7 @@ NPT_XmlSerializer::Text(const char* text)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::CdataSection
+|   NPT_XmlSerializer::CdataSection
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::CdataSection(const char* data)
@@ -2303,7 +2428,7 @@ NPT_XmlSerializer::CdataSection(const char* data)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlSerializer::Comment
+|   NPT_XmlSerializer::Comment
 +---------------------------------------------------------------------*/
 NPT_Result  
 NPT_XmlSerializer::Comment(const char* comment)
@@ -2315,7 +2440,7 @@ NPT_XmlSerializer::Comment(const char* comment)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlWriter::Serialize
+|   NPT_XmlWriter::Serialize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
@@ -2329,12 +2454,12 @@ NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_XmlCanonicalizer::Serialize
+|   NPT_XmlCanonicalizer::Serialize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlCanonicalizer::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
 {
-    // create a serialzer with no indentiation and no shrinking of empty elements
+    // create a serializer with no indentation and no shrinking of empty elements
     NPT_XmlSerializer serializer(&output, 0, false);
 
     // serialize the node

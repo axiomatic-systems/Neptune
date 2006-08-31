@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Network
+|   Neptune - Network
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_NETWORK_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptConstants.h"
@@ -19,12 +19,12 @@
 #include "NptList.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const unsigned int NPT_NETWORK_MAX_MAC_ADDRESS_LENGTH  = 8;
 
 /*----------------------------------------------------------------------
-|       flags
+|   flags
 +---------------------------------------------------------------------*/
 #define NPT_NETWORK_INTERFACE_FLAG_LOOPBACK       0x01
 #define NPT_NETWORK_INTERFACE_FLAG_PROMISCUOUS    0x02
@@ -33,7 +33,7 @@ const unsigned int NPT_NETWORK_MAX_MAC_ADDRESS_LENGTH  = 8;
 #define NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT 0x10
 
 /*----------------------------------------------------------------------
-|       workarounds
+|   workarounds
 +---------------------------------------------------------------------*/
 #if defined(WIN32)
 #if defined(SetPort)
@@ -42,12 +42,12 @@ const unsigned int NPT_NETWORK_MAX_MAC_ADDRESS_LENGTH  = 8;
 #endif
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef unsigned int NPT_IpPort;
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress
+|   NPT_IpAddress
 +---------------------------------------------------------------------*/
 class NPT_IpAddress
 {
@@ -75,7 +75,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_MacAddress
+|   NPT_MacAddress
 +---------------------------------------------------------------------*/
 class NPT_MacAddress
 {
@@ -111,7 +111,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterfaceAddress
+|   NPT_NetworkInterfaceAddress
 +---------------------------------------------------------------------*/
 class NPT_NetworkInterfaceAddress
 {
@@ -149,7 +149,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterface
+|   NPT_NetworkInterface
 +---------------------------------------------------------------------*/
 class NPT_NetworkInterface
 {

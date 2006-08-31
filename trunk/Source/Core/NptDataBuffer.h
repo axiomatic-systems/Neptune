@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Datagram Packets
+|   Neptune - Datagram Packets
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,13 +11,13 @@
 #define _NPT_DATA_BUFFER_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptConstants.h"
 
 /*----------------------------------------------------------------------
-|       NPT_DataBuffer
+|   NPT_DataBuffer
 +---------------------------------------------------------------------*/
 class NPT_DataBuffer 
 {
@@ -38,7 +38,7 @@ class NPT_DataBuffer
     virtual NPT_Result SetBuffer(NPT_Byte* buffer, NPT_Size bufferSize);
     virtual NPT_Result SetBufferSize(NPT_Size bufferSize);
     virtual NPT_Size   GetBufferSize() const { return m_BufferSize; }
-    virtual NPT_Result GrowBuffer(NPT_Size size);
+    virtual NPT_Result Reserve(NPT_Size size);
 
     // data handling methods
     virtual const NPT_Byte* GetData() const { return m_Buffer; }

@@ -1,17 +1,21 @@
 /*****************************************************************
 |
-|      Neptune - Threads :: Win32 Implementation
+|   Neptune - Threads :: Win32 Implementation
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
+#if defined(_XBOX)
+#include <xtl.h>
+#else
 #include <windows.h>
 #include <process.h>
+#endif
 
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -22,9 +26,9 @@
 #include "NptWin32Threads.h"
 
 /*----------------------------------------------------------------------
-|       configuration macros
+|   configuration macros
 +---------------------------------------------------------------------*/
-#define NPT_WIN32_USE_CREATE_THREAD
+//#define NPT_WIN32_USE_CREATE_THREAD
 #if defined(NPT_WIN32_USE_CREATE_THREAD)
 #define _beginthreadex(security, stack_size, start_proc, arg, flags,pid) \
 CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,  \
@@ -33,7 +37,7 @@ CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,  \
 #endif
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Mutex::NPT_Win32Mutex
+|   NPT_Win32Mutex::NPT_Win32Mutex
 +---------------------------------------------------------------------*/
 NPT_Win32Mutex::NPT_Win32Mutex()
 {
@@ -41,7 +45,7 @@ NPT_Win32Mutex::NPT_Win32Mutex()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Mutex::~NPT_Win32Mutex
+|   NPT_Win32Mutex::~NPT_Win32Mutex
 +---------------------------------------------------------------------*/
 NPT_Win32Mutex::~NPT_Win32Mutex()
 {
@@ -49,7 +53,7 @@ NPT_Win32Mutex::~NPT_Win32Mutex()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Mutex::Lock
+|   NPT_Win32Mutex::Lock
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Mutex::Lock()
@@ -63,7 +67,7 @@ NPT_Win32Mutex::Lock()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Mutex::Unlock
+|   NPT_Win32Mutex::Unlock
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Mutex::Unlock()
@@ -73,7 +77,7 @@ NPT_Win32Mutex::Unlock()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Mutex::NPT_Mutex
+|   NPT_Mutex::NPT_Mutex
 +---------------------------------------------------------------------*/
 NPT_Mutex::NPT_Mutex()
 {
@@ -81,7 +85,7 @@ NPT_Mutex::NPT_Mutex()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32CriticalSection::NPT_Win32CriticalSection
+|   NPT_Win32CriticalSection::NPT_Win32CriticalSection
 +---------------------------------------------------------------------*/
 NPT_Win32CriticalSection::NPT_Win32CriticalSection()
 {
@@ -89,7 +93,7 @@ NPT_Win32CriticalSection::NPT_Win32CriticalSection()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32CriticalSection::~NPT_Win32CriticalSection
+|   NPT_Win32CriticalSection::~NPT_Win32CriticalSection
 +---------------------------------------------------------------------*/
 NPT_Win32CriticalSection::~NPT_Win32CriticalSection()
 {
@@ -97,7 +101,7 @@ NPT_Win32CriticalSection::~NPT_Win32CriticalSection()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32CriticalSection::Lock
+|   NPT_Win32CriticalSection::Lock
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32CriticalSection::Lock()
@@ -107,7 +111,7 @@ NPT_Win32CriticalSection::Lock()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32CriticalSection::Unlock
+|   NPT_Win32CriticalSection::Unlock
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32CriticalSection::Unlock()
@@ -117,7 +121,7 @@ NPT_Win32CriticalSection::Unlock()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event
+|   NPT_Win32Event
 +---------------------------------------------------------------------*/
 class NPT_Win32Event
 {
@@ -137,7 +141,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event::NPT_Win32Event
+|   NPT_Win32Event::NPT_Win32Event
 +---------------------------------------------------------------------*/
 NPT_Win32Event::NPT_Win32Event(bool bManual)
 {
@@ -145,7 +149,7 @@ NPT_Win32Event::NPT_Win32Event(bool bManual)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event::~NPT_Win32Event
+|   NPT_Win32Event::~NPT_Win32Event
 +---------------------------------------------------------------------*/
 NPT_Win32Event::~NPT_Win32Event()
 {
@@ -153,7 +157,7 @@ NPT_Win32Event::~NPT_Win32Event()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event::Wait
+|   NPT_Win32Event::Wait
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Event::Wait(NPT_Timeout timeout)
@@ -171,7 +175,7 @@ NPT_Win32Event::Wait(NPT_Timeout timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event::Signal
+|   NPT_Win32Event::Signal
 +---------------------------------------------------------------------*/
 void
 NPT_Win32Event::Signal()
@@ -180,7 +184,7 @@ NPT_Win32Event::Signal()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Event::Reset
+|   NPT_Win32Event::Reset
 +---------------------------------------------------------------------*/
 void
 NPT_Win32Event::Reset()
@@ -189,7 +193,7 @@ NPT_Win32Event::Reset()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable
+|   NPT_Win32SharedVariable
 +---------------------------------------------------------------------*/
 class NPT_Win32SharedVariable : public NPT_SharedVariableInterface
 {
@@ -210,7 +214,7 @@ class NPT_Win32SharedVariable : public NPT_SharedVariableInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::NPT_Win32SharedVariable
+|   NPT_Win32SharedVariable::NPT_Win32SharedVariable
 +---------------------------------------------------------------------*/
 NPT_Win32SharedVariable::NPT_Win32SharedVariable(NPT_Integer value) : 
     m_Value(value)
@@ -218,28 +222,31 @@ NPT_Win32SharedVariable::NPT_Win32SharedVariable(NPT_Integer value) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::~NPT_Win32SharedVariable
+|   NPT_Win32SharedVariable::~NPT_Win32SharedVariable
 +---------------------------------------------------------------------*/
 NPT_Win32SharedVariable::~NPT_Win32SharedVariable()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::SetValue
+|   NPT_Win32SharedVariable::SetValue
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32SharedVariable::SetValue(NPT_Integer value)
 {
     m_Lock.Lock();
-    m_Value = value;
-    m_Event.Signal();
+    if (value != m_Value) {
+        //NPT_Debug("NPT_Win32SharedVariable::SetValue - value changed to %d\n", value);
+        m_Value = value;
+        m_Event.Signal();
+    }
     m_Lock.Unlock();
     
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::GetValue
+|   NPT_Win32SharedVariable::GetValue
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32SharedVariable::GetValue(NPT_Integer& value)
@@ -251,21 +258,25 @@ NPT_Win32SharedVariable::GetValue(NPT_Integer& value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::WaitUntilEquals
+|   NPT_Win32SharedVariable::WaitUntilEquals
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32SharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout)
 {
+    //NPT_Debug("NPT_Win32SharedVariable::WaitUntilEquals - want %d\n", value);
     do {
         m_Lock.Lock();
         if (m_Value == value) {
+            //NPT_Debug("NPT_Win32SharedVariable::WaitUntilEquals - got it (%d)\n", value);
             break;
         }
-        m_Event.Reset();
         m_Lock.Unlock();
-        if (NPT_FAILED(m_Event.Wait(timeout))) {
-            return NPT_FAILURE;
+        //NPT_Debug("NPT_Win32SharedVariable::WaitUntilEquals - prewait\n");
+        {
+             NPT_Result result = m_Event.Wait(timeout);
+             if (NPT_FAILED(result)) return result;
         }
+        //NPT_Debug("NPT_Win32SharedVariable::WaitUntilEquals - postwait\n");
     } while (1);
 
     m_Lock.Unlock();
@@ -274,21 +285,25 @@ NPT_Win32SharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32SharedVariable::WaitWhileEquals
+|   NPT_Win32SharedVariable::WaitWhileEquals
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32SharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout)
 {
+    //NPT_Debug("NPT_Win32SharedVariable::WaitWhileEquals - want != %d\n", value);
     do {
         m_Lock.Lock();
         if (m_Value != value) {
+            //NPT_Debug("NPT_Win32SharedVariable::WaitWhileEquals - got it (%d != %d)\n", value, m_Value);
             break;
         }
-        m_Event.Reset();
         m_Lock.Unlock();
-        if (NPT_FAILED(m_Event.Wait(timeout))) {
-            return NPT_FAILURE;
+        //NPT_Debug("NPT_Win32SharedVariable::WaitWhileEquals - prewait\n");
+        {
+             NPT_Result result = m_Event.Wait(timeout);
+             if (NPT_FAILED(result)) return result;
         }
+        //NPT_Debug("NPT_Win32SharedVariable::WaitWhileEquals - postwait\n");
     } while (1);
 
     m_Lock.Unlock();
@@ -297,7 +312,7 @@ NPT_Win32SharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_SharedVariable::NPT_SharedVariable
+|   NPT_SharedVariable::NPT_SharedVariable
 +---------------------------------------------------------------------*/
 NPT_SharedVariable::NPT_SharedVariable(NPT_Integer value)
 {
@@ -305,7 +320,7 @@ NPT_SharedVariable::NPT_SharedVariable(NPT_Integer value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable
+|   NPT_Win32AtomicVariable
 +---------------------------------------------------------------------*/
 class NPT_Win32AtomicVariable : public NPT_AtomicVariableInterface
 {
@@ -324,7 +339,7 @@ class NPT_Win32AtomicVariable : public NPT_AtomicVariableInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::NPT_Win32AtomicVariable
+|   NPT_Win32AtomicVariable::NPT_Win32AtomicVariable
 +---------------------------------------------------------------------*/
 NPT_Win32AtomicVariable::NPT_Win32AtomicVariable(NPT_Integer value) : 
     m_Value(value)
@@ -332,14 +347,14 @@ NPT_Win32AtomicVariable::NPT_Win32AtomicVariable(NPT_Integer value) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::~NPT_Win32AtomicVariable
+|   NPT_Win32AtomicVariable::~NPT_Win32AtomicVariable
 +---------------------------------------------------------------------*/
 NPT_Win32AtomicVariable::~NPT_Win32AtomicVariable()
 {
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::Increment
+|   NPT_Win32AtomicVariable::Increment
 +---------------------------------------------------------------------*/
 NPT_Integer
 NPT_Win32AtomicVariable::Increment()
@@ -348,7 +363,7 @@ NPT_Win32AtomicVariable::Increment()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::Decrement
+|   NPT_Win32AtomicVariable::Decrement
 +---------------------------------------------------------------------*/
 NPT_Integer
 NPT_Win32AtomicVariable::Decrement()
@@ -357,7 +372,7 @@ NPT_Win32AtomicVariable::Decrement()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::SetValue
+|   NPT_Win32AtomicVariable::SetValue
 +---------------------------------------------------------------------*/
 void
 NPT_Win32AtomicVariable::SetValue(NPT_Integer value)
@@ -366,7 +381,7 @@ NPT_Win32AtomicVariable::SetValue(NPT_Integer value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32AtomicVariable::GetValue
+|   NPT_Win32AtomicVariable::GetValue
 +---------------------------------------------------------------------*/
 NPT_Integer
 NPT_Win32AtomicVariable::GetValue()
@@ -375,7 +390,7 @@ NPT_Win32AtomicVariable::GetValue()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_AtomicVariable::NPT_AtomicVariable
+|   NPT_AtomicVariable::NPT_AtomicVariable
 +---------------------------------------------------------------------*/
 NPT_AtomicVariable::NPT_AtomicVariable(NPT_Integer value)
 {
@@ -383,7 +398,7 @@ NPT_AtomicVariable::NPT_AtomicVariable(NPT_Integer value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread
+|   NPT_Win32Thread
 +---------------------------------------------------------------------*/
 class NPT_Win32Thread : public NPT_ThreadInterface
 {
@@ -395,7 +410,6 @@ class NPT_Win32Thread : public NPT_ThreadInterface
                ~NPT_Win32Thread();
     NPT_Result  Start(); 
     NPT_Result  Wait();
-    NPT_Result  Terminate();
 
  private:
     // methods
@@ -403,6 +417,9 @@ class NPT_Win32Thread : public NPT_ThreadInterface
 
     // NPT_Runnable methods
     void Run();
+
+    // NPT_Interruptible methods
+    NPT_Result Interrupt() { return NPT_ERROR_NOT_IMPLEMENTED; } 
 
     // members
     NPT_Thread*   m_Delegator;
@@ -413,7 +430,7 @@ class NPT_Win32Thread : public NPT_ThreadInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::NPT_Win32Thread
+|   NPT_Win32Thread::NPT_Win32Thread
 +---------------------------------------------------------------------*/
 NPT_Win32Thread::NPT_Win32Thread(NPT_Thread*   delegator,
                                  NPT_Runnable& target,
@@ -427,7 +444,7 @@ NPT_Win32Thread::NPT_Win32Thread(NPT_Thread*   delegator,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::~NPT_Win32Thread
+|   NPT_Win32Thread::~NPT_Win32Thread
 +---------------------------------------------------------------------*/
 NPT_Win32Thread::~NPT_Win32Thread()
 {
@@ -442,24 +459,7 @@ NPT_Win32Thread::~NPT_Win32Thread()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::Terminate
-+---------------------------------------------------------------------*/
-NPT_Result
-NPT_Win32Thread::Terminate()
-{
-    // end the thread
-    _endthreadex(0);
-
-    // if we're detached, we need to delete ourselves
-    if (m_Detached) {
-        delete m_Delegator;
-    }
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
-|       NPT_Win32Thread::EntryPoint
+|   NPT_Win32Thread::EntryPoint
 +---------------------------------------------------------------------*/
 unsigned int __stdcall
 NPT_Win32Thread::EntryPoint(void* argument)
@@ -473,15 +473,20 @@ NPT_Win32Thread::EntryPoint(void* argument)
     
     NPT_Debug(":: NPT_Win32Thread::EntryPoint - out ======================\n");
 
-    // we're done with the thread object
-    thread->Terminate();
+    // if the thread is detached, delete it
+    if (thread->m_Detached) {
+        delete thread->m_Delegator;
+    }
+
+    // end the thread
+    _endthreadex(0);
 
     // done
     return 0;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::Start
+|   NPT_Win32Thread::Start
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Thread::Start()
@@ -495,23 +500,26 @@ NPT_Win32Thread::Start()
     NPT_Debug(":: NPT_Win32Thread::Start - creating thread\n");
 
     // create the native thread
+    unsigned int thread_id;
     m_ThreadHandle = (HANDLE)
         _beginthreadex(NULL, 
                        0, 
                        EntryPoint, 
                        reinterpret_cast<void*>(this), 
                        0, 
-                       &m_ThreadId);
+                       &thread_id);
     if (m_ThreadHandle == 0) {
         // failed
+        m_ThreadId = 0;
         return NPT_FAILURE;
     }
+    m_ThreadId = thread_id;
 
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::Run
+|   NPT_Win32Thread::Run
 +---------------------------------------------------------------------*/
 void
 NPT_Win32Thread::Run()
@@ -520,7 +528,7 @@ NPT_Win32Thread::Run()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Thread::Wait
+|   NPT_Win32Thread::Wait
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Thread::Wait()
@@ -531,7 +539,7 @@ NPT_Win32Thread::Wait()
     }
 
     // wait for the thread to finish
-    NPT_Debug(":: NPT_Win32Thread::Wait - joining thread id %d\n", m_ThreadId);
+    //NPT_Debug(":: NPT_Win32Thread::Wait - joining thread id %d\n", m_ThreadId);
     DWORD result = WaitForSingleObject(m_ThreadHandle, INFINITE);
     if (result != WAIT_OBJECT_0) {
         return NPT_FAILURE;
@@ -541,7 +549,16 @@ NPT_Win32Thread::Wait()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Thread::NPT_Thread
+|   NPT_Thread::GetCurrentThreadId
++---------------------------------------------------------------------*/
+NPT_Thread::ThreadId 
+NPT_Thread::GetCurrentThreadId()
+{
+    return ::GetCurrentThreadId();
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Thread::NPT_Thread
 +---------------------------------------------------------------------*/
 NPT_Thread::NPT_Thread(bool detached)
 {
@@ -549,7 +566,7 @@ NPT_Thread::NPT_Thread(bool detached)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Thread::NPT_Thread
+|   NPT_Thread::NPT_Thread
 +---------------------------------------------------------------------*/
 NPT_Thread::NPT_Thread(NPT_Runnable& target, bool detached)
 {

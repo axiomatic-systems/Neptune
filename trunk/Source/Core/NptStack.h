@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Stack
+|   Neptune - Stack
 |
-|      (c) 2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,14 +11,14 @@
 #define _NPT_STACK_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptResults.h"
 #include "NptTypes.h"
 #include "NptList.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Stack
+|   NPT_Stack
 +---------------------------------------------------------------------*/
 template <typename T> 
 class NPT_Stack : public NPT_List<T>

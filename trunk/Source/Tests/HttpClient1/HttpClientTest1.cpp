@@ -104,6 +104,30 @@ TestHttpGet(const char* arg)
     delete response;
 }
 
+#define TEST_PROXY
+#if defined(TEST_PROXY)
+/*----------------------------------------------------------------------
+|       TestHttpGetWithProxy
++---------------------------------------------------------------------*/
+static void 
+TestHttpGetWithProxy(const char* arg)
+{
+    NPT_HttpUrl url(arg);
+    NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
+    NPT_HttpClient client;
+    NPT_HttpResponse* response;
+
+    client.SetProxy("proxy", 8080);
+    NPT_Result result = client.SendRequest(request, response);
+    NPT_Debug("SendRequest returned %d\n", result);
+    if (NPT_FAILED(result)) return;
+
+    ShowResponse(response);
+
+    delete response;
+}
+#endif
+
 #if defined(TEST_POST)
 /*----------------------------------------------------------------------
 |       TestHttpPost
@@ -178,7 +202,12 @@ main(int argc, char** argv)
     TestUrlParser("http://foo.bar/blabla");
 #endif
 
+#if defined(TEST_PROXY)
+    TestHttpGetWithProxy(argv[1]);
+#else
     TestHttpGet(argv[1]);
+#endif
+
 #if defined(TEST_POST)
     TestHttpPost(argv[1]);
 #endif

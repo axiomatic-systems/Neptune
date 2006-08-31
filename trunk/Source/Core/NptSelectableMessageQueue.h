@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Selectable Message Queue
+|   Neptune - Selectable Message Queue
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,13 +11,13 @@
 #define _NPT_SELECTABLE_MESSAGE_QUEUE_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptMessaging.h"
 #include "NptSimpleMessageQueue.h"
 
 /*----------------------------------------------------------------------
-|       NPT_SelectableMessageQueue
+|   NPT_SelectableMessageQueue
 +---------------------------------------------------------------------*/
 class NPT_SelectableMessageQueue : public NPT_SimpleMessageQueue
 {

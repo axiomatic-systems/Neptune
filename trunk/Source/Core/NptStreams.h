@@ -47,9 +47,9 @@ class NPT_InputStream
                             NPT_Size* bytes_read = NULL) = 0;
     virtual NPT_Result ReadFully(void*     buffer, 
                                  NPT_Size  bytes_to_read);
-    virtual NPT_Result Seek(NPT_Offset offset) = 0;
-    virtual NPT_Result Skip(NPT_Offset offset);
-    virtual NPT_Result Tell(NPT_Offset& offset) = 0;
+    virtual NPT_Result Seek(NPT_Position offset) = 0;
+    virtual NPT_Result Skip(NPT_Position offset);
+    virtual NPT_Result Tell(NPT_Position& offset) = 0;
     virtual NPT_Result GetSize(NPT_Size& size) = 0;
     virtual NPT_Result GetAvailable(NPT_Size& available) = 0;
 };
@@ -73,8 +73,8 @@ public:
                                   NPT_Size    bytes_to_write);
     virtual NPT_Result WriteString(const char* string_buffer);
     virtual NPT_Result WriteLine(const char* line_buffer);
-    virtual NPT_Result Seek(NPT_Offset offset) = 0;
-    virtual NPT_Result Tell(NPT_Offset& offset) = 0;
+    virtual NPT_Result Seek(NPT_Position offset) = 0;
+    virtual NPT_Result Tell(NPT_Position& offset) = 0;
     virtual NPT_Result Flush() { return NPT_SUCCESS; }
 };
 
@@ -85,7 +85,7 @@ typedef NPT_Reference<NPT_OutputStream> NPT_OutputStreamReference;
 +---------------------------------------------------------------------*/
 NPT_Result NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                                   NPT_OutputStream& to,
-                                  NPT_Offset        offset = 0,
+                                  NPT_Position      offset = 0,
                                   NPT_Size          size   = 0 /* 0 means the entire stream */);
 
 /*----------------------------------------------------------------------
@@ -101,17 +101,17 @@ class NPT_DelegatingInputStream : public NPT_InputStream
 {
 public:
     // NPT_InputStream methods
-    NPT_Result Seek(NPT_Offset offset) {
+    NPT_Result Seek(NPT_Position offset) {
         return InputSeek(offset);
     }
-    NPT_Result Tell(NPT_Offset& offset) {
+    NPT_Result Tell(NPT_Position& offset) {
         return InputTell(offset);
     }
 
 private:
     // methods
-    virtual NPT_Result InputSeek(NPT_Offset  offset) = 0;
-    virtual NPT_Result InputTell(NPT_Offset& offset) = 0;
+    virtual NPT_Result InputSeek(NPT_Position  offset) = 0;
+    virtual NPT_Result InputTell(NPT_Position& offset) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -127,17 +127,17 @@ class NPT_DelegatingOutputStream : public NPT_OutputStream
 {
 public:
     // NPT_OutputStream methods
-    NPT_Result Seek(NPT_Offset offset) {
+    NPT_Result Seek(NPT_Position offset) {
         return OutputSeek(offset);
     }
-    NPT_Result Tell(NPT_Offset& offset) {
+    NPT_Result Tell(NPT_Position& offset) {
         return OutputTell(offset);
     }
 
 private:
     // methods
-    virtual NPT_Result OutputSeek(NPT_Offset  offset) = 0;
-    virtual NPT_Result OutputTell(NPT_Offset& offset) = 0;
+    virtual NPT_Result OutputSeek(NPT_Position  offset) = 0;
+    virtual NPT_Result OutputTell(NPT_Position& offset) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -184,15 +184,15 @@ public:
 
 private:
     // NPT_DelegatingInputStream methods
-    NPT_Result InputSeek(NPT_Offset offset);
-    NPT_Result InputTell(NPT_Offset& offset) { 
+    NPT_Result InputSeek(NPT_Position offset);
+    NPT_Result InputTell(NPT_Position& offset) { 
         offset = m_ReadOffset; 
         return NPT_SUCCESS;
     }
 
     // NPT_DelegatingOutputStream methods
-    NPT_Result OutputSeek(NPT_Offset offset);
-    NPT_Result OutputTell(NPT_Offset& offset) {
+    NPT_Result OutputSeek(NPT_Position offset);
+    NPT_Result OutputTell(NPT_Position& offset) {
         offset = m_WriteOffset; 
         return NPT_SUCCESS;
     }
@@ -200,8 +200,8 @@ private:
 protected:
     // members
     NPT_DataBuffer m_Buffer;
-    NPT_Offset     m_ReadOffset;
-    NPT_Offset     m_WriteOffset;
+    NPT_Position   m_ReadOffset;
+    NPT_Position   m_WriteOffset;
 };
 
 typedef NPT_Reference<NPT_MemoryStream> NPT_MemoryStreamReference;

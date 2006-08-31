@@ -77,6 +77,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MiscTest1", "..\..\..\Tests
 		{12AFF2E5-6D95-4809-9728-9551677C078A} = {12AFF2E5-6D95-4809-9728-9551677C078A}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HttpServerTest1", "..\..\..\Tests\HttpServer1\Targets\x86-microsoft-win32-vs2005\HttpServerTest1.vcproj", "{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12AFF2E5-6D95-4809-9728-9551677C078A} = {12AFF2E5-6D95-4809-9728-9551677C078A}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -147,6 +152,10 @@ Global
 		{85255DB0-110B-460E-8AC9-406516F790BB}.Debug|Win32.Build.0 = Debug|Win32
 		{85255DB0-110B-460E-8AC9-406516F790BB}.Release|Win32.ActiveCfg = Release|Win32
 		{85255DB0-110B-460E-8AC9-406516F790BB}.Release|Win32.Build.0 = Release|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Debug|Win32.Build.0 = Debug|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Release|Win32.ActiveCfg = Release|Win32
+		{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

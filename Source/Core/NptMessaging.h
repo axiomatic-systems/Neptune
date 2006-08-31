@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Messaging System
+|   Neptune - Messaging System
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_MESSAGING_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConstants.h"
 #include "NptTypes.h"
@@ -19,12 +19,12 @@
 #include "NptList.h"
 
 /*----------------------------------------------------------------------
-|       forward references
+|   forward references
 +---------------------------------------------------------------------*/
 class NPT_Message;
 
 /*----------------------------------------------------------------------
-|       NPT_MessageHandler
+|   NPT_MessageHandler
 +---------------------------------------------------------------------*/
 class NPT_MessageHandler
 {
@@ -42,7 +42,7 @@ class NPT_MessageHandler
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Messsage
+|   NPT_Messsage
 +---------------------------------------------------------------------*/
 class NPT_Message
 {
@@ -68,7 +68,7 @@ class NPT_Message
 };
 
 /*----------------------------------------------------------------------
-|       NPT_TerminateMesssage
+|   NPT_TerminateMesssage
 +---------------------------------------------------------------------*/
 class NPT_TerminateMessage : public NPT_Message
 {
@@ -80,7 +80,7 @@ class NPT_TerminateMessage : public NPT_Message
 };
 
 /*----------------------------------------------------------------------
-|       NPT_MessageQueue
+|   NPT_MessageQueue
 +---------------------------------------------------------------------*/
 class NPT_MessageQueue
 {
@@ -93,7 +93,7 @@ class NPT_MessageQueue
 };
 
 /*----------------------------------------------------------------------
-|       NPT_MessageReceiver
+|   NPT_MessageReceiver
 +---------------------------------------------------------------------*/
 class NPT_MessageReceiver
 {
@@ -131,7 +131,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_MessageBroadcaster
+|   NPT_MessageBroadcaster
 +---------------------------------------------------------------------*/
 class NPT_MessageBroadcaster
 {

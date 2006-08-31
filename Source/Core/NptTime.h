@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Time
+|   Neptune - Time
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,12 +11,12 @@
 #define _NPT_TIME_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp
+|   NPT_TimeStamp
 +---------------------------------------------------------------------*/
 class NPT_TimeStamp
 {
@@ -32,6 +32,12 @@ class NPT_TimeStamp
     bool operator!=(const NPT_TimeStamp& time_stamp) const;
     bool operator>(const NPT_TimeStamp& time_stamp) const;
     bool operator<(const NPT_TimeStamp& time_stamp) const;
+    bool operator>=(const NPT_TimeStamp& time_stamp) const;
+    bool operator<=(const NPT_TimeStamp& time_stamp) const;
+
+    // friend operators
+    friend NPT_TimeStamp operator+(const NPT_TimeStamp& timestamp, long seconds);
+    friend NPT_TimeStamp operator-(const NPT_TimeStamp& timestamp, long seconds);
 
     // members
     long m_Seconds;
@@ -39,7 +45,7 @@ class NPT_TimeStamp
 };
 
 /*----------------------------------------------------------------------
-|       operator+
+|   operator+
 +---------------------------------------------------------------------*/
 inline 
 NPT_TimeStamp 
@@ -50,7 +56,7 @@ operator+(const NPT_TimeStamp& t1, const NPT_TimeStamp& t2)
 }
 
 /*----------------------------------------------------------------------
-|       operator-
+|   operator-
 +---------------------------------------------------------------------*/
 inline 
 NPT_TimeStamp 
@@ -61,7 +67,7 @@ operator-(const NPT_TimeStamp& t1, const NPT_TimeStamp& t2)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeInterval
+|   NPT_TimeInterval
 +---------------------------------------------------------------------*/
 typedef NPT_TimeStamp NPT_TimeInterval;
 

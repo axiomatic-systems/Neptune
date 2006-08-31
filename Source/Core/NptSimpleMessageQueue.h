@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Simple Message Queue
+|   Neptune - Simple Message Queue
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_SIMPLE_MESSAGE_QUEUE_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptThreads.h"
@@ -19,12 +19,12 @@
 #include "NptQueue.h"
 
 /*----------------------------------------------------------------------
-|       class references
+|   class references
 +---------------------------------------------------------------------*/
 struct NPT_SimpleMessageCapsule;
 
 /*----------------------------------------------------------------------
-|       NPT_SimpleMessageQueue
+|   NPT_SimpleMessageQueue
 +---------------------------------------------------------------------*/
 class NPT_SimpleMessageQueue : public NPT_MessageQueue
 {

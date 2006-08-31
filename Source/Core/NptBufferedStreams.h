@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Buffered Byte Stream
+|   Neptune - Buffered Byte Stream
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_BUFFERED_STREAMS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptStreams.h"
 #include "NptTypes.h"
@@ -20,12 +20,12 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedStream
+|   NPT_BufferedStream
 +---------------------------------------------------------------------*/
 const NPT_Size NPT_BUFFERED_BYTE_STREAM_DEFAULT_SIZE = 4096;
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedByteStream
+|   NPT_BufferedByteStream
 +---------------------------------------------------------------------*/
 class NPT_BufferedInputStream : public NPT_InputStream
 {
@@ -47,8 +47,8 @@ public:
     NPT_Result Read(void*     buffer, 
                     NPT_Size  bytes_to_read, 
                     NPT_Size* bytes_read = NULL);
-    NPT_Result Seek(NPT_Offset offset);
-    NPT_Result Tell(NPT_Offset& offset);
+    NPT_Result Seek(NPT_Position offset);
+    NPT_Result Tell(NPT_Position& offset);
     NPT_Result GetSize(NPT_Size& size);
     NPT_Result GetAvailable(NPT_Size& available);
 
@@ -58,11 +58,11 @@ private:
     bool                     m_SkipNewline;
     bool                     m_Eos;
     struct {
-        NPT_Byte*  data;
-        NPT_Offset offset;
-        NPT_Size   valid;
-        NPT_Size   size;
-    }              m_Buffer;
+        NPT_Byte*    data;
+        NPT_Position offset;
+        NPT_Size     valid;
+        NPT_Size     size;
+    } m_Buffer;
 
     // methods
     NPT_Result FillBuffer();

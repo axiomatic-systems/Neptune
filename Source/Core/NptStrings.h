@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - String Objects
+|   Neptune - String Objects
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_STRINGS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #if defined(NPT_CONFIG_HAVE_NEW_H)
@@ -22,12 +22,12 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_STRING_SEARCH_FAILED = -1;
 
 /*----------------------------------------------------------------------
-|       NPT_String
+|   NPT_String
 +---------------------------------------------------------------------*/
 class NPT_String
 {
@@ -45,16 +45,16 @@ public:
    ~NPT_String() { if (m_Chars) delete GetBuffer(); }
 
     // string info and manipulations
-    bool IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
-    NPT_Size GetLength()   const { return m_Chars ? GetBuffer()->GetLength() : 0;    }
-    NPT_Size GetCapacity() const { return m_Chars ? GetBuffer()->GetAllocated() : 0; }
+    bool       IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
+    NPT_Size   GetLength()   const { return m_Chars ? GetBuffer()->GetLength() : 0;    }
+    NPT_Size   GetCapacity() const { return m_Chars ? GetBuffer()->GetAllocated() : 0; }
     NPT_Result SetLength(NPT_Size length);
-    void Assign(const char* chars, NPT_Size size);
-    void Append(const char* chars, NPT_Size size);
-    void Append(const char* s) { Append(s, StringLength(s)); }
-    int Compare(const char* s, bool ignore_case = false) const;
+    void       Assign(const char* chars, NPT_Size size);
+    void       Append(const char* chars, NPT_Size size);
+    void       Append(const char* s) { Append(s, StringLength(s)); }
+    int        Compare(const char* s, bool ignore_case = false) const;
     static int Compare(const char* s1, const char* s2, bool ignore_case = false);
-    int CompareN(const char* s, NPT_Size count, bool ignore_case = false) const;
+    int        CompareN(const char* s, NPT_Size count, bool ignore_case = false) const;
     static int CompareN(const char* s1, const char* s2, NPT_Size count, bool ignore_case = false);
 
     // substrings
@@ -72,7 +72,7 @@ public:
     }
 
     // buffer management
-    void Reserve(NPT_Size length);
+    void       Reserve(NPT_Size length);
 
     // conversions
     NPT_String ToLowercase() const;
@@ -112,7 +112,7 @@ public:
     operator char*() const        { return m_Chars ? m_Chars: &EmptyString; }
     operator const char* () const { return m_Chars ? m_Chars: &EmptyString; }
     const char* GetChars() const  { return m_Chars ? m_Chars: &EmptyString; }
-    char* UseChars()              { return m_Chars ? m_Chars: &EmptyString; }
+    char*       UseChars()        { return m_Chars ? m_Chars: &EmptyString; }
 
     // operator overloading
     NPT_String& operator=(const char* str);
@@ -245,7 +245,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       external operators
+|   external operators
 +---------------------------------------------------------------------*/
 inline bool operator==(const NPT_String& s1, const NPT_String& s2) { 
     return s1.Compare(s2) == 0; 

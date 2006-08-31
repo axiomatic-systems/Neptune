@@ -67,7 +67,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         config.ifc_buf = (char*)buffer;
         if (ioctl(net, SIOCGIFCONF, &config) < 0) {
             if (errno != EINVAL || last_size != 0) {
-                return NPT_FAILURE;
+                return NPT_ERROR_BASE_UNIX-errno;
             }
         } else {
             if ((unsigned int)config.ifc_len == last_size) {

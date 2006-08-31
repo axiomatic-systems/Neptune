@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Queue :: Win32 Implementation
+|   Neptune - Queue :: Win32 Implementation
 |
-|      (c) 2001-2002 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2002 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <windows.h>
 
@@ -21,7 +21,7 @@
 #include "NptWin32Threads.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Queue
+|   NPT_Win32Queue
 +---------------------------------------------------------------------*/
 class NPT_Win32Queue : public NPT_GenericQueue
 {
@@ -42,7 +42,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Queue::NPT_Win32Queue
+|   NPT_Win32Queue::NPT_Win32Queue
 +---------------------------------------------------------------------*/
 NPT_Win32Queue::NPT_Win32Queue(NPT_Cardinal max_items) : 
     m_MaxItems(max_items)
@@ -52,7 +52,7 @@ NPT_Win32Queue::NPT_Win32Queue(NPT_Cardinal max_items) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Queue::~NPT_Win32Queue()
+|   NPT_Win32Queue::~NPT_Win32Queue()
 +---------------------------------------------------------------------*/
 NPT_Win32Queue::~NPT_Win32Queue()
 {
@@ -61,7 +61,7 @@ NPT_Win32Queue::~NPT_Win32Queue()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Queue::Push
+|   NPT_Win32Queue::Push
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Queue::Push(NPT_QueueItem* item)
@@ -106,7 +106,7 @@ NPT_Win32Queue::Push(NPT_QueueItem* item)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Queue::Pop
+|   NPT_Win32Queue::Pop
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Win32Queue::Pop(NPT_QueueItem*& item, bool blocking)
@@ -152,7 +152,7 @@ NPT_Win32Queue::Pop(NPT_QueueItem*& item, bool blocking)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_GenericQueue::CreateInstance
+|   NPT_GenericQueue::CreateInstance
 +---------------------------------------------------------------------*/
 NPT_GenericQueue*
 NPT_GenericQueue::CreateInstance(NPT_Cardinal max_items)

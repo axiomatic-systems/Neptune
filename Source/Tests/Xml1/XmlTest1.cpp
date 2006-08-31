@@ -10,18 +10,19 @@
 /*----------------------------------------------------------------------
 |       includes
 +---------------------------------------------------------------------*/
+#include <stdlib.h>
 #include "Neptune.h"
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
 |       CHECK
 +---------------------------------------------------------------------*/
-#define CHECK(test, message)                                            \
-do {                                                                    \
-    if (!(test)) {                                                      \
-        fprintf(stderr, "FAILED: (%s) line %d\n", (const char*)(message), __LINE__); \
-        NPT_ASSERT(0);                                                  \
-    }                                                                   \
+#define CHECK(test)                                     \
+do {                                                    \
+    if (!(test)) {                                      \
+        fprintf(stderr, "FAILED: line %d\n", __LINE__); \
+        abort();                                        \
+    }                                                   \
 } while(0)
 
 #ifdef TEST_WRITER
@@ -58,6 +59,46 @@ WriterTest1()
 #endif
 
 /*----------------------------------------------------------------------
+|       TestFinders
++---------------------------------------------------------------------*/
+static void
+TestFinders()
+{
+    const char* xml = "<a b='foo' c='bar' ns:b='bla' ns:d='123' xmlns:ns='ns-uri' xmlns:ns1='ns1-uri' xmlns:ns2='ns2-uri' xmlns:ns3='ns3-uri'><b xmlns='ns4-uri'></b><b ba='123'></b><ns2:b></ns2:b><ns1:b></ns1:b></a>";
+    NPT_XmlParser parser;
+    NPT_XmlNode* root;
+    CHECK(NPT_SUCCEEDED(parser.Parse(xml, root)));
+    
+    NPT_XmlElementNode* elem = root->AsElementNode();
+    const NPT_String* attr = elem->GetAttribute("d");
+    CHECK(attr == NULL);
+    attr = elem->GetAttribute("b");
+    CHECK(attr != NULL && *attr == "foo");
+    attr = elem->GetAttribute("b", "ns-uri");
+    CHECK(attr != NULL && *attr == "bla");
+    attr = elem->GetAttribute("c", NPT_XML_ANY_NAMESPACE);
+    CHECK(attr != NULL && *attr == "bar");
+    attr = elem->GetAttribute("b", NPT_XML_ANY_NAMESPACE);
+    CHECK(attr != NULL && *attr == "foo");
+    attr = elem->GetAttribute("b", "boubou");
+    CHECK(attr == NULL);
+    attr = elem->GetAttribute("d", NPT_XML_NO_NAMESPACE);
+    CHECK(attr == NULL);
+
+    NPT_XmlElementNode* child;
+    child = elem->GetChild("b");
+    CHECK(child != NULL && *child->GetAttribute("ba") == "123");
+    child = elem->GetChild("b", NPT_XML_ANY_NAMESPACE);
+    CHECK(child != NULL && *child->GetNamespace() == "ns4-uri");
+    child = elem->GetChild("b", "ns2-uri");
+    CHECK(child != NULL && *child->GetNamespace() == "ns2-uri");
+    child = elem->GetChild("b", "boubou");
+    CHECK(child == NULL);
+
+    delete root;
+}
+
+/*----------------------------------------------------------------------
 |       TestNamespaces
 +---------------------------------------------------------------------*/
 static void
@@ -66,37 +107,37 @@ TestNamespaces()
     NPT_XmlElementNode* top = new NPT_XmlElementNode("top");
     top->SetNamespaceUri("", "http://namespace1.com");
     CHECK(top->GetNamespaceUri("") &&
-        *(top->GetNamespaceUri("")) == "http://namespace1.com", "");
+        *(top->GetNamespaceUri("")) == "http://namespace1.com");
 
     NPT_XmlElementNode* child1 = new NPT_XmlElementNode("child1");
     top->AddChild(child1);
-    CHECK(child1->GetNamespaceUri(""), "");
-    CHECK(*(child1->GetNamespaceUri("")) == "http://namespace1.com", "");
+    CHECK(child1->GetNamespaceUri(""));
+    CHECK(*(child1->GetNamespaceUri("")) == "http://namespace1.com");
 
     NPT_XmlElementNode* child2 = new NPT_XmlElementNode("ns1", "child2");
     top->AddChild(child2);
-    CHECK(child2->GetNamespaceUri(""), "");
-    CHECK(*(child2->GetNamespaceUri("")) == "http://namespace1.com", "");
-    CHECK(child2->GetNamespaceUri("ns1") == NULL, "");
+    CHECK(child2->GetNamespaceUri(""));
+    CHECK(*(child2->GetNamespaceUri("")) == "http://namespace1.com");
+    CHECK(child2->GetNamespaceUri("ns1") == NULL);
     child2->SetNamespaceUri("ns1", "http://blabla");
-    CHECK(child2->GetNamespaceUri("ns1"), "");
-    CHECK(*child2->GetNamespaceUri("ns1") == "http://blabla", "");
-    CHECK(*child2->GetNamespace() == "http://blabla", "");
+    CHECK(child2->GetNamespaceUri("ns1"));
+    CHECK(*child2->GetNamespaceUri("ns1") == "http://blabla");
+    CHECK(*child2->GetNamespace() == "http://blabla");
 
     // testing a child with a namespace defined in parent
     NPT_XmlElementNode* child3 = new NPT_XmlElementNode("ns1", "child3");
     child2->AddChild(child3);
-    CHECK(child3->GetNamespaceUri(""), "");
-    CHECK(*(child3->GetNamespaceUri("")) == "http://namespace1.com", "");
-    CHECK(child3->GetNamespaceUri("ns1"), "");
-    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla", "");
-    CHECK(*child3->GetNamespace() == "http://blabla", "");
+    CHECK(child3->GetNamespaceUri(""));
+    CHECK(*(child3->GetNamespaceUri("")) == "http://namespace1.com");
+    CHECK(child3->GetNamespaceUri("ns1"));
+    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla");
+    CHECK(*child3->GetNamespace() == "http://blabla");
 
     // testing adding a namespace in a node which namespace is defined in parent
     child3->SetNamespaceUri("ns3", "http://foofoo");
-    CHECK(child3->GetNamespaceUri("ns1"), "");
-    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla", "");
-    CHECK(*child3->GetNamespace() == "http://blabla", "");
+    CHECK(child3->GetNamespaceUri("ns1"));
+    CHECK(*child3->GetNamespaceUri("ns1") == "http://blabla");
+    CHECK(*child3->GetNamespace() == "http://blabla");
 
     const char* xml1 = 
         "<top>"
@@ -113,8 +154,8 @@ TestNamespaces()
     NPT_XmlParser parser;
     NPT_XmlNode* root = NULL;
     NPT_Result result = parser.Parse(xml1, root);
-    CHECK(NPT_SUCCEEDED(result), "");
-    CHECK(root != NULL, "");
+    CHECK(NPT_SUCCEEDED(result));
+    CHECK(root != NULL);
 
     NPT_XmlWriter    writer;
     NPT_MemoryStream output;
@@ -124,6 +165,19 @@ TestNamespaces()
     printf(NPT_String((const char*)output.GetData(), size).GetChars());
 
     delete top;
+    delete root;
+
+    // test default and empty namespaces 
+    const char* xml2 = "<top><a></a><b xmlns='foo'><c xmlns=''></c></b></top>";
+    result = parser.Parse(xml2, root);
+    CHECK(root->AsElementNode()->GetNamespace() == NULL);
+    NPT_XmlElementNode* a_elem = (*root->AsElementNode()->GetChildren().GetItem(0))->AsElementNode();
+    CHECK(a_elem->GetNamespace() == NULL);
+    NPT_XmlElementNode* b_elem = (*root->AsElementNode()->GetChildren().GetItem(1))->AsElementNode();
+    CHECK(*b_elem->GetNamespace() == "foo");
+    NPT_XmlElementNode* c_elem = (*b_elem->GetChildren().GetItem(0))->AsElementNode();
+    CHECK(c_elem->GetNamespace() == NULL);
+
     delete root;
 }
 
@@ -147,7 +201,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top/>", check);
+    CHECK(check == "<top/>");
 
     // with one attribute
     output.SetSize(0);
@@ -155,7 +209,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top attr1=\"b&amp;w\"/>", check);
+    CHECK(check == "<top attr1=\"b&amp;w\"/>");
 
     // add one child
     output.SetSize(0);
@@ -166,7 +220,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top><child1/></top>", check);
+    CHECK(check == "<top><child1/></top>");
 
     //
     // test with namespaces
@@ -180,7 +234,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top xmlns=\"http://namespace.com\"/>", check);
+    CHECK(check == "<top xmlns=\"http://namespace.com\"/>");
 
     // test attribute prefixes
     output.SetSize(0);
@@ -193,7 +247,7 @@ TestSerializer()
     writer.Serialize(*top, output);
     output.GetSize(size);
     check.Assign((const char*)output.GetData(), size);
-    CHECK(check == "<top foo=\"6\" ns1:foo=\"5\" ns2:foo=\"4\"/>", check);
+    CHECK(check == "<top foo=\"6\" ns1:foo=\"5\" ns2:foo=\"4\"/>");
 
     delete top;
 }
@@ -212,8 +266,8 @@ TestCanonicalizer()
     for (unsigned int i=0; xml_cano_1[i]; i+=2) {
         const char* xml_in = xml_cano_1[i];
         const char* xml_out = xml_cano_1[i+1];
-        NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml_in, root)));
-        NPT_ASSERT(root);
+        CHECK(NPT_SUCCEEDED(parser.Parse(xml_in, root)));
+        CHECK(root);
 
         NPT_XmlCanonicalizer canonicalizer;
         NPT_MemoryStream buffer1;
@@ -221,15 +275,15 @@ TestCanonicalizer()
 
         NPT_String str((const char*)buffer1.GetData(), buffer1.GetDataSize());
         NPT_Debug("%s", str.GetChars());
-        NPT_ASSERT(str == xml_out);
+        CHECK(str == xml_out);
 
         delete root;
 
-        NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(str, root)));
-        NPT_ASSERT(root);
+        CHECK(NPT_SUCCEEDED(parser.Parse(str, root)));
+        CHECK(root);
         NPT_MemoryStream buffer2;
         result = canonicalizer.Serialize(*root, buffer2);
-        NPT_ASSERT(buffer1.GetBuffer() == buffer2.GetBuffer());
+        CHECK(buffer1.GetBuffer() == buffer2.GetBuffer());
 
         delete root;
     }
@@ -248,8 +302,9 @@ TestRegression()
     element->SetAttribute("foo", "5");
     element->SetAttribute("ns", "foo", "7");
     element->SetAttribute("foo", "8");
-    NPT_ASSERT(*element->GetAttribute("foo") == "8");
-    NPT_ASSERT(*element->GetAttribute("foo", "ns") == "7");
+    element->SetNamespaceUri("ns", "blabla");
+    CHECK(*element->GetAttribute("foo") == "8");
+    CHECK(*element->GetAttribute("foo", "blabla") == "7");
     
     delete element;
 }
@@ -295,25 +350,25 @@ TestWhitespace()
 "   </mixed>\n"
 "</doc>";
 
-    NPT_XmlParser parser1; // ignore whitespace (default)
+    NPT_XmlParser parser1(false); // ignore whitespace
     NPT_XmlNode* root;
-    NPT_ASSERT(NPT_SUCCEEDED(parser1.Parse(xml, root)));
-    NPT_ASSERT(root);
+    CHECK(NPT_SUCCEEDED(parser1.Parse(xml, root)));
+    CHECK(root);
 
     NPT_XmlWriter writer;
     NPT_MemoryStream buffer;
     writer.Serialize(*root, buffer);
-    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect1, NPT_StringLength(expect1)));
+    CHECK(buffer.GetBuffer() == NPT_DataBuffer(expect1, NPT_StringLength(expect1)));
 
     delete root;
 
     NPT_XmlParser parser2(true); // keep whitespace
-    NPT_ASSERT(NPT_SUCCEEDED(parser2.Parse(xml, root)));
-    NPT_ASSERT(root);
+    CHECK(NPT_SUCCEEDED(parser2.Parse(xml, root)));
+    CHECK(root);
 
     buffer.SetSize(0);
     writer.Serialize(*root, buffer);
-    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect2, NPT_StringLength(expect2)));
+    CHECK(buffer.GetBuffer() == NPT_DataBuffer(expect2, NPT_StringLength(expect2)));
 
     delete root;
 }
@@ -331,13 +386,13 @@ TestComments()
 
     NPT_XmlParser parser;
     NPT_XmlNode* root;
-    NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml, root)));
-    NPT_ASSERT(root);
+    CHECK(NPT_SUCCEEDED(parser.Parse(xml, root)));
+    CHECK(root);
 
     NPT_XmlWriter writer;
     NPT_MemoryStream buffer;
     writer.Serialize(*root, buffer);
-    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
+    CHECK(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
 
     delete root;
 }
@@ -354,13 +409,13 @@ TestCdata()
 
     NPT_XmlParser parser;
     NPT_XmlNode* root;
-    NPT_ASSERT(NPT_SUCCEEDED(parser.Parse(xml, root)));
-    NPT_ASSERT(root);
+    CHECK(NPT_SUCCEEDED(parser.Parse(xml, root)));
+    CHECK(root);
 
     NPT_XmlWriter writer;
     NPT_MemoryStream buffer;
     writer.Serialize(*root, buffer);
-    NPT_ASSERT(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
+    CHECK(buffer.GetBuffer() == NPT_DataBuffer(expect, NPT_StringLength(expect)));
 
     delete root;
 }
@@ -376,11 +431,41 @@ TestAttributes()
     NPT_XmlParser parser;
     NPT_XmlNode* root = NULL;
     NPT_Result result = parser.Parse(xml, root);
-    CHECK(NPT_SUCCEEDED(result), "");
-    CHECK(root != NULL, "");
-    CHECK(root->AsElementNode() != NULL, "");
+    CHECK(NPT_SUCCEEDED(result));
+    CHECK(root != NULL);
+    CHECK(root->AsElementNode() != NULL);
     const NPT_String* a = root->AsElementNode()->GetAttribute("foo");
-    CHECK(*a == "blabla", "");
+    CHECK(*a == "blabla");
+    delete root;
+}
+
+/*----------------------------------------------------------------------
+|       TestMakeStandalone
++---------------------------------------------------------------------*/
+static void
+TestMakeStandalone()
+{
+    const char* xml = 
+        "<parent xmlns:foo='foo-ns' xmlns:bar='bar-ns' xmlns='default-ns'><inter xmlns:bli='bli-ns' xmlns:bou='bou-ns'><child><foo:a>a-text</foo:a><bar:b xml:fifi='0'>b-text</bar:b><c>c-text</c><d bou:att='b-att'/></child></inter></parent>";
+    const char* expected = 
+        "<child xmlns=\"default-ns\" xmlns:foo=\"foo-ns\" xmlns:bar=\"bar-ns\" xmlns:bou=\"bou-ns\"><foo:a>a-text</foo:a><bar:b xml:fifi=\"0\">b-text</bar:b><c>c-text</c><d bou:att=\"b-att\"/></child>";
+    NPT_XmlParser parser;
+    NPT_XmlNode* root = NULL;
+    NPT_Result result = parser.Parse(xml, root);
+    CHECK(NPT_SUCCEEDED(result));
+    CHECK(root != NULL);
+    CHECK(root->AsElementNode() != NULL);
+    NPT_XmlElementNode* inter = root->AsElementNode()->GetChild("inter", NPT_XML_ANY_NAMESPACE);
+    CHECK(inter != NULL);
+    NPT_XmlElementNode* child = inter->GetChild("child", NPT_XML_ANY_NAMESPACE);
+    CHECK(child != NULL);
+    child->MakeStandalone();
+    NPT_XmlWriter writer;
+    NPT_MemoryStream buffer;
+    writer.Serialize(*child, buffer);
+    CHECK(buffer.GetBuffer() == NPT_DataBuffer(expected, NPT_StringLength(expected)));
+    
+
     delete root;
 }
 
@@ -461,7 +546,9 @@ main(int argc, char** argv)
     TestAttributes();
     TestNamespaces();
     TestSerializer();
+    TestMakeStandalone();
     TestCanonicalizer();
+    TestFinders();
 
     return 0;
 }

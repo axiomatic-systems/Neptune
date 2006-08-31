@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Arrays
+|   Neptune - Arrays
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_ARRAY_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #if defined(NPT_CONFIG_HAVE_NEW_H)
@@ -21,12 +21,12 @@
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_ARRAY_INITIAL_MAX_SIZE = 128; // bytes
 
 /*----------------------------------------------------------------------
-|       NPT_Array
+|   NPT_Array
 +---------------------------------------------------------------------*/
 template <typename T> 
 class NPT_Array 
@@ -112,7 +112,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::NPT_Array<T>
+|   NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -125,7 +125,7 @@ NPT_Array<T>::NPT_Array(NPT_Cardinal count) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::NPT_Array<T>
+|   NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -142,7 +142,7 @@ NPT_Array<T>::NPT_Array(const NPT_Array<T>& copy) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::NPT_Array<T>
+|   NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -158,7 +158,7 @@ NPT_Array<T>::NPT_Array(NPT_Cardinal count, const T& item) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::NPT_Array<T>
+|   NPT_Array<T>::NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -174,7 +174,7 @@ NPT_Array<T>::NPT_Array(const T* items, NPT_Cardinal item_count) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::~NPT_Array<T>
+|   NPT_Array<T>::~NPT_Array<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -188,7 +188,7 @@ NPT_Array<T>::~NPT_Array()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::operator=
+|   NPT_Array<T>::operator=
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Array<T>&
@@ -210,7 +210,7 @@ NPT_Array<T>::operator=(const NPT_Array<T>& copy)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Clear
+|   NPT_Array<T>::Clear
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -227,7 +227,7 @@ NPT_Array<T>::Clear()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Allocate
+|   NPT_Array<T>::Allocate
 +---------------------------------------------------------------------*/
 template <typename T>
 T*
@@ -248,7 +248,7 @@ NPT_Array<T>::Allocate(NPT_Cardinal count, NPT_Cardinal& allocated)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Reserve
+|   NPT_Array<T>::Reserve
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -279,7 +279,7 @@ NPT_Array<T>::Reserve(NPT_Cardinal count)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Add
+|   NPT_Array<T>::Add
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -297,7 +297,7 @@ NPT_Array<T>::Add(const T& item)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Erase
+|   NPT_Array<T>::Erase
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -308,7 +308,7 @@ NPT_Array<T>::Erase(Iterator which)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Erase
+|   NPT_Array<T>::Erase
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -345,7 +345,7 @@ NPT_Array<T>::Erase(Iterator first, Iterator last)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Insert
+|   NPT_Array<T>::Insert
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -398,7 +398,7 @@ NPT_Array<T>::Insert(Iterator where, const T& item, NPT_Cardinal repeat)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Resize
+|   NPT_Array<T>::Resize
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -418,7 +418,7 @@ NPT_Array<T>::Resize(NPT_Cardinal size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Resize
+|   NPT_Array<T>::Resize
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -438,7 +438,7 @@ NPT_Array<T>::Resize(NPT_Cardinal size, const T& fill)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::Contains
+|   NPT_Array<T>::Contains
 +---------------------------------------------------------------------*/
 template <typename T>
 bool
@@ -452,7 +452,7 @@ NPT_Array<T>::Contains(const T& data) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::operator==
+|   NPT_Array<T>::operator==
 +---------------------------------------------------------------------*/
 template <typename T>
 bool
@@ -470,7 +470,7 @@ NPT_Array<T>::operator==(const NPT_Array<T>& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Array<T>::operator!=
+|   NPT_Array<T>::operator!=
 +---------------------------------------------------------------------*/
 template <typename T>
 inline

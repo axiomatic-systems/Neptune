@@ -1,20 +1,20 @@
 /*****************************************************************
 |
-|      Neptune - Sockets
+|   Neptune - Sockets
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptSockets.h"
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|       NPT_SocketAddress::ToString
+|   NPT_SocketAddress::ToString
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_SocketAddress::ToString() const

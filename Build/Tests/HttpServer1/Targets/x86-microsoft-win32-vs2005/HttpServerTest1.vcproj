@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="XmlTest1"
-	ProjectGUID="{21C242CD-B371-4970-94BE-7ED2522872BA}"
-	RootNamespace="XmlTest1"
+	Name="HttpServerTest1"
+	ProjectGUID="{77FD5430-1AB3-414A-BE15-E63D38F1A5FC}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -62,10 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/XmlTest1.exe"
+				AdditionalDependencies="ws2_32.lib"
+				OutputFile="$(OutDir)/HttpServerTest1.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/XmlTest1.pdb"
+				ProgramDatabaseFile="$(OutDir)/HttpServerTest1.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -138,15 +138,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/XmlTest1.exe"
+				AdditionalDependencies="ws2_32.lib"
+				OutputFile="$(OutDir)/HttpServerTest1.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
-				Profile="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -183,39 +182,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Xml1\XmlTest1.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Xml1\XmlTest1Data.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-		</Filter>
-		<Filter
-			Name="Test Files"
-			>
-			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Xml1\big.xml"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Xml1\test.xml"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Xml1\unicode.xml"
+				RelativePath="..\..\..\..\..\Source\Tests\HttpServer1\HttpServerTest1.cpp"
 				>
 			</File>
 		</Filter>

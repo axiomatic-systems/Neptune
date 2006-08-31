@@ -1,24 +1,24 @@
 /*****************************************************************
 |
-|      Neptune - Messaging System
+|   Neptune - Messaging System
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptMessaging.h"
 
 /*----------------------------------------------------------------------
-|       globals
+|   globals
 +---------------------------------------------------------------------*/
 NPT_Message::Type NPT_Message::MessageType = "Generic Message";
 
 /*----------------------------------------------------------------------
-|       NPT_MessageHandler::HandleMessage
+|   NPT_MessageHandler::HandleMessage
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_MessageHandler::HandleMessage(NPT_Message* message)

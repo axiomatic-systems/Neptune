@@ -150,5 +150,32 @@ main(int /*argc*/, char** /*argv*/)
     result = NPT_Base64::Decode(t.GetChars(), t.GetLength(), data);
     NPT_ASSERT(result == NPT_ERROR_INVALID_FORMAT);
 
+    // test IP address parsing
+    NPT_IpAddress ip;
+    NPT_ASSERT(NPT_FAILED(ip.Parse("")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("a.b.c.d")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.2.3.4.5")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.2.3.4.")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.2.3.4f")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.g.3.4")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.2..3.4")));
+    NPT_ASSERT(NPT_FAILED(ip.Parse("1.2.300.4")));
+    NPT_ASSERT(NPT_SUCCEEDED(ip.Parse("1.2.3.4")));
+    NPT_ASSERT(ip.AsBytes()[0] == 1);
+    NPT_ASSERT(ip.AsBytes()[1] == 2);
+    NPT_ASSERT(ip.AsBytes()[2] == 3);
+    NPT_ASSERT(ip.AsBytes()[3] == 4);
+    NPT_ASSERT(NPT_SUCCEEDED(ip.Parse("255.255.0.1")));
+    NPT_ASSERT(ip.AsBytes()[0] == 255);
+    NPT_ASSERT(ip.AsBytes()[1] == 255);
+    NPT_ASSERT(ip.AsBytes()[2] == 0);
+    NPT_ASSERT(ip.AsBytes()[3] == 1);
+    NPT_ASSERT(NPT_SUCCEEDED(ip.Parse("0.0.0.0")));
+    NPT_ASSERT(ip.AsBytes()[0] == 0);
+    NPT_ASSERT(ip.AsBytes()[1] == 0);
+    NPT_ASSERT(ip.AsBytes()[2] == 0);
+    NPT_ASSERT(ip.AsBytes()[3] == 0);
+
     return 0;
 }

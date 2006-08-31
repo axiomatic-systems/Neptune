@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Base64
+|   Neptune - Base64
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,19 +11,19 @@
 #define _NPT_BASE64_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptDataBuffer.h"
 #include "NptStrings.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const NPT_Cardinal NPT_BASE64_MIME_BLOCKS_PER_LINE = 19;
 const NPT_Cardinal NPT_BASE64_PEM_BLOCKS_PER_LINE  = 16;
 
 /*----------------------------------------------------------------------
-|       NPT_Base64
+|   NPT_Base64
 +---------------------------------------------------------------------*/
 class NPT_Base64 {
 public:

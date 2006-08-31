@@ -12,6 +12,9 @@
 +---------------------------------------------------------------------*/
 #include <pthread.h>
 #include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
+#include <cerrno>
 
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -151,30 +154,84 @@ NPT_PosixSharedVariable::GetValue(NPT_Integer& value)
 |       NPT_PosixSharedVariable::WaitUntilEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout /* timeout */)
+NPT_PosixSharedVariable::WaitUntilEquals(NPT_Integer value, NPT_Timeout timeout)
 {
+    NPT_Result result = NPT_SUCCESS;
+    struct     timespec timed;
+    struct     timeval  now;
+
+    // get current time from system
+    if (gettimeofday(&now, NULL)) {
+        return NPT_FAILURE;
+    }
+
+    now.tv_usec += timeout * 1000;
+    if (now.tv_usec >= 1000000) {
+        now.tv_sec += now.tv_usec / 1000000;
+        now.tv_usec = now.tv_usec % 1000000;
+    }
+
+    // setup timeout
+    timed.tv_sec  = now.tv_sec;
+    timed.tv_nsec = now.tv_usec * 1000;
+
     pthread_mutex_lock(&m_Mutex);
     while (value != m_Value) {
-        pthread_cond_wait(&m_Condition, &m_Mutex);
+        if (timeout == NPT_TIMEOUT_INFINITE) {
+            pthread_cond_wait(&m_Condition, &m_Mutex);
+        } else {
+            int wait_res = pthread_cond_timedwait(&m_Condition, &m_Mutex, &timed);
+            if (wait_res == ETIMEDOUT) {
+                result = NPT_ERROR_TIMEOUT;
+                break;
+            }
+        }
     }
     pthread_mutex_unlock(&m_Mutex);
     
-    return NPT_SUCCESS;
+    return result;
 }
 
 /*----------------------------------------------------------------------
 |       NPT_PosixSharedVariable::WaitWhileEquals
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixSharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout /*timeout*/)
+NPT_PosixSharedVariable::WaitWhileEquals(NPT_Integer value, NPT_Timeout timeout)
 {
+    NPT_Result result = NPT_SUCCESS;
+    struct     timespec timed;
+    struct     timeval  now;
+
+    // get current time from system
+    if (gettimeofday(&now, NULL)) {
+        return NPT_FAILURE;
+    }
+
+    now.tv_usec += timeout * 1000;
+    if (now.tv_usec >= 1000000) {
+        now.tv_sec += now.tv_usec / 1000000;
+        now.tv_usec = now.tv_usec % 1000000;
+    }
+
+    // setup timeout
+    timed.tv_sec  = now.tv_sec;
+    timed.tv_nsec = now.tv_usec * 1000;
+
     pthread_mutex_lock(&m_Mutex);
     while (value == m_Value) {
-        pthread_cond_wait(&m_Condition, &m_Mutex);
+        if (timeout == NPT_TIMEOUT_INFINITE) {
+            pthread_cond_wait(&m_Condition, &m_Mutex);
+        } else {
+            int wait_res = pthread_cond_timedwait(&m_Condition, &m_Mutex, &timed);
+            if (wait_res == ETIMEDOUT) {
+                result = NPT_ERROR_TIMEOUT;
+                break;
+            }
+        }
     }
     pthread_mutex_unlock(&m_Mutex);
     
-    return NPT_SUCCESS;
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -293,7 +350,6 @@ class NPT_PosixThread : public NPT_ThreadInterface
                ~NPT_PosixThread();
     NPT_Result  Start(); 
     NPT_Result  Wait();
-    NPT_Result  Terminate();
 
  private:
     // methods
@@ -301,6 +357,9 @@ class NPT_PosixThread : public NPT_ThreadInterface
 
     // NPT_Runnable methods
     void Run();
+
+    // NPT_Interruptible methods
+    NPT_Result Interrupt() { return NPT_ERROR_NOT_IMPLEMENTED; }
 
     // members
     NPT_Thread*    m_Delegator;
@@ -341,22 +400,6 @@ NPT_PosixThread::~NPT_PosixThread()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_PosixThread::Terminate
-+---------------------------------------------------------------------*/
-NPT_Result
-NPT_PosixThread::Terminate()
-{
-    NPT_Debug(":: NPT_PosixThread::Terminate %d\n", m_ThreadId);
-
-    // if we're detached, we need to delete ourselves
-    if (m_Detached) {
-        delete m_Delegator;
-    }
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |       NPT_PosixThread::EntryPoint
 +---------------------------------------------------------------------*/
 void*
@@ -372,7 +415,10 @@ NPT_PosixThread::EntryPoint(void* argument)
     NPT_Debug(":: NPT_PosixThread::EntryPoint - out ======================\n");
 
     // we're done with the thread object
-    thread->Terminate();
+    // if we're detached, we need to delete ourselves
+    if (thread->m_Detached) {
+        delete thread->m_Delegator;
+    }
 
     // done
     return NULL;

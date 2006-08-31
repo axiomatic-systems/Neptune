@@ -1,21 +1,21 @@
 /*****************************************************************
 |
-|      Neptune - Base64
+|   Neptune - Base64
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptBase64.h"
 #include "NptUtils.h"
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 static const signed char NPT_Base64_Bytes[128] = {
       -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
@@ -33,7 +33,7 @@ const char NPT_BASE64_PAD_CHAR = '=';
 const char NPT_BASE64_PAD_BYTE = 0x7F;
 
 /*----------------------------------------------------------------------
-|       NPT_Base64::Decode
+|   NPT_Base64::Decode
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Base64::Decode(const char*     base64, 
@@ -110,7 +110,7 @@ NPT_Base64::Decode(const char*     base64,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_Base64::Encode
+|   NPT_Base64::Encode
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_Base64::Encode(const NPT_Byte* data, 

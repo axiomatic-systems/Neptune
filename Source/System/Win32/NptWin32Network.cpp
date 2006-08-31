@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Network :: Winsock Implementation
+|   Neptune - Network :: Winsock Implementation
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #define STRICT
 #include <winsock2.h>
@@ -17,7 +17,7 @@
 #include "NptWin32Network.h"
 
 /*----------------------------------------------------------------------
-|       static initializer
+|   static initializer
 +---------------------------------------------------------------------*/
 NPT_WinsockSystem::NPT_WinsockSystem() {
     WORD    wVersionRequested;
@@ -32,7 +32,7 @@ NPT_WinsockSystem::~NPT_WinsockSystem() {
 NPT_WinsockSystem NPT_WinsockSystem::Initializer;
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterface::GetNetworkInterfaces
+|   NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)

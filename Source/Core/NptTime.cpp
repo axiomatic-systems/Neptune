@@ -1,19 +1,19 @@
 /*****************************************************************
 |
-|      Neptune - Time
+|   Neptune - Time
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTime.h"
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::NPT_TimeStamp
+|   NPT_TimeStamp::NPT_TimeStamp
 +---------------------------------------------------------------------*/
 NPT_TimeStamp::NPT_TimeStamp(float seconds)
 {
@@ -22,7 +22,7 @@ NPT_TimeStamp::NPT_TimeStamp(float seconds)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator float
+|   NPT_TimeStamp::operator float
 +---------------------------------------------------------------------*/
 NPT_TimeStamp::operator float() const
 {       
@@ -30,7 +30,7 @@ NPT_TimeStamp::operator float() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator+=
+|   NPT_TimeStamp::operator+=
 +---------------------------------------------------------------------*/
 NPT_TimeStamp&
 NPT_TimeStamp::operator+=(const NPT_TimeStamp& t)
@@ -52,7 +52,7 @@ NPT_TimeStamp::operator+=(const NPT_TimeStamp& t)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator-=
+|   NPT_TimeStamp::operator-=
 +---------------------------------------------------------------------*/
 NPT_TimeStamp&
 NPT_TimeStamp::operator-=(const NPT_TimeStamp& t)
@@ -74,7 +74,7 @@ NPT_TimeStamp::operator-=(const NPT_TimeStamp& t)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator==
+|   NPT_TimeStamp::operator==
 +---------------------------------------------------------------------*/
 bool
 NPT_TimeStamp::operator==(const NPT_TimeStamp& t) const
@@ -85,7 +85,7 @@ NPT_TimeStamp::operator==(const NPT_TimeStamp& t) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator!=
+|   NPT_TimeStamp::operator!=
 +---------------------------------------------------------------------*/
 bool
 NPT_TimeStamp::operator!=(const NPT_TimeStamp& t) const
@@ -96,7 +96,7 @@ NPT_TimeStamp::operator!=(const NPT_TimeStamp& t) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator>
+|   NPT_TimeStamp::operator>
 +---------------------------------------------------------------------*/
 bool
 NPT_TimeStamp::operator>(const NPT_TimeStamp& t) const
@@ -107,7 +107,7 @@ NPT_TimeStamp::operator>(const NPT_TimeStamp& t) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_TimeStamp::operator<
+|   NPT_TimeStamp::operator<
 +---------------------------------------------------------------------*/
 bool
 NPT_TimeStamp::operator<(const NPT_TimeStamp& t) const
@@ -117,4 +117,51 @@ NPT_TimeStamp::operator<(const NPT_TimeStamp& t) const
         (m_Seconds == t.m_Seconds && m_NanoSeconds < t.m_NanoSeconds);
 }
 
+/*----------------------------------------------------------------------
+|   NPT_TimeStamp::operator>=
++---------------------------------------------------------------------*/
+bool
+NPT_TimeStamp::operator>=(const NPT_TimeStamp& t) const
+{
+    return *this > t || *this == t;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TimeStamp::operator<=
++---------------------------------------------------------------------*/
+bool
+NPT_TimeStamp::operator<=(const NPT_TimeStamp& t) const
+{
+    return *this < t || *this == t;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TimeStamp::operator+
++---------------------------------------------------------------------*/
+NPT_TimeStamp
+operator+(const NPT_TimeStamp& timestamp, long seconds)
+{
+    // shortcut
+    if (seconds == 0) return NPT_TimeStamp(timestamp);
+
+    NPT_TimeStamp result = timestamp;
+    result.m_Seconds += seconds;
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TimeStamp::operator-
++---------------------------------------------------------------------*/
+NPT_TimeStamp
+operator-(const NPT_TimeStamp& timestamp, long seconds)
+{
+    // shortcut
+    if (seconds == 0) return NPT_TimeStamp(timestamp);
+
+    NPT_TimeStamp result = timestamp;
+    result.m_Seconds -= seconds;
+
+    return result;
+}
 

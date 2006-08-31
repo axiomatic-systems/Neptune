@@ -1,20 +1,22 @@
 /*****************************************************************
 |
-|      File: NptWin32Debug.c
+|   Neptune - Debug Support: Win32 Implementation
 |
-|      Neptune - Debug Support: Win32 Implementation
-|
-|      (c) 2002-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2002-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <stdarg.h>
 #include <stdio.h>
+#if defined(_XBOX)
+#include <xtl.h>
+#else
 #include <windows.h>
+#endif
 
 #include "NptConfig.h"
 #include "NptDefs.h"
@@ -22,7 +24,7 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define NPT_DEBUG_LOCAL_BUFFER_SIZE 1024
 #define NPT_DEBUG_BUFFER_INCREMENT  4096
@@ -30,7 +32,7 @@
 
 #if defined(NPT_DEBUG)
 /*----------------------------------------------------------------------
-|       NPT_Print
+|   NPT_Print
 +---------------------------------------------------------------------*/
 static void
 NPT_Print(const char* message)
@@ -41,7 +43,7 @@ NPT_Print(const char* message)
 #endif
 
 /*----------------------------------------------------------------------
-|       NPT_Debug
+|   NPT_Debug
 +---------------------------------------------------------------------*/
 void
 NPT_Debug(const char* format, ...)

@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Buffered Streams
+|   Neptune - Buffered Streams
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptInterfaces.h"
@@ -17,7 +17,7 @@
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::NPT_BufferedInputStream
+|   NPT_BufferedInputStream::NPT_BufferedInputStream
 +---------------------------------------------------------------------*/
 NPT_BufferedInputStream::NPT_BufferedInputStream(NPT_InputStreamReference& source, NPT_Size buffer_size) :
     m_Source(source),
@@ -32,7 +32,7 @@ NPT_BufferedInputStream::NPT_BufferedInputStream(NPT_InputStreamReference& sourc
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::~NPT_BufferedInputStream
+|   NPT_BufferedInputStream::~NPT_BufferedInputStream
 +---------------------------------------------------------------------*/
 NPT_BufferedInputStream::~NPT_BufferedInputStream()
 {
@@ -41,7 +41,7 @@ NPT_BufferedInputStream::~NPT_BufferedInputStream()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::SetBufferSize
+|   NPT_BufferedInputStream::SetBufferSize
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BufferedInputStream::SetBufferSize(NPT_Size size)
@@ -74,7 +74,7 @@ NPT_BufferedInputStream::SetBufferSize(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::FillBuffer
+|   NPT_BufferedInputStream::FillBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BufferedInputStream::FillBuffer()
@@ -101,7 +101,7 @@ NPT_BufferedInputStream::FillBuffer()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::ReleaseBuffer
+|   NPT_BufferedInputStream::ReleaseBuffer
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BufferedInputStream::ReleaseBuffer()
@@ -118,7 +118,7 @@ NPT_BufferedInputStream::ReleaseBuffer()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::ReadLine
+|   NPT_BufferedInputStream::ReadLine
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BufferedInputStream::ReadLine(char* buffer, NPT_Size size, NPT_Size* chars_read)
@@ -189,7 +189,7 @@ done:
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::ReadLine
+|   NPT_BufferedInputStream::ReadLine
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_BufferedInputStream::ReadLine(NPT_String& line,
@@ -212,7 +212,7 @@ NPT_BufferedInputStream::ReadLine(NPT_String& line,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::Read
+|   NPT_BufferedInputStream::Read
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BufferedInputStream::Read(void*     buffer, 
@@ -291,28 +291,28 @@ done:
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::Seek
+|   NPT_BufferedInputStream::Seek
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_BufferedInputStream::Seek(NPT_Offset /*offset*/)
+NPT_BufferedInputStream::Seek(NPT_Position /*offset*/)
 {
     // not implemented yet
-    return NPT_FAILURE;
+    return NPT_ERROR_NOT_IMPLEMENTED;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::Tell
+|   NPT_BufferedInputStream::Tell
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_BufferedInputStream::Tell(NPT_Offset& offset)
+NPT_BufferedInputStream::Tell(NPT_Position& offset)
 {
     // not implemented yet
     offset = 0;
-    return NPT_FAILURE;
+    return NPT_ERROR_NOT_IMPLEMENTED;
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::GetSize
+|   NPT_BufferedInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BufferedInputStream::GetSize(NPT_Size& size)
@@ -321,7 +321,7 @@ NPT_BufferedInputStream::GetSize(NPT_Size& size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BufferedInputStream::GetAvailable
+|   NPT_BufferedInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_BufferedInputStream::GetAvailable(NPT_Size& available)

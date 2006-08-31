@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - HTTP Protocol
+|   Neptune - HTTP Protocol
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_HTTP_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptUri.h"
 #include "NptTypes.h"
@@ -19,12 +19,13 @@
 #include "NptBufferedStreams.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const unsigned int NPT_HTTP_DEFAULT_PORT = 80;
 const unsigned int NPT_HTTP_INVALID_PORT = 0;
 
-const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH = 2048;
+const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH  = 8192;
+const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 
 #define NPT_HTTP_PROTOCOL_1_0   "HTTP/1.0"
 #define NPT_HTTP_PROTOCOL_1_1   "HTTP/1.1"
@@ -38,6 +39,9 @@ const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH = 2048;
 #define NPT_HTTP_HEADER_CONTENT_LENGTH      "Content-Length"
 #define NPT_HTTP_HEADER_CONTENT_TYPE        "Content-Type"
 #define NPT_HTTP_HEADER_CONTENT_ENCODING    "Content-Encoding"
+#define NPT_HTTP_HEADER_LOCATION            "Location"
+#define NPT_HTTP_HEADER_RANGE               "Range"
+#define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
 const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
@@ -45,12 +49,12 @@ const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
 #define NPT_HTTP_LINE_TERMINATOR "\r\n"
 
 /*----------------------------------------------------------------------
-|       types
+|   types
 +---------------------------------------------------------------------*/
 typedef unsigned int NPT_HttpStatusCode;
 
 /*----------------------------------------------------------------------
-|       NPT_HttpProtocol
+|   NPT_HttpProtocol
 +---------------------------------------------------------------------*/
 class NPT_HttpProtocol
 {
@@ -60,12 +64,12 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpUrl
+|   NPT_HttpUrl
 +---------------------------------------------------------------------*/
 class NPT_HttpUrl : public NPT_Uri {
 public:
     // constructors and destructor
-    NPT_HttpUrl() : NPT_Uri("http:") {}
+    NPT_HttpUrl() : NPT_Uri("http:"), m_Port(NPT_HTTP_DEFAULT_PORT) {}
     NPT_HttpUrl(const char* url);
     NPT_HttpUrl(const char* host, NPT_UInt16 port, const char* path);
 
@@ -88,7 +92,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpHeader
+|   NPT_HttpHeader
 +---------------------------------------------------------------------*/
 class NPT_HttpHeader {
 public:
@@ -110,7 +114,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpHeaders
+|   NPT_HttpHeaders
 +---------------------------------------------------------------------*/
 class NPT_HttpHeaders {
 public:
@@ -132,7 +136,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpEntity
+|   NPT_HttpEntity
 +---------------------------------------------------------------------*/
 class NPT_HttpEntity {
 public:
@@ -165,7 +169,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpMessage
+|   NPT_HttpMessage
 +---------------------------------------------------------------------*/
 class NPT_HttpMessage {
 public:
@@ -185,7 +189,6 @@ public:
     }
     virtual NPT_Result ParseHeaders(NPT_BufferedInputStream& stream,
                                     NPT_Timeout              timeout = NPT_TIMEOUT_INFINITE);
-    virtual NPT_Result Emit(NPT_OutputStream& stream) const = 0;
 
 protected:
     // constructors
@@ -198,7 +201,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpRequest
+|   NPT_HttpRequest
 +---------------------------------------------------------------------*/
 class NPT_HttpRequest : public NPT_HttpMessage {
 public:
@@ -218,8 +221,9 @@ public:
 
     // methods
     const NPT_HttpUrl& GetUrl() { return m_Url; }
+    NPT_Result         SetUrl(const char* url);
     const NPT_String&  GetMethod() const { return m_Method; }
-    NPT_Result         Emit(NPT_OutputStream& stream) const;
+    virtual NPT_Result Emit(NPT_OutputStream& stream, bool use_proxy=false) const;
     
 protected:
     // members
@@ -228,7 +232,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpResponse
+|   NPT_HttpResponse
 +---------------------------------------------------------------------*/
 class NPT_HttpResponse : public NPT_HttpMessage {
 public:
@@ -249,7 +253,7 @@ public:
                                  const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     NPT_HttpStatusCode GetStatusCode()   { return m_StatusCode;   }
     NPT_String&        GetReasonPhrase() { return m_ReasonPhrase; }
-    NPT_Result         Emit(NPT_OutputStream& stream) const;
+    virtual NPT_Result Emit(NPT_OutputStream& stream) const;
 
 protected:
     // members
@@ -258,7 +262,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpClient
+|   NPT_HttpClient
 +---------------------------------------------------------------------*/
 class NPT_HttpClient {
 public:
@@ -270,13 +274,23 @@ public:
     NPT_Result SendRequest(NPT_HttpRequest&   request,
                            NPT_HttpResponse*& response,
                            NPT_Timeout        timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result SetProxy(const char* hostname, NPT_UInt16 port);
 
 protected:
+    // methods
+    NPT_Result SendRequestOnce(NPT_HttpRequest&   request,
+                               NPT_HttpResponse*& response,
+                               NPT_Timeout        timeout = NPT_TIMEOUT_INFINITE);
+
     // members
+    bool       m_FollowRedirect;
+    bool       m_UseProxy;
+    NPT_String m_ProxyHostname;
+    NPT_UInt16 m_ProxyPort;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_HttpServer
+|   NPT_HttpServer
 +---------------------------------------------------------------------*/
 class NPT_HttpServer {
 public:

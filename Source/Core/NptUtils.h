@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune Utils
+|   Neptune Utils
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,28 +11,28 @@
 #define _NPT_UTILS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #include "NptTypes.h"
 
 /*----------------------------------------------------------------------
-|       macros
+|   macros
 +---------------------------------------------------------------------*/
 #define NPT_ARRAY_SIZE(_a) (sizeof(_a)/sizeof((_a)[0]))
 
 /*----------------------------------------------------------------------
-|       byte I/O
+|   byte I/O
 +---------------------------------------------------------------------*/
-extern void NPT_BytesFromInt32Be(unsigned char* buffer, unsigned long value);
-extern void NPT_BytesFromInt16Be(unsigned char* buffer, unsigned short value);
-extern unsigned long NPT_BytesToInt32Be(const unsigned char* buffer);
-extern unsigned short NPT_BytesToInt16Be(const unsigned char* buffer);
+extern void NPT_BytesFromInt32Be(unsigned char* buffer, NPT_UInt32 value);
+extern void NPT_BytesFromInt16Be(unsigned char* buffer, NPT_UInt16 value);
+extern NPT_UInt32 NPT_BytesToInt32Be(const unsigned char* buffer);
+extern NPT_UInt16 NPT_BytesToInt16Be(const unsigned char* buffer);
 
-extern void NPT_BytesFromInt32Le(unsigned char* buffer, unsigned long value);
-extern void NPT_BytesFromInt16Le(unsigned char* buffer, unsigned short value);
-extern unsigned long NPT_BytesToInt32Le(const unsigned char* buffer);
-extern unsigned short NPT_BytesToInt16Le(const unsigned char* buffer);
+extern void NPT_BytesFromInt32Le(unsigned char* buffer, NPT_UInt32 value);
+extern void NPT_BytesFromInt16Le(unsigned char* buffer, NPT_UInt16 value);
+extern NPT_UInt32 NPT_BytesToInt32Le(const unsigned char* buffer);
+extern NPT_UInt16 NPT_BytesToInt16Le(const unsigned char* buffer);
 
 extern void NPT_ByteToHex(NPT_Byte b, char* buffer);
 extern void NPT_HexToByte(const char* buffer, NPT_Byte& b);
@@ -44,10 +44,13 @@ extern NPT_Result
 NPT_ParseFloat(const char* str, float& result, bool relaxed = true);
 
 extern NPT_Result 
-NPT_ParseInteger(const char* str, long& result, bool relaxed = true);
+NPT_ParseInteger(const char* str, long& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
+
+extern NPT_Result 
+NPT_ParseInteger32(const char* str, NPT_Int32& result, bool relaxed = true);
 
 /*----------------------------------------------------------------------
-|       string utils
+|   string utils
 +---------------------------------------------------------------------*/
 #if defined (NPT_CONFIG_HAVE_STDIO_H)
 #include <stdio.h>

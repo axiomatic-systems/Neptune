@@ -1,21 +1,21 @@
 /*****************************************************************
 |
-|      Neptune - Ring Buffer
+|   Neptune - Ring Buffer
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptRingBuffer.h"
 #include "NptResults.h"
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::NPT_RingBuffer
+|   NPT_RingBuffer::NPT_RingBuffer
 +---------------------------------------------------------------------*/
 NPT_RingBuffer::NPT_RingBuffer(NPT_Size size) :
     m_Size(size),
@@ -28,7 +28,7 @@ NPT_RingBuffer::NPT_RingBuffer(NPT_Size size) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::NPT_RingBuffer
+|   NPT_RingBuffer::NPT_RingBuffer
 +---------------------------------------------------------------------*/
 NPT_RingBuffer::NPT_RingBuffer(void* buffer, NPT_Size size) :
     m_Size(size),
@@ -41,7 +41,7 @@ NPT_RingBuffer::NPT_RingBuffer(void* buffer, NPT_Size size) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::~NPT_RingBuffer
+|   NPT_RingBuffer::~NPT_RingBuffer
 +---------------------------------------------------------------------*/
 NPT_RingBuffer::~NPT_RingBuffer()
 {
@@ -49,7 +49,7 @@ NPT_RingBuffer::~NPT_RingBuffer()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::GetContiguousSpace
+|   NPT_RingBuffer::GetContiguousSpace
 +---------------------------------------------------------------------*/
 NPT_Size
 NPT_RingBuffer::GetContiguousSpace() const
@@ -63,7 +63,7 @@ NPT_RingBuffer::GetContiguousSpace() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::GetSpace
+|   NPT_RingBuffer::GetSpace
 +---------------------------------------------------------------------*/
 NPT_Size
 NPT_RingBuffer::GetSpace() const
@@ -75,7 +75,7 @@ NPT_RingBuffer::GetSpace() const
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::Write
+|    NPT_RingBuffer::Write
 +----------------------------------------------------------------------*/
 NPT_Result
 NPT_RingBuffer::Write(const void* buffer, NPT_Size byte_count)
@@ -107,7 +107,7 @@ NPT_RingBuffer::Write(const void* buffer, NPT_Size byte_count)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::GetContiguousAvailable
+|   NPT_RingBuffer::GetContiguousAvailable
 +---------------------------------------------------------------------*/
 NPT_Size
 NPT_RingBuffer::GetContiguousAvailable() const
@@ -119,7 +119,7 @@ NPT_RingBuffer::GetContiguousAvailable() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_RingBuffer::GetAvailable
+|   NPT_RingBuffer::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Size
 NPT_RingBuffer::GetAvailable() const
@@ -131,7 +131,7 @@ NPT_RingBuffer::GetAvailable() const
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::Read
+|    NPT_RingBuffer::Read
 +----------------------------------------------------------------------*/
 NPT_Result
 NPT_RingBuffer::Read(void* buffer, NPT_Size byte_count)
@@ -161,7 +161,7 @@ NPT_RingBuffer::Read(void* buffer, NPT_Size byte_count)
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::ReadByte
+|    NPT_RingBuffer::ReadByte
 +----------------------------------------------------------------------*/
 unsigned char
 NPT_RingBuffer::ReadByte()
@@ -172,10 +172,10 @@ NPT_RingBuffer::ReadByte()
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::PeekByte
+|    NPT_RingBuffer::PeekByte
 +----------------------------------------------------------------------*/
 unsigned char
-NPT_RingBuffer::PeekByte(NPT_Offset offset)
+NPT_RingBuffer::PeekByte(NPT_Position offset)
 {
     unsigned char *where;
 
@@ -186,10 +186,10 @@ NPT_RingBuffer::PeekByte(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::MoveIn
+|    NPT_RingBuffer::MoveIn
 +----------------------------------------------------------------------*/
 NPT_Result
-NPT_RingBuffer::MoveIn(NPT_Offset offset)
+NPT_RingBuffer::MoveIn(NPT_Position offset)
 {
     int fold;
 
@@ -203,10 +203,10 @@ NPT_RingBuffer::MoveIn(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::MoveOut
+|    NPT_RingBuffer::MoveOut
 +----------------------------------------------------------------------*/
 NPT_Result
-NPT_RingBuffer::MoveOut(NPT_Offset offset)
+NPT_RingBuffer::MoveOut(NPT_Position offset)
 {
     int fold;
 
@@ -220,7 +220,7 @@ NPT_RingBuffer::MoveOut(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------+
-|        NPT_RingBuffer::Flush
+|    NPT_RingBuffer::Flush
 +----------------------------------------------------------------------*/
 NPT_Result
 NPT_RingBuffer::Flush()

@@ -1,8 +1,8 @@
 /*****************************************************************
 |
-|      Neptune - Types
+|   Neptune - Types
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
+|      (c) 2001-2006 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (boK@bok.net)
 |
  ****************************************************************/
@@ -11,33 +11,33 @@
 #define _NPT_TYPES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------
-|       named types       
+|   named types       
 +---------------------------------------------------------------------*/
 typedef int           NPT_Result;
-typedef unsigned long NPT_Cardinal;
-typedef unsigned long NPT_Ordinal;
-typedef long          NPT_Integer;
+typedef unsigned int  NPT_Cardinal;
+typedef unsigned int  NPT_Ordinal;
 typedef unsigned long NPT_Size;
-typedef unsigned long NPT_Offset;
+typedef signed   long NPT_Offset;
+typedef unsigned long NPT_Position;
 typedef long          NPT_Timeout;
 typedef void          NPT_Interface;
 typedef unsigned char NPT_Byte;
 typedef unsigned int  NPT_Flags;
+typedef int           NPT_Integer;
 
 /*----------------------------------------------------------------------
-|       sized types
+|   sized types
 +---------------------------------------------------------------------*/
-typedef unsigned long  NPT_UInt32;
-typedef long           NPT_Int32;
+typedef unsigned int   NPT_UInt32;
+typedef int            NPT_Int32;
 typedef unsigned short NPT_UInt16;
 typedef short          NPT_Int16;
 typedef unsigned char  NPT_UInt8;
 typedef char           NPT_Int8;
-typedef int            NPT_Int;
 typedef float          NPT_Float;
 
 #endif // _NPT_TYPES_H_

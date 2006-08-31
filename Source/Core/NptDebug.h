@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Debug Utilities
+|   Neptune - Debug Utilities
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -18,15 +18,15 @@
 /*----------------------------------------------------------------------
 |    standard macros
 +---------------------------------------------------------------------*/
-#if defined(NPT_CONFIG_HAVE_ASSERT_H)
+#if defined(NPT_CONFIG_HAVE_ASSERT_H) && defined(NPT_DEBUG)
 #include <assert.h>
 #define NPT_ASSERT(x) assert(x)
 #else
-#define NPT_ASSERT(x)
+#define NPT_ASSERT(x) ((void)0)
 #endif
 
 /*----------------------------------------------------------------------
-|       NPT_Debug
+|   NPT_Debug
 +---------------------------------------------------------------------*/
 extern void NPT_Debug(const char* format, ...);
 

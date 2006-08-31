@@ -1,25 +1,25 @@
 /*****************************************************************
 |
-|      Neptune - Network
+|   Neptune - Network
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptSockets.h"
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::Any
+|   NPT_IpAddress::Any
 +---------------------------------------------------------------------*/
 NPT_IpAddress NPT_IpAddress::Any;
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::NPT_IpAddress
+|   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress()
 {
@@ -27,7 +27,7 @@ NPT_IpAddress::NPT_IpAddress()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::NPT_IpAddress
+|   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress(unsigned long address)
 {
@@ -35,38 +35,54 @@ NPT_IpAddress::NPT_IpAddress(unsigned long address)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::Parse
+|   NPT_IpAddress::Parse
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_IpAddress::Parse(const char* name)
 {
-    const char*   look = name;
-    unsigned char step = 0;
-    unsigned char c;
-    unsigned int  accumulator = 0;
-    
-    while ((c = *look++) && step < 4) {
-        if (c >= '0' && c <= '9') {
-            /* a numerical character */
-            accumulator = accumulator*10 + (c - '0');
-            continue;
-        }
-        if (c == '.') {
-            m_Address[step++] = accumulator;
+    // check the name
+    if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    // clear the address
+    m_Address[0] = m_Address[1] = m_Address[2] = m_Address[3] = 0;
+
+    // parse
+    unsigned int  fragment;
+    bool          fragment_empty = true;
+    unsigned char address[4];
+    unsigned int  accumulator;
+    for (fragment = 0, accumulator = 0; fragment < 4; ++name) {
+        if (*name == '\0' || *name == '.') {
+            // fragment terminator
+            if (fragment_empty) return NPT_ERROR_INVALID_SYNTAX;
+            address[fragment++] = accumulator;
+            if (*name == '\0') break;
             accumulator = 0;
+            fragment_empty = true;
+        } else if (*name >= '0' && *name <= '9') {
+            // numerical character
+            accumulator = accumulator*10 + (*name - '0');
+            if (accumulator > 255) return NPT_ERROR_INVALID_SYNTAX;
+            fragment_empty = false; 
+        } else {
+            // invalid character
+            return NPT_ERROR_INVALID_SYNTAX;
         }
     }
 
-    if (c == '\0' && step == 3) {
-        m_Address[3] = accumulator;
+    if (fragment == 4 && *name == '\0' && !fragment_empty) {
+        m_Address[0] = address[0];
+        m_Address[1] = address[1];
+        m_Address[2] = address[2];
+        m_Address[3] = address[3];
         return NPT_SUCCESS;
     } else {
-        return NPT_FAILURE;
+        return NPT_ERROR_INVALID_SYNTAX;
     }
-} 
+}
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::AsLong
+|   NPT_IpAddress::AsLong
 +---------------------------------------------------------------------*/
 unsigned long
 NPT_IpAddress::AsLong() const
@@ -79,7 +95,16 @@ NPT_IpAddress::AsLong() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::ToString
+|   NPT_IpAddress::AsBytes
++---------------------------------------------------------------------*/
+const unsigned char* 
+NPT_IpAddress::AsBytes() const
+{
+    return m_Address;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::ToString
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_IpAddress::ToString() const
@@ -98,7 +123,7 @@ NPT_IpAddress::ToString() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::Set
+|   NPT_IpAddress::Set
 +---------------------------------------------------------------------*/
 NPT_Result    
 NPT_IpAddress::Set(const unsigned char bytes[4])
@@ -112,7 +137,7 @@ NPT_IpAddress::Set(const unsigned char bytes[4])
 }
 
 /*----------------------------------------------------------------------
-|       NPT_IpAddress::Set
+|   NPT_IpAddress::Set
 +---------------------------------------------------------------------*/
 NPT_Result    
 NPT_IpAddress::Set(unsigned long address)
@@ -126,7 +151,7 @@ NPT_IpAddress::Set(unsigned long address)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MacAddress::NPT_MacAddress
+|   NPT_MacAddress::NPT_MacAddress
 +---------------------------------------------------------------------*/
 NPT_MacAddress::NPT_MacAddress(Type                  type,
                                const unsigned char*  address, 
@@ -136,7 +161,7 @@ NPT_MacAddress::NPT_MacAddress(Type                  type,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MacAddress::SetAddress
+|   NPT_MacAddress::SetAddress
 +---------------------------------------------------------------------*/
 void
 NPT_MacAddress::SetAddress(Type                 type,
@@ -154,7 +179,7 @@ NPT_MacAddress::SetAddress(Type                 type,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MacAddress::ToString
+|   NPT_MacAddress::ToString
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_MacAddress::ToString() const
@@ -177,7 +202,7 @@ NPT_MacAddress::ToString() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterface::NPT_NetworkInterface
+|   NPT_NetworkInterface::NPT_NetworkInterface
 +---------------------------------------------------------------------*/ 
 NPT_NetworkInterface::NPT_NetworkInterface(const char*           name,
                                            const NPT_MacAddress& mac,
@@ -189,7 +214,7 @@ NPT_NetworkInterface::NPT_NetworkInterface(const char*           name,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterface::AddAddress
+|   NPT_NetworkInterface::AddAddress
 +---------------------------------------------------------------------*/ 
 NPT_Result
 NPT_NetworkInterface::AddAddress(const NPT_NetworkInterfaceAddress& address)

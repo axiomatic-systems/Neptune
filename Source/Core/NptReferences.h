@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - References
+|   Neptune - References
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
 ****************************************************************/
 
@@ -11,12 +11,12 @@
 #define _NPT_REFERENCES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConstants.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Reference
+|   NPT_Reference
 +---------------------------------------------------------------------*/
 template <typename T>
 class NPT_Reference

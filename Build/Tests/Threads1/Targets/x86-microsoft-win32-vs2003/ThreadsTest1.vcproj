@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="MiscTest1"
-	ProjectGUID="{F91CB4EB-8441-4427-80FC-FCF1D63C3866}"
+	Name="ThreadsTest1"
+	ProjectGUID="{D1355CEF-E9CF-4FDF-A48F-69ACBE5622DC}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\..\..\Source\Neptune;..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;NPT_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -32,10 +32,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/MiscTest1.exe"
+				OutputFile="$(OutDir)/ThreadsTest1.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/MiscTest1.pdb"
+				ProgramDatabaseFile="$(OutDir)/ThreadsTest1.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -78,7 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/MiscTest1.exe"
+				OutputFile="$(OutDir)/ThreadsTest1.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -115,8 +115,18 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\..\..\Source\Tests\Misc1\MiscTest1.cpp">
+				RelativePath="..\..\..\..\..\Source\Tests\Threads1\ThreadsTest1.cpp">
 			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 		</Filter>
 	</Files>
 	<Globals>

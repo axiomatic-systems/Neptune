@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - String Objects
+|   Neptune - String Objects
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -19,12 +19,12 @@
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 #define NPT_STRINGS_WHITESPACE_CHARS "\r\n\t "
 
 /*----------------------------------------------------------------------
-|       helpers
+|   helpers
 +---------------------------------------------------------------------*/
 inline char NPT_Uppercase(char x) {
     return (x >= 'a' && x <= 'z') ? x&0xdf : x;
@@ -35,12 +35,12 @@ inline char NPT_Lowercase(char x) {
 }
                
 /*----------------------------------------------------------------------
-|       NPT_String::EmptyString
+|   NPT_String::EmptyString
 +---------------------------------------------------------------------*/
 char NPT_String::EmptyString = '\0';
 
 /*----------------------------------------------------------------------
-|       NPT_String::FromInteger
+|   NPT_String::FromInteger
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_String::FromInteger(long value)
@@ -73,7 +73,7 @@ NPT_String::FromInteger(long value)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::NPT_String
+|   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
 NPT_String::NPT_String(const char* str)
 {
@@ -85,7 +85,7 @@ NPT_String::NPT_String(const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::NPT_String
+|   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
 NPT_String::NPT_String(const char* str, NPT_Size length)
 {
@@ -97,7 +97,7 @@ NPT_String::NPT_String(const char* str, NPT_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::NPT_String
+|   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
 NPT_String::NPT_String(const NPT_String& str)
 {
@@ -109,7 +109,7 @@ NPT_String::NPT_String(const NPT_String& str)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::NPT_String
+|   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
 NPT_String::NPT_String(const char* str,
                        NPT_Ordinal first, 
@@ -133,7 +133,7 @@ NPT_String::NPT_String(const char* str,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::NPT_String
+|   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
 NPT_String::NPT_String(char c, NPT_Cardinal repeat)
 {
@@ -145,7 +145,7 @@ NPT_String::NPT_String(char c, NPT_Cardinal repeat)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::SetLength
+|   NPT_String::SetLength
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_String::SetLength(NPT_Size length)
@@ -164,7 +164,7 @@ NPT_String::SetLength(NPT_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::PrepareToWrite
+|   NPT_String::PrepareToWrite
 +---------------------------------------------------------------------*/
 inline char*
 NPT_String::PrepareToWrite(NPT_Size length)
@@ -185,18 +185,7 @@ NPT_String::PrepareToWrite(NPT_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::PrepareToAppend
-+---------------------------------------------------------------------*/
-inline void
-NPT_String::PrepareToAppend(NPT_Size length, NPT_Size allocate)
-{
-    NPT_ASSERT(allocate >= length);
-    Reserve(allocate);
-    GetBuffer()->SetLength(length);
-}
-
-/*----------------------------------------------------------------------
-|       NPT_String::Reserve
+|   NPT_String::Reserve
 +---------------------------------------------------------------------*/
 void
 NPT_String::Reserve(NPT_Size allocate)
@@ -221,7 +210,7 @@ NPT_String::Reserve(NPT_Size allocate)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Assign
+|   NPT_String::Assign
 +---------------------------------------------------------------------*/
 void
 NPT_String::Assign(const char* str, NPT_Size length)
@@ -236,7 +225,7 @@ NPT_String::Assign(const char* str, NPT_Size length)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::operator=
+|   NPT_String::operator=
 +---------------------------------------------------------------------*/
 NPT_String&
 NPT_String::operator=(const char* str)
@@ -248,8 +237,7 @@ NPT_String::operator=(const char* str)
         if (length == 0) {
             Reset();
         } else {
-            PrepareToWrite(length);
-            CopyString(m_Chars, str);
+            CopyString(PrepareToWrite(length), str);
         }
     }
 
@@ -257,7 +245,7 @@ NPT_String::operator=(const char* str)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::operator=
+|   NPT_String::operator=
 +---------------------------------------------------------------------*/
 NPT_String&
 NPT_String::operator=(const NPT_String& str)
@@ -270,7 +258,7 @@ NPT_String::operator=(const NPT_String& str)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Append
+|   NPT_String::Append
 +---------------------------------------------------------------------*/
 void
 NPT_String::Append(const char* str, NPT_Size length)
@@ -283,15 +271,18 @@ NPT_String::Append(const char* str, NPT_Size length)
     NPT_Size new_length = old_length + length;
 
     // allocate enough space
-    PrepareToAppend(new_length, new_length);
+    Reserve(new_length);
     
     // append the new string at the end of the current one
     CopyBuffer(m_Chars+old_length, str, length);
     m_Chars[new_length] = '\0';
+
+    // update the length
+    GetBuffer()->SetLength(new_length);
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Compare
+|   NPT_String::Compare
 +---------------------------------------------------------------------*/
 int 
 NPT_String::Compare(const char *s, bool ignore_case) const
@@ -300,7 +291,7 @@ NPT_String::Compare(const char *s, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Compare
+|   NPT_String::Compare
 +---------------------------------------------------------------------*/
 int 
 NPT_String::Compare(const char *s1, const char *s2, bool ignore_case)
@@ -328,7 +319,7 @@ NPT_String::Compare(const char *s1, const char *s2, bool ignore_case)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::CompareN
+|   NPT_String::CompareN
 +---------------------------------------------------------------------*/
 int 
 NPT_String::CompareN(const char *s, NPT_Size count, bool ignore_case) const
@@ -337,7 +328,7 @@ NPT_String::CompareN(const char *s, NPT_Size count, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::CompareN
+|   NPT_String::CompareN
 +---------------------------------------------------------------------*/
 int 
 NPT_String::CompareN(const char* s1, const char *s2, NPT_Size count, bool ignore_case)
@@ -362,7 +353,7 @@ NPT_String::CompareN(const char* s1, const char *s2, NPT_Size count, bool ignore
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::SubString
+|   NPT_String::SubString
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_String::SubString(NPT_Ordinal first, NPT_Size length) const
@@ -371,11 +362,11 @@ NPT_String::SubString(NPT_Ordinal first, NPT_Size length) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_StringStartsWith
+|   NPT_StringStartsWith
 |
 |    returns:
-|      1 if str starts with sub,
-|      0 if str is large enough but does not start with sub
+|   1 if str starts with sub,
+|   0 if str is large enough but does not start with sub
 |     -1 if str is too short to start with sub
 +---------------------------------------------------------------------*/
 static inline int
@@ -400,7 +391,7 @@ NPT_StringStartsWith(const char* str, const char* sub, bool ignore_case)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::StartsWith
+|   NPT_String::StartsWith
 +---------------------------------------------------------------------*/
 bool 
 NPT_String::StartsWith(const char *s, bool ignore_case) const
@@ -410,7 +401,7 @@ NPT_String::StartsWith(const char *s, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::EndsWith
+|   NPT_String::EndsWith
 +---------------------------------------------------------------------*/
 bool 
 NPT_String::EndsWith(const char *s, bool ignore_case) const
@@ -422,7 +413,7 @@ NPT_String::EndsWith(const char *s, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Find
+|   NPT_String::Find
 +---------------------------------------------------------------------*/
 int
 NPT_String::Find(const char* str, NPT_Ordinal start, bool ignore_case) const
@@ -451,7 +442,7 @@ NPT_String::Find(const char* str, NPT_Ordinal start, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Find
+|   NPT_String::Find
 +---------------------------------------------------------------------*/
 int
 NPT_String::Find(char c, NPT_Ordinal start, bool ignore_case) const
@@ -481,7 +472,7 @@ NPT_String::Find(char c, NPT_Ordinal start, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::ReverseFind
+|   NPT_String::ReverseFind
 +---------------------------------------------------------------------*/
 int
 NPT_String::ReverseFind(const char* str, NPT_Ordinal start, bool ignore_case) const
@@ -507,7 +498,7 @@ NPT_String::ReverseFind(const char* str, NPT_Ordinal start, bool ignore_case) co
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::ReverseFind
+|   NPT_String::ReverseFind
 +---------------------------------------------------------------------*/
 int
 NPT_String::ReverseFind(char c, NPT_Ordinal start, bool ignore_case) const
@@ -535,7 +526,7 @@ NPT_String::ReverseFind(char c, NPT_Ordinal start, bool ignore_case) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::MakeLowercase
+|   NPT_String::MakeLowercase
 +---------------------------------------------------------------------*/
 void
 NPT_String::MakeLowercase()
@@ -552,7 +543,7 @@ NPT_String::MakeLowercase()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::MakeUppercase
+|   NPT_String::MakeUppercase
 +---------------------------------------------------------------------*/
 void
 NPT_String::MakeUppercase() 
@@ -569,7 +560,7 @@ NPT_String::MakeUppercase()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::ToLowercase
+|   NPT_String::ToLowercase
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_String::ToLowercase() const
@@ -580,7 +571,7 @@ NPT_String::ToLowercase() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::ToUppercase
+|   NPT_String::ToUppercase
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_String::ToUppercase() const
@@ -591,7 +582,7 @@ NPT_String::ToUppercase() const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Replace
+|   NPT_String::Replace
 +---------------------------------------------------------------------*/
 void
 NPT_String::Replace(char a, char b) 
@@ -610,7 +601,7 @@ NPT_String::Replace(char a, char b)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Insert
+|   NPT_String::Insert
 +---------------------------------------------------------------------*/
 void
 NPT_String::Insert(const char* str, NPT_Ordinal where)
@@ -691,7 +682,7 @@ NPT_String::ToFloat(float& value, bool relaxed) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimLeft
+|   NPT_String::TrimLeft
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimLeft()
@@ -700,7 +691,7 @@ NPT_String::TrimLeft()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimLeft
+|   NPT_String::TrimLeft
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimLeft(char c)
@@ -710,7 +701,7 @@ NPT_String::TrimLeft(char c)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimLeft
+|   NPT_String::TrimLeft
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimLeft(const char* chars)
@@ -738,7 +729,7 @@ NPT_String::TrimLeft(const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimRight
+|   NPT_String::TrimRight
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimRight()
@@ -747,7 +738,7 @@ NPT_String::TrimRight()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimRight
+|   NPT_String::TrimRight
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimRight(char c)
@@ -757,7 +748,7 @@ NPT_String::TrimRight(char c)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::TrimRight
+|   NPT_String::TrimRight
 +---------------------------------------------------------------------*/
 void 
 NPT_String::TrimRight(const char* chars)
@@ -785,7 +776,7 @@ NPT_String::TrimRight(const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Trim
+|   NPT_String::Trim
 +---------------------------------------------------------------------*/
 void 
 NPT_String::Trim()
@@ -795,7 +786,7 @@ NPT_String::Trim()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Trim
+|   NPT_String::Trim
 +---------------------------------------------------------------------*/
 void 
 NPT_String::Trim(char c)
@@ -806,7 +797,7 @@ NPT_String::Trim(char c)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::Trim
+|   NPT_String::Trim
 +---------------------------------------------------------------------*/
 void 
 NPT_String::Trim(const char* chars)
@@ -816,7 +807,7 @@ NPT_String::Trim(const char* chars)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::operator+(const NPT_String&, const char*)
+|   NPT_String::operator+(const NPT_String&, const char*)
 +---------------------------------------------------------------------*/
 NPT_String 
 operator+(const NPT_String& s1, const char* s2)
@@ -840,7 +831,7 @@ operator+(const NPT_String& s1, const char* s2)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_String::operator+(const NPT_String& , const char*)
+|   NPT_String::operator+(const NPT_String& , const char*)
 +---------------------------------------------------------------------*/
 NPT_String 
 operator+(const char* s1, const NPT_String& s2)

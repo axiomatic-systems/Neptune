@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Byte Streams
+|   Neptune - Byte Streams
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptStreams.h"
 #include "NptUtils.h"
@@ -43,7 +43,7 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
     } 
 
     // pre-allocate the buffer
-    if (size) NPT_CHECK(buffer.GrowBuffer(size));
+    if (size) NPT_CHECK(buffer.Reserve(size));
 
     // read the data from the file
     total_bytes_read = 0;
@@ -71,7 +71,7 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
         if (bytes_to_read == 0) break;
 
         // ensure that the buffer has enough space
-        NPT_CHECK(buffer.GrowBuffer(total_bytes_read+bytes_to_read));
+        NPT_CHECK(buffer.Reserve(total_bytes_read+bytes_to_read));
 
         // read the data
         data = buffer.UseData()+total_bytes_read;
@@ -90,7 +90,7 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_InputStream::ReadFully
+|   NPT_InputStream::ReadFully
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_InputStream::ReadFully(void* buffer, NPT_Size bytes_to_read)
@@ -103,7 +103,7 @@ NPT_InputStream::ReadFully(void* buffer, NPT_Size bytes_to_read)
     while (bytes_to_read) {
         NPT_Result result = Read(buffer, bytes_to_read, &bytes_read);
         if (NPT_FAILED(result)) return result;
-        if (bytes_read == 0) return NPT_FAILURE;
+        if (bytes_read == 0) return NPT_ERROR_INTERNAL;
         NPT_ASSERT(bytes_read <= bytes_to_read);
         bytes_to_read -= bytes_read;
         buffer = (void*)(((NPT_Byte*)buffer)+bytes_read);
@@ -113,13 +113,13 @@ NPT_InputStream::ReadFully(void* buffer, NPT_Size bytes_to_read)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_InputStream::Skip
+|   NPT_InputStream::Skip
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_InputStream::Skip(NPT_Size count)
 {
     // get the current location
-    NPT_Offset position;
+    NPT_Position position;
     NPT_CHECK(Tell(position));
 
     // seek ahead
@@ -127,7 +127,7 @@ NPT_InputStream::Skip(NPT_Size count)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_OutputStream::WriteFully
+|   NPT_OutputStream::WriteFully
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_OutputStream::WriteFully(const void* buffer, NPT_Size bytes_to_write)
@@ -140,7 +140,7 @@ NPT_OutputStream::WriteFully(const void* buffer, NPT_Size bytes_to_write)
     while (bytes_to_write) {
         NPT_Result result = Write(buffer, bytes_to_write, &bytes_written);
         if (NPT_FAILED(result)) return result;
-        if (bytes_written == 0) return NPT_FAILURE;
+        if (bytes_written == 0) return NPT_ERROR_INTERNAL;
         NPT_ASSERT(bytes_written <= bytes_to_write);
         bytes_to_write -= bytes_written;
         buffer = (const void*)(((const NPT_Byte*)buffer)+bytes_written);
@@ -150,7 +150,7 @@ NPT_OutputStream::WriteFully(const void* buffer, NPT_Size bytes_to_write)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_OutputStream::WriteString
+|   NPT_OutputStream::WriteString
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_OutputStream::WriteString(const char* buffer)
@@ -166,7 +166,7 @@ NPT_OutputStream::WriteString(const char* buffer)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_OutputStream::WriteLine
+|   NPT_OutputStream::WriteLine
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_OutputStream::WriteLine(const char* buffer)
@@ -178,7 +178,7 @@ NPT_OutputStream::WriteLine(const char* buffer)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::NPT_MemoryStream
+|   NPT_MemoryStream::NPT_MemoryStream
 +---------------------------------------------------------------------*/
 NPT_MemoryStream::NPT_MemoryStream() : 
     m_ReadOffset(0),
@@ -187,7 +187,7 @@ NPT_MemoryStream::NPT_MemoryStream() :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::NPT_MemoryStream
+|   NPT_MemoryStream::NPT_MemoryStream
 +---------------------------------------------------------------------*/
 NPT_MemoryStream::NPT_MemoryStream(void* data, NPT_Size size) : 
     m_Buffer(data, size),
@@ -197,7 +197,7 @@ NPT_MemoryStream::NPT_MemoryStream(void* data, NPT_Size size) :
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::Read
+|   NPT_MemoryStream::Read
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_MemoryStream::Read(void*     buffer, 
@@ -227,10 +227,10 @@ NPT_MemoryStream::Read(void*     buffer,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::InputSeek
+|   NPT_MemoryStream::InputSeek
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_MemoryStream::InputSeek(NPT_Offset offset)
+NPT_MemoryStream::InputSeek(NPT_Position offset)
 {
     if (offset > m_Buffer.GetDataSize()) {
         return NPT_ERROR_INVALID_PARAMETERS;
@@ -241,14 +241,14 @@ NPT_MemoryStream::InputSeek(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::Write
+|   NPT_MemoryStream::Write
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_MemoryStream::Write(const void* data, 
                         NPT_Size    bytes_to_write, 
                         NPT_Size*   bytes_written)
 {
-    NPT_CHECK(m_Buffer.GrowBuffer(m_WriteOffset+bytes_to_write));
+    NPT_CHECK(m_Buffer.Reserve(m_WriteOffset+bytes_to_write));
 
     NPT_CopyMemory(m_Buffer.UseData()+m_WriteOffset, data, bytes_to_write);
     m_WriteOffset += bytes_to_write;
@@ -261,10 +261,10 @@ NPT_MemoryStream::Write(const void* data,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::OutputSeek
+|   NPT_MemoryStream::OutputSeek
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_MemoryStream::OutputSeek(NPT_Offset offset)
+NPT_MemoryStream::OutputSeek(NPT_Position offset)
 {
     if (offset <= m_Buffer.GetDataSize()) {
         m_WriteOffset = offset;
@@ -275,7 +275,7 @@ NPT_MemoryStream::OutputSeek(NPT_Offset offset)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::SetSize
+|   NPT_MemoryStream::SetSize
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_MemoryStream::SetSize(NPT_Size size)
@@ -291,13 +291,13 @@ NPT_MemoryStream::SetSize(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_MemoryStream::SetSize
+|   NPT_MemoryStream::SetSize
 +---------------------------------------------------------------------*/
 const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 4096; // copy 4k at a time
 NPT_Result 
 NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                        NPT_OutputStream& to,
-                       NPT_Offset        offset /* = 0 */,
+                       NPT_Position      offset /* = 0 */,
                        NPT_Size          size   /* = 0, 0 means the entire stream */)
 {
     // seek into the input if required

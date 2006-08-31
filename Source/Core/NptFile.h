@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Files
+|   Neptune - Files
 |
-|      (c) 2001-2004 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,13 +11,13 @@
 #define _NPT_FILE_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptStreams.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_ERROR_NO_SUCH_FILE      = NPT_ERROR_BASE_FILE - 0;
 const int NPT_ERROR_FILE_NOT_OPEN     = NPT_ERROR_BASE_FILE - 1;
@@ -37,12 +37,12 @@ const unsigned int NPT_FILE_OPEN_MODE_UNBUFFERED = 0x10;
 #define NPT_FILE_STANDARD_ERROR  "@STDERR"
 
 /*----------------------------------------------------------------------
-|       class references
+|   class references
 +---------------------------------------------------------------------*/
 class NPT_DataBuffer;
 
 /*----------------------------------------------------------------------
-|       NPT_FileInterface
+|   NPT_FileInterface
 +---------------------------------------------------------------------*/
 class NPT_FileInterface
 {
@@ -65,7 +65,7 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_File
+|   NPT_File
 +---------------------------------------------------------------------*/
 class NPT_File : public NPT_FileInterface
 {

@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Network Sockets
+|   Neptune - Network Sockets
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_SOCKETS_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptConstants.h"
@@ -21,29 +21,31 @@
 #include "NptNetwork.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
-const int NPT_ERROR_CONNECTION_RESET    = NPT_ERROR_BASE_SOCKET - 0;
-const int NPT_ERROR_CONNECTION_ABORTED  = NPT_ERROR_BASE_SOCKET - 1;
-const int NPT_ERROR_CONNECTION_REFUSED  = NPT_ERROR_BASE_SOCKET - 2;
-const int NPT_ERROR_CONNECTION_FAILED   = NPT_ERROR_BASE_SOCKET - 3;
-const int NPT_ERROR_HOST_UNKNOWN        = NPT_ERROR_BASE_SOCKET - 4;
-const int NPT_ERROR_SOCKET_FAILED       = NPT_ERROR_BASE_SOCKET - 5;
-const int NPT_ERROR_GETSOCKOPT_FAILED   = NPT_ERROR_BASE_SOCKET - 6;
-const int NPT_ERROR_BIND_FAILED         = NPT_ERROR_BASE_SOCKET - 7;
-const int NPT_ERROR_LISTEN_FAILED       = NPT_ERROR_BASE_SOCKET - 8;
-const int NPT_ERROR_ACCEPT_FAILED       = NPT_ERROR_BASE_SOCKET - 9;
-const int NPT_ERROR_ADDRESS_IN_USE      = NPT_ERROR_BASE_SOCKET - 10;
-const int NPT_ERROR_NETWORK_DOWN        = NPT_ERROR_BASE_SOCKET - 11;
-const int NPT_ERROR_NETWORK_UNREACHABLE = NPT_ERROR_BASE_SOCKET - 12;
+const int NPT_ERROR_CONNECTION_RESET      = NPT_ERROR_BASE_SOCKET - 0;
+const int NPT_ERROR_CONNECTION_ABORTED    = NPT_ERROR_BASE_SOCKET - 1;
+const int NPT_ERROR_CONNECTION_REFUSED    = NPT_ERROR_BASE_SOCKET - 2;
+const int NPT_ERROR_CONNECTION_FAILED     = NPT_ERROR_BASE_SOCKET - 3;
+const int NPT_ERROR_HOST_UNKNOWN          = NPT_ERROR_BASE_SOCKET - 4;
+const int NPT_ERROR_SOCKET_FAILED         = NPT_ERROR_BASE_SOCKET - 5;
+const int NPT_ERROR_GETSOCKOPT_FAILED     = NPT_ERROR_BASE_SOCKET - 6;
+const int NPT_ERROR_SETSOCKOPT_FAILED     = NPT_ERROR_BASE_SOCKET - 7;
+const int NPT_ERROR_SOCKET_CONTROL_FAILED = NPT_ERROR_BASE_SOCKET - 8;
+const int NPT_ERROR_BIND_FAILED           = NPT_ERROR_BASE_SOCKET - 9;
+const int NPT_ERROR_LISTEN_FAILED         = NPT_ERROR_BASE_SOCKET - 10;
+const int NPT_ERROR_ACCEPT_FAILED         = NPT_ERROR_BASE_SOCKET - 11;
+const int NPT_ERROR_ADDRESS_IN_USE        = NPT_ERROR_BASE_SOCKET - 12;
+const int NPT_ERROR_NETWORK_DOWN          = NPT_ERROR_BASE_SOCKET - 13;
+const int NPT_ERROR_NETWORK_UNREACHABLE   = NPT_ERROR_BASE_SOCKET - 14;
 
 /*----------------------------------------------------------------------
-|       forward references
+|   forward references
 +---------------------------------------------------------------------*/
 class NPT_Socket;
 
 /*----------------------------------------------------------------------
-|       NPT_SocketAddress
+|   NPT_SocketAddress
 +---------------------------------------------------------------------*/
 class NPT_SocketAddress 
 {
@@ -78,7 +80,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_SocketInfo
+|   NPT_SocketInfo
 +---------------------------------------------------------------------*/
 typedef struct {
     NPT_SocketAddress local_address;
@@ -86,7 +88,7 @@ typedef struct {
 } NPT_SocketInfo;
 
 /*----------------------------------------------------------------------
-|       NPT_SocketInterface
+|   NPT_SocketInterface
 +---------------------------------------------------------------------*/
 class NPT_SocketInterface
 {
@@ -95,17 +97,18 @@ class NPT_SocketInterface
 
     // interface methods
     virtual NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) = 0;
-    virtual NPT_Result Connect(const NPT_SocketAddress& address,
-                               NPT_Timeout timeout) = 0;
+    virtual NPT_Result Connect(const NPT_SocketAddress& address, NPT_Timeout timeout) = 0;
     virtual NPT_Result WaitForConnection(NPT_Timeout timeout) = 0;
     virtual NPT_Result GetInputStream(NPT_InputStreamReference& stream) = 0;
     virtual NPT_Result GetOutputStream(NPT_OutputStreamReference& stream) = 0;
     virtual NPT_Result GetInfo(NPT_SocketInfo& info) = 0;
     virtual NPT_Result SetBlockingMode(bool blocking) = 0;
+    virtual NPT_Result SetReadTimeout(NPT_Timeout timeout) = 0;
+    virtual NPT_Result SetWriteTimeout(NPT_Timeout timeout) = 0;
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UdpSocketInterface
+|   NPT_UdpSocketInterface
 +---------------------------------------------------------------------*/
 class NPT_UdpSocketInterface
 {
@@ -120,7 +123,7 @@ class NPT_UdpSocketInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UdpMulticastSocketInterface
+|   NPT_UdpMulticastSocketInterface
 +---------------------------------------------------------------------*/
 class NPT_UdpMulticastSocketInterface
 {
@@ -137,7 +140,7 @@ class NPT_UdpMulticastSocketInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_TcpServerSocketInterface
+|   NPT_TcpServerSocketInterface
 +---------------------------------------------------------------------*/
 class NPT_TcpServerSocketInterface
 {
@@ -151,7 +154,7 @@ class NPT_TcpServerSocketInterface
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Socket
+|   NPT_Socket
 +---------------------------------------------------------------------*/
 class NPT_Socket : public NPT_SocketInterface
 {
@@ -184,6 +187,12 @@ public:
     NPT_Result SetBlockingMode(bool blocking) {                      
         return m_SocketDelegate->SetBlockingMode(blocking);                            
     }                                                          
+    NPT_Result SetReadTimeout(NPT_Timeout timeout) {                      
+        return m_SocketDelegate->SetReadTimeout(timeout);                            
+    }                                                          
+    NPT_Result SetWriteTimeout(NPT_Timeout timeout) {                      
+        return m_SocketDelegate->SetWriteTimeout(timeout);                            
+    }                                                          
 
 protected:
     // constructor
@@ -194,7 +203,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UdpSocket
+|   NPT_UdpSocket
 +---------------------------------------------------------------------*/
 class NPT_UdpSocket : public NPT_Socket,
                       public NPT_UdpSocketInterface
@@ -223,7 +232,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UdpMulticastSocket
+|   NPT_UdpMulticastSocket
 +---------------------------------------------------------------------*/
 class NPT_UdpMulticastSocket : public NPT_UdpSocket, 
                                public NPT_UdpMulticastSocketInterface
@@ -257,7 +266,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_TcpClientSocket
+|   NPT_TcpClientSocket
 +---------------------------------------------------------------------*/
 class NPT_TcpClientSocket : public NPT_Socket
 {
@@ -268,7 +277,7 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_TcpServerSocket
+|   NPT_TcpServerSocket
 +---------------------------------------------------------------------*/
 class NPT_TcpServerSocket : public NPT_Socket,
                             public NPT_TcpServerSocketInterface

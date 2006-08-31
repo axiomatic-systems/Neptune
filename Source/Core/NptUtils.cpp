@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Utils
+|   Neptune - Utils
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include <math.h>
 
@@ -18,34 +18,34 @@
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       NPT_BytesToInt32Be
+|   NPT_BytesToInt32Be
 +---------------------------------------------------------------------*/
-unsigned long 
+NPT_UInt32 
 NPT_BytesToInt32Be(const unsigned char* bytes)
 {
     return 
-        ( ((unsigned long)bytes[0])<<24 ) |
-        ( ((unsigned long)bytes[1])<<16 ) |
-        ( ((unsigned long)bytes[2])<<8  ) |
-        ( ((unsigned long)bytes[3])     );    
+        ( ((NPT_UInt32)bytes[0])<<24 ) |
+        ( ((NPT_UInt32)bytes[1])<<16 ) |
+        ( ((NPT_UInt32)bytes[2])<<8  ) |
+        ( ((NPT_UInt32)bytes[3])     );    
 }
 
 /*----------------------------------------------------------------------
-|       NPT_BytesToInt16Be
+|   NPT_BytesToInt16Be
 +---------------------------------------------------------------------*/
-unsigned short 
+NPT_UInt16
 NPT_BytesToInt16Be(const unsigned char* bytes)
 {
     return 
-        ( ((unsigned short)bytes[0])<<8  ) |
-        ( ((unsigned short)bytes[1])     );    
+        ( ((NPT_UInt16)bytes[0])<<8  ) |
+        ( ((NPT_UInt16)bytes[1])     );    
 }
 
 /*----------------------------------------------------------------------
 |    NPT_BytesFromInt32Be
 +---------------------------------------------------------------------*/
 void 
-NPT_BytesFromInt32Be(unsigned char* buffer, unsigned long value)
+NPT_BytesFromInt32Be(unsigned char* buffer, NPT_UInt32 value)
 {
     buffer[0] = (unsigned char)(value>>24) & 0xFF;
     buffer[1] = (unsigned char)(value>>16) & 0xFF;
@@ -57,7 +57,7 @@ NPT_BytesFromInt32Be(unsigned char* buffer, unsigned long value)
 |    NPT_BytesFromInt16Be
 +---------------------------------------------------------------------*/
 void 
-NPT_BytesFromInt16Be(unsigned char* buffer, unsigned short value)
+NPT_BytesFromInt16Be(unsigned char* buffer, NPT_UInt16 value)
 {
     buffer[0] = (unsigned char)((value>> 8) & 0xFF);
     buffer[1] = (unsigned char)((value    ) & 0xFF);
@@ -65,7 +65,7 @@ NPT_BytesFromInt16Be(unsigned char* buffer, unsigned short value)
 
 #if !defined(NPT_CONFIG_HAVE_SNPRINTF)
 /*----------------------------------------------------------------------
-|       NPT_FormatString
+|   NPT_FormatString
 +---------------------------------------------------------------------*/
 int 
 NPT_FormatString(char* str, NPT_Size size, const char* format, ...)
@@ -76,7 +76,7 @@ NPT_FormatString(char* str, NPT_Size size, const char* format, ...)
 #endif // NPT_CONFIG_HAVE_SNPRINTF
 
 /*----------------------------------------------------------------------
-|       NPT_NibbleToHex
+|   NPT_NibbleToHex
 +---------------------------------------------------------------------*/
 static char NPT_NibbleToHex(unsigned int nibble)
 {
@@ -85,7 +85,7 @@ static char NPT_NibbleToHex(unsigned int nibble)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_HexToNibble
+|   NPT_HexToNibble
 +---------------------------------------------------------------------*/
 static unsigned int NPT_HexToNibble(char hex)
 {
@@ -99,7 +99,7 @@ static unsigned int NPT_HexToNibble(char hex)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_ByteToHex
+|   NPT_ByteToHex
 +---------------------------------------------------------------------*/
 void NPT_ByteToHex(NPT_Byte b, char* buffer)
 {
@@ -108,7 +108,7 @@ void NPT_ByteToHex(NPT_Byte b, char* buffer)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_HexToByte
+|   NPT_HexToByte
 +---------------------------------------------------------------------*/
 void NPT_HexToByte(const char* buffer, NPT_Byte& b)
 {
@@ -120,10 +120,11 @@ void NPT_HexToByte(const char* buffer, NPT_Byte& b)
 |    NPT_ParseInteger
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_ParseInteger(const char* str, long& result, bool relaxed)
+NPT_ParseInteger(const char* str, long& result, bool relaxed, NPT_Cardinal* chars_used)
 {
     // safe default value
     result = 0;
+    if (chars_used) *chars_used = 0;
 
     if (str == NULL) {
         return NPT_ERROR_INVALID_PARAMETERS;
@@ -133,6 +134,7 @@ NPT_ParseInteger(const char* str, long& result, bool relaxed)
     if (relaxed) {
         while (*str == ' ' || *str == '\t') {
             str++;
+            if (chars_used) (*chars_used)++;
         }
     }
     if (*str == '\0') {
@@ -145,19 +147,22 @@ NPT_ParseInteger(const char* str, long& result, bool relaxed)
         // negative number
         negative = true; 
         str++;
+        if (chars_used) (*chars_used)++;
     } else if (*str == '+') {
         // skip the + sign
         str++;
+        if (chars_used) (*chars_used)++;
     }
 
     // parse the digits
-    bool empty    = true;
-    long value    = 0;
+    bool empty      = true;
+    NPT_Int32 value = 0;
     char c;
     while ((c = *str++)) {
         if (c >= '0' && c <= '9') {
             value = 10*value + (c-'0');
             empty = false;
+            if (chars_used) (*chars_used)++;
         } else {
             if (relaxed) {
                 break;
@@ -175,6 +180,18 @@ NPT_ParseInteger(const char* str, long& result, bool relaxed)
     // return the result
     result = negative ? -value : value;
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|    NPT_ParseInteger32
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_ParseInteger32(const char* str, NPT_Int32& value, bool relaxed)
+{
+    long value_l;
+    NPT_Result result = NPT_ParseInteger(str, value_l, relaxed);
+    if (NPT_SUCCEEDED(result)) value = (NPT_Int32)value_l;
+    return result;
 }
 
 /*----------------------------------------------------------------------

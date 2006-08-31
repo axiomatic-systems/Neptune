@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Common Definitions
+|   Neptune - Common Definitions
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,13 +11,13 @@
 #define _NPT_COMMON_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       NPT_ObjectDeleter
+|   NPT_ObjectDeleter
 +---------------------------------------------------------------------*/
 template <class T>
 class NPT_ObjectDeleter {
@@ -28,7 +28,7 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_ObjectComparator
+|   NPT_ObjectComparator
 +---------------------------------------------------------------------*/
 template <class T>
 class NPT_ObjectComparator {
@@ -42,7 +42,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_ContainerFind
+|   NPT_ContainerFind
 +---------------------------------------------------------------------*/
 template <typename T, typename P>
 NPT_Result NPT_ContainerFind(T&                   container, 
@@ -60,7 +60,7 @@ NPT_Result NPT_ContainerFind(T&                   container,
 }
 
 /*----------------------------------------------------------------------
-|       NPT_UntilResultEquals
+|   NPT_UntilResultEquals
 +---------------------------------------------------------------------*/
 class NPT_UntilResultEquals
 {
@@ -86,7 +86,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_UntilResultNotEquals
+|   NPT_UntilResultNotEquals
 +---------------------------------------------------------------------*/
 class NPT_UntilResultNotEquals
 {
@@ -109,7 +109,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_PropertyValue
+|   NPT_PropertyValue
 +---------------------------------------------------------------------*/
 class NPT_PropertyValue
 {

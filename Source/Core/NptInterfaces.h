@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Interfaces
+|   Neptune - Interfaces
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,26 +11,26 @@
 #define _NPT_INTERFACES_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptCommon.h"
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
 const int NPT_ERROR_NO_SUCH_INTERFACE = NPT_ERROR_BASE_INTERFACES - 0;
 
-#if 0 // disabled
+#if 0 // disabled, use NPT_Reference instead
 /*----------------------------------------------------------------------
-|       macros
+|   macros
 +---------------------------------------------------------------------*/
 #define NPT_RELEASE(o) do { if (o) (o)->Release(); (o) = NULL; } while (0)
 #define NPT_ADD_REFERENCE(o) do { if (o) (o)->AddReference(); } while (0)
 
 /*----------------------------------------------------------------------
-|       NPT_Referenceable
+|   NPT_Referenceable
 +---------------------------------------------------------------------*/
 class NPT_Referenceable
 {
@@ -47,7 +47,7 @@ protected:
 #endif
 
 /*----------------------------------------------------------------------
-|       NPT_InterfaceId
+|   NPT_InterfaceId
 +---------------------------------------------------------------------*/
 class NPT_InterfaceId
 {
@@ -63,7 +63,7 @@ class NPT_InterfaceId
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Polymorphic
+|   NPT_Polymorphic
 +---------------------------------------------------------------------*/
 class NPT_Polymorphic
 {
@@ -77,7 +77,20 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Configurable
+|   NPT_Interruptible
++---------------------------------------------------------------------*/
+class NPT_Interruptible
+{
+public:
+    // destructor
+    virtual ~NPT_Interruptible() {}
+
+    // methods
+    virtual NPT_Result Interrupt() = 0;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_Configurable
 +---------------------------------------------------------------------*/
 class NPT_Configurable
 {

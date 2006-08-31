@@ -123,11 +123,22 @@ NPT_Result
 NPT_System::SleepUntil(const NPT_TimeStamp& when)
 {
     struct timespec timeout;
+    struct timeval  now;
     int             result;
 
+    // get current time from system
+    if (gettimeofday(&now, NULL)) {
+        return NPT_FAILURE;
+    }
+
     // setup timeout
-    timeout.tv_sec  = when.m_Seconds;
-    timeout.tv_nsec = when.m_NanoSeconds;
+    timeout.tv_sec  = now.tv_sec + when.m_Seconds;
+    timeout.tv_nsec = now.tv_usec * 1000 + when.m_NanoSeconds;
+
+    if (timeout.tv_nsec >= 1000000000) {
+        timeout.tv_sec  += timeout.tv_nsec / 1000000000;
+        timeout.tv_nsec %= 1000000000;
+    }
 
     // sleep
     do {

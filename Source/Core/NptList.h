@@ -1,9 +1,9 @@
 /*****************************************************************
 |
-|      Neptune - Lists
+|   Neptune - Lists
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2006 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
@@ -11,7 +11,7 @@
 #define _NPT_LIST_H_
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
 #include "NptResults.h"
 #include "NptTypes.h"
@@ -19,13 +19,14 @@
 #include "NptCommon.h"
 
 /*----------------------------------------------------------------------
-|       constants
+|   constants
 +---------------------------------------------------------------------*/
-const int NPT_ERROR_LIST_EMPTY             = NPT_ERROR_BASE_LIST - 0;
-const int NPT_ERROR_LIST_OPERATION_ABORTED = NPT_ERROR_BASE_LIST - 1;
+const int NPT_ERROR_LIST_EMPTY              = NPT_ERROR_BASE_LIST - 0;
+const int NPT_ERROR_LIST_OPERATION_ABORTED  = NPT_ERROR_BASE_LIST - 1;
+const int NPT_ERROR_LIST_OPERATION_CONTINUE = NPT_ERROR_BASE_LIST - 2;
 
 /*----------------------------------------------------------------------
-|       NPT_List
+|   NPT_List
 +---------------------------------------------------------------------*/
 template <typename T> 
 class NPT_List 
@@ -187,7 +188,7 @@ protected:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::NPT_List
+|   NPT_List<T>::NPT_List
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -196,7 +197,7 @@ NPT_List<T>::NPT_List() : m_ItemCount(0), m_Head(0), m_Tail(0)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::NPT_List
+|   NPT_List<T>::NPT_List
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -206,7 +207,7 @@ NPT_List<T>::NPT_List(const NPT_List<T>& list) : m_ItemCount(0), m_Head(0), m_Ta
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::~NPT_List<T>
+|   NPT_List<T>::~NPT_List<T>
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -216,7 +217,7 @@ NPT_List<T>::~NPT_List()
 }
  
 /*----------------------------------------------------------------------
-|       NPT_List<T>::operator=
+|   NPT_List<T>::operator=
 +---------------------------------------------------------------------*/
 template <typename T>
 void
@@ -234,7 +235,7 @@ NPT_List<T>::operator=(const NPT_List<T>& list)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::operator==
+|   NPT_List<T>::operator==
 +---------------------------------------------------------------------*/
 template <typename T>
 bool
@@ -256,7 +257,7 @@ NPT_List<T>::operator==(const NPT_List<T>& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::operator!=
+|   NPT_List<T>::operator!=
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -267,7 +268,7 @@ NPT_List<T>::operator!=(const NPT_List<T>& other) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Clear
+|   NPT_List<T>::Clear
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -289,7 +290,7 @@ NPT_List<T>::Clear()
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Add
+|   NPT_List<T>::Add
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -315,7 +316,7 @@ NPT_List<T>::Add(Item& item)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Add
+|   NPT_List<T>::Add
 +---------------------------------------------------------------------*/
 template <typename T>
 inline
@@ -326,7 +327,7 @@ NPT_List<T>::Add(const T& data)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::GetItem
+|   NPT_List<T>::GetItem
 +---------------------------------------------------------------------*/
 template <typename T>
 typename NPT_List<T>::Iterator
@@ -344,7 +345,7 @@ NPT_List<T>::GetItem(NPT_Ordinal n) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Insert
+|   NPT_List<T>::Insert
 +---------------------------------------------------------------------*/
 template <typename T>
 inline NPT_Result
@@ -354,7 +355,7 @@ NPT_List<T>::Insert(Iterator where, const T&data)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Insert
+|   NPT_List<T>::Insert
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -385,7 +386,7 @@ NPT_List<T>::Insert(Iterator where, Item& item)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Erase
+|   NPT_List<T>::Erase
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -399,7 +400,7 @@ NPT_List<T>::Erase(Iterator position)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Remove
+|   NPT_List<T>::Remove
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -428,7 +429,7 @@ NPT_List<T>::Remove(const T& data, bool all)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Detach
+|   NPT_List<T>::Detach
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -465,7 +466,7 @@ NPT_List<T>::Detach(Item& item)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Get
+|   NPT_List<T>::Get
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -478,7 +479,7 @@ NPT_List<T>::Get(NPT_Ordinal index, T& data) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Get
+|   NPT_List<T>::Get
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -497,7 +498,7 @@ NPT_List<T>::Get(NPT_Ordinal index, T*& data) const
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::PopHead
+|   NPT_List<T>::PopHead
 +---------------------------------------------------------------------*/
 template <typename T>
 NPT_Result
@@ -526,7 +527,7 @@ NPT_List<T>::PopHead(T& data)
 }
 
 /*----------------------------------------------------------------------
-|       NPT_List<T>::Contains
+|   NPT_List<T>::Contains
 +---------------------------------------------------------------------*/
 template <typename T>
 bool

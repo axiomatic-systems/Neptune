@@ -1,24 +1,22 @@
 /*****************************************************************
 |
-|      Neptune - Threads :: Win32 Implementation
+|   Neptune - Threads :: Win32 Implementation
 |
-|      (c) 2001-2003 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2003 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
-#include <windows.h>
-
 #include "NptConfig.h"
 #include "NptTypes.h"
 #include "NptThreads.h"
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Win32Mutex
+|   NPT_Win32Mutex
 +---------------------------------------------------------------------*/
 class NPT_Win32Mutex : public NPT_MutexInterface
 {
@@ -37,7 +35,7 @@ private:
 };
 
 /*----------------------------------------------------------------------
-|       NPT_Win32CriticalSection
+|   NPT_Win32CriticalSection
 +---------------------------------------------------------------------*/
 class NPT_Win32CriticalSection
 {

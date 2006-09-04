@@ -16,7 +16,7 @@ include $(NPT_BUILD_INCLUDES)/ImportModuleDeps.mak
 #######################################################################
 # sources and object files
 #######################################################################
-NPT_MODULE_SOURCES = XmlTest1.cpp
+NPT_MODULE_SOURCES = XmlTest1.cpp XmlTest1Data.cpp
 NPT_MODULE_OBJECTS = $(NPT_MODULE_SOURCES:.cpp=.o)
 
 #######################################################################

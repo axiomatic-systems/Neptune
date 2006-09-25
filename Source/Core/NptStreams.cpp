@@ -291,7 +291,7 @@ NPT_MemoryStream::SetSize(NPT_Size size)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_MemoryStream::SetSize
+|   NPT_StreamToStreamCopy
 +---------------------------------------------------------------------*/
 const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 4096; // copy 4k at a time
 NPT_Result 

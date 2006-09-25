@@ -125,15 +125,15 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(a_array.GetItemCount() == 207);
     NPT_ASSERT(a_array[206] == A(9,10));
 
-	a_array.Clear();
-	a_array.Insert(a_array.GetFirstItem(), A(1, 'c'));
-	NPT_ASSERT(a_array.GetItemCount() == 1);
-	NPT_ASSERT(a_array[0] == A(1,'c'));
-	
-	a_array.Insert(a_array.GetItem(1), A(2, 'd'));
-	NPT_ASSERT(a_array.GetItemCount() == 2);
-	NPT_ASSERT(a_array[0] == A(1,'c'));
-	NPT_ASSERT(a_array[1] == A(2,'d'));
+    a_array.Clear();
+    a_array.Insert(a_array.GetFirstItem(), A(1, 'c'));
+    NPT_ASSERT(a_array.GetItemCount() == 1);
+    NPT_ASSERT(a_array[0] == A(1,'c'));
+    
+    a_array.Insert(a_array.GetItem(1), A(2, 'd'));
+    NPT_ASSERT(a_array.GetItemCount() == 2);
+    NPT_ASSERT(a_array[0] == A(1,'c'));
+    NPT_ASSERT(a_array[1] == A(2,'d'));
 
     NPT_Array<int>* int_array = new NPT_Array<int>(100);
     NPT_ASSERT(int_array->GetItemCount() == 0);

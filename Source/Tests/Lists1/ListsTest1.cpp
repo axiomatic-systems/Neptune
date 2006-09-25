@@ -88,20 +88,20 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(a_list.GetItem(1) == ++a_list.GetFirstItem());
 
     a_list.Clear();
-	NPT_ASSERT(a_list.GetItemCount() == 0);
-	a_list.Insert(a_list.GetFirstItem(), A(7,9));
-	NPT_ASSERT(a_list.GetItemCount() == 1);
-	NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
+    NPT_ASSERT(a_list.GetItemCount() == 0);
+    a_list.Insert(a_list.GetFirstItem(), A(7,9));
+    NPT_ASSERT(a_list.GetItemCount() == 1);
+    NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
 
-	a_list.Add(A(1, 2));
-	NPT_ASSERT(a_list.GetItemCount() == 2);
-	NPT_ASSERT(A_Count == 3);
-	NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
-	NPT_ASSERT(*a_list.GetLastItem()  == A(1,2));
-	
-	a_list.Insert(a_list.GetLastItem(), A(3,4));
-	NPT_ASSERT(a_list.GetItemCount() == 3);
-	NPT_ASSERT(*a_list.GetLastItem() == A(1,2));
+    a_list.Add(A(1, 2));
+    NPT_ASSERT(a_list.GetItemCount() == 2);
+    NPT_ASSERT(A_Count == 3);
+    NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
+    NPT_ASSERT(*a_list.GetLastItem()  == A(1,2));
+    
+    a_list.Insert(a_list.GetLastItem(), A(3,4));
+    NPT_ASSERT(a_list.GetItemCount() == 3);
+    NPT_ASSERT(*a_list.GetLastItem() == A(1,2));
 
     // test ApplyUntil 
     ApplyCounter = 0;
@@ -124,21 +124,21 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(ApplyCounter == 3);
 
     a_list.Insert(NPT_List<A>::Iterator(NULL), A(3,4));
-	NPT_ASSERT(a_list.GetItemCount() == 4);
-	NPT_ASSERT(*a_list.GetLastItem() == A(3,4));
+    NPT_ASSERT(a_list.GetItemCount() == 4);
+    NPT_ASSERT(*a_list.GetLastItem() == A(3,4));
 
-	a_list.Insert(a_list.GetFirstItem(), A(7,8));
-	NPT_ASSERT(a_list.GetItemCount() == 5);
-	NPT_ASSERT(*a_list.GetFirstItem() == A(7,8));
+    a_list.Insert(a_list.GetFirstItem(), A(7,8));
+    NPT_ASSERT(a_list.GetItemCount() == 5);
+    NPT_ASSERT(*a_list.GetFirstItem() == A(7,8));
 
-	a_list.Insert(a_list.GetItem(2), A(9,10));
-	NPT_ASSERT(a_list.GetItemCount() == 6);
-	NPT_ASSERT(*a_list.GetItem(2) == A(9,10));
+    a_list.Insert(a_list.GetItem(2), A(9,10));
+    NPT_ASSERT(a_list.GetItemCount() == 6);
+    NPT_ASSERT(*a_list.GetItem(2) == A(9,10));
 
-	a_list.Erase(a_list.GetItem(1));
-	NPT_ASSERT(a_list.GetItemCount() == 5);
-	NPT_ASSERT(*a_list.GetItem(1) == A(9,10));
-	NPT_ASSERT(A_Count == 1+a_list.GetItemCount());
+    a_list.Erase(a_list.GetItem(1));
+    NPT_ASSERT(a_list.GetItemCount() == 5);
+    NPT_ASSERT(*a_list.GetItem(1) == A(9,10));
+    NPT_ASSERT(A_Count == 1+a_list.GetItemCount());
 
     NPT_List<int> i1_list;
     NPT_List<int> i2_list;
@@ -173,5 +173,5 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
     NPT_ASSERT(i == 4);
 
-	return 0;
+    return 0;
 }

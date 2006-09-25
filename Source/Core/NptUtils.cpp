@@ -87,21 +87,24 @@ static char NPT_NibbleToHex(unsigned int nibble)
 /*----------------------------------------------------------------------
 |   NPT_HexToNibble
 +---------------------------------------------------------------------*/
-static unsigned int NPT_HexToNibble(char hex)
+static int NPT_HexToNibble(char hex)
 {
-    if (hex >= 'a') {
+    if (hex >= 'a' && hex <= 'f') {
         return ((hex - 'a') + 10);
-    } else if (hex >= 'A') {
+    } else if (hex >= 'A' && hex <= 'F') {
         return ((hex - 'A') + 10);
-    } else {
+    } else if (hex >= '0' && hex <= '9') {
         return (hex - '0');
+    } else {
+        return -1;
     }
 }
 
 /*----------------------------------------------------------------------
 |   NPT_ByteToHex
 +---------------------------------------------------------------------*/
-void NPT_ByteToHex(NPT_Byte b, char* buffer)
+void
+NPT_ByteToHex(NPT_Byte b, char* buffer)
 {
     buffer[0] = NPT_NibbleToHex((b>>4) & 0x0F);
     buffer[1] = NPT_NibbleToHex(b      & 0x0F);
@@ -110,10 +113,17 @@ void NPT_ByteToHex(NPT_Byte b, char* buffer)
 /*----------------------------------------------------------------------
 |   NPT_HexToByte
 +---------------------------------------------------------------------*/
-void NPT_HexToByte(const char* buffer, NPT_Byte& b)
+NPT_Result
+NPT_HexToByte(const char* buffer, NPT_Byte& b)
 {
-    NPT_ASSERT(NPT_StringLength(buffer) >= 2);
-    b = (NPT_HexToNibble(buffer[0]) << 4) | NPT_HexToNibble(buffer[1]);
+    int nibble_0 = NPT_HexToNibble(buffer[0]);
+    if (nibble_0 < 0) return NPT_ERROR_INVALID_SYNTAX;
+    
+    int nibble_1 = NPT_HexToNibble(buffer[1]);
+    if (nibble_1 < 0) return NPT_ERROR_INVALID_SYNTAX;
+
+    b = (nibble_0 << 4) | nibble_1;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------

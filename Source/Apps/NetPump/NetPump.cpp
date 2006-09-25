@@ -266,8 +266,8 @@ GetEndPointStreams(EndPoint*                  endpoint,
                           endpoint->info.tcp_server.port);
             }
 
-			// bind to the address
-			server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, 
+            // bind to the address
+            server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, 
                         endpoint->info.tcp_server.port));
 
             // wait for connection

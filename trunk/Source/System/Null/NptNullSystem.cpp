@@ -31,7 +31,7 @@ public:
    ~NPT_NullSystem(){}
     NPT_Result  GetProcessId(NPT_Integer& id) { 
         id = 0; 
-	return NPT_SUCCESS; 
+        return NPT_SUCCESS; 
     }
     NPT_Result  GetCurrentTimeStamp(NPT_TimeStamp& now) {
         now = 0.0f;

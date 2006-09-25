@@ -132,7 +132,7 @@ NPT_PosixSharedVariable::SetValue(NPT_Integer value)
 {
     pthread_mutex_lock(&m_Mutex);
     m_Value = value;
-    pthread_cond_signal(&m_Condition);
+    pthread_cond_broadcast(&m_Condition);
     pthread_mutex_unlock(&m_Mutex);
     
     return NPT_SUCCESS;

@@ -25,7 +25,7 @@ ShowRequest(NPT_HttpRequest* request)
 {
     // show response info
     NPT_Debug("REQUEST: url=%s, protocol=%s\n",
-              request->GetUrl().AsString().GetChars(),
+              request->GetUrl().ToString().GetChars(),
               request->GetProtocol().GetChars());
 
     // show headers
@@ -33,7 +33,7 @@ ShowRequest(NPT_HttpRequest* request)
     NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
     while (header) {
         NPT_Debug("%s: %s\n", 
-		  (const char*)(*header)->GetName(),
+          (const char*)(*header)->GetName(),
           (const char*)(*header)->GetValue());
         ++header;
     }
@@ -67,16 +67,27 @@ TestHttp()
 {
     NPT_HttpServer            server;
     NPT_HttpRequest*          request;
-    NPT_OutputStreamReference stream;
+    NPT_InputStreamReference  input;
+    NPT_OutputStreamReference output;
+    NPT_SocketAddress         local_address;
 
-    NPT_Result result = server.WaitForRequest(request, stream);
-    NPT_Debug("WaitForRequest returned %d\n", result);
+    NPT_Result result = server.WaitForNewClient(input, 
+                                                output,
+                                                &local_address,
+                                                NULL);
+    NPT_Debug("WaitForNewClient returned %d\n", result);
     if (NPT_FAILED(result)) return;
+
+    NPT_HttpResponder responder(input, output);
+    result = responder.ParseRequest(request, &local_address);
+    if (NPT_FAILED(result)) {
+        NPT_Debug("ParseRequest failed\n");
+    }
 
     ShowRequest(request);
 
     NPT_HttpResponse response(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
-    server.SendResponse(response, *stream);
+    responder.SendResponse(response);
 
     delete request;
 }

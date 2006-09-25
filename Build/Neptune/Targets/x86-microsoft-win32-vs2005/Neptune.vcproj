@@ -46,7 +46,8 @@
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -110,13 +111,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				OmitFramePointers="true"
-				WholeProgramOptimization="true"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Neptune;..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"
 				ExceptionHandling="0"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="true"
 				EnableFunctionLevelLinking="true"
 				FloatingPointModel="2"
 				UsePrecompiledHeader="0"
@@ -188,6 +189,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptDebug.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptFile.cpp"
 				>
 			</File>
 			<File
@@ -409,7 +414,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Core\NptVersion.h"
+				RelativePath="..\..\..\..\Source\Neptune\NptVersion.h"
 				>
 			</File>
 			<File

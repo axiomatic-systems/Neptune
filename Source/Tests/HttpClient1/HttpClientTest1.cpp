@@ -54,7 +54,7 @@ ShowResponse(NPT_HttpResponse* response)
     NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
     while (header) {
         NPT_Debug("%s: %s\n", 
-		  (const char*)(*header)->GetName(),
+          (const char*)(*header)->GetName(),
                   (const char*)(*header)->GetValue());
         ++header;
     }

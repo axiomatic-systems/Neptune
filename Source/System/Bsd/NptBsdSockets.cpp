@@ -249,7 +249,7 @@ typedef int         SocketFd;
 #undef ENETDOWN      
 #undef ENETUNREACH   
 #undef EAGAIN        
-#undef EINTR	     
+#undef EINTR     
 #undef EINPROGRESS
 
 #define EWOULDBLOCK   SYS_NET_EWOULDBLOCK 
@@ -262,7 +262,7 @@ typedef int         SocketFd;
 #define ENETDOWN      SYS_NET_ENETDOWN
 #define ENETUNREACH   SYS_NET_ENETUNREACH
 #define EAGAIN        SYS_NET_EAGAIN
-#define EINTR	      SYS_NET_EINTR
+#define EINTR         SYS_NET_EINTR
 #define EINPROGRESS   SYS_NET_EINPROGRESS
 
 typedef void*        SocketBuffer;

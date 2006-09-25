@@ -12,30 +12,7 @@
 +---------------------------------------------------------------------*/
 #include "NptUri.h"
 #include "NptUtils.h"
-
-/*----------------------------------------------------------------------
-|   NPT_Uri::NPT_Uri
-+---------------------------------------------------------------------*/
-NPT_Uri::NPT_Uri(const char* uri) :
-    m_Uri(uri)
-{
-    if (uri == NULL) return;
-
-    // parse the scheme
-    const char* scheme = uri;
-    while (*scheme) {
-        if (*scheme == ':') {
-            m_Scheme.Assign(uri, (NPT_Size)(scheme-uri));
-            m_Scheme.MakeLowercase();
-            m_Specific = scheme+1;
-
-            // compute the scheme id
-            m_SchemeId = ParseScheme(m_Scheme);
-            return;
-        }
-        scheme++;
-    }
-}
+#include "NptResults.h"
 
 /*----------------------------------------------------------------------
 |   NPT_Uri::ParseScheme
@@ -51,10 +28,67 @@ NPT_Uri::ParseScheme(const NPT_String& scheme)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_Uri::SetScheme
++---------------------------------------------------------------------*/
+void
+NPT_Uri::SetScheme(const char* scheme)
+{
+    m_Scheme = scheme;
+    m_Scheme.MakeLowercase();
+    m_SchemeId = ParseScheme(m_Scheme);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Uri::SetSchemeFromUri
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Uri::SetSchemeFromUri(const char* uri)
+{
+    const char* start = uri;
+    char c;
+    while ((c =*uri++)) {
+        if (c == ':') {
+            m_Scheme.Assign(start, uri-start-1);
+            m_Scheme.MakeLowercase();
+            m_SchemeId = ParseScheme(m_Scheme);
+            return NPT_SUCCESS;
+        } else if ((c >= 'a' && c <= 'z') ||
+                   (c >= 'A' && c <= 'Z') ||
+                   (c >= '0' && c <= '9') ||
+                   (c == '+')             ||
+                   (c == '.')             ||
+                   (c == '-')) {
+            continue;
+        } else {
+            break;
+        }
+    }
+    return NPT_ERROR_INVALID_SYNTAX;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Uri::PathCharsToEncode
++---------------------------------------------------------------------*/
+const char* const
+NPT_Uri::PathCharsToEncode = " !\"#$&'()*+,:;<=>?@[\\]^`{|}~";
+
+/*----------------------------------------------------------------------
+|   NPT_Uri::QueryCharsToEncode
++---------------------------------------------------------------------*/
+const char* const
+NPT_Uri::QueryCharsToEncode = " !\"#$&'()*+,/:;<=>?@[\\]^`{|}~";
+
+/*----------------------------------------------------------------------
+|   NPT_Uri::UnsafeCharsToEncode
++---------------------------------------------------------------------*/
+const char* const
+NPT_Uri::UnsafeCharsToEncode = " \"#<>[\\]^`{|}~";
+
+/*----------------------------------------------------------------------
 |   NPT_Uri::Encode
 +---------------------------------------------------------------------*/
 NPT_String
-NPT_Uri::Encode(const char* uri)
+NPT_Uri::Encode(const char* uri, const char* chars, bool encode_percents)
 {
     NPT_String encoded;
 
@@ -68,23 +102,25 @@ NPT_Uri::Encode(const char* uri)
     char escaped[3];
     escaped[0] = '%';
     while (unsigned char c = *uri++) {
-        if (c == '<'   ||
-            c == '>'   || 
-            c == '"'   || 
-            c == '\\'  ||
-            c == '^'   ||
-            c == '`'   ||
-            c == ']'   ||
-            c == '['   ||
-            c == '#'   ||
-            c == '%'   ||
-            c <= 0x20  ||
-            c >= 0x7B) {  // this includes { } and | 
-            // needs to be escaped
+        bool encode = false;
+        if (encode_percents && c == '%') {
+            encode = true;
+        } else {
+            const char* match = chars;
+            while (*match) {
+                if (c == *match) {
+                    encode = true;
+                    break;
+                }
+                ++match;
+            }
+        }
+        if (encode) {
+            // encode
             NPT_ByteToHex(c, &escaped[1]);
             encoded.Append(escaped, 3);
         } else {
-            // no escaping required
+            // no encoding required
             encoded += c;
         }
     }
@@ -111,9 +147,10 @@ NPT_Uri::Decode(const char* uri)
         if (c == '%') {
             // needs to be unescaped
             unsigned char unescaped;
-            NPT_HexToByte(uri, unescaped);
-            decoded += unescaped;
-            uri += 2;
+            if (NPT_SUCCEEDED(NPT_HexToByte(uri, unescaped))) {
+                decoded += unescaped;
+                uri += 2;
+            }
         } else {
             // no unescaping required
             decoded += c;

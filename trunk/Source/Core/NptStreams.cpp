@@ -189,7 +189,7 @@ NPT_MemoryStream::NPT_MemoryStream() :
 /*----------------------------------------------------------------------
 |   NPT_MemoryStream::NPT_MemoryStream
 +---------------------------------------------------------------------*/
-NPT_MemoryStream::NPT_MemoryStream(void* data, NPT_Size size) : 
+NPT_MemoryStream::NPT_MemoryStream(const void* data, NPT_Size size) : 
     m_Buffer(data, size),
     m_ReadOffset(0),
     m_WriteOffset(0)

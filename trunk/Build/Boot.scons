@@ -13,7 +13,7 @@ PLATFORM_TO_TARGET_MAP = {
     'darwin'     : 'powerpc-apple-macosx'
 }
   
-CROSS_PLATFORMS = ['ppu-sony-ps3']
+CROSS_PLATFORMS = ['ppu-sony-ps3', 'arm-unknown-linux', 'mips-unknown-linux', 'powerpc-unknown-linux', 'arm-gp2x-linux']
   
 def DefaultTarget():
     if PLATFORM_TO_TARGET_MAP.has_key(sys.platform):
@@ -28,6 +28,7 @@ def DefaultTarget():
 options = Options()
 options.AddOptions(
     EnumOption('target', 'build target', DefaultTarget(), allowed_values=PLATFORM_TO_TARGET_MAP.values()+CROSS_PLATFORMS),
+    BoolOption('enable_profiling', 'enable profiling', False),
     ListOption('build_configs', 'build configurations', 'Debug', names=['Debug', 'Release'])
 )
 

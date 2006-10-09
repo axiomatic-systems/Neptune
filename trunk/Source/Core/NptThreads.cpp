@@ -83,7 +83,7 @@ NPT_ThreadCallbackSlot::ReceiveCallback(NPT_ThreadCallbackReceiver& receiver,
 
     // process the callback
     //NPT_Debug("NPT_ThreadCallbackSlot::ReceiveCallback - calling back\n");
-    receiver.OnCallback((void*)m_CallbackArgs);
+    receiver.OnCallback(const_cast<void*>(m_CallbackArgs));
 
     // signal that we've processed the callback
     m_Pending.SetValue(0);

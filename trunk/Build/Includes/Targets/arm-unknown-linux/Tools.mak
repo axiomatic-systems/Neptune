@@ -10,7 +10,7 @@
 ##########################################################################
 #    tools
 ##########################################################################
-NPT_CROSS_PREFIX=arm-xscale-linux-
+NPT_CROSS_PREFIX=arm-linux-
 
 NPT_COMPILE_CPP   = $(NPT_CROSS_PREFIX)g++
 NPT_FLAGS_CPP     = -ansi -pedantic

@@ -28,7 +28,7 @@
 |       main
 +---------------------------------------------------------------------*/
 int
-main(int argc, char** argv)
+main(int /*argc*/, char** /*argv*/)
 {
     // setup debugging
 #if defined(WIN32) && defined(_DEBUG)
@@ -192,9 +192,22 @@ main(int argc, char** argv)
     CHECK(url.IsValid());
     CHECK(url.GetHost() == "bar.com");
     CHECK(url.GetPort() == 8080);
-    CHECK(url.GetPath() == "/bla/foo");
+    CHECK(url.GetPath() == "bla/foo");
     CHECK(url.GetQuery() == "query=bar");
- 
+
+    url.SetPathPlus("*");
+    CHECK(url.IsValid());
+    CHECK(url.GetPath() == "*");
+
+    url = NPT_HttpUrl("http://foo/?query=1&bla=2&slash=/&foo=a#fragment");
+    CHECK(url.IsValid());
+    CHECK(url.GetHost() == "foo");
+    CHECK(url.GetPort() == 80);
+    CHECK(url.GetPath() == "/");
+    CHECK(url.GetQuery() == "query=1&bla=2&slash=/&foo=a");
+    CHECK(url.GetFragment() == "fragment");
+    CHECK(url.ToRequestString() == "/?query=1&bla=2&slash=/&foo=a");
+
     // url form encoding
     NPT_HttpUrlQuery query;
     query.AddField("url1","http://foo.bar/foo?q=3&bar=+7/3");

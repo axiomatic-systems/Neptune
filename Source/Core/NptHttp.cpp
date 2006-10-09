@@ -84,6 +84,23 @@ NPT_HttpUrlQuery::AddField(const char* name, const char* value)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpUrlQuery::GetField
++---------------------------------------------------------------------*/
+const char* 
+NPT_HttpUrlQuery::GetField(const char* name)
+{
+    for (NPT_List<Field>::Iterator it = m_Fields.GetFirstItem();
+         it;
+         ++it) {
+         Field& field = *it;
+         if (field.m_Name == name) return field.m_Value;
+    }
+
+    // field not found
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
 |   types
 +---------------------------------------------------------------------*/
 typedef enum {
@@ -157,10 +174,11 @@ NPT_HttpUrl::NPT_HttpUrl(const char* url, bool ignore_scheme) :
           case NPT_HTTP_URL_PARSER_STATE_HOST:
             if (c == ':' || c == '/' || c == '\0') {
                 m_Host.Assign(mark, (NPT_Size)(url-1-mark));
-                mark = url;
                 if (c == ':') {
+                    mark = url;
                     state = NPT_HTTP_URL_PARSER_STATE_PORT;
                 } else {
+                    mark = url-1;
                     m_Port = NPT_HTTP_DEFAULT_PORT;
                     state = NPT_HTTP_URL_PARSER_STATE_PATH;
                 }
@@ -176,7 +194,7 @@ NPT_HttpUrl::NPT_HttpUrl(const char* url, bool ignore_scheme) :
                 }
                 m_Port = val;
             } else if (c == '/' || c == '\0') {
-                mark = url;
+                mark = url-1;
                 state = NPT_HTTP_URL_PARSER_STATE_PATH;
             } else {
                 // invalid character
@@ -256,12 +274,8 @@ NPT_HttpUrl::SetHost(const char* host)
 NPT_Result 
 NPT_HttpUrl::SetPort(NPT_UInt16 port)
 {
-    if (port <= 65535) {
-        m_Port = port;
-        return NPT_SUCCESS;
-    } else {
-        return NPT_ERROR_INVALID_PARAMETERS;
-    }
+    m_Port = port;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -285,14 +299,14 @@ NPT_HttpUrl::SetPathPlus(const char* path_plus)
     if (path_plus == NULL) return NPT_ERROR_INVALID_PARAMETERS;
 
     // reset any existing values
-    m_Path = "/";
+    m_Path.SetLength(0);
     m_Query.SetLength(0);
     m_Fragment.SetLength(0);
     m_HasQuery = false;
     m_HasFragment = false;
 
     // intialize the parser
-    NPT_HttpUrlParserState state = NPT_HTTP_URL_PARSER_STATE_START;
+    NPT_HttpUrlParserState state = NPT_HTTP_URL_PARSER_STATE_PATH;
     const char* mark = path_plus;
 
     // parse the path+
@@ -300,18 +314,6 @@ NPT_HttpUrl::SetPathPlus(const char* path_plus)
     do  {
         c = *path_plus++;
         switch (state) {
-          case NPT_HTTP_URL_PARSER_STATE_START:
-            if (c == '/') {
-                // ignore leading slashes
-                mark = path_plus;
-                continue;
-            } else if (c == '\0') {
-                return NPT_SUCCESS;
-            } else {
-                state = NPT_HTTP_URL_PARSER_STATE_PATH;
-            }
-            break;
-
           case NPT_HTTP_URL_PARSER_STATE_PATH:
             if (c == '\0' || c == '?' || c == '#') {
                 if (path_plus-1 > mark) {
@@ -449,8 +451,6 @@ NPT_HttpHeader::Emit(NPT_OutputStream& stream) const
     stream.WriteFully(": ", 2);
     stream.WriteString(m_Value);
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
-
-    //NPT_Debug("%s: %s\n", (const char*)m_Name, (const char*)m_Value);
 
     return NPT_SUCCESS;
 }
@@ -643,6 +643,42 @@ NPT_HttpEntity::SetInputStream(const NPT_InputStreamReference& stream,
     }
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntity::SetInputStream
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetInputStream(const void* data, NPT_Size data_size)
+{
+    NPT_MemoryStream* memory_stream = new NPT_MemoryStream(data, data_size);
+    NPT_InputStreamReference body(memory_stream);
+    return SetInputStream(body, true);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntity::SetInputStream
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetInputStream(const char* string)
+{
+    if (string == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+    NPT_MemoryStream* memory_stream = new NPT_MemoryStream((const void*)string, 
+                                                           NPT_StringLength(string));
+    NPT_InputStreamReference body(memory_stream);
+    return SetInputStream(body, true);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntity::SetInputStream
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetInputStream(const NPT_String& string)
+{
+    NPT_MemoryStream* memory_stream = new NPT_MemoryStream((const void*)string.GetChars(), 
+                                                           string.GetLength());
+    NPT_InputStreamReference body(memory_stream);
+    return SetInputStream(body, true);
 }
 
 /*----------------------------------------------------------------------
@@ -1249,6 +1285,8 @@ NPT_HttpServer::NPT_HttpServer()
     m_Config.m_ListenPort        = NPT_HTTP_DEFAULT_PORT;
     m_Config.m_IoTimeout         = NPT_HTTP_SERVER_DEFAULT_IO_TIMEOUT;
     m_Config.m_ConnectionTimeout = NPT_HTTP_SERVER_DEFAULT_CONNECTION_TIMEOUT;
+
+    SetListenPort(NPT_HTTP_DEFAULT_PORT);
 }
 
 /*----------------------------------------------------------------------
@@ -1256,6 +1294,7 @@ NPT_HttpServer::NPT_HttpServer()
 +---------------------------------------------------------------------*/
 NPT_HttpServer::~NPT_HttpServer()
 {
+    m_RequestHandlers.Apply(NPT_ObjectDeleter<HandlerConfig>());
 }
 
 /*----------------------------------------------------------------------
@@ -1276,8 +1315,7 @@ NPT_Result
 NPT_HttpServer::SetListenPort(NPT_UInt16 port)
 {
     m_Config.m_ListenPort = port;
-
-    return NPT_SUCCESS;
+    return m_Socket.Bind(NPT_SocketAddress(NPT_IpAddress::Any, m_Config.m_ListenPort));
 }
 
 /*----------------------------------------------------------------------
@@ -1303,11 +1341,9 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
                                  NPT_SocketAddress*         remote_address)
 {
     // wait for a connection
-    NPT_TcpServerSocket server;
     NPT_Socket*         client;
     NPT_Debug("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...\n", m_Config.m_ListenPort);
-    NPT_CHECK(server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, m_Config.m_ListenPort)));
-    NPT_CHECK(server.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
+    NPT_CHECK(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
     if (client == NULL) return NPT_ERROR_INTERNAL;
 
     // get the client info
@@ -1333,7 +1369,99 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
     client->GetInputStream(input);
     client->GetOutputStream(output);
 
+    // we don't need the socket anymore
+    delete client;
+
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::HandlerConfig::HandlerConfig
++---------------------------------------------------------------------*/
+NPT_HttpServer::HandlerConfig::HandlerConfig(NPT_HttpRequestHandler* handler, 
+                                             const char*             path, 
+                                             bool                    include_children) :
+    m_Handler(handler),
+    m_Path(path),
+    m_IncludeChildren(include_children)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::HandlerConfig::~HandlerConfig
++---------------------------------------------------------------------*/
+NPT_HttpServer::HandlerConfig::~HandlerConfig()
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::AddRequestHandler
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpServer::AddRequestHandler(NPT_HttpRequestHandler* handler, 
+                                  const char*             path, 
+                                  bool                    include_children)
+{
+    return m_RequestHandlers.Add(new HandlerConfig(handler, path, include_children));
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::FindRequestHandler
++---------------------------------------------------------------------*/
+NPT_HttpRequestHandler* 
+NPT_HttpServer::FindRequestHandler(NPT_HttpRequest& request)
+{
+    for (NPT_List<HandlerConfig*>::Iterator it = m_RequestHandlers.GetFirstItem();
+         it;
+         ++it) {
+         HandlerConfig* config = *it;
+         // FIXME: we currently ignore the 'include_children' flag
+         if (config->m_Path == request.GetUrl().GetPath()) {
+             return config->m_Handler;
+         }
+    }
+
+    // not found
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::RespondToClient
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
+                                NPT_OutputStreamReference& output,
+                                NPT_SocketAddress*         local_address)
+{
+    NPT_HttpRequest*  request;
+    NPT_HttpResponse* response;
+    NPT_Result        result = NPT_SUCCESS;
+
+    NPT_HttpResponder responder(input, output);
+    NPT_CHECK(responder.ParseRequest(request, local_address));
+
+    NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
+    if (handler == NULL) {
+        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
+    } else {
+        // create a repsones object
+        response = new NPT_HttpResponse(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
+
+        // prepare the response
+        response->SetEntity(new NPT_HttpEntity());
+
+        // ask the handler to setup the response
+        handler->SetupResponse(*request, *response);
+    }
+
+    // send the response
+    result = responder.SendResponse(*response);
+
+    // cleanup
+    delete response;
+    delete request;
+
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -1408,9 +1536,8 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response)
     headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close");
 
     // add computed headers
-    NPT_InputStreamReference body_stream;
     NPT_HttpEntity* entity = response.GetEntity();
-    if (entity && NPT_SUCCEEDED(entity->GetInputStream(body_stream))) {
+    if (entity) {
         // content length
         headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
             NPT_String::FromInteger(entity->GetContentLength()));
@@ -1439,6 +1566,48 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response)
 
     // send the buffer
     NPT_CHECK(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
+
+    // send the body
+    if (entity) {
+        NPT_InputStreamReference body_stream;
+        entity->GetInputStream(body_stream);
+        return NPT_StreamToStreamCopy(*body_stream, *m_Output);
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler
++---------------------------------------------------------------------*/
+NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler(const void* data, 
+                                                           NPT_Size    size, 
+                                                           const char* mime_type) :
+    m_MimeType(mime_type),
+    m_Buffer(data, size)
+{}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler
++---------------------------------------------------------------------*/
+NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler(const char* document, 
+                                                           const char* mime_type) :
+    m_MimeType(mime_type),
+    m_Buffer(document, NPT_StringLength(document))
+{}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpBufferRequestHandler::SetupResponse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpBufferRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/, 
+                                            NPT_HttpResponse& response)
+{
+    NPT_HttpEntity* entity = response.GetEntity();
+    if (entity == NULL) return NPT_ERROR_INVALID_STATE;
+
+    entity->SetContentType(m_MimeType);
+    entity->SetInputStream(m_Buffer.GetData(), m_Buffer.GetDataSize());
 
     return NPT_SUCCESS;
 }

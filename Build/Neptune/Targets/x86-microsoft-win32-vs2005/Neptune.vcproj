@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Neptune;..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;NPT_DEBUG"
 				MinimalRebuild="true"
@@ -111,7 +112,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				OmitFramePointers="true"
-				WholeProgramOptimization="false"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Neptune;..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"

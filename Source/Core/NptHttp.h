@@ -93,8 +93,9 @@ public:
     NPT_List<Field>& GetFields() { return m_Fields; }
 
     // methods
-    NPT_Result AddField(const char* name, const char* value);
-    NPT_String ToString();
+    NPT_Result  AddField(const char* name, const char* value);
+    const char* GetField(const char* name);
+    NPT_String  ToString();
 
 private:
     // members
@@ -122,6 +123,8 @@ public:
     const NPT_String& GetQuery() const    { return m_Query;    }
     const NPT_String& GetFragment() const { return m_Fragment; }
     bool              IsValid() const;
+    bool              HasQuery()    const { return m_HasQuery;    } 
+    bool              HasFragment() const { return m_HasFragment; }
     NPT_Result        SetHost(const char*  host);
     NPT_Result        SetPort(NPT_UInt16 port);
     NPT_Result        SetPath(const char*  path);
@@ -199,6 +202,9 @@ public:
     // methods
     NPT_Result SetInputStream(const NPT_InputStreamReference& stream,
                               bool update_content_length = false);
+    NPT_Result SetInputStream(const void* data, NPT_Size size);
+    NPT_Result SetInputStream(const NPT_String& string);
+    NPT_Result SetInputStream(const char* string);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result Load(NPT_DataBuffer& buffer);
     NPT_Result SetHeaders(const NPT_HttpHeaders& headers);
@@ -351,6 +357,42 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+|   NPT_HttpRequestHandler
++---------------------------------------------------------------------*/
+class NPT_HttpRequestHandler 
+{
+public:
+    // destructor
+    virtual ~NPT_HttpRequestHandler() {}
+
+    // methods
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request,
+                                     NPT_HttpResponse& response) = 0;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpBufferRequestHandler
++---------------------------------------------------------------------*/
+class NPT_HttpBufferRequestHandler : public NPT_HttpRequestHandler
+{
+public:
+    // constructors
+    NPT_HttpBufferRequestHandler(const char* document, 
+                                 const char* mime_type);
+    NPT_HttpBufferRequestHandler(const void* data,
+                                 NPT_Size    size,
+                                 const char* mime_type);
+
+    // NPT_HttpRequetsHandler methods
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
+                                     NPT_HttpResponse& response);
+
+private:
+    NPT_String     m_MimeType;
+    NPT_DataBuffer m_Buffer;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpServer
 +---------------------------------------------------------------------*/
 class NPT_HttpServer {
@@ -374,10 +416,42 @@ public:
                                 NPT_OutputStreamReference& output,
                                 NPT_SocketAddress*         local_address  = NULL,
                                 NPT_SocketAddress*         remote_address = NULL);
+    
+    /**
+     *  Add a request handler. The ownership of the handler is NOT transfered to this object,
+     *  so the caller is responsible for the lifetime management of the handler object.
+     */
+    NPT_Result AddRequestHandler(NPT_HttpRequestHandler* handler, const char* path, bool include_children = false);
+    NPT_HttpRequestHandler* FindRequestHandler(NPT_HttpRequest& request);
+
+    /**
+     * Simple 
+     */
+    NPT_Result RespondToClient(NPT_InputStreamReference&  input,
+                               NPT_OutputStreamReference& output,
+                               NPT_SocketAddress*         local_address = NULL);
 
 protected:
+    // types
+    struct HandlerConfig {
+        HandlerConfig(NPT_HttpRequestHandler* handler,
+                      const char*             path,
+                      bool                    include_children);
+        ~HandlerConfig();
+
+        // methods
+        bool WillHandle(NPT_HttpRequest& request);
+
+        // members
+        NPT_HttpRequestHandler* m_Handler;
+        NPT_String              m_Path;
+        bool                    m_IncludeChildren;
+    };
+
     // members
-    Config m_Config;
+    NPT_TcpServerSocket      m_Socket;
+    Config                   m_Config;
+    NPT_List<HandlerConfig*> m_RequestHandlers;
 };
 
 /*----------------------------------------------------------------------

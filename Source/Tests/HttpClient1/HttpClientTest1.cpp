@@ -84,6 +84,8 @@ ShowResponse(NPT_HttpResponse* response)
     }
 }
 
+//#define TEST_GET
+#if defined(TEST_GET)
 /*----------------------------------------------------------------------
 |       TestHttpGet
 +---------------------------------------------------------------------*/
@@ -103,6 +105,7 @@ TestHttpGet(const char* arg)
 
     delete response;
 }
+#endif
 
 #define TEST_PROXY
 #if defined(TEST_PROXY)

@@ -48,7 +48,7 @@ NPT_Uri::SetSchemeFromUri(const char* uri)
     char c;
     while ((c =*uri++)) {
         if (c == ':') {
-            m_Scheme.Assign(start, uri-start-1);
+            m_Scheme.Assign(start, (NPT_Size)(uri-start-1));
             m_Scheme.MakeLowercase();
             m_SchemeId = ParseScheme(m_Scheme);
             return NPT_SUCCESS;

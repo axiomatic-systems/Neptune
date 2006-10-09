@@ -18,78 +18,83 @@
 #endif
 
 /*----------------------------------------------------------------------
-|       ShowRequest
+|       TestHandler
 +---------------------------------------------------------------------*/
-static void
-ShowRequest(NPT_HttpRequest* request)
+class TestHandler : public NPT_HttpRequestHandler
 {
-    // show response info
-    NPT_Debug("REQUEST: url=%s, protocol=%s\n",
-              request->GetUrl().ToString().GetChars(),
-              request->GetProtocol().GetChars());
+public:
+    NPT_Result SetupResponse(NPT_HttpRequest&  request, 
+                             NPT_HttpResponse& response) {
+        NPT_String msg = "<HTML>";
+        msg += "PATH=";
+        msg += request.GetUrl().GetPath();
+        msg += " <P><UL>";
+        if (request.GetUrl().HasQuery()) {
+            NPT_HttpUrlQuery query(request.GetUrl().GetQuery());
+            for (NPT_List<NPT_HttpUrlQuery::Field>::Iterator it = query.GetFields().GetFirstItem();
+                 it;
+                 ++it) {
+                 NPT_HttpUrlQuery::Field& field = *it;
+                 msg += "<LI>";
+                 msg += field.m_Name;
+                 msg += " = ";
+                 msg += field.m_Value;
+                 msg += " </LI>";
+            }
+        }
+        msg += "</UL></HTML>";
 
-    // show headers
-    NPT_HttpHeaders& headers = request->GetHeaders();
-    NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
-    while (header) {
-        NPT_Debug("%s: %s\n", 
-          (const char*)(*header)->GetName(),
-          (const char*)(*header)->GetValue());
-        ++header;
-    }
+        if (request.GetMethod() == NPT_HTTP_METHOD_POST) {
+            NPT_DataBuffer request_body;
+            request.GetEntity()->Load(request_body);
+            NPT_Debug("REQUEST: body = %d bytes\n", request_body.GetDataSize());
+            NPT_Debug("REQUEST: content type = %s\n", request.GetEntity()->GetContentType().GetChars());
+            if (request.GetEntity()->GetContentType().StartsWith("text") ||
+                request.GetEntity()->GetContentType() == "application/x-www-form-urlencoded") {
+                NPT_String body_string;
+                body_string.Assign((char*)request_body.GetData(), request_body.GetDataSize());
+                NPT_Debug("%s", body_string.GetChars());
+            }
+        }
 
-    // show entity
-    NPT_HttpEntity* entity = request->GetEntity();
-    if (entity != NULL) {
-        NPT_Debug("ENTITY: length=%d, type=%s, encoding=%s\n",
-                  entity->GetContentLength(),
-                  entity->GetContentType().GetChars(),
-                  entity->GetContentEncoding().GetChars());
-    }
+        NPT_HttpEntity* entity = response.GetEntity();
+        entity->SetContentType("text/html");
+        entity->SetInputStream(msg);
 
-    // dump the body
-    if (entity && entity->GetContentLength()) {
-        NPT_InputStreamReference input;
-        entity->GetInputStream(input);
-        NPT_OutputStreamReference output;
-        NPT_File standard_out(NPT_FILE_STANDARD_OUTPUT);
-        standard_out.Open(NPT_FILE_OPEN_MODE_WRITE);
-        standard_out.GetOutputStream(output);
-        NPT_StreamToStreamCopy(*input, *output);
+        return NPT_SUCCESS;
     }
-}
+};
 
 /*----------------------------------------------------------------------
 |       TestHttp
 +---------------------------------------------------------------------*/
-static void 
+static NPT_Result 
 TestHttp()
 {
     NPT_HttpServer            server;
-    NPT_HttpRequest*          request;
     NPT_InputStreamReference  input;
     NPT_OutputStreamReference output;
     NPT_SocketAddress         local_address;
+
+    NPT_HttpBufferRequestHandler* handler1 = new NPT_HttpBufferRequestHandler("<HTML><H1>Hello World</H1></HTML>", "text/html");
+    server.AddRequestHandler(handler1, "/test", false);
+
+    TestHandler* test_handler = new TestHandler();
+    server.AddRequestHandler(test_handler, "/test2", false);
 
     NPT_Result result = server.WaitForNewClient(input, 
                                                 output,
                                                 &local_address,
                                                 NULL);
     NPT_Debug("WaitForNewClient returned %d\n", result);
-    if (NPT_FAILED(result)) return;
+    if (NPT_FAILED(result)) return result;
 
-    NPT_HttpResponder responder(input, output);
-    result = responder.ParseRequest(request, &local_address);
-    if (NPT_FAILED(result)) {
-        NPT_Debug("ParseRequest failed\n");
-    }
+    result = server.RespondToClient(input, output, &local_address);
+    NPT_Debug("ResponToClient returned %d\n", result);
 
-    ShowRequest(request);
+    delete handler1;
 
-    NPT_HttpResponse response(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
-    responder.SendResponse(response);
-
-    delete request;
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -110,7 +115,7 @@ main(int /*argc*/, char** /*argv*/)
     //freopen("CONOUT$", "w", stdout);
 #endif 
 
-    TestHttp();
+    while (NPT_SUCCEEDED(TestHttp()));
 
 #if defined(WIN32) && defined(_DEBUG)
     _CrtDumpMemoryLeaks();

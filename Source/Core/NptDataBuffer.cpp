@@ -39,21 +39,9 @@ NPT_DataBuffer::NPT_DataBuffer(NPT_Size bufferSize) :
 /*----------------------------------------------------------------------
 |   NPT_DataBuffer::NPT_DataBuffer
 +---------------------------------------------------------------------*/
-NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size data_size) :
-    m_BufferIsLocal(true),
-    m_Buffer(data_size?new NPT_Byte[data_size]:NULL),
-    m_BufferSize(data_size),
-    m_DataSize(data_size)
-{
-    if (data_size) NPT_CopyMemory(m_Buffer, data, data_size);
-}
-
-/*----------------------------------------------------------------------
-|   NPT_DataBuffer::NPT_DataBuffer
-+---------------------------------------------------------------------*/
-NPT_DataBuffer::NPT_DataBuffer(void* data, NPT_Size data_size, bool copy) :
+NPT_DataBuffer::NPT_DataBuffer(const void* data, NPT_Size data_size, bool copy) :
     m_BufferIsLocal(copy),
-    m_Buffer(copy?(data_size?new NPT_Byte[data_size]:NULL):(NPT_Byte*)data),
+    m_Buffer(copy?(data_size?new NPT_Byte[data_size]:NULL):reinterpret_cast<NPT_Byte*>(const_cast<void*>(data))),
     m_BufferSize(data_size),
     m_DataSize(data_size)
 {

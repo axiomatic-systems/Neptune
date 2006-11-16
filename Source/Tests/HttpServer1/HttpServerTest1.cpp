@@ -76,11 +76,14 @@ TestHttp()
     NPT_OutputStreamReference output;
     NPT_SocketAddress         local_address;
 
-    NPT_HttpBufferRequestHandler* handler1 = new NPT_HttpBufferRequestHandler("<HTML><H1>Hello World</H1></HTML>", "text/html");
-    server.AddRequestHandler(handler1, "/test", false);
+    NPT_HttpStaticRequestHandler* static_handler = new NPT_HttpStaticRequestHandler("<HTML><H1>Hello World</H1></HTML>", "text/html");
+    server.AddRequestHandler(static_handler, "/test", false);
 
     TestHandler* test_handler = new TestHandler();
     server.AddRequestHandler(test_handler, "/test2", false);
+
+    NPT_HttpFileRequestHandler* file_handler = new NPT_HttpFileRequestHandler("/temp", "c:\\Temp");
+    server.AddRequestHandler(file_handler, "/temp", true);
 
     NPT_Result result = server.WaitForNewClient(input, 
                                                 output,
@@ -92,7 +95,8 @@ TestHttp()
     result = server.RespondToClient(input, output, &local_address);
     NPT_Debug("ResponToClient returned %d\n", result);
 
-    delete handler1;
+    delete static_handler;
+    delete file_handler;
 
     return result;
 }

@@ -343,6 +343,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptMap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptMessaging.h"
 				>
 			</File>

@@ -16,6 +16,7 @@
 #include "NptDebug.h"
 #include "NptVersion.h"
 #include "NptUtils.h"
+#include "NptFile.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -1415,9 +1416,14 @@ NPT_HttpServer::FindRequestHandler(NPT_HttpRequest& request)
          it;
          ++it) {
          HandlerConfig* config = *it;
-         // FIXME: we currently ignore the 'include_children' flag
-         if (config->m_Path == request.GetUrl().GetPath()) {
-             return config->m_Handler;
+         if (config->m_IncludeChildren) {
+             if (request.GetUrl().GetPath().StartsWith(config->m_Path)) {
+                 return config->m_Handler;
+             }  
+         } else {
+             if (request.GetUrl().GetPath() == config->m_Path) {
+                 return config->m_Handler;
+             }
          }
     }
 
@@ -1455,7 +1461,8 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
     }
 
     // send the response
-    result = responder.SendResponse(*response);
+    result = responder.SendResponse(*response, 
+                                    request->GetMethod()==NPT_HTTP_METHOD_HEAD);
 
     // cleanup
     delete response;
@@ -1529,7 +1536,8 @@ NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&  request,
 |   NPT_HttpResponder::SendResponse
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpResponder::SendResponse(NPT_HttpResponse& response)
+NPT_HttpResponder::SendResponse(NPT_HttpResponse& response, 
+                                bool              headers_only)
 {
     // add default headers
     NPT_HttpHeaders& headers = response.GetHeaders();
@@ -1568,39 +1576,41 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response)
     NPT_CHECK(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
 
     // send the body
-    if (entity) {
+    if (!headers_only && entity) {
         NPT_InputStreamReference body_stream;
         entity->GetInputStream(body_stream);
-        return NPT_StreamToStreamCopy(*body_stream, *m_Output);
+        if (!body_stream.IsNull()) return NPT_StreamToStreamCopy(*body_stream, *m_Output);
     }
 
     return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
-|   NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler
+|   NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler
 +---------------------------------------------------------------------*/
-NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler(const void* data, 
+NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler(const void* data, 
                                                            NPT_Size    size, 
-                                                           const char* mime_type) :
+                                                           const char* mime_type,
+                                                           bool        copy) :
     m_MimeType(mime_type),
-    m_Buffer(data, size)
+    m_Buffer(data, size, copy)
 {}
 
 /*----------------------------------------------------------------------
-|   NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler
+|   NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler
 +---------------------------------------------------------------------*/
-NPT_HttpBufferRequestHandler::NPT_HttpBufferRequestHandler(const char* document, 
-                                                           const char* mime_type) :
+NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler(const char* document, 
+                                                           const char* mime_type,
+                                                           bool        copy) :
     m_MimeType(mime_type),
-    m_Buffer(document, NPT_StringLength(document))
+    m_Buffer(document, NPT_StringLength(document), copy)
 {}
 
 /*----------------------------------------------------------------------
-|   NPT_HttpBufferRequestHandler::SetupResponse
+|   NPT_HttpStaticRequestHandler::SetupResponse
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpBufferRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/, 
+NPT_HttpStaticRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/, 
                                             NPT_HttpResponse& response)
 {
     NPT_HttpEntity* entity = response.GetEntity();
@@ -1610,4 +1620,109 @@ NPT_HttpBufferRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/,
     entity->SetInputStream(m_Buffer.GetData(), m_Buffer.GetDataSize());
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpFileRequestHandler_DefaultFileTypeMap
++---------------------------------------------------------------------*/
+struct NPT_HttpFileRequestHandler_DefaultFileTypeMapEntry {
+    const char* extension;
+    const char* mime_type;
+};
+static const NPT_HttpFileRequestHandler_DefaultFileTypeMapEntry 
+NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
+    {"xml", "text/html"},
+    {"htm", "text/html"},
+    {"html", "text/html"},
+    {"gif",  "image/gif"},
+    {"jpg",  "image/jpeg"},
+    {"jpeg", "image/jpeg"},
+    {"jpe",  "image/jpeg"},
+    {"png",  "image/png"},
+    {"bmp",  "image/bmp"},
+    {"css",  "text/css"},
+    {"js",   "application/javascript"}
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler
++---------------------------------------------------------------------*/
+NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
+                                                       const char* file_root) :
+    m_UrlRoot(url_root),
+    m_FileRoot(file_root),
+    m_DefaultMimeType("text/html"),
+    m_UseDefaultFileTypeMap(true)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpFileRequestHandler::SetupResponse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&  request, 
+                                          NPT_HttpResponse& response)
+{
+    NPT_HttpEntity* entity = response.GetEntity();
+    if (entity == NULL) return NPT_ERROR_INVALID_STATE;
+
+    // check the method
+    if (request.GetMethod() != NPT_HTTP_METHOD_GET &&
+        request.GetMethod() != NPT_HTTP_METHOD_HEAD) {
+        response.SetStatus(405, "Method Not Allowed");
+        return NPT_SUCCESS;
+    }
+
+    // TODO: we need to normalize the request path
+
+    // check that the request's path is an entry under the url root
+    if (!request.GetUrl().GetPath().StartsWith(m_UrlRoot)) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
+    // compute the filename
+    NPT_String filename = m_FileRoot;
+    filename += request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength();
+    
+    // open the file
+    NPT_File file(filename);
+    NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_READ);
+    if (NPT_FAILED(result)) {
+        response.SetStatus(404, "Not Found");
+        return NPT_SUCCESS;
+    }
+    NPT_InputStreamReference stream;
+    file.GetInputStream(stream);
+    entity->SetContentType(GetContentType(filename));
+    entity->SetInputStream(stream, true);
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpFileRequestHandler::GetContentType
++---------------------------------------------------------------------*/
+const char*
+NPT_HttpFileRequestHandler::GetContentType(const NPT_String& filename)
+{
+    int last_dot = filename.ReverseFind('.');
+    if (last_dot > 0) {
+        NPT_String extension = filename.GetChars()+filename.GetLength()-last_dot;
+        extension.MakeLowercase();
+        NPT_String* mime_type;
+        if (NPT_SUCCEEDED(m_FileTypeMap.Get(extension, mime_type))) {
+            return mime_type->GetChars();
+        }
+
+        // not found, look in the default map if necessary
+        if (m_UseDefaultFileTypeMap) {
+            for (unsigned int i=0; i<NPT_ARRAY_SIZE(NPT_HttpFileRequestHandler_DefaultFileTypeMap); i++) {
+                if (extension == NPT_HttpFileRequestHandler_DefaultFileTypeMap[i].extension) {
+                    return NPT_HttpFileRequestHandler_DefaultFileTypeMap[i].mime_type;
+                }
+            }
+        }
+    }
+
+    return m_DefaultMimeType;
 }

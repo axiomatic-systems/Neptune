@@ -18,6 +18,7 @@
 #include "NptList.h"
 #include "NptBufferedStreams.h"
 #include "NptSockets.h"
+#include "NptMap.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -371,17 +372,19 @@ public:
 };
 
 /*----------------------------------------------------------------------
-|   NPT_HttpBufferRequestHandler
+|   NPT_HttpStaticRequestHandler
 +---------------------------------------------------------------------*/
-class NPT_HttpBufferRequestHandler : public NPT_HttpRequestHandler
+class NPT_HttpStaticRequestHandler : public NPT_HttpRequestHandler
 {
 public:
     // constructors
-    NPT_HttpBufferRequestHandler(const char* document, 
-                                 const char* mime_type);
-    NPT_HttpBufferRequestHandler(const void* data,
+    NPT_HttpStaticRequestHandler(const char* document, 
+                                 const char* mime_type,
+                                 bool        copy = true);
+    NPT_HttpStaticRequestHandler(const void* data,
                                  NPT_Size    size,
-                                 const char* mime_type);
+                                 const char* mime_type,
+                                 bool        copy = true);
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
@@ -390,6 +393,41 @@ public:
 private:
     NPT_String     m_MimeType;
     NPT_DataBuffer m_Buffer;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpFileRequestHandler
++---------------------------------------------------------------------*/
+class NPT_HttpFileRequestHandler : public NPT_HttpRequestHandler
+{
+public:
+    // constructors
+    NPT_HttpFileRequestHandler(const char* url_root,
+                               const char* file_root);
+
+    // NPT_HttpRequetsHandler methods
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
+                                     NPT_HttpResponse& response);
+
+    // accessors
+    NPT_Map<NPT_String,NPT_String>& GetFileTypeMap() { return m_FileTypeMap; }
+    void SetDefaultMimeType(const char* mime_type) {
+        m_DefaultMimeType = mime_type;
+    }
+    void SetUseDefaultFileTypeMap(bool use_default) {
+        m_UseDefaultFileTypeMap = use_default;
+    }
+
+protected:
+    // methods
+    const char* GetContentType(const NPT_String& filename);
+
+private:
+    NPT_String                      m_UrlRoot;
+    NPT_String                      m_FileRoot;
+    NPT_Map<NPT_String, NPT_String> m_FileTypeMap;
+    NPT_String                      m_DefaultMimeType;
+    bool                            m_UseDefaultFileTypeMap;
 };
 
 /*----------------------------------------------------------------------
@@ -474,7 +512,8 @@ public:
     NPT_Result SetTimeout(NPT_Timeout io_timeout);
     NPT_Result ParseRequest(NPT_HttpRequest*&  request,
                             NPT_SocketAddress* local_address = NULL);
-    NPT_Result SendResponse(NPT_HttpResponse& response);
+    NPT_Result SendResponse(NPT_HttpResponse& response,
+                            bool              headers_only = false);
 
 protected:
     // members

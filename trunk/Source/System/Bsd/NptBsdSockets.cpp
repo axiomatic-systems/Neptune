@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#if defined(WIN32)
+#if defined(WIN32) || defined(UNDER_CE)
 
 // Win32 includes
 #define __WIN32__
@@ -131,7 +131,9 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EADDRINUSE   WSAEADDRINUSE
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
+#if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK 
+#endif
 
 typedef int         ssize_t;
 typedef int         socklen_t;

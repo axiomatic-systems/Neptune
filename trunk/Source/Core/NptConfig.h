@@ -128,6 +128,13 @@ typedef __w64 long NPT_PointerLong;
 #endif
 #endif
 
+/* Windows CE */
+#if defined(UNDER_CE)
+#if defined(NPT_CONFIG_HAVE_FOPEN_S)
+#undef NPT_CONFIG_HAVE_FOPEN_S
+#endif
+#endif
+
 /* Symbian */
 #if defined(__SYMBIAN32__)
 #undef NPT_CONFIG_HAVE_NEW_H

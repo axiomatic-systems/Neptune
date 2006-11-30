@@ -37,7 +37,9 @@
 static void
 NPT_Print(const char* message)
 {
+#if !defined(UNDER_CE)
     OutputDebugString(message);
+#endif
     printf("%s", message);
 }
 #endif
@@ -60,7 +62,7 @@ NPT_Debug(const char* format, ...)
         int result;
 
         /* try to format the message (it might not fit) */
-#if (_MSC_VER >= 1400)
+#if (_MSC_VER >= 1400) && !defined(UNDER_CE)
         /* use the secure function for VC 8 and above */
         result = _vsnprintf_s(buffer, buffer_size, _TRUNCATE, format, args);
 #else

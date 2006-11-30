@@ -11,9 +11,11 @@
 |   includes
 +---------------------------------------------------------------------*/
 #include <stdio.h>
+#if !defined(UNDER_CE)
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#endif
 
 #include "NptUtils.h"
 #include "NptFile.h"
@@ -31,7 +33,11 @@ static int fopen_s(FILE**      file,
                    const char* mode)
 {
     *file = fopen(filename, mode);
+#if defined(UNDER_CE)
+    if (*file == NULL) return ENOENT;
+#else
     if (*file == NULL) return errno;
+#endif
     return 0;
 }
 #endif // defined(NPT_CONFIG_HAVE_FOPEN_S
@@ -356,7 +362,9 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 
     // unbuffer the file if needed 
     if ((mode & NPT_FILE_OPEN_MODE_UNBUFFERED) && file != NULL) {
+#if !defined(UNDER_CE)
         setvbuf(file, NULL, _IONBF, 0);
+#endif
     }   
 
     // create a reference to the FILE object

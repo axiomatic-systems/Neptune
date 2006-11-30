@@ -38,7 +38,7 @@ private:
                                             WPARAM wparam, 
                                             LPARAM lparam);
     HWND        m_WindowHandle;
-    NPT_String  m_ClassName;
+    TCHAR       m_ClassName[16];
     HINSTANCE   m_hInstance;
 };
 

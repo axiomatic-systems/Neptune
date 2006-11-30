@@ -26,7 +26,15 @@ NPT_Win32WindowMessageQueue::NPT_Win32WindowMessageQueue()
     WNDCLASS wclass;
 
     // compute a unique class name
-    m_ClassName = "NPTHW" + NPT_String::FromInteger(GetCurrentThreadId());
+    m_ClassName[0] = 'N';
+    m_ClassName[1] = 'P';
+    m_ClassName[2] = 'T';
+    m_ClassName[3] = 'H';
+    m_ClassName[4] = 'W';
+    NPT_String tid = NPT_String::FromInteger(GetCurrentThreadId());
+    for (unsigned int i=0; i<=tid.GetLength(); i++) {
+        m_ClassName[5+i] = tid.GetChars()[i];        
+    }
 
     // register a window class
     wclass.style         = 0;

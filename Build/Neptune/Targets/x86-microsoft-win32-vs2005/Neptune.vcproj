@@ -91,7 +91,7 @@
 			ConfigurationType="4"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			CharacterSet="2"
-			WholeProgramOptimization="1"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -112,7 +112,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				OmitFramePointers="true"
-				WholeProgramOptimization="true"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Neptune;..\..\..\..\Source\Config;..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				StringPooling="true"
@@ -165,10 +165,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\Source\Neptune\Neptune.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\..\Source\Core\NptBase64.cpp"
 				>
 			</File>
@@ -198,6 +194,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptHttp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptList.cpp"
 				>
 			</File>
 			<File
@@ -287,7 +287,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\Source\Neptune\Neptune.h"
+				RelativePath="..\..\..\..\Source\Core\Neptune.h"
 				>
 			</File>
 			<File
@@ -307,7 +307,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Config\NptConfig.h"
+				RelativePath="..\..\..\..\Source\Core\NptConfig.h"
 				>
 			</File>
 			<File
@@ -419,7 +419,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\Source\Neptune\NptVersion.h"
+				RelativePath="..\..\..\..\Source\Core\NptVersion.h"
 				>
 			</File>
 			<File

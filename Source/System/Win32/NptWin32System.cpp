@@ -16,7 +16,9 @@
 #include <windows.h>
 #endif
 
+#if !defined(UNDER_CE)
 #include <sys/timeb.h>
+#endif
 
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -35,6 +37,30 @@ NPT_System::GetProcessId(NPT_Integer& id)
     return NPT_SUCCESS;
 }
 
+#if defined(UNDER_CE)
+/*----------------------------------------------------------------------
+|   NPT_System::GetCurrentTimeStamp
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
+{
+    SYSTEMTIME stime;
+    FILETIME   ftime;
+    __int64    time64;
+    GetSystemTime(&stime);
+    SystemTimeToFileTime(&stime, &ftime);
+
+    /* convert to 64-bits 100-nanoseconds value */
+    time64 = (((unsigned __int64)ftime.dwHighDateTime)<<32) | ((unsigned __int64)ftime.dwLowDateTime);
+    time64 += 116444736000000000; /* convert from the Windows epoch (Jan. 1, 1601) to the 
+                                   * Unix epoch (Jan. 1, 1970) */
+    
+    now.m_Seconds = (NPT_Int32)time64/10000000;
+    now.m_NanoSeconds = 100*(NPT_Int32)(time64-((unsigned __int64)now.m_Seconds*10000000));
+
+    return NPT_SUCCESS;
+}
+#else
 /*----------------------------------------------------------------------
 |   NPT_System::GetCurrentTimeStamp
 +---------------------------------------------------------------------*/
@@ -53,6 +79,7 @@ NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 
     return NPT_SUCCESS;
 }
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_System::Sleep

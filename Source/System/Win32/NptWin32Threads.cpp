@@ -14,7 +14,9 @@
 #include <xtl.h>
 #else
 #include <windows.h>
+#if !defined(UNDER_CE)
 #include <process.h>
+#endif
 #endif
 
 #include "NptConfig.h"
@@ -28,7 +30,10 @@
 /*----------------------------------------------------------------------
 |   configuration macros
 +---------------------------------------------------------------------*/
-//#define NPT_WIN32_USE_CREATE_THREAD
+#if defined(UNDER_CE)
+#define NPT_WIN32_USE_CREATE_THREAD
+#endif
+
 #if defined(NPT_WIN32_USE_CREATE_THREAD)
 #define _beginthreadex(security, stack_size, start_proc, arg, flags,pid) \
 CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,  \
@@ -455,7 +460,9 @@ NPT_Win32Thread::~NPT_Win32Thread()
     }
 
     // close the thread handle
+#if defined(NPT_WIN32_USE_CREATE_THREAD)
     CloseHandle(m_ThreadHandle);
+#endif
 }
 
 /*----------------------------------------------------------------------
@@ -500,7 +507,11 @@ NPT_Win32Thread::Start()
     NPT_Debug(":: NPT_Win32Thread::Start - creating thread\n");
 
     // create the native thread
+#if defined(UNDER_CE)
+    DWORD thread_id;
+#else
     unsigned int thread_id;
+#endif
     m_ThreadHandle = (HANDLE)
         _beginthreadex(NULL, 
                        0, 

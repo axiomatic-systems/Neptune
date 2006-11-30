@@ -11,6 +11,7 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include <stdlib.h>
+#include <assert.h>
 #include "Neptune.h"
 #include "NptDebug.h"
 
@@ -21,7 +22,7 @@
 do {                                                    \
     if (!(test)) {                                      \
         fprintf(stderr, "FAILED: line %d\n", __LINE__); \
-        abort();                                        \
+        assert(0);                                      \
     }                                                   \
 } while(0)
 
@@ -54,7 +55,7 @@ WriterTest1()
 }
 #endif
 
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG) && !defined(UNDER_CE)
 #include <crtdbg.h>
 #endif
 
@@ -522,7 +523,7 @@ int
 main(int argc, char** argv)
 {
     // setup debugging
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG) && !defined(UNDER_CE)
     int flags = _crtDbgFlag       | 
         _CRTDBG_ALLOC_MEM_DF      |
         _CRTDBG_DELAY_FREE_MEM_DF |

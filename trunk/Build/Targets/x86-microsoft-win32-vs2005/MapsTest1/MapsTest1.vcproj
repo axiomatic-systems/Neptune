@@ -2,9 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="NetConfig"
-	ProjectGUID="{0E80CEA0-5817-4B9C-B2D8-733D955A7673}"
-	RootNamespace="NetConfig"
+	Name="MapsTest1"
+	ProjectGUID="{257C9F75-2708-4136-BFA9-621ACD0B9BD1}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -41,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Neptune"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -62,11 +61,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib"
-				OutputFile="$(OutDir)/NetConfig.exe"
+				OutputFile="$(OutDir)/MapsTest1.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/NetConfig.pdb"
+				ProgramDatabaseFile="$(OutDir)/MapsTest1.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -120,9 +118,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\..\Source\Config;..\..\..\..\..\Source\Core;..\..\..\..\..\Source\Neptune"
+				AdditionalIncludeDirectories="..\..\..\..\Source\Core"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -139,14 +137,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="WS2_32.lib"
-				OutputFile="$(OutDir)/NetConfig.exe"
+				OutputFile="$(OutDir)/MapsTest1.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -184,21 +180,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\..\Source\Apps\NetConfig\NetConfig.cpp"
+				RelativePath="..\..\..\..\Source\Tests\Maps1\MapsTest1.cpp"
 				>
 			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
 		</Filter>
 	</Files>
 	<Globals>

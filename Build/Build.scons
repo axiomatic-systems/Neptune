@@ -154,7 +154,7 @@ if (env['build_config'] == 'Debug'):
     env.Append(CPPDEFINES=['NPT_DEBUG'])
 
 ### try to read in any target specific configuration
-target_config_file = env.GetBuildPath('#/Build/SCons/Targets/'+env['target']+'/Config.scons')
+target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
 if os.path.exists(target_config_file):
     # Load the target-specific config file    
     execfile(target_config_file)
@@ -165,7 +165,6 @@ if os.path.exists(target_config_file):
 LibraryModule(name                  = 'Neptune', 
               build_source_dirs     = ['Core'],
               build_source_files    = env['NPT_SYSTEM_SOURCES'],
-              build_include_dirs    = ['Source/Config','Source/Neptune'],
               linked_modules        = env['NPT_EXTRA_LIBS'])
            
 for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho']:

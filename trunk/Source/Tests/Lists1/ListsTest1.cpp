@@ -62,6 +62,13 @@ public:
     }
 };
 
+#define CHECK(x) {                                  \
+    if (!(x)) {                                     \
+        printf("TEST FAILED line %d\n", __LINE__);  \
+        return 1;                                   \
+    }                                               \
+}
+
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -72,106 +79,106 @@ main(int /*argc*/, char** /*argv*/)
     a_list.Add(A(1,2));
     a_list.Add(A(2,3));
     a_list.Add(A(3,4));
-    NPT_ASSERT(a_list.GetItemCount() == 3);
-    NPT_ASSERT(a_list.Contains(A(2,3)));
-    NPT_ASSERT(!a_list.Contains(A(7,8)));
+    CHECK(a_list.GetItemCount() == 3);
+    CHECK(a_list.Contains(A(2,3)));
+    CHECK(!a_list.Contains(A(7,8)));
     A a;
-    NPT_ASSERT(NPT_SUCCEEDED(a_list.PopHead(a)));
-    NPT_ASSERT(a == A(1,2));
-    NPT_ASSERT(a_list.GetItemCount() == 2);
-    NPT_ASSERT(NPT_SUCCEEDED(a_list.Get(0, a)));
-    NPT_ASSERT(a == A(2,3));
+    CHECK(NPT_SUCCEEDED(a_list.PopHead(a)));
+    CHECK(a == A(1,2));
+    CHECK(a_list.GetItemCount() == 2);
+    CHECK(NPT_SUCCEEDED(a_list.Get(0, a)));
+    CHECK(a == A(2,3));
     A* pa = NULL;
-    NPT_ASSERT(NPT_SUCCEEDED(a_list.Get(0,pa)));
-    NPT_ASSERT(pa != NULL);
-    NPT_ASSERT(*pa == A(2,3));
-    NPT_ASSERT(a_list.GetItem(1) == ++a_list.GetFirstItem());
+    CHECK(NPT_SUCCEEDED(a_list.Get(0,pa)));
+    CHECK(pa != NULL);
+    CHECK(*pa == A(2,3));
+    CHECK(a_list.GetItem(1) == ++a_list.GetFirstItem());
 
     a_list.Clear();
-    NPT_ASSERT(a_list.GetItemCount() == 0);
+    CHECK(a_list.GetItemCount() == 0);
     a_list.Insert(a_list.GetFirstItem(), A(7,9));
-    NPT_ASSERT(a_list.GetItemCount() == 1);
-    NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
+    CHECK(a_list.GetItemCount() == 1);
+    CHECK(*a_list.GetFirstItem() == A(7,9));
 
     a_list.Add(A(1, 2));
-    NPT_ASSERT(a_list.GetItemCount() == 2);
-    NPT_ASSERT(A_Count == 3);
-    NPT_ASSERT(*a_list.GetFirstItem() == A(7,9));
-    NPT_ASSERT(*a_list.GetLastItem()  == A(1,2));
+    CHECK(a_list.GetItemCount() == 2);
+    CHECK(A_Count == 3);
+    CHECK(*a_list.GetFirstItem() == A(7,9));
+    CHECK(*a_list.GetLastItem()  == A(1,2));
     
     a_list.Insert(a_list.GetLastItem(), A(3,4));
-    NPT_ASSERT(a_list.GetItemCount() == 3);
-    NPT_ASSERT(*a_list.GetLastItem() == A(1,2));
+    CHECK(a_list.GetItemCount() == 3);
+    CHECK(*a_list.GetLastItem() == A(1,2));
 
     // test ApplyUntil 
     ApplyCounter = 0;
     bool applied;
     NPT_Result result = a_list.ApplyUntil(Test1(), NPT_UntilResultEquals(NPT_ERROR_OUT_OF_MEMORY), &applied);
-    NPT_ASSERT(applied == true);
-    NPT_ASSERT(result == NPT_SUCCESS);
-    NPT_ASSERT(ApplyCounter == 2);
+    CHECK(applied == true);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(ApplyCounter == 2);
 
     ApplyCounter = 0;
     result = a_list.ApplyUntil(Test1(), NPT_UntilResultNotEquals(NPT_SUCCESS), &applied);
-    NPT_ASSERT(applied == true);
-    NPT_ASSERT(result == NPT_ERROR_OUT_OF_MEMORY);
-    NPT_ASSERT(ApplyCounter == 2);
+    CHECK(applied == true);
+    CHECK(result == NPT_ERROR_OUT_OF_MEMORY);
+    CHECK(ApplyCounter == 2);
 
     ApplyCounter = 0;
     result = a_list.ApplyUntil(Test1(), NPT_UntilResultEquals(NPT_FAILURE), &applied);
-    NPT_ASSERT(applied == false);
-    NPT_ASSERT(result == NPT_SUCCESS);
-    NPT_ASSERT(ApplyCounter == 3);
+    CHECK(applied == false);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(ApplyCounter == 3);
 
     a_list.Insert(NPT_List<A>::Iterator(NULL), A(3,4));
-    NPT_ASSERT(a_list.GetItemCount() == 4);
-    NPT_ASSERT(*a_list.GetLastItem() == A(3,4));
+    CHECK(a_list.GetItemCount() == 4);
+    CHECK(*a_list.GetLastItem() == A(3,4));
 
     a_list.Insert(a_list.GetFirstItem(), A(7,8));
-    NPT_ASSERT(a_list.GetItemCount() == 5);
-    NPT_ASSERT(*a_list.GetFirstItem() == A(7,8));
+    CHECK(a_list.GetItemCount() == 5);
+    CHECK(*a_list.GetFirstItem() == A(7,8));
 
     a_list.Insert(a_list.GetItem(2), A(9,10));
-    NPT_ASSERT(a_list.GetItemCount() == 6);
-    NPT_ASSERT(*a_list.GetItem(2) == A(9,10));
+    CHECK(a_list.GetItemCount() == 6);
+    CHECK(*a_list.GetItem(2) == A(9,10));
 
     a_list.Erase(a_list.GetItem(1));
-    NPT_ASSERT(a_list.GetItemCount() == 5);
-    NPT_ASSERT(*a_list.GetItem(1) == A(9,10));
-    NPT_ASSERT(A_Count == 1+a_list.GetItemCount());
+    CHECK(a_list.GetItemCount() == 5);
+    CHECK(*a_list.GetItem(1) == A(9,10));
+    CHECK(A_Count == 1+a_list.GetItemCount());
 
     NPT_List<int> i1_list;
     NPT_List<int> i2_list;
-    NPT_ASSERT(i1_list == i2_list);
+    CHECK(i1_list == i2_list);
     i1_list.Add(3);
-    NPT_ASSERT(i1_list != i2_list);
-    NPT_ASSERT(!(i1_list == i2_list));
+    CHECK(i1_list != i2_list);
+    CHECK(!(i1_list == i2_list));
     i2_list.Add(3);
-    NPT_ASSERT(i1_list == i2_list);
+    CHECK(i1_list == i2_list);
     i2_list.Add(4);
-    NPT_ASSERT(i1_list != i2_list);
+    CHECK(i1_list != i2_list);
     i1_list.Add(4);
     i1_list.Add(5);
     i2_list.Add(6);
-    NPT_ASSERT(i1_list != i2_list);
+    CHECK(i1_list != i2_list);
   
 
     // NPT_Stack test
     NPT_Stack<int> i_stack;
     int i=0;
-    NPT_ASSERT(NPT_FAILED(i_stack.Pop(i)));
-    NPT_ASSERT(NPT_FAILED(i_stack.Peek(i)));
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(4)));
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(5)));
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Push(6)));
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
-    NPT_ASSERT(i == 6);
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Peek(i)));
-    NPT_ASSERT(i == 5);
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
-    NPT_ASSERT(i == 5);
-    NPT_ASSERT(NPT_SUCCEEDED(i_stack.Pop(i)));
-    NPT_ASSERT(i == 4);
+    CHECK(NPT_FAILED(i_stack.Pop(i)));
+    CHECK(NPT_FAILED(i_stack.Peek(i)));
+    CHECK(NPT_SUCCEEDED(i_stack.Push(4)));
+    CHECK(NPT_SUCCEEDED(i_stack.Push(5)));
+    CHECK(NPT_SUCCEEDED(i_stack.Push(6)));
+    CHECK(NPT_SUCCEEDED(i_stack.Pop(i)));
+    CHECK(i == 6);
+    CHECK(NPT_SUCCEEDED(i_stack.Peek(i)));
+    CHECK(i == 5);
+    CHECK(NPT_SUCCEEDED(i_stack.Pop(i)));
+    CHECK(i == 5);
+    CHECK(NPT_SUCCEEDED(i_stack.Pop(i)));
+    CHECK(i == 4);
 
     return 0;
 }

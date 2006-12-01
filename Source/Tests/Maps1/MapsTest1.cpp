@@ -48,6 +48,13 @@ public:
     int* _c;
 };
 
+#define CHECK(x) {                                  \
+    if (!(x)) {                                     \
+        printf("TEST FAILED line %d\n", __LINE__);  \
+        return 1;                                   \
+    }                                               \
+}
+
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -57,61 +64,61 @@ main(int /*argc*/, char** /*argv*/)
     NPT_Map<NPT_String,A> a_map;
     A* a = NULL;
 
-    NPT_ASSERT(a_map.GetEntryCount() == 0);
-    NPT_ASSERT(a_map.HasKey("hello") == false);
-    NPT_ASSERT(!a_map.HasValue(A(1,2)));
-    NPT_ASSERT(NPT_FAILED(a_map.Get("bla", a)));
-    NPT_ASSERT(a == NULL);
+    CHECK(a_map.GetEntryCount() == 0);
+    CHECK(a_map.HasKey("hello") == false);
+    CHECK(!a_map.HasValue(A(1,2)));
+    CHECK(NPT_FAILED(a_map.Get("bla", a)));
+    CHECK(a == NULL);
 
     a_map.Put("hello", A(1,2));
-    NPT_ASSERT(a_map.GetEntryCount() == 1);
-    NPT_ASSERT(NPT_SUCCEEDED(a_map.Get("hello", a)));
-    NPT_ASSERT(*a == A(1,2));
-    NPT_ASSERT(a_map.HasKey("hello"));
-    NPT_ASSERT(a_map.HasValue(A(1,2)));
-    NPT_ASSERT(a_map["hello"] == A(1,2));
+    CHECK(a_map.GetEntryCount() == 1);
+    CHECK(NPT_SUCCEEDED(a_map.Get("hello", a)));
+    CHECK(*a == A(1,2));
+    CHECK(a_map.HasKey("hello"));
+    CHECK(a_map.HasValue(A(1,2)));
+    CHECK(a_map["hello"] == A(1,2));
     
-    NPT_ASSERT(a_map["bla"] == A());
-    NPT_ASSERT(a_map.GetEntryCount() == 2);
+    CHECK(a_map["bla"] == A());
+    CHECK(a_map.GetEntryCount() == 2);
     a_map["bla"] = A(3,4);
-    NPT_ASSERT(a_map["bla"] == A(3,4));
-    NPT_ASSERT(a_map.GetEntryCount() == 2);
+    CHECK(a_map["bla"] == A(3,4));
+    CHECK(a_map.GetEntryCount() == 2);
 
     NPT_Map<NPT_String,A> b_map;
     b_map["hello"] = A(1,2);
     b_map["bla"] = A(3,4);
-    NPT_ASSERT(a_map == b_map);
+    CHECK(a_map == b_map);
 
     NPT_Map<NPT_String,A> c_map = a_map;
-    NPT_ASSERT(c_map["hello"] == a_map["hello"]);
-    NPT_ASSERT(c_map["bla"] == a_map["bla"]);
+    CHECK(c_map["hello"] == a_map["hello"]);
+    CHECK(c_map["bla"] == a_map["bla"]);
 
-    NPT_ASSERT(NPT_SUCCEEDED(a_map.Put("bla", A(5,6))));
-    NPT_ASSERT(NPT_SUCCEEDED(a_map.Get("bla", a)));
-    NPT_ASSERT(*a == A(5,6));
-    NPT_ASSERT(NPT_FAILED(a_map.Get("youyou", a)));
+    CHECK(NPT_SUCCEEDED(a_map.Put("bla", A(5,6))));
+    CHECK(NPT_SUCCEEDED(a_map.Get("bla", a)));
+    CHECK(*a == A(5,6));
+    CHECK(NPT_FAILED(a_map.Get("youyou", a)));
 
     b_map.Clear();
-    NPT_ASSERT(b_map.GetEntryCount() == 0);
+    CHECK(b_map.GetEntryCount() == 0);
 
     a_map["youyou"] = A(6,7);
-    NPT_ASSERT(NPT_FAILED(a_map.Erase("coucou")));
-    NPT_ASSERT(NPT_SUCCEEDED(a_map.Erase("bla")));
-    NPT_ASSERT(!a_map.HasKey("bla"));
+    CHECK(NPT_FAILED(a_map.Erase("coucou")));
+    CHECK(NPT_SUCCEEDED(a_map.Erase("bla")));
+    CHECK(!a_map.HasKey("bla"));
 
-    NPT_ASSERT(!(a_map == c_map));
-    NPT_ASSERT(c_map != a_map);
+    CHECK(!(a_map == c_map));
+    CHECK(c_map != a_map);
 
     c_map = a_map;
     NPT_Map<NPT_String,A> d_map(c_map);
-    NPT_ASSERT(d_map == c_map);
+    CHECK(d_map == c_map);
 
     NPT_Map<int,int> i_map;
     i_map[5] = 6;
     i_map[6] = 7;
     i_map[9] = 0;
-    NPT_ASSERT(i_map[0] == 0 || i_map[0] != 0); // unknown value
-    NPT_ASSERT(i_map.GetEntryCount() == 4);
+    CHECK(i_map[0] == 0 || i_map[0] != 0); // unknown value
+    CHECK(i_map.GetEntryCount() == 4);
 
     NPT_Map<NPT_String,A> a1_map;
     NPT_Map<NPT_String,A> a2_map;
@@ -121,19 +128,19 @@ main(int /*argc*/, char** /*argv*/)
     a2_map["bla"]   = A(2,3);
     a2_map["youyou"]= A(3,4);
     a2_map["hello"] = A(1,2);
-    NPT_ASSERT(a1_map == a2_map);
+    CHECK(a1_map == a2_map);
     a1_map["foo"] = A(0,0);
-    NPT_ASSERT(a1_map != a2_map);
+    CHECK(a1_map != a2_map);
     a2_map["foo"] = A(0,0);
-    NPT_ASSERT(a1_map == a2_map);
+    CHECK(a1_map == a2_map);
     a2_map["foo"] = A(7,8);
-    NPT_ASSERT(a1_map != a2_map);
+    CHECK(a1_map != a2_map);
     a2_map["foo"] = A(0,0);
     a1_map["bir"] = A(0,0);
     a2_map["bar"] = A(0,0);
-    NPT_ASSERT(a1_map.GetEntryCount() == a2_map.GetEntryCount());
-    NPT_ASSERT(a1_map != a2_map);
-    NPT_ASSERT(!(a1_map == a2_map));
+    CHECK(a1_map.GetEntryCount() == a2_map.GetEntryCount());
+    CHECK(a1_map != a2_map);
+    CHECK(!(a1_map == a2_map));
 
     return 0;
 }

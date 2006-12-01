@@ -363,7 +363,7 @@ static NPT_Result
 GetEndPointUdpSocket(EndPoint* endpoint, NPT_UdpSocket*& udp_socket)
 {
     // default return values
-    if (udp_socket) udp_socket = NULL;
+    udp_socket = NULL;
 
     switch (endpoint->type) {
       case ENDPOINT_TYPE_UDP_SERVER:

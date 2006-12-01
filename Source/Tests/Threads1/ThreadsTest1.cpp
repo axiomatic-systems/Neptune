@@ -16,6 +16,13 @@
 #include <crtdbg.h>
 #endif
 
+#define CHECK(x) {                                  \
+    if (!(x)) {                                     \
+        printf("TEST FAILED line %d\n", __LINE__);  \
+        NPT_ASSERT(0);                              \
+    }                                               \
+}
+
 /*----------------------------------------------------------------------
 |       Thread1
 +---------------------------------------------------------------------*/
@@ -140,7 +147,7 @@ Test1()
     thread1->Start();
     NPT_Debug("+++ waiting for non-detached thread +++\n");
     NPT_Result result = thread1->Wait();
-    NPT_ASSERT(NPT_SUCCEEDED(result));
+    CHECK(NPT_SUCCEEDED(result));
     NPT_Debug("+++ deleting for non-detached thread +++\n");
     delete thread1;
     NPT_Debug("+++ done with non-detached thread +++\n");
@@ -228,7 +235,7 @@ public:
 
     void OnCallback(void* args) {
         _CB_T* t_args = (_CB_T*)args;
-        NPT_ASSERT(*t_args->var == -1);
+        CHECK(*t_args->var == -1);
         (*t_args->var)+= t_args->var_i;
         _count_CBR[m_Var]++;
         m_FlipFlop = true;
@@ -248,8 +255,8 @@ public:
                     NPT_Debug(".CBR [%d] - nothing pending\n", m_Var);
                 }
             } else {
-                NPT_ASSERT(result == NPT_SUCCESS);
-                NPT_ASSERT(m_FlipFlop == true);
+                CHECK(result == NPT_SUCCESS);
+                CHECK(m_FlipFlop == true);
                 m_FlipFlop = false;
                 i++;
             }
@@ -285,7 +292,7 @@ public:
                 NPT_Debug("SHUTDOWN\n");
                 return;
             }
-            NPT_ASSERT(res == m_Var);
+            CHECK(res == m_Var);
             res -= (m_Var+1);
             if (m_Sleep != 0.0f) {
                 NPT_Debug("@CBR [%d] - sleeping\n", m_Var);
@@ -388,8 +395,8 @@ Test4()
         NPT_Debug("Test4: calling back [%d]\n", i);
         NPT_Result result = slot.SendCallback(NULL);
         if (NPT_FAILED(result)) {
-            NPT_ASSERT(result == NPT_ERROR_CALLBACK_HANDLER_SHUTDOWN);
-            NPT_ASSERT(i >= 10);
+            CHECK(result == NPT_ERROR_CALLBACK_HANDLER_SHUTDOWN);
+            CHECK(i >= 10);
             NPT_Debug("Test4: slot shutdown\n");
         }
     }

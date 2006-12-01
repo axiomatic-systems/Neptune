@@ -138,7 +138,7 @@ def Application(name, dir):
     prog = env.Program(name, 
                        GlobSources(dir, ['*.c', '*.cpp']), 
                        LIBS=libs, CPPPATH=cpp_path)
-    env.Alias(name, prog)
+    #env.Alias(name, prog)
     if env.has_key('NPT_EXECUTABLE_POST_PROCESSOR'):
         env.AddPostAction(prog, env['NPT_EXECUTABLE_POST_PROCESSOR'])
     

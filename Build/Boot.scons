@@ -29,7 +29,7 @@ options = Options()
 options.AddOptions(
     EnumOption('target', 'build target', DefaultTarget(), allowed_values=PLATFORM_TO_TARGET_MAP.values()+CROSS_PLATFORMS),
     BoolOption('enable_profiling', 'enable profiling', False),
-    ListOption('build_configs', 'build configurations', 'Debug', names=['Debug', 'Release'])
+    ListOption('build_config', 'build configurations', 'Debug', names=['Debug', 'Release'])
 )
 
 env = Environment(options=options).Copy()
@@ -37,7 +37,7 @@ Help(options.GenerateHelpText(env))
 
 
 ### call the actual build script for each build config
-for build_config in env['build_configs']:
+for build_config in env['build_config']:
     env['build_config'] = build_config
     print '********** Configuring Build Target =', env['target'], '/', build_config, '********'  
     SConscript('Build.scons', build_dir='Targets/'+env['target']+'/'+build_config, exports='env', duplicate=0)

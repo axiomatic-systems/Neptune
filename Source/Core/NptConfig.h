@@ -136,7 +136,7 @@ typedef __w64 long NPT_PointerLong;
 #endif
 
 /* Symbian */
-#if defined(__SYMBIAN32__)
+#if defined(__symbian__)
 #undef NPT_CONFIG_HAVE_NEW_H
 #include "e32std.h"
 #define explicit

@@ -707,6 +707,10 @@
 				RelativePath="..\..\..\..\Source\Tests\Messages1\MessagesTest1.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\WinCE\NptWinceMain.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

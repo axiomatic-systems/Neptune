@@ -52,6 +52,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;NPT_DEBUG"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -127,6 +128,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;NPT_DEBUG"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -202,6 +204,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;NPT_DEBUG"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -277,6 +280,7 @@
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;NPT_DEBUG"
 				MinimalRebuild="true"
+				ExceptionHandling="0"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -351,6 +355,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -425,6 +430,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -499,6 +505,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -573,6 +580,7 @@
 				Optimization="2"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_LIB;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -746,10 +754,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\System\Win32\NptWin32Threads.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\Source\System\WinCE\NptWinceUtils.cpp"
 				>
 			</File>
 			<File

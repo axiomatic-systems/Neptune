@@ -705,6 +705,10 @@
 				RelativePath="..\..\..\..\Source\Tests\BufferedStreams1\BufferedStreamsTest1.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\WinCE\NptWinceMain.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

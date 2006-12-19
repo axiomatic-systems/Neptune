@@ -18,6 +18,13 @@
 #include "NptResults.h"
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+const int ATX_FORMAT_LOCAL_BUFFER_SIZE = 1024;
+const int ATX_FORMAT_BUFFER_INCREMENT  = 4096;
+const int ATX_FORMAT_BUFFER_MAX_SIZE   = 65536;
+
+/*----------------------------------------------------------------------
 |   NPT_BytesToInt32Be
 +---------------------------------------------------------------------*/
 NPT_UInt32 
@@ -292,4 +299,46 @@ NPT_ParseFloat(const char* str, float& result, bool relaxed)
     return NPT_SUCCESS;
 }
 
+#if !defined(NPT_CONFIG_HAVE_STRCPY)
+/*----------------------------------------------------------------------
+|    NPT_CopyString
++---------------------------------------------------------------------*/
+void
+NPT_CopyString(char* dst, const char* src)
+{
+    while(*dst++ = *src++);
+}
+#endif
 
+/*----------------------------------------------------------------------
+|   NPT_FormatOutput
++---------------------------------------------------------------------*/
+void
+NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
+                 void*       function_parameter,
+                 const char* format, 
+                 va_list     args)
+{
+    char         local_buffer[ATX_FORMAT_LOCAL_BUFFER_SIZE];
+    unsigned int buffer_size = ATX_FORMAT_LOCAL_BUFFER_SIZE;
+    char*        buffer = local_buffer;
+
+    for(;;) {
+        int result;
+
+        /* try to format the message (it might not fit) */
+        result = NPT_vsnprintf(buffer, buffer_size-1, format, args);
+        buffer[buffer_size-1] = 0; /* force a NULL termination */
+        if (result >= 0) break;
+
+        /* the buffer was too small, try something bigger */
+        buffer_size = (buffer_size+ATX_FORMAT_BUFFER_INCREMENT)*2;
+        if (buffer_size > ATX_FORMAT_BUFFER_MAX_SIZE) break;
+        if (buffer != local_buffer) delete[] buffer;
+        buffer = new char[buffer_size];
+        if (buffer == NULL) return;
+    }
+
+    (*function)(function_parameter, buffer);
+    if (buffer != local_buffer) delete[] buffer;
+}

@@ -149,7 +149,7 @@ class NPT_MemoryStream :
 {
 public:
     // constructor and destructor
-    NPT_MemoryStream();
+    NPT_MemoryStream(NPT_Size initial_capacity = 0);
     NPT_MemoryStream(const void* data, NPT_Size size);
     virtual ~NPT_MemoryStream() {}
 

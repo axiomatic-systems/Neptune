@@ -888,7 +888,7 @@ NPT_HttpRequest::Parse(NPT_BufferedInputStream& stream,
         proxy_style_request = true;
     } else {
         // normal absolute path request
-        request = new NPT_HttpRequest("", method, protocol);
+        request = new NPT_HttpRequest("http:", method, protocol);
     }
 
     // parse headers

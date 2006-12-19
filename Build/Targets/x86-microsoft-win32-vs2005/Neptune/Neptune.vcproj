@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptConsole.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptDataBuffer.cpp"
 				>
 			</File>
@@ -199,6 +203,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptList.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptLogging.cpp"
 				>
 			</File>
 			<File
@@ -223,6 +231,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptSockets.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\StdC\NptStdcEnvironment.cpp"
 				>
 			</File>
 			<File
@@ -258,7 +270,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\Win32\NptWin32Console.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\System\Win32\NptWin32Debug.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\NptWin32MessageQueue.cpp"
 				>
 			</File>
 			<File
@@ -312,6 +332,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\Core\NptConsole.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\Core\NptConstants.h"
 				>
 			</File>
@@ -341,6 +365,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptList.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\Core\NptLogging.h"
 				>
 			</File>
 			<File
@@ -421,6 +449,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\..\Source\Core\NptVersion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\Source\System\Win32\NptWin32MessageQueue.h"
 				>
 			</File>
 			<File

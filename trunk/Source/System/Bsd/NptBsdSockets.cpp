@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#if defined(WIN32) || defined(UNDER_CE)
+#if defined(_WIN32) || defined(_WIN32_WCE)
 
 // Win32 includes
 #define __WIN32__
@@ -627,10 +627,12 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
         }
     } else if (NPT_BSD_SOCKET_SELECT_FAILED(io_result)) {
         result = MapErrorCode(GetSocketError());
+    } else if ((wait_for_readable  && FD_ISSET(m_SocketFd, &read_set)) ||
+               (wait_for_writeable && FD_ISSET(m_SocketFd, &write_set))) {
+        result = NPT_SUCCESS;
     } else if (FD_ISSET(m_SocketFd, &except_set)) {
         result = MapErrorCode(GetSocketError());
-    } else if (!(wait_for_readable  && FD_ISSET(m_SocketFd, &read_set)) && 
-               !(wait_for_writeable && FD_ISSET(m_SocketFd, &write_set))) {
+    } else {
         // should not happen
         result = NPT_ERROR_INTERNAL;
     }

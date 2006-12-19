@@ -68,7 +68,7 @@ NPT_Win32WindowMessageQueue::NPT_Win32WindowMessageQueue()
 
     // set a pointer to ourself as user data */
     if (m_WindowHandle) {
-        SetWindowLong(m_WindowHandle, GWL_USERDATA, (LONG)this);
+        SetWindowLong(m_WindowHandle, GWL_USERDATA, NPT_POINTER_TO_LONG(this));
     }
 
     m_hInstance = wclass.hInstance;
@@ -104,7 +104,7 @@ NPT_Win32WindowMessageQueue::WindowProcedure(HWND   window,
     }
 
     // dispatch the message to the handler
-    NPT_Win32WindowMessageQueue* queue = (NPT_Win32WindowMessageQueue *)GetWindowLong(window, GWL_USERDATA);
+    NPT_Win32WindowMessageQueue* queue = reinterpret_cast<NPT_Win32WindowMessageQueue *>(GetWindowLong(window, GWL_USERDATA));
     if (queue == NULL) {
         return 0; 
     }

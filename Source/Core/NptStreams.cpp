@@ -180,9 +180,10 @@ NPT_OutputStream::WriteLine(const char* buffer)
 /*----------------------------------------------------------------------
 |   NPT_MemoryStream::NPT_MemoryStream
 +---------------------------------------------------------------------*/
-NPT_MemoryStream::NPT_MemoryStream() : 
+NPT_MemoryStream::NPT_MemoryStream(NPT_Size initial_capacity) : 
     m_ReadOffset(0),
-    m_WriteOffset(0)
+    m_WriteOffset(0),
+    m_Buffer(initial_capacity)
 {
 }
 

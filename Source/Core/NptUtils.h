@@ -15,6 +15,7 @@
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #include "NptTypes.h"
+#include "NptStrings.h"
 
 /*----------------------------------------------------------------------
 |   macros
@@ -50,6 +51,20 @@ extern NPT_Result
 NPT_ParseInteger32(const char* str, NPT_Int32& result, bool relaxed = true);
 
 /*----------------------------------------------------------------------
+|    formatting
++---------------------------------------------------------------------*/
+void
+NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
+                 void*       function_parameter,
+                 const char* format, 
+                 va_list     args);
+
+/*----------------------------------------------------------------------
+|    environment variables
++---------------------------------------------------------------------*/
+NPT_Result NPT_GetEnvironment(const char* name, NPT_String& value);
+
+/*----------------------------------------------------------------------
 |   string utils
 +---------------------------------------------------------------------*/
 #if defined (NPT_CONFIG_HAVE_STDIO_H)
@@ -64,6 +79,12 @@ NPT_ParseInteger32(const char* str, NPT_Int32& result, bool relaxed = true);
 #define NPT_FormatString NPT_snprintf
 #else
 int NPT_FormatString(char* str, NPT_Size size, const char* format, ...);
+#endif
+
+#if defined(NPT_CONFIG_HAVE_VSNPRINTF)
+#define NPT_FormatStringVN(s,c,f,a) NPT_vsnprintf(s,c,f,a)
+#else
+extern int NPT_FormatStringVN(char *buffer, size_t count, const char *format, va_list argptr);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_MEMCPY)
@@ -91,6 +112,18 @@ extern int NPT_StringsEqualN(const char* s1, const char* s2, unsigned long size)
 (NPT_Size)(strlen(s))
 #else
 extern unsigned long NPT_StringLength(const char* s);
+#endif
+
+#if defined(NPT_CONFIG_HAVE_STRCPY)
+#define NPT_CopyString(dst, src) ((void)strcpy((dst), (src)))
+#else
+extern void NPT_CopyString(char* dst, const char* src);
+#endif
+
+#if defined(NPT_CONFIG_HAVE_STRNCPY)
+#define NPT_CopyStringN(dst, src, n) ((void)NPT_strncpy((dst), (src), n))
+#else
+extern int NPT_CopyStringN(char* dst, const char* src, unsigned long n);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_MEMSET)

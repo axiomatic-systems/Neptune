@@ -14,7 +14,7 @@
 #include <xtl.h>
 #else
 #include <windows.h>
-#if !defined(UNDER_CE)
+#if !defined(_WIN32_WCE)
 #include <process.h>
 #endif
 #endif
@@ -30,7 +30,7 @@
 /*----------------------------------------------------------------------
 |   configuration macros
 +---------------------------------------------------------------------*/
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
 #define NPT_WIN32_USE_CREATE_THREAD
 #endif
 
@@ -507,7 +507,7 @@ NPT_Win32Thread::Start()
     NPT_Debug(":: NPT_Win32Thread::Start - creating thread\n");
 
     // create the native thread
-#if defined(UNDER_CE)
+#if defined(_WIN32_WCE)
     DWORD thread_id;
 #else
     unsigned int thread_id;

@@ -20,7 +20,7 @@
 |   NPT_ConsoleOutputFunction
 +---------------------------------------------------------------------*/
 static void
-NPT_ConsoleOutputFunction(void* parameter, const char* message)
+NPT_ConsoleOutputFunction(void*, const char* message)
 {
     NPT_ConsoleOutput(message);
 }

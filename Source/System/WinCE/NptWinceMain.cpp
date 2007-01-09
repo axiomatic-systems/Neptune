@@ -20,7 +20,7 @@ extern int main(int argc, char** argv);
 int
 _tmain(int argc, wchar_t** argv, wchar_t** envp)
 {
-    char** argv_utf8 = new char*[(1+argc)*sizeof(char*)];
+    char** argv_utf8 = new char*[1+argc];
     int i;
     int result;
 

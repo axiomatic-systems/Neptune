@@ -1,45 +1,35 @@
 /*****************************************************************
 |
-|   Neptune - Console
+|   Neptune - Console Support: Symbian Implementation
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
-****************************************************************/
+ ****************************************************************/
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptConfig.h"
-
-#if defined(NPT_CONFIG_HAVE_STDARG_H)
-#include <stdarg.h>
-#endif
+#include <e32base.h>
+#include <e32std.h>
+#include <e32cons.h>            // Console
 
 #include "NptConfig.h"
 #include "NptConsole.h"
-#include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|   NPT_ConsoleOutputFunction
+|   globals
 +---------------------------------------------------------------------*/
-static void
-NPT_ConsoleOutputFunction(void*, const char* message)
-{
-    NPT_Console::Output(message);
-}
+static CConsoleBase* NPT_SymbianConsole;
 
 /*----------------------------------------------------------------------
-|   NPT_ConsoleOutputF
+|   NPT_Console::Output
 +---------------------------------------------------------------------*/
-void 
-NPT_Console::OutputF(const char* format, ...)
+void
+NPT_Console::Output(const char* message)
 {
-    va_list args;
-    va_start(args, format);
-    
-    NPT_FormatOutput(NPT_ConsoleOutputFunction, NULL, format, args);
-
-    va_end(args);
+    if (NPT_SymbianConsole) {
+        NPT_SymbianConsole->Write(message);
+    }
 }
 

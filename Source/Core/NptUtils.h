@@ -13,11 +13,21 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include <stdarg.h>
-
 #include "NptConfig.h"
 #include "NptTypes.h"
 #include "NptStrings.h"
+
+#if defined (NPT_CONFIG_HAVE_STDIO_H)
+#include <stdio.h>
+#endif
+
+#if defined (NPT_CONFIG_HAVE_STRING_H)
+#include <string.h>
+#endif
+
+#if defined(NPT_CONFIG_HAVE_STDARG_H)
+#include <stdarg.h>
+#endif
 
 /*----------------------------------------------------------------------
 |   macros

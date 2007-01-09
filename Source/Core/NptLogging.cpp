@@ -843,7 +843,7 @@ NPT_LogConsoleHandler::Log(const NPT_LogRecord& record)
 
     NPT_Log::FormatRecordToStream(record, memory_stream, m_UseColors, m_FormatFilter);
     memory_stream.Write("\0", 1);
-    NPT_ConsoleOutput((const char*)memory_stream.GetData());
+    NPT_Console::Output((const char*)memory_stream.GetData());
 }
 
 /*----------------------------------------------------------------------

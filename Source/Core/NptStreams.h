@@ -18,6 +18,7 @@
 #include "NptConstants.h"
 #include "NptResults.h"
 #include "NptDataBuffer.h"
+#include "NptStrings.h"
 
 /*----------------------------------------------------------------------
 |    class references
@@ -205,5 +206,31 @@ protected:
 };
 
 typedef NPT_Reference<NPT_MemoryStream> NPT_MemoryStreamReference;
+
+/*----------------------------------------------------------------------
+|   NPT_StringOutputStream
++---------------------------------------------------------------------*/
+class NPT_StringOutputStream : public NPT_OutputStream
+{
+public:
+    // methods
+    NPT_StringOutputStream(NPT_Size size = 4096);
+    NPT_StringOutputStream(NPT_String* storage);
+    virtual ~NPT_StringOutputStream() ;
+
+    const NPT_String& GetString() const { return *m_String; }
+
+    // NPT_OutputStream methods
+    NPT_Result Write(const void* buffer, NPT_Size bytes_to_write, NPT_Size* bytes_written = NULL);
+
+    NPT_Result Seek(NPT_Position /*offset*/)  { return NPT_ERROR_NOT_SUPPORTED;   }
+    NPT_Result Tell(NPT_Position& offset) { offset = m_String->GetLength(); return NPT_SUCCESS; }
+
+protected:
+    NPT_String* m_String;
+    bool        m_StringIsOwned;
+};
+
+typedef NPT_Reference<NPT_StringOutputStream> NPT_StringOutputStreamReference;
 
 #endif // _NPT_STREAMS_H_

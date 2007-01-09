@@ -1,33 +1,26 @@
 /*****************************************************************
 |
-|   Neptune - Console
+|   Neptune - Console Support: Windows CE Implementation
 |
 |   (c) 2002-2006 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
-****************************************************************/
-/** @file
-* Header file for console support
-*/
-
-#ifndef _NPT_CONSOLE_H_
-#define _NPT_CONSOLE_H_
+ ****************************************************************/
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptTypes.h"
-#include "NptResults.h"
+#include <stdio.h>
+
+#include "NptConfig.h"
+#include "NptConsole.h"
 
 /*----------------------------------------------------------------------
-|   prototypes
+|   NPT_Console::Output
 +---------------------------------------------------------------------*/
-class NPT_Console {
-public:
-	// class methods
-	static void Output(const char* message);
-    static void OutputF(const char* format, ...);
-};
+void
+NPT_Console::Output(const char* message)
+{
+    printf("%s", message);
+}
 
-
-#endif /* _NPT_CONSOLE_H_ */

@@ -17,6 +17,7 @@
 #define NPT_CONFIG_HAVE_STD_C
 #define NPT_CONFIG_HAVE_STDLIB_H
 #define NPT_CONFIG_HAVE_STDIO_H
+#define NPT_CONFIG_HAVE_STDARG_H
 #define NPT_CONFIG_HAVE_STRING_H
 
 /*----------------------------------------------------------------------
@@ -113,7 +114,7 @@
 
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
-#if _MSC_VER >= 1400
+#if _MSC_VER >= 1400 && !defined(_WIN32_WCE)
 typedef __w64 long NPT_PointerLong;
 #define NPT_POINTER_TO_LONG(_p) ((long)(NPT_PointerLong) (_p) )
 #define NPT_CONFIG_HAVE_FOPEN_S
@@ -140,10 +141,12 @@ typedef __w64 long NPT_PointerLong;
 #endif
 
 /* Symbian */
-#if defined(__symbian__)
+#if defined(__SYMBIAN32__)
 #undef NPT_CONFIG_HAVE_NEW_H
 #include "e32std.h"
 #define explicit
+#undef NPT_CONFIG_HAVE_VSNPRINTF
+#undef NPT_CONFIG_HAVE_SNPRINTF
 #endif
 
 /*----------------------------------------------------------------------

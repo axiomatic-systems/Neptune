@@ -16,10 +16,10 @@
 #include "NptConsole.h"
 
 /*----------------------------------------------------------------------
-|       NPT_ConsoleOutput
+|       NPT_Console::Output
 +---------------------------------------------------------------------*/
 void
-NPT_ConsoleOutput(const char* message)
+NPT_Console::Output(const char* message)
 {
     printf("%s", message);
 }

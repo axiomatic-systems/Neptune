@@ -345,3 +345,42 @@ NPT_StreamToStreamCopy(NPT_InputStream&  from,
     delete[] buffer;
     return result;
 }
+
+/*----------------------------------------------------------------------
+|   NPT_StringOutputStream::NPT_StringOutputStream
++---------------------------------------------------------------------*/
+NPT_StringOutputStream::NPT_StringOutputStream(NPT_Size size) :
+    m_String(new NPT_String),
+    m_StringIsOwned(true)
+{
+    m_String->Reserve(size);
+}
+
+
+/*----------------------------------------------------------------------
+|   NPT_StringOutputStream::NPT_StringOutputStream
++---------------------------------------------------------------------*/
+NPT_StringOutputStream::NPT_StringOutputStream(NPT_String* storage) :
+    m_String(storage),
+    m_StringIsOwned(false)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_StringOutputStream::~NPT_StringOutputStream
++---------------------------------------------------------------------*/
+NPT_StringOutputStream::~NPT_StringOutputStream()
+{
+    if (m_StringIsOwned) delete m_String;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_StringOutputStream::Write
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_StringOutputStream::Write(const void* buffer, NPT_Size bytes_to_write, NPT_Size* bytes_written /* = NULL */)
+{
+     m_String->Append((const char*)buffer, bytes_to_write);
+    if (bytes_written) *bytes_written = bytes_to_write;
+    return NPT_SUCCESS;
+}

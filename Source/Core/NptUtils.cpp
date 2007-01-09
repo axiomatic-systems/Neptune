@@ -75,7 +75,7 @@ NPT_BytesFromInt16Be(unsigned char* buffer, NPT_UInt16 value)
 |   NPT_FormatString
 +---------------------------------------------------------------------*/
 int 
-NPT_FormatString(char* str, NPT_Size size, const char* format, ...)
+NPT_FormatString(char* /*str*/, NPT_Size /*size*/, const char* /*format*/, ...)
 {
     NPT_ASSERT(0); // not implemented yet
     return 0;
@@ -327,7 +327,7 @@ NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
         int result;
 
         /* try to format the message (it might not fit) */
-        result = NPT_vsnprintf(buffer, buffer_size-1, format, args);
+        result = NPT_FormatStringVN(buffer, buffer_size-1, format, args);
         buffer[buffer_size-1] = 0; /* force a NULL termination */
         if (result >= 0) break;
 

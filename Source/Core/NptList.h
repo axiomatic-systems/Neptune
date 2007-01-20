@@ -410,6 +410,7 @@ NPT_List<T>::Remove(const T& data, bool all)
     NPT_Cardinal matches = 0;
 
     while (item) {
+        Item* next = item->m_Next;
         if (item->m_Data == data) {
             // we found a match
             ++matches;
@@ -422,7 +423,7 @@ NPT_List<T>::Remove(const T& data, bool all)
 
             if (!all) return NPT_SUCCESS;
         }
-        item = item->m_Next;
+        item = next;
     }
  
     return matches?NPT_SUCCESS:NPT_ERROR_NO_SUCH_ITEM;

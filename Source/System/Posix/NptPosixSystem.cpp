@@ -169,5 +169,13 @@ NPT_System::SetRandomSeed(unsigned int seed)
 NPT_Integer 
 NPT_System::GetRandomInteger()
 {
+    static bool seeded = false;
+    if (seeded == false) {
+        NPT_TimeStamp now;
+        GetCurrentTimeStamp(now);
+        SetRandomSeed(now.m_NanoSeconds);
+        seeded = true;
+    }
+
     return rand();
 }

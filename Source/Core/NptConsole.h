@@ -24,8 +24,8 @@
 +---------------------------------------------------------------------*/
 class NPT_Console {
 public:
-	// class methods
-	static void Output(const char* message);
+    // class methods
+    static void Output(const char* message);
     static void OutputF(const char* format, ...);
 };
 

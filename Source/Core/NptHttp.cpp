@@ -901,6 +901,7 @@ NPT_HttpRequest::Parse(NPT_BufferedInputStream& stream,
 
     // update the URL
     if (!proxy_style_request) {
+        request->m_Url.SetScheme("http");
         request->m_Url.SetPathPlus(uri);
         request->m_Url.SetPort(NPT_HTTP_DEFAULT_PORT);
 
@@ -1445,24 +1446,24 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK(responder.ParseRequest(request, local_address));
+    bool headers_only = request->GetMethod()==NPT_HTTP_METHOD_HEAD;
 
     NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
     if (handler == NULL) {
         response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
     } else {
         // create a repsones object
-        response = new NPT_HttpResponse(200, "Ok", NPT_HTTP_PROTOCOL_1_0);
+        response = new NPT_HttpResponse(200, "OK", NPT_HTTP_PROTOCOL_1_0);
 
         // prepare the response
         response->SetEntity(new NPT_HttpEntity());
 
         // ask the handler to setup the response
-        handler->SetupResponse(*request, *response);
+        handler->SetupResponse(*request, *response, headers_only);
     }
 
     // send the response
-    result = responder.SendResponse(*response, 
-                                    request->GetMethod()==NPT_HTTP_METHOD_HEAD);
+    result = responder.SendResponse(*response, headers_only);
 
     // cleanup
     delete response;
@@ -1582,6 +1583,9 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
         if (!body_stream.IsNull()) return NPT_StreamToStreamCopy(*body_stream, *m_Output);
     }
 
+    // flush
+    m_Output->Flush();
+
     return NPT_SUCCESS;
 }
 
@@ -1611,7 +1615,8 @@ NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler(const char* document,
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpStaticRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/, 
-                                            NPT_HttpResponse& response)
+                                            NPT_HttpResponse& response,
+                                            bool              /*headers_only*/)
 {
     NPT_HttpEntity* entity = response.GetEntity();
     if (entity == NULL) return NPT_ERROR_INVALID_STATE;
@@ -1661,7 +1666,8 @@ NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&  request, 
-                                          NPT_HttpResponse& response)
+                                          NPT_HttpResponse& response,
+                                          bool              /*headers_only*/)
 {
     NPT_HttpEntity* entity = response.GetEntity();
     if (entity == NULL) return NPT_ERROR_INVALID_STATE;

@@ -24,7 +24,8 @@ class TestHandler : public NPT_HttpRequestHandler
 {
 public:
     NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                             NPT_HttpResponse& response) {
+                             NPT_HttpResponse& response,
+                             bool              headers_only) {
         NPT_String msg = "<HTML>";
         msg += "PATH=";
         msg += request.GetUrl().GetPath();

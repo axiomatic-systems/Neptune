@@ -238,6 +238,10 @@ public:
     const NPT_String& GetProtocol() const { 
         return m_Protocol; 
     }
+    NPT_Result SetProtocol(const char* protocol) {
+        m_Protocol = protocol;
+        return NPT_SUCCESS;
+    }
     NPT_HttpHeaders& GetHeaders() { 
         return m_Headers;  
     }
@@ -368,7 +372,8 @@ public:
 
     // methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request,
-                                     NPT_HttpResponse& response) = 0;
+                                     NPT_HttpResponse& response,
+                                     bool              headers_only) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -388,7 +393,8 @@ public:
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response);
+                                     NPT_HttpResponse& response,
+                                     bool              headers_only);
 
 private:
     NPT_String     m_MimeType;
@@ -407,7 +413,8 @@ public:
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response);
+                                     NPT_HttpResponse& response,
+                                     bool              headers_only);
 
     // accessors
     NPT_Map<NPT_String,NPT_String>& GetFileTypeMap() { return m_FileTypeMap; }
@@ -463,7 +470,7 @@ public:
     NPT_HttpRequestHandler* FindRequestHandler(NPT_HttpRequest& request);
 
     /**
-     * Simple 
+     * Parse the request from a new client, form a response, and send it back. 
      */
     NPT_Result RespondToClient(NPT_InputStreamReference&  input,
                                NPT_OutputStreamReference& output,

@@ -219,6 +219,7 @@ public:
     virtual ~NPT_StringOutputStream() ;
 
     const NPT_String& GetString() const { return *m_String; }
+    NPT_Result Reset() { if (m_String) m_String->SetLength(0); return NPT_SUCCESS; }
 
     // NPT_OutputStream methods
     NPT_Result Write(const void* buffer, NPT_Size bytes_to_write, NPT_Size* bytes_written = NULL);

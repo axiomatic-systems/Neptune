@@ -114,9 +114,13 @@
 
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
-#if _MSC_VER >= 1400 && !defined(_WIN32_WCE)
+#if defined(_WIN64)
+typedef __int64 NPT_PointerLong;
+#else
 typedef __w64 long NPT_PointerLong;
-#define NPT_POINTER_TO_LONG(_p) ((long)(NPT_PointerLong) (_p) )
+#endif
+#define NPT_POINTER_TO_LONG(_p) ((NPT_PointerLong) (_p) )
+#if _MSC_VER >= 1400 && !defined(_WIN32_WCE)
 #define NPT_CONFIG_HAVE_FOPEN_S
 #define NPT_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define NPT_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)

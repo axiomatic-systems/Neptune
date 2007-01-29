@@ -157,8 +157,6 @@ NPT_Win32Queue::Pop(NPT_QueueItem*& item, bool blocking)
 NPT_GenericQueue*
 NPT_GenericQueue::CreateInstance(NPT_Cardinal max_items)
 {
-    NPT_Debug(":: NPT_GenericQueue::CreateInstance - queue max_items = %ld\n", 
-           max_items);
     return new NPT_Win32Queue(max_items);
 }
 

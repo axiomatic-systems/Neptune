@@ -13,6 +13,14 @@
 #include "NptWin32MessageQueue.h"
 
 /*----------------------------------------------------------------------
+|       plaform adaptation
++---------------------------------------------------------------------*/
+#if defined(_WIN32_WCE)
+#define GetWindowLongPtr GetWindowLong
+#define SetWindowLongPtr SetWindowLong
+#endif
+
+/*----------------------------------------------------------------------
 |       constants
 +---------------------------------------------------------------------*/
 const int NPT_WIN32_MESSAGE_ID_BASE = WM_USER + 9200;
@@ -83,7 +91,7 @@ NPT_Win32WindowMessageQueue::NPT_Win32WindowMessageQueue()
 NPT_Win32WindowMessageQueue::~NPT_Win32WindowMessageQueue() 
 {
     // remove ourself as user data to ensure we're not called anymore
-    SetWindowLong(m_WindowHandle, GWL_USERDATA, 0);
+    SetWindowLongPtr(m_WindowHandle, GWL_USERDATA, 0);
 
     // destroy the hidden window
     DestroyWindow(m_WindowHandle);

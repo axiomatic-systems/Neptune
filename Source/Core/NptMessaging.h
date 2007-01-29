@@ -75,7 +75,7 @@ class NPT_TerminateMessage : public NPT_Message
  public:
     // methods
     NPT_Result Dispatch(NPT_MessageHandler* /*handler*/) {
-        return NPT_FAILURE;
+        return NPT_ERROR_TERMINATED;
     }
 };
 

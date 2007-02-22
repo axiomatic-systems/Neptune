@@ -17,6 +17,7 @@
 #include <crtdbg.h>
 #endif
 
+#define TEST_URL
 #if defined(TEST_URL)
 /*----------------------------------------------------------------------
 |       TestUrlParser
@@ -84,7 +85,7 @@ ShowResponse(NPT_HttpResponse* response)
     }
 }
 
-//#define TEST_GET
+#define TEST_GET
 #if defined(TEST_GET)
 /*----------------------------------------------------------------------
 |       TestHttpGet
@@ -107,7 +108,7 @@ TestHttpGet(const char* arg)
 }
 #endif
 
-#define TEST_PROXY
+//#define TEST_PROXY
 #if defined(TEST_PROXY)
 /*----------------------------------------------------------------------
 |       TestHttpGetWithProxy

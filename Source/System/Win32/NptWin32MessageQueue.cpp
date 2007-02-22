@@ -13,7 +13,7 @@
 #include "NptWin32MessageQueue.h"
 
 /*----------------------------------------------------------------------
-|       plaform adaptation
+|       platform adaptation
 +---------------------------------------------------------------------*/
 #if defined(_WIN32_WCE)
 #define GetWindowLongPtr GetWindowLong

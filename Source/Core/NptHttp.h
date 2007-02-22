@@ -372,8 +372,7 @@ public:
 
     // methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request,
-                                     NPT_HttpResponse& response,
-                                     bool              headers_only) = 0;
+                                     NPT_HttpResponse& response) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -393,8 +392,7 @@ public:
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response,
-                                     bool              headers_only);
+                                     NPT_HttpResponse& response);
 
 private:
     NPT_String     m_MimeType;
@@ -413,8 +411,7 @@ public:
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response,
-                                     bool              headers_only);
+                                     NPT_HttpResponse& response);
 
     // accessors
     NPT_Map<NPT_String,NPT_String>& GetFileTypeMap() { return m_FileTypeMap; }
@@ -450,7 +447,7 @@ public:
     };
 
     // constructors and destructor
-    NPT_HttpServer();
+    NPT_HttpServer(NPT_UInt16 listen_port = NPT_HTTP_DEFAULT_PORT);
     virtual ~NPT_HttpServer();
 
     // methods
@@ -463,8 +460,8 @@ public:
                                 NPT_SocketAddress*         remote_address = NULL);
     
     /**
-     *  Add a request handler. The ownership of the handler is NOT transfered to this object,
-     *  so the caller is responsible for the lifetime management of the handler object.
+     * Add a request handler. The ownership of the handler is NOT transfered to this object,
+     * so the caller is responsible for the lifetime management of the handler object.
      */
     NPT_Result AddRequestHandler(NPT_HttpRequestHandler* handler, const char* path, bool include_children = false);
     NPT_HttpRequestHandler* FindRequestHandler(NPT_HttpRequest& request);
@@ -493,8 +490,12 @@ protected:
         bool                    m_IncludeChildren;
     };
 
+    // methods
+    NPT_Result Bind();
+
     // members
     NPT_TcpServerSocket      m_Socket;
+    NPT_UInt16               m_BoundPort;
     Config                   m_Config;
     NPT_List<HandlerConfig*> m_RequestHandlers;
 };

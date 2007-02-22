@@ -24,8 +24,7 @@ class TestHandler : public NPT_HttpRequestHandler
 {
 public:
     NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                             NPT_HttpResponse& response,
-                             bool              headers_only) {
+                             NPT_HttpResponse& response) {
         NPT_String msg = "<HTML>";
         msg += "PATH=";
         msg += request.GetUrl().GetPath();
@@ -72,7 +71,7 @@ public:
 static NPT_Result 
 TestHttp()
 {
-    NPT_HttpServer            server;
+    NPT_HttpServer            server(1234);
     NPT_InputStreamReference  input;
     NPT_OutputStreamReference output;
     NPT_SocketAddress         local_address;

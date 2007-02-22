@@ -1282,13 +1282,12 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
 /*----------------------------------------------------------------------
 |   NPT_HttpServer::NPT_HttpServer
 +---------------------------------------------------------------------*/
-NPT_HttpServer::NPT_HttpServer()
+NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
+    m_BoundPort(0)
 {
-    m_Config.m_ListenPort        = NPT_HTTP_DEFAULT_PORT;
+    m_Config.m_ListenPort        = listen_port;
     m_Config.m_IoTimeout         = NPT_HTTP_SERVER_DEFAULT_IO_TIMEOUT;
     m_Config.m_ConnectionTimeout = NPT_HTTP_SERVER_DEFAULT_CONNECTION_TIMEOUT;
-
-    SetListenPort(NPT_HTTP_DEFAULT_PORT);
 }
 
 /*----------------------------------------------------------------------
@@ -1300,6 +1299,25 @@ NPT_HttpServer::~NPT_HttpServer()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpServer::Bind
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpServer::Bind()
+{
+    // check if we're already bound
+    if (m_BoundPort != 0) return NPT_SUCCESS;
+
+    // bind
+    NPT_Result result = m_Socket.Bind(NPT_SocketAddress(NPT_IpAddress::Any, m_Config.m_ListenPort));
+    if (NPT_FAILED(result)) return result;
+
+    // remember that we're bound
+    m_BoundPort = m_Config.m_ListenPort;
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpServer::SetConfig
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -1307,7 +1325,8 @@ NPT_HttpServer::SetConfig(const Config& config)
 {
     m_Config = config;
 
-    return NPT_SUCCESS;
+    // check that we can bind to this listen port
+    return Bind();
 }
 
 /*----------------------------------------------------------------------
@@ -1317,7 +1336,7 @@ NPT_Result
 NPT_HttpServer::SetListenPort(NPT_UInt16 port)
 {
     m_Config.m_ListenPort = port;
-    return m_Socket.Bind(NPT_SocketAddress(NPT_IpAddress::Any, m_Config.m_ListenPort));
+    return Bind();
 }
 
 /*----------------------------------------------------------------------
@@ -1342,6 +1361,9 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
                                  NPT_SocketAddress*         local_address,
                                  NPT_SocketAddress*         remote_address)
 {
+    // ensure that we're bound 
+    NPT_CHECK(Bind());
+
     // wait for a connection
     NPT_Socket*         client;
     NPT_Debug("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...\n", m_Config.m_ListenPort);
@@ -1446,7 +1468,6 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK(responder.ParseRequest(request, local_address));
-    bool headers_only = request->GetMethod()==NPT_HTTP_METHOD_HEAD;
 
     NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
     if (handler == NULL) {
@@ -1459,11 +1480,11 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
         response->SetEntity(new NPT_HttpEntity());
 
         // ask the handler to setup the response
-        handler->SetupResponse(*request, *response, headers_only);
+        handler->SetupResponse(*request, *response);
     }
 
     // send the response
-    result = responder.SendResponse(*response, headers_only);
+    result = responder.SendResponse(*response, request->GetMethod()==NPT_HTTP_METHOD_HEAD);
 
     // cleanup
     delete response;
@@ -1615,8 +1636,7 @@ NPT_HttpStaticRequestHandler::NPT_HttpStaticRequestHandler(const char* document,
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpStaticRequestHandler::SetupResponse(NPT_HttpRequest&  /*request*/, 
-                                            NPT_HttpResponse& response,
-                                            bool              /*headers_only*/)
+                                            NPT_HttpResponse& response)
 {
     NPT_HttpEntity* entity = response.GetEntity();
     if (entity == NULL) return NPT_ERROR_INVALID_STATE;
@@ -1666,8 +1686,7 @@ NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&  request, 
-                                          NPT_HttpResponse& response,
-                                          bool              /*headers_only*/)
+                                          NPT_HttpResponse& response)
 {
     NPT_HttpEntity* entity = response.GetEntity();
     if (entity == NULL) return NPT_ERROR_INVALID_STATE;

@@ -29,7 +29,7 @@ void
 NPT_Console::Output(const char* message)
 {
     if (NPT_SymbianConsole) {
-        NPT_SymbianConsole->Write(message);
+        //NPT_SymbianConsole->Write(message);
     }
 }
 

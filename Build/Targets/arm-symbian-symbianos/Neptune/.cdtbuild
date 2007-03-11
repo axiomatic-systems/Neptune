@@ -75,7 +75,7 @@
 <option id="com.nokia.cdt.build.toolChain.S60_31.winscw.GlobalOptions.systemIncludePaths.winscwUdebSLib.1991439459" name="System Include Paths" superClass="com.nokia.cdt.build.toolChain.S60_31.winscw.GlobalOptions.systemIncludePaths.winscwUdebSLib" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\variant&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\libc&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\stdapis&quot;"/>
 </option>
 <option id="com.symbian.cdt.sdk.91.build.winscw.staticLibUdeb.targetType.1579771640" name="TargetType" superClass="com.symbian.cdt.sdk.91.build.winscw.staticLibUdeb.targetType" value="com.symbian.cdt.sdk.91.build.winscw.staticLibUdeb.lib" valueType="enumerated"/>
 <option id="com.symbian.cdt.build.91.toolChain.winscw.GlobalOptions.uid2.libUdeb.129059740" name="UID2" superClass="com.symbian.cdt.build.91.toolChain.winscw.GlobalOptions.uid2.libUdeb" value="0x00000000" valueType="string"/>
@@ -95,6 +95,12 @@
 <tool id="com.nokia.sdk.S60_31.build.winscw.mif.udebLib.534661131" name="MIF Compiler" superClass="com.nokia.sdk.S60_31.build.winscw.mif.udebLib"/>
 <macros/>
 </toolChain>
+<resourceConfiguration exclude="true" id="S60_31_com.symbian.cdt.build.projectType.lib_winscw.udeb_S60_3rd_FP1.582533161.395486098" name="NptBsdNetwork.cpp" rcbsApplicability="disable" resourcePath="/Neptune/BsdSystem/NptBsdNetwork.cpp" toolsToInvoke="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873./Neptune/BsdSystem/NptBsdNetwork.cpp">
+<tool id="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873./Neptune/BsdSystem/NptBsdNetwork.cpp" name="WINSCW C/C++ Compiler" superClass="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873"/>
+</resourceConfiguration>
+<resourceConfiguration exclude="true" id="S60_31_com.symbian.cdt.build.projectType.lib_winscw.udeb_S60_3rd_FP1.582533161.1317784172" name="NptStdcConsole.cpp" rcbsApplicability="disable" resourcePath="/Neptune/StdcSystem/NptStdcConsole.cpp" toolsToInvoke="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873./Neptune/StdcSystem/NptStdcConsole.cpp">
+<tool id="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873./Neptune/StdcSystem/NptStdcConsole.cpp" name="WINSCW C/C++ Compiler" superClass="com.nokia.sdk.S60_31.build.winscw.compiler.udebLib.1398476873"/>
+</resourceConfiguration>
 </configuration>
 <configuration artifactExtension="lib" artifactName="Neptune" cleanCommand="del /s/q" description="" errorParsers="com.symbian.cdt.build.WinscwErrorParser;org.eclipse.cdt.core.MakeErrorParser;;com.symbian.cdt.build.RCOMPErrorParser;" id="UIQ3_com.symbian.cdt.build.projectType.lib_winscw.udeb_UIQ3.384904516" name="UIQ 3.0 Emulator Debug" parent="UIQ3_com.symbian.cdt.build.projectType.lib_winscw.udeb_UIQ3">
 <toolChain id="com.nokia.sdk.UIQ3.build.winscw.winscwUdebSLib.846884524" name="WINSCW UDEB Defaults" superClass="com.nokia.sdk.UIQ3.build.winscw.winscwUdebSLib">

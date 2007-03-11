@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#if defined(_WIN32) || defined(_WIN32_WCE)
+#if (defined(_WIN32) || defined(_WIN32_WCE)) && !defined(__SYMBIAN32__)
 
 // Win32 includes
 #define __WIN32__
@@ -80,7 +80,9 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
+#if !defined(__SYMBIAN32__)
 #include <netinet/tcp.h>
+#endif
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>

@@ -664,6 +664,24 @@ NPT_String::Insert(const char* str, NPT_Ordinal where)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::Erase
++---------------------------------------------------------------------*/
+void
+NPT_String::Erase(NPT_Ordinal start, NPT_Cardinal count /* = 1 */)
+{
+    // check bounds
+    NPT_Size length = GetLength();
+    if (start+count > length) {
+        if (start >= length) return;
+        count = length-start;
+    }
+    if (count == 0) return;
+
+    CopyString(m_Chars+start, m_Chars+start+count);
+    GetBuffer()->SetLength(length-count);
+}
+
+/*----------------------------------------------------------------------
 |    NPT_String::ToInteger
 +---------------------------------------------------------------------*/
 NPT_Result 

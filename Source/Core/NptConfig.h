@@ -149,8 +149,6 @@ typedef __w64 long NPT_PointerLong;
 #undef NPT_CONFIG_HAVE_NEW_H
 #include "e32std.h"
 #define explicit
-#undef NPT_CONFIG_HAVE_VSNPRINTF
-#undef NPT_CONFIG_HAVE_SNPRINTF
 #endif
 
 /*----------------------------------------------------------------------

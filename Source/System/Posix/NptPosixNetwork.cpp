@@ -1,10 +1,8 @@
 /*****************************************************************
 |
-|      File: NptStdcDebug.c
+|      Neptune - Network :: POSIX Implementation
 |
-|      Atomix - Debug Support: StdC Implementation
-|
-|      (c) 2002-2006 Gilles Boccon-Gibod
+|      (c) 2001-2005 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -13,14 +11,25 @@
 |       includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
-#include "NptDefs.h"
+
+#if defined(NPT_CONFIG_HAVE_NETCONFIG_H)
+#include <netconfig.h>
+
 #include "NptTypes.h"
-#include "NptDebug.h"
+#include "NptStreams.h"
+#include "NptThreads.h"
+#include "NptNetwork.h"
+#include "NptUtils.h"
+#include "NptConstants.h"
 
 /*----------------------------------------------------------------------
-|       NPT_Debug
+|       NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
-void
-NPT_Debug(const char* /* format */, ...)
+NPT_Result
+NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)
 {
+	interfaces.Clear();
+    return NPT_SUCCESS;
 }
+
+#endif

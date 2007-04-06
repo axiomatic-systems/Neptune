@@ -129,15 +129,33 @@
 <option id="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUdebSlib.1631849495" name="System Include Paths" superClass="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUdebSlib" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\variant&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\libc&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\stdapis&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${GCCEINC}&quot;"/>
 </option>
 <option id="com.symbian.cdt.sdk.91.build.gcce.targetType.slib.868970790" name="TargetType" superClass="com.symbian.cdt.sdk.91.build.gcce.targetType.slib" value="com.symbian.cdt.sdk.91.build.gcce.slib.lib" valueType="enumerated"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib.1532564291" name="UID2" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib.850380188" name="UID3" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib.86072793" name="Vendor Id" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib" value="0x00000000" valueType="string"/>
-<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.64799397" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths"/>
-<tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1953418578" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb"/>
+<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.64799397" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${NEPTUNE_HOME}\Source\Core&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${NEPTUNE_HOME}\Source\System\Symbian&quot;"/>
+</option>
+<tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1953418578" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb">
+<option id="com.nokia.cdt.build.buildDefinitions.S60_31.gcce.compiler.defineSymbols.gcceUdebSlib.1372066570" superClass="com.nokia.cdt.build.buildDefinitions.S60_31.gcce.compiler.defineSymbols.gcceUdebSlib" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="_DEBUG"/>
+<listOptionValue builtIn="false" value="_UNICODE"/>
+<listOptionValue builtIn="false" value="__GCCE__"/>
+<listOptionValue builtIn="false" value="__SYMBIAN32__"/>
+<listOptionValue builtIn="false" value="__EPOC32__"/>
+<listOptionValue builtIn="false" value="__MARM__"/>
+<listOptionValue builtIn="false" value="__EABI__"/>
+<listOptionValue builtIn="false" value="__MARM_ARMV5__"/>
+<listOptionValue builtIn="false" value="__SUPPORT_CPP_EXCEPTIONS__"/>
+<listOptionValue builtIn="false" value="__SERIES60_31__"/>
+<listOptionValue builtIn="false" value="__SERIES60_3X__"/>
+<listOptionValue builtIn="false" value="NPT_DEBUG"/>
+</option>
+</tool>
 <tool id="com.symbian.cdt.build.tool.gcce.aif.slib.416984291" name="AIF Compiler" superClass="com.symbian.cdt.build.tool.gcce.aif.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.rcomp.slib.80157134" name="Resource Compiler" superClass="com.symbian.cdt.build.tool.gcce.rcomp.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.mbm.slib.804211718" name="MBM Compiler" superClass="com.symbian.cdt.build.tool.gcce.mbm.slib"/>
@@ -146,6 +164,9 @@
 <tool id="com.nokia.cdt.build.tool.S60_31.gcce.mif.slibUdeb.1809053488" name="MIF Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.mif.slibUdeb"/>
 <macros/>
 </toolChain>
+<resourceConfiguration exclude="true" id="S60_31_com.symbian.cdt.build.projectType.lib_gcce.udeb_S60_3rd_FP1.556595877.1037827706" name="NptBsdNetwork.cpp" rcbsApplicability="disable" resourcePath="/Neptune/BsdSystem/NptBsdNetwork.cpp" toolsToInvoke="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1953418578./Neptune/BsdSystem/NptBsdNetwork.cpp">
+<tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1953418578./Neptune/BsdSystem/NptBsdNetwork.cpp" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1953418578"/>
+</resourceConfiguration>
 </configuration>
 <macros/>
 </project>

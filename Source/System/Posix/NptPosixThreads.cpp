@@ -404,6 +404,17 @@ NPT_PosixThread::~NPT_PosixThread()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_Thread::GetCurrentThreadId
++---------------------------------------------------------------------*/
+NPT_Thread::ThreadId 
+NPT_Thread::GetCurrentThreadId()
+{
+    pthread_t pid = pthread_self();
+    return (NPT_Thread::ThreadId)((void*)pid);
+}
+
+
+/*----------------------------------------------------------------------
 |       NPT_PosixThread::EntryPoint
 +---------------------------------------------------------------------*/
 void*

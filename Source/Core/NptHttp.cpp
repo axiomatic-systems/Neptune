@@ -17,6 +17,12 @@
 #include "NptVersion.h"
 #include "NptUtils.h"
 #include "NptFile.h"
+#include "NptLogging.h"
+
+/*----------------------------------------------------------------------
+|   logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.http")
 
 /*----------------------------------------------------------------------
 |   constants
@@ -936,7 +942,6 @@ NPT_HttpRequest::~NPT_HttpRequest()
 NPT_Result
 NPT_HttpRequest::Emit(NPT_OutputStream& stream, bool use_proxy) const
 {
-    //NPT_Debug("NPT_HttpRequest::Emit ++\n");
     // write the request line
     stream.WriteString(m_Method);
     stream.WriteFully(" ", 1);
@@ -954,8 +959,6 @@ NPT_HttpRequest::Emit(NPT_OutputStream& stream, bool use_proxy) const
 
     // finish with an empty line
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
-
-    //NPT_Debug("NPT_HttpRequest::Emit --\n");
 
     return NPT_SUCCESS;
 }
@@ -999,7 +1002,6 @@ NPT_HttpResponse::SetStatus(NPT_HttpStatusCode status_code,
 NPT_Result
 NPT_HttpResponse::Emit(NPT_OutputStream& stream) const
 {
-    //NPT_Debug("NPT_HttpResponse::Emit ++\n");
     // write the request line
     stream.WriteString(m_Protocol);
     stream.WriteFully(" ", 1);
@@ -1008,18 +1010,11 @@ NPT_HttpResponse::Emit(NPT_OutputStream& stream) const
     stream.WriteString(m_ReasonPhrase);
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
 
-    //NPT_Debug("%s %s %s\n", 
-    //    (const char*)m_Protocol,
-    //    (const char*)NPT_String::FromInteger(m_StatusCode), 
-    //    (const char*)m_ReasonPhrase);
-
     // emit headers
     m_Headers.Emit(stream);
 
     // finish with an empty line
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
-
-    //NPT_Debug("NPT_HttpResponse::Emit --\n");
 
     return NPT_SUCCESS;
 }
@@ -1068,9 +1063,55 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpTcpConnector
++---------------------------------------------------------------------*/
+class NPT_HttpTcpConnector : public NPT_HttpClient::Connector
+{
+    virtual NPT_Result Connect(const char*                   hostname, 
+                               NPT_UInt16                    port, 
+                               NPT_Timeout                   connection_timeout,
+                               NPT_Timeout                   io_timeout,
+                               NPT_Timeout                   name_resolver_timeout,
+                               NPT_InputStreamReference&     input_stream, 
+                               NPT_OutputStreamReference&    output_stream);
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTcpConnector::Connect
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpTcpConnector::Connect(const char*                    hostname, 
+                               NPT_UInt16                    port, 
+                               NPT_Timeout                   connection_timeout,
+                               NPT_Timeout                   io_timeout,
+                               NPT_Timeout                   name_resolver_timeout,
+                               NPT_InputStreamReference&     input_stream, 
+                               NPT_OutputStreamReference&    output_stream)
+{
+    // get the address and port to which we need to connect
+    NPT_IpAddress address;
+    NPT_CHECK(address.ResolveName(hostname, name_resolver_timeout));
+
+    // connect to the server
+    NPT_LOG_FINE_2("NPT_HttpClient::SendRequest - will connect to %s:%d\n", hostname, port);
+    NPT_TcpClientSocket connection;
+    connection.SetReadTimeout(io_timeout);
+    connection.SetWriteTimeout(io_timeout);
+    NPT_SocketAddress socket_address(address, port);
+    NPT_CHECK(connection.Connect(socket_address, connection_timeout));
+
+    // get the streams
+    NPT_CHECK(connection.GetInputStream(input_stream));
+    NPT_CHECK(connection.GetOutputStream(output_stream));
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpClient::NPT_HttpClient
 +---------------------------------------------------------------------*/
-NPT_HttpClient::NPT_HttpClient()
+NPT_HttpClient::NPT_HttpClient(Connector* connector) :
+    m_Connector(connector)
 {
     m_Config.m_FollowRedirect      = true;
     m_Config.m_UseProxy            = false;
@@ -1078,6 +1119,8 @@ NPT_HttpClient::NPT_HttpClient()
     m_Config.m_ConnectionTimeout   = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
     m_Config.m_IoTimeout           = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
     m_Config.m_NameResolverTimeout = NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT;
+
+    if (connector == NULL) m_Connector = new NPT_HttpTcpConnector();
 }
 
 /*----------------------------------------------------------------------
@@ -1085,6 +1128,7 @@ NPT_HttpClient::NPT_HttpClient()
 +---------------------------------------------------------------------*/
 NPT_HttpClient::~NPT_HttpClient()
 {
+    delete m_Connector;
 }
 
 /*----------------------------------------------------------------------
@@ -1142,27 +1186,26 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     response = NULL;
 
     // get the address and port to which we need to connect
-    NPT_IpAddress server_address;
-    NPT_UInt16    server_port;
+    const char* server_hostname;
+    NPT_UInt16  server_port;
     if (m_Config.m_UseProxy) {
-        NPT_CHECK(server_address.ResolveName(m_Config.m_ProxyHostname, m_Config.m_NameResolverTimeout));
+        server_hostname = (const char*)m_Config.m_ProxyHostname;
         server_port = m_Config.m_ProxyPort;
     } else {
-        NPT_CHECK(server_address.ResolveName(request.GetUrl().GetHost(), m_Config.m_NameResolverTimeout));
+        server_hostname = (const char*)request.GetUrl().GetHost();
         server_port = request.GetUrl().GetPort();
     }
 
     // connect to the server
-    NPT_SocketAddress address(server_address, server_port);
-    NPT_Debug("NPT_HttpClient::SendRequest - will connect to %s:%d\n", (const char*)request.GetUrl().GetHost(), request.GetUrl().GetPort());
-    NPT_TcpClientSocket connection;
-    connection.SetReadTimeout(m_Config.m_IoTimeout);
-    connection.SetWriteTimeout(m_Config.m_IoTimeout);
-    NPT_CHECK(connection.Connect(address, m_Config.m_ConnectionTimeout));
-
-    // get the socket stream to send the request
+    NPT_InputStreamReference  input_stream;
     NPT_OutputStreamReference output_stream;
-    NPT_CHECK(connection.GetOutputStream(output_stream));
+    NPT_CHECK_WARNING(m_Connector->Connect(server_hostname,
+                                           server_port,
+                                           m_Config.m_ConnectionTimeout,
+                                           m_Config.m_IoTimeout,
+                                           m_Config.m_NameResolverTimeout,
+                                           input_stream,
+                                           output_stream));
 
     // add any headers that may be missing
     NPT_HttpHeaders& headers = request.GetHeaders();
@@ -1217,10 +1260,6 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     // flush the output stream so that everything is sent to the server
     output_stream->Flush();
 
-    // get the input stream to read the response
-    NPT_InputStreamReference input_stream;
-    NPT_CHECK(connection.GetInputStream(input_stream));
-
     // create a buffered stream for this socket stream
     NPT_BufferedInputStreamReference buffered_input_stream(new NPT_BufferedInputStream(input_stream));
 
@@ -1267,7 +1306,7 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
             if (location) {
                 // replace the request url
                 if (NPT_SUCCEEDED(request.SetUrl(location->GetValue()))) {
-                    NPT_Debug("NPT_HttpClient::SendRequest - redirecting to %s\n", location->GetValue().GetChars());
+                    NPT_LOG_FINE_1("NPT_HttpClient::SendRequest - redirecting to %s\n", location->GetValue().GetChars());
                     keep_going = true;
                     delete response;
                     response = NULL;
@@ -1366,7 +1405,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
 
     // wait for a connection
     NPT_Socket*         client;
-    NPT_Debug("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...\n", m_Config.m_ListenPort);
+    NPT_LOG_FINE_1("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...\n", m_Config.m_ListenPort);
     NPT_CHECK(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
     if (client == NULL) return NPT_ERROR_INTERNAL;
 
@@ -1378,11 +1417,9 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
         if (local_address) *local_address = client_info.local_address;
         if (remote_address) *remote_address = client_info.remote_address;
 
-#if defined(NPT_DEBUG)
-        NPT_Debug("NPT_HttpServer::WaitForRequest - client connected (%s)\n",
-                  client_info.local_address.ToString().GetChars(),
-                  client_info.remote_address.ToString().GetChars());
-#endif // NPT_DEBUG
+        NPT_LOG_FINE_2("NPT_HttpServer::WaitForRequest - client connected (%s)\n",
+                       client_info.local_address.ToString().GetChars(),
+                       client_info.remote_address.ToString().GetChars());
     }
 
     // configure the socket
@@ -1473,7 +1510,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&  input,
     if (handler == NULL) {
         response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
     } else {
-        // create a repsones object
+        // create a response object
         response = new NPT_HttpResponse(200, "OK", NPT_HTTP_PROTOCOL_1_0);
 
         // prepare the response

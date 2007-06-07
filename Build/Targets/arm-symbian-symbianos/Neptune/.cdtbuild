@@ -52,14 +52,17 @@
 <option id="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib.508226924" name="System Include Paths" superClass="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\variant&quot;"/>
-<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\libc&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\stdapis&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${GCCEINC}&quot;"/>
 </option>
 <option id="com.symbian.cdt.sdk.91.build.gcce.targetType.slib.510546831" name="TargetType" superClass="com.symbian.cdt.sdk.91.build.gcce.targetType.slib" value="com.symbian.cdt.sdk.91.build.gcce.slib.lib" valueType="enumerated"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib.430684926" name="UID2" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib.1505365276" name="UID3" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib.1596051914" name="Vendor Id" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib" value="0x00000000" valueType="string"/>
-<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.1089116082" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths"/>
+<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.1089116082" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths" valueType="includePath">
+<listOptionValue builtIn="false" value="${NEPTUNE_HOME}/Source/Core"/>
+<listOptionValue builtIn="false" value="${NEPTUNE_HOME}/Source/System/Symbian"/>
+</option>
 <tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUrel.1056160758" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUrel"/>
 <tool id="com.symbian.cdt.build.tool.gcce.aif.slib.2088671573" name="AIF Compiler" superClass="com.symbian.cdt.build.tool.gcce.aif.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.rcomp.slib.1987330554" name="Resource Compiler" superClass="com.symbian.cdt.build.tool.gcce.rcomp.slib"/>

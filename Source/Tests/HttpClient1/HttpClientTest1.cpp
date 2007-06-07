@@ -17,6 +17,10 @@
 #include <crtdbg.h>
 #endif
 
+#ifdef __GCCE__
+#include <staticlibinit_gcce.h>  
+#endif
+
 #define TEST_URL
 #if defined(TEST_URL)
 /*----------------------------------------------------------------------

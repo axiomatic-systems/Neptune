@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <?fileVersion 3.0.0?>
 
 <ManagedProjectBuildInfo>
@@ -29,14 +29,17 @@
 </configuration>
 <configuration artifactExtension="lib" artifactName="Neptune" cleanCommand="del /s/q" description="" id="S60_31_com.symbian.cdt.build.projectType.lib_gcce.urel_S60_3rd_FP1.1710909102" name="S60 3.1 Phone (GCCE) Release [S60_3rd_FP1]" parent="S60_31_com.symbian.cdt.build.projectType.lib_gcce.urel_S60_3rd_FP1">
 <toolChain id="com.nokia.sdk.S60_31.build.toolChain.gcce.gcceUrelSlib.1841365788" name="GCCE STATICLIB Defaults" superClass="com.nokia.sdk.S60_31.build.toolChain.gcce.gcceUrelSlib">
-<option id="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib.513805445" name="System Include Paths" superClass="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib"/>
-<option id="com.symbian.cdt.sdk.91.build.gcce.targetType.slib.370774112" name="TargetType" superClass="com.symbian.cdt.sdk.91.build.gcce.targetType.slib" value="lib" valueType="enumerated"/>
+<option id="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib.513805445" name="System Include Paths" superClass="com.nokia.cdt.build.toolChain.S60_31.gcce.GlobalOptions.systemIncludePaths.gcceUrelSlib" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\variant&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${EPOCROOT}epoc32\include\libc&quot;"/>
+<listOptionValue builtIn="false" value="&quot;..\..\..\..\..\..\ThirdParty\Neptune\Source\Core&quot;"/>
+</option>
+<option id="com.symbian.cdt.sdk.91.build.gcce.targetType.slib.370774112" name="TargetType" superClass="com.symbian.cdt.sdk.91.build.gcce.targetType.slib" value="com.symbian.cdt.sdk.91.build.gcce.slib.lib" valueType="enumerated"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib.1363200835" name="UID2" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib.240093293" name="UID3" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib.194884619" name="Vendor Id" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib" value="0x00000000" valueType="string"/>
-<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.1098677136" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths" valueType="includePath">
-<listOptionValue builtIn="false" value="&quot;${ProjDirPath}\inc&quot;"/>
-</option>
+<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.1098677136" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths" valueType="includePath"/>
 <tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUrel.2067303856" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUrel"/>
 <tool id="com.symbian.cdt.build.tool.gcce.aif.slib.1349327510" name="AIF Compiler" superClass="com.symbian.cdt.build.tool.gcce.aif.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.rcomp.slib.1244661020" name="Resource Compiler" superClass="com.symbian.cdt.build.tool.gcce.rcomp.slib"/>
@@ -44,6 +47,7 @@
 <tool id="com.symbian.cdt.build.tool.gcce.createsis.slib.383798520" name="CreateSis (Installation File Generator)" superClass="com.symbian.cdt.build.tool.gcce.createsis.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.archiver.slib.771362763" name="Archiver" superClass="com.symbian.cdt.build.tool.gcce.archiver.slib"/>
 <tool id="com.nokia.cdt.build.tool.S60_31.gcce.mif.slibUrel.1121412197" name="MIF Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.mif.slibUrel"/>
+<macros/>
 </toolChain>
 </configuration>
 <configuration artifactExtension="lib" artifactName="Neptune" cleanCommand="del /s/q" description="" id="S60_31_com.symbian.cdt.build.projectType.lib_gcce.udeb_S60_3rd_FP1.1300248611" name="S60 3.1 Phone (GCCE) Debug [S60_3rd_FP1]" parent="S60_31_com.symbian.cdt.build.projectType.lib_gcce.udeb_S60_3rd_FP1">
@@ -58,7 +62,7 @@
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib.502788635" name="UID2" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid2.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib.2123037499" name="UID3" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.uid3.slib" value="0x00000000" valueType="string"/>
 <option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib.455343668" name="Vendor Id" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.vendorid.slib" value="0x00000000" valueType="string"/>
-<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.2082041349" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths" valueType="includePath"/>
+<option id="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths.2082041349" name="User Include Paths" superClass="com.symbian.cdt.build.toolChain.gcce.GlobalOptions.userIncludePaths"/>
 <tool id="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb.1545822527" name="GCCE Compiler" superClass="com.nokia.cdt.build.tool.S60_31.gcce.compiler.slibUdeb"/>
 <tool id="com.symbian.cdt.build.tool.gcce.aif.slib.1517596755" name="AIF Compiler" superClass="com.symbian.cdt.build.tool.gcce.aif.slib"/>
 <tool id="com.symbian.cdt.build.tool.gcce.rcomp.slib.1841180452" name="Resource Compiler" superClass="com.symbian.cdt.build.tool.gcce.rcomp.slib"/>

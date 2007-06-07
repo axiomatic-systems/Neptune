@@ -339,8 +339,26 @@ public:
         bool        m_FollowRedirect;
     };
 
-    // constructors and destructor
-             NPT_HttpClient();
+    class Connector {
+    public:
+        virtual ~Connector() {}
+
+        virtual NPT_Result Connect(const char*                hostname, 
+                                   NPT_UInt16                 port, 
+                                   NPT_Timeout                connection_timeout,
+                                   NPT_Timeout                io_timeout,
+                                   NPT_Timeout                name_resolver_timeout,
+                                   NPT_InputStreamReference&  input_stream,
+                                   NPT_OutputStreamReference& output_stream) = 0;
+
+    };
+
+    /**
+     * @param connector Pointer to a Connector instance, or NULL to use 
+     * the default (TCP) connector.
+     */
+    NPT_HttpClient(Connector* connector = NULL);
+
     virtual ~NPT_HttpClient();
 
     // methods
@@ -358,7 +376,8 @@ protected:
                                NPT_HttpResponse*& response);
 
     // members
-    Config m_Config;
+    Config     m_Config;
+    Connector* m_Connector;
 };
 
 /*----------------------------------------------------------------------

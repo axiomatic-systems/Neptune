@@ -17,12 +17,17 @@
 #include <sys/stat.h>
 #endif
 
+#include "NptConfig.h"
 #include "NptUtils.h"
 #include "NptFile.h"
 #include "NptThreads.h"
 #include "NptInterfaces.h"
 #include "NptStrings.h"
 #include "NptDebug.h"
+
+#if defined(NPT_CONFIG_HAVE_SHARE_H)
+#include <share.h>
+#endif
 
 /*----------------------------------------------------------------------
 |   compatibility wrappers
@@ -33,6 +38,7 @@ static int fopen_s(FILE**      file,
                    const char* mode)
 {
     *file = fopen(filename, mode);
+
 #if defined(_WIN32_WCE)
     if (*file == NULL) return ENOENT;
 #else
@@ -340,7 +346,12 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
         }
 
         // open the file
+#if defined(NPT_CONFIG_HAVE_FSOPEN)
+        file = _fsopen(name, fmode, _SH_DENYWR);
+        int open_result = file == NULL ? ENOENT : 0; 
+#else
         int open_result = fopen_s(&file, name, fmode);
+#endif
 
         // test the result of the open
         if (open_result != 0) {

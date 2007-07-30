@@ -54,6 +54,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
 const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
+const int NPT_ERROR_HTTP_NO_PROXY              = NPT_ERROR_BASE_HTTP - 2;
 
 #define NPT_HTTP_LINE_TERMINATOR "\r\n"
 
@@ -324,6 +325,40 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+|   NPT_HttpProxyAddress
++---------------------------------------------------------------------*/
+class NPT_HttpProxyAddress
+{
+public:
+    NPT_HttpProxyAddress() : m_Port(NPT_HTTP_INVALID_PORT) {}
+    NPT_HttpProxyAddress(const char* hostname, NPT_UInt16 port) :
+        m_HostName(hostname), m_Port(port) {}
+
+    const NPT_String& GetHostName() const { return m_HostName; } 
+    void              SetHostName(const char* hostname) { m_HostName = hostname; }
+    NPT_UInt16        GetPort() const { return m_Port; }
+    void              SetPort(NPT_UInt16 port) { m_Port = port; }
+
+private:
+    NPT_String m_HostName;
+    NPT_UInt16 m_Port;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpProxySelector
++---------------------------------------------------------------------*/
+class NPT_HttpProxySelector
+{
+public:
+    // class methods
+    static NPT_HttpProxySelector* GetSystemDefault();
+
+    // methods
+    virtual ~NPT_HttpProxySelector() {};
+    virtual NPT_Result GetProxyForUrl(const NPT_HttpUrl& url, NPT_HttpProxyAddress& proxy) = 0;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpClient
 +---------------------------------------------------------------------*/
 class NPT_HttpClient {
@@ -333,9 +368,6 @@ public:
         NPT_Timeout m_ConnectionTimeout;
         NPT_Timeout m_IoTimeout;
         NPT_Timeout m_NameResolverTimeout;
-        bool        m_UseProxy;
-        NPT_String  m_ProxyHostname;
-        NPT_UInt16  m_ProxyPort;
         bool        m_FollowRedirect;
     };
 
@@ -366,6 +398,7 @@ public:
                            NPT_HttpResponse*& response);
     NPT_Result SetConfig(const Config& config);
     NPT_Result SetProxy(const char* hostname, NPT_UInt16 port);
+    NPT_Result SetProxySelector(NPT_HttpProxySelector* selector);
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout,
                            NPT_Timeout io_timeout,
                            NPT_Timeout name_resolver_timeout);
@@ -376,8 +409,10 @@ protected:
                                NPT_HttpResponse*& response);
 
     // members
-    Config     m_Config;
-    Connector* m_Connector;
+    Config                 m_Config;
+    NPT_HttpProxySelector* m_ProxySelector;
+    bool                   m_ProxySelectorIsOwned;
+    Connector*             m_Connector;
 };
 
 /*----------------------------------------------------------------------

@@ -1107,15 +1107,58 @@ NPT_HttpTcpConnector::Connect(const char*                    hostname,
     return NPT_SUCCESS;
 }
 
+//// temporary place holder implementation
+NPT_HttpProxySelector*
+NPT_HttpProxySelector::GetSystemDefault()
+{
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpStaticProxySelector
++---------------------------------------------------------------------*/
+class NPT_HttpStaticProxySelector : public NPT_HttpProxySelector
+{
+public:
+    // constructor
+    NPT_HttpStaticProxySelector(const char* hostname, NPT_UInt16 port);
+
+    // NPT_HttpProxySelector methods
+    NPT_Result GetProxyForUrl(const NPT_HttpUrl& url, NPT_HttpProxyAddress& proxy);
+
+private:
+    // members
+    NPT_HttpProxyAddress m_Proxy;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpStaticProxySelector::NPT_HttpStaticProxySelector
++---------------------------------------------------------------------*/
+NPT_HttpStaticProxySelector::NPT_HttpStaticProxySelector(const char* hostname, NPT_UInt16 port) :
+    m_Proxy(hostname, port)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpStaticProxySelector::GetProxyForUrl
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpStaticProxySelector::GetProxyForUrl(const NPT_HttpUrl& /* url */, 
+                                            NPT_HttpProxyAddress& proxy)
+{
+    proxy = m_Proxy;
+    return NPT_SUCCESS;
+}
+
 /*----------------------------------------------------------------------
 |   NPT_HttpClient::NPT_HttpClient
 +---------------------------------------------------------------------*/
 NPT_HttpClient::NPT_HttpClient(Connector* connector) :
+    m_ProxySelector(NPT_HttpProxySelector::GetSystemDefault()),
+    m_ProxySelectorIsOwned(false),
     m_Connector(connector)
 {
     m_Config.m_FollowRedirect      = true;
-    m_Config.m_UseProxy            = false;
-    m_Config.m_ProxyPort           = NPT_HTTP_INVALID_PORT;
     m_Config.m_ConnectionTimeout   = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
     m_Config.m_IoTimeout           = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
     m_Config.m_NameResolverTimeout = NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT;
@@ -1128,6 +1171,9 @@ NPT_HttpClient::NPT_HttpClient(Connector* connector) :
 +---------------------------------------------------------------------*/
 NPT_HttpClient::~NPT_HttpClient()
 {
+    if (m_ProxySelectorIsOwned) {
+        delete m_ProxySelector;
+    }
     delete m_Connector;
 }
 
@@ -1148,14 +1194,33 @@ NPT_HttpClient::SetConfig(const Config& config)
 NPT_Result
 NPT_HttpClient::SetProxy(const char* hostname, NPT_UInt16 port)
 {
-    m_Config.m_ProxyHostname = hostname;
-    m_Config.m_ProxyPort     = port;
-    if (m_Config.m_ProxyHostname.IsEmpty()) {
-        // remove the proxy
-        m_Config.m_UseProxy = false;
-    } else {
-        m_Config.m_UseProxy = true;
+    if (m_ProxySelectorIsOwned) {
+        delete m_ProxySelector;
+        m_ProxySelector = NULL;
+        m_ProxySelectorIsOwned = false;
     }
+
+    // only set a proxy selector is hostname is not null, disable the
+    // proxy otherwise
+    if (hostname != NULL && port != NPT_HTTP_INVALID_PORT) {
+        m_ProxySelector = new NPT_HttpStaticProxySelector(hostname, port);
+        m_ProxySelectorIsOwned = true;
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpClient::SetProxy
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpClient::SetProxySelector(NPT_HttpProxySelector* selector)
+{
+    if (m_ProxySelectorIsOwned) {
+        delete m_ProxySelector;
+    }
+    m_ProxySelector = selector;
+    m_ProxySelectorIsOwned = false;
 
     return NPT_SUCCESS;
 }
@@ -1186,17 +1251,32 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     response = NULL;
 
     // get the address and port to which we need to connect
+    NPT_HttpProxyAddress proxy;
+    bool                 use_proxy = false;
+    if (m_ProxySelector) {
+        // we have a proxy selector, ask it to select a proxy for this URL
+        NPT_Result result = m_ProxySelector->GetProxyForUrl(request.GetUrl(), proxy);
+        if (NPT_FAILED(result) && result != NPT_ERROR_HTTP_NO_PROXY) {
+            NPT_LOG_WARNING_1("NPT_HttpClient::SendRequestOnce - proxy selector failure (%d)", result);
+            return result;
+        }
+        use_proxy = true;
+    }
+
+    // decide which host we need to connect to
     const char* server_hostname;
     NPT_UInt16  server_port;
-    if (m_Config.m_UseProxy) {
-        server_hostname = (const char*)m_Config.m_ProxyHostname;
-        server_port = m_Config.m_ProxyPort;
+    if (use_proxy) {
+        // the proxy is set
+        server_hostname = (const char*)proxy.GetHostName();
+        server_port = proxy.GetPort();
     } else {
+        // no proxy selector, so no proxy: connect directly
         server_hostname = (const char*)request.GetUrl().GetHost();
         server_port = request.GetUrl().GetPort();
     }
 
-    // connect to the server
+    // connect to the server or proxy
     NPT_InputStreamReference  input_stream;
     NPT_OutputStreamReference output_stream;
     NPT_CHECK_WARNING(m_Connector->Connect(server_hostname,
@@ -1247,7 +1327,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     NPT_MemoryStream header_stream;
 
     // emit the request headers into the header buffer
-    request.Emit(header_stream, m_Config.m_UseProxy);
+    request.Emit(header_stream, use_proxy);
 
     // send the headers
     NPT_CHECK(output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));

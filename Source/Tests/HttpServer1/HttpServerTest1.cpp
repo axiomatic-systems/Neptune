@@ -30,11 +30,11 @@ public:
         msg += request.GetUrl().GetPath();
         msg += " <P><UL>";
         if (request.GetUrl().HasQuery()) {
-            NPT_HttpUrlQuery query(request.GetUrl().GetQuery());
-            for (NPT_List<NPT_HttpUrlQuery::Field>::Iterator it = query.GetFields().GetFirstItem();
+            NPT_UrlQuery query(request.GetUrl().GetQuery());
+            for (NPT_List<NPT_UrlQuery::Field>::Iterator it = query.GetFields().GetFirstItem();
                  it;
                  ++it) {
-                 NPT_HttpUrlQuery::Field& field = *it;
+                 NPT_UrlQuery::Field& field = *it;
                  msg += "<LI>";
                  msg += field.m_Name;
                  msg += " = ";

@@ -54,6 +54,7 @@
 				CA5045890C5AF0340060E6FE /* PBXTargetDependency */,
 				CA50458B0C5AF0340060E6FE /* PBXTargetDependency */,
 				CA50458D0C5AF0340060E6FE /* PBXTargetDependency */,
+				CAF03DB00C7F91AC002C470F /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = Tests;
@@ -100,6 +101,8 @@
 		CA50456B0C5AF0090060E6FE /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5044470C5AEAE90060E6FE /* libNeptune.a */; };
 		CA50456C0C5AF0140060E6FE /* XmlTest1Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5044220C5AEA810060E6FE /* XmlTest1Data.cpp */; };
 		CA50456D0C5AF0160060E6FE /* XmlTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5044210C5AEA810060E6FE /* XmlTest1.cpp */; };
+		CAF03D8B0C7F8C65002C470F /* ZipTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */; };
+		CAF03D8F0C7F8C7F002C470F /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5044470C5AEAE90060E6FE /* libNeptune.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,288 +110,302 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = F912B69F0B8EB1C700C1E90D /* libNeptune.a */;
+			remoteGlobalIDString = F912B69F0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA50447B0C5AEB7F0060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA50447F0C5AEB9C0060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044860C5AEBB10060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044980C5AEBF80060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044A10C5AEC540060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044250C5AEAC90060E6FE /* NetConfig */;
+			remoteGlobalIDString = CA5044250C5AEAC90060E6FE;
 			remoteInfo = NetConfig;
 		};
 		CA5044A30C5AEC540060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044780C5AEB560060E6FE /* NetEcho */;
+			remoteGlobalIDString = CA5044780C5AEB560060E6FE;
 			remoteInfo = NetEcho;
 		};
 		CA5044A50C5AEC540060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044830C5AEBAD0060E6FE /* NetPing */;
+			remoteGlobalIDString = CA5044830C5AEBAD0060E6FE;
 			remoteInfo = NetPing;
 		};
 		CA5044A70C5AEC540060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044950C5AEBF20060E6FE /* NetPump */;
+			remoteGlobalIDString = CA5044950C5AEBF20060E6FE;
 			remoteInfo = NetPump;
 		};
 		CA5044AA0C5AEC710060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044A00C5AEC4B0060E6FE /* Apps */;
+			remoteGlobalIDString = CA5044A00C5AEC4B0060E6FE;
 			remoteInfo = Apps;
 		};
 		CA5044B10C5AEC990060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044C40C5AECE00060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044D10C5AED270060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044DE0C5AED6B0060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044E90C5AEDA60060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5044F90C5AEDE80060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045070C5AEE430060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045140C5AEE800060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045210C5AEEC10060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA50452E0C5AEEFB0060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA50453B0C5AEF460060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045450C5AEF710060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045550C5AEFB30060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA50455F0C5AEFDB0060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045690C5AF0030060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CA5045700C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044AE0C5AEC8F0060E6FE /* ArraysTest1 */;
+			remoteGlobalIDString = CA5044AE0C5AEC8F0060E6FE;
 			remoteInfo = ArraysTest1;
 		};
 		CA5045720C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044C10C5AECDB0060E6FE /* BufferedStreamsTest1 */;
+			remoteGlobalIDString = CA5044C10C5AECDB0060E6FE;
 			remoteInfo = BufferedStreamsTest1;
 		};
 		CA5045740C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044CE0C5AED200060E6FE /* HttpClientTest1 */;
+			remoteGlobalIDString = CA5044CE0C5AED200060E6FE;
 			remoteInfo = HttpClientTest1;
 		};
 		CA5045760C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044DB0C5AED660060E6FE /* HttpServerTest1 */;
+			remoteGlobalIDString = CA5044DB0C5AED660060E6FE;
 			remoteInfo = HttpServerTest1;
 		};
 		CA5045780C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044E60C5AEDA10060E6FE /* ListsTest1 */;
+			remoteGlobalIDString = CA5044E60C5AEDA10060E6FE;
 			remoteInfo = ListsTest1;
 		};
 		CA50457A0C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5044F60C5AEDE30060E6FE /* LoggingTest1 */;
+			remoteGlobalIDString = CA5044F60C5AEDE30060E6FE;
 			remoteInfo = LoggingTest1;
 		};
 		CA50457C0C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045040C5AEE390060E6FE /* MapsTest1 */;
+			remoteGlobalIDString = CA5045040C5AEE390060E6FE;
 			remoteInfo = MapsTest1;
 		};
 		CA50457E0C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045110C5AEE7B0060E6FE /* MessagesTest1 */;
+			remoteGlobalIDString = CA5045110C5AEE7B0060E6FE;
 			remoteInfo = MessagesTest1;
 		};
 		CA5045800C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA50451E0C5AEEBC0060E6FE /* MessagesTest2 */;
+			remoteGlobalIDString = CA50451E0C5AEEBC0060E6FE;
 			remoteInfo = MessagesTest2;
 		};
 		CA5045820C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA50452B0C5AEEF50060E6FE /* MiscTest1 */;
+			remoteGlobalIDString = CA50452B0C5AEEF50060E6FE;
 			remoteInfo = MiscTest1;
 		};
 		CA5045840C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045380C5AEF400060E6FE /* RingBufferTest1 */;
+			remoteGlobalIDString = CA5045380C5AEF400060E6FE;
 			remoteInfo = RingBufferTest1;
 		};
 		CA5045860C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045420C5AEF6C0060E6FE /* ThreadsTest1 */;
+			remoteGlobalIDString = CA5045420C5AEF6C0060E6FE;
 			remoteInfo = ThreadsTest1;
 		};
 		CA5045880C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045520C5AEFAF0060E6FE /* UdpTest1 */;
+			remoteGlobalIDString = CA5045520C5AEFAF0060E6FE;
 			remoteInfo = UdpTest1;
 		};
 		CA50458A0C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA50455C0C5AEFD30060E6FE /* UrlTest1 */;
+			remoteGlobalIDString = CA50455C0C5AEFD30060E6FE;
 			remoteInfo = UrlTest1;
 		};
 		CA50458C0C5AF0340060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA5045660C5AEFFD0060E6FE /* XmlTest1 */;
+			remoteGlobalIDString = CA5045660C5AEFFD0060E6FE;
 			remoteInfo = XmlTest1;
 		};
 		CA50459C0C5AF0780060E6FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA50456F0C5AF02D0060E6FE /* Tests */;
+			remoteGlobalIDString = CA50456F0C5AF02D0060E6FE;
 			remoteInfo = Tests;
+		};
+		CAF03D890C7F8C4F002C470F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteInfo = Neptune;
+		};
+		CAF03DAF0C7F91AC002C470F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAF03D860C7F8C47002C470F /* ZipTest1 */;
+			remoteInfo = ZipTest1;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -417,26 +434,28 @@
 		CA5044200C5AEA810060E6FE /* unicode.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = unicode.xml; sourceTree = "<group>"; };
 		CA5044210C5AEA810060E6FE /* XmlTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = XmlTest1.cpp; sourceTree = "<group>"; };
 		CA5044220C5AEA810060E6FE /* XmlTest1Data.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = XmlTest1Data.cpp; sourceTree = "<group>"; };
-		CA5044260C5AEAC90060E6FE /* NetConfig */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NetConfig; path = build/Debug/NetConfig; sourceTree = "<group>"; };
+		CA5044260C5AEAC90060E6FE /* NetConfig */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetConfig; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Neptune.xcodeproj; sourceTree = "<group>"; };
-		CA5044790C5AEB560060E6FE /* NetEcho */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NetEcho; path = build/Debug/NetEcho; sourceTree = "<group>"; };
-		CA5044840C5AEBAD0060E6FE /* NetPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NetPing; path = build/Debug/NetPing; sourceTree = "<group>"; };
-		CA5044960C5AEBF20060E6FE /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = NetPump; path = build/Debug/NetPump; sourceTree = "<group>"; };
-		CA5044AF0C5AEC8F0060E6FE /* ArraysTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ArraysTest1; path = build/Debug/ArraysTest1; sourceTree = "<group>"; };
-		CA5044C20C5AECDB0060E6FE /* BufferedStreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = BufferedStreamsTest1; path = build/Debug/BufferedStreamsTest1; sourceTree = "<group>"; };
-		CA5044CF0C5AED200060E6FE /* HttpClientTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = HttpClientTest1; path = build/Debug/HttpClientTest1; sourceTree = "<group>"; };
-		CA5044DC0C5AED660060E6FE /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = HttpServerTest1; path = build/Debug/HttpServerTest1; sourceTree = "<group>"; };
-		CA5044E70C5AEDA10060E6FE /* ListsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ListsTest1; path = build/Debug/ListsTest1; sourceTree = "<group>"; };
-		CA5044F70C5AEDE30060E6FE /* LoggingTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = LoggingTest1; path = build/Debug/LoggingTest1; sourceTree = "<group>"; };
-		CA5045050C5AEE390060E6FE /* MapsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MapsTest1; path = build/Debug/MapsTest1; sourceTree = "<group>"; };
-		CA5045120C5AEE7B0060E6FE /* MessagesTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MessagesTest1; path = build/Debug/MessagesTest1; sourceTree = "<group>"; };
-		CA50451F0C5AEEBC0060E6FE /* MessagesTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MessagesTest2; path = build/Debug/MessagesTest2; sourceTree = "<group>"; };
-		CA50452C0C5AEEF50060E6FE /* MiscTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MiscTest1; path = build/Debug/MiscTest1; sourceTree = "<group>"; };
-		CA5045390C5AEF400060E6FE /* RingBufferTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = RingBufferTest1; path = build/Debug/RingBufferTest1; sourceTree = "<group>"; };
-		CA5045430C5AEF6C0060E6FE /* ThreadsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ThreadsTest1; path = build/Debug/ThreadsTest1; sourceTree = "<group>"; };
-		CA5045530C5AEFAF0060E6FE /* UdpTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = UdpTest1; path = build/Debug/UdpTest1; sourceTree = "<group>"; };
-		CA50455D0C5AEFD30060E6FE /* UrlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = UrlTest1; path = build/Debug/UrlTest1; sourceTree = "<group>"; };
-		CA5045670C5AEFFD0060E6FE /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = XmlTest1; path = build/Debug/XmlTest1; sourceTree = "<group>"; };
+		CA5044790C5AEB560060E6FE /* NetEcho */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetEcho; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044840C5AEBAD0060E6FE /* NetPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPing; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044960C5AEBF20060E6FE /* NetPump */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPump; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044AF0C5AEC8F0060E6FE /* ArraysTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ArraysTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044C20C5AECDB0060E6FE /* BufferedStreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BufferedStreamsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044CF0C5AED200060E6FE /* HttpClientTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpClientTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044DC0C5AED660060E6FE /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServerTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044E70C5AEDA10060E6FE /* ListsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ListsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5044F70C5AEDE30060E6FE /* LoggingTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045050C5AEE390060E6FE /* MapsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MapsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045120C5AEE7B0060E6FE /* MessagesTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MessagesTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA50451F0C5AEEBC0060E6FE /* MessagesTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MessagesTest2; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA50452C0C5AEEF50060E6FE /* MiscTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045390C5AEF400060E6FE /* RingBufferTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RingBufferTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045430C5AEF6C0060E6FE /* ThreadsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ThreadsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045530C5AEFAF0060E6FE /* UdpTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UdpTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA50455D0C5AEFD30060E6FE /* UrlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UrlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA5045670C5AEFFD0060E6FE /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XmlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ZipTest1.cpp; sourceTree = "<group>"; };
+		CAF03D870C7F8C47002C470F /* ZipTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ZipTest1; path = build/Debug/ZipTest1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -592,6 +611,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAF03D850C7F8C47002C470F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAF03D8F0C7F8C7F002C470F /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -668,6 +695,7 @@
 				CA5044190C5AEA810060E6FE /* Udp1 */,
 				CA50441B0C5AEA810060E6FE /* Url1 */,
 				CA50441D0C5AEA810060E6FE /* Xml1 */,
+				CAF03D820C7F8C1E002C470F /* Zip1 */,
 			);
 			name = Tests;
 			path = ../../../Source/Tests;
@@ -827,6 +855,7 @@
 				CA5045530C5AEFAF0060E6FE /* UdpTest1 */,
 				CA50455D0C5AEFD30060E6FE /* UrlTest1 */,
 				CA5045670C5AEFFD0060E6FE /* XmlTest1 */,
+				CAF03D870C7F8C47002C470F /* ZipTest1 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -837,6 +866,14 @@
 				CA5044470C5AEAE90060E6FE /* libNeptune.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CAF03D820C7F8C1E002C470F /* Zip1 */ = {
+			isa = PBXGroup;
+			children = (
+				CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */,
+			);
+			path = Zip1;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1165,6 +1202,23 @@
 			productReference = CA5045670C5AEFFD0060E6FE /* XmlTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAF03D860C7F8C47002C470F /* ZipTest1 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAF03D920C7F8C9E002C470F /* Build configuration list for PBXNativeTarget "ZipTest1" */;
+			buildPhases = (
+				CAF03D840C7F8C47002C470F /* Sources */,
+				CAF03D850C7F8C47002C470F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAF03D8A0C7F8C4F002C470F /* PBXTargetDependency */,
+			);
+			name = ZipTest1;
+			productName = ZipTest1;
+			productReference = CAF03D870C7F8C47002C470F /* ZipTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1204,6 +1258,7 @@
 				CA5045520C5AEFAF0060E6FE /* UdpTest1 */,
 				CA50455C0C5AEFD30060E6FE /* UrlTest1 */,
 				CA5045660C5AEFFD0060E6FE /* XmlTest1 */,
+				CAF03D860C7F8C47002C470F /* ZipTest1 */,
 			);
 		};
 /* End PBXProject section */
@@ -1369,6 +1424,14 @@
 			files = (
 				CA50456C0C5AF0140060E6FE /* XmlTest1Data.cpp in Sources */,
 				CA50456D0C5AF0160060E6FE /* XmlTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAF03D840C7F8C47002C470F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAF03D8B0C7F8C65002C470F /* ZipTest1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1574,6 +1637,16 @@
 			isa = PBXTargetDependency;
 			target = CA50456F0C5AF02D0060E6FE /* Tests */;
 			targetProxy = CA50459C0C5AF0780060E6FE /* PBXContainerItemProxy */;
+		};
+		CAF03D8A0C7F8C4F002C470F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Neptune;
+			targetProxy = CAF03D890C7F8C4F002C470F /* PBXContainerItemProxy */;
+		};
+		CAF03DB00C7F91AC002C470F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAF03D860C7F8C47002C470F /* ZipTest1 */;
+			targetProxy = CAF03DAF0C7F91AC002C470F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2232,6 +2305,36 @@
 			};
 			name = Release;
 		};
+		CAF03D930C7F8C9E002C470F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = ZipTest1;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		CAF03D940C7F8C9E002C470F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = "$(HOME)/bin";
+				PREBINDING = NO;
+				PRODUCT_NAME = ZipTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2438,6 +2541,15 @@
 			buildConfigurations = (
 				CA50459A0C5AF0580060E6FE /* Debug */,
 				CA50459B0C5AF0580060E6FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAF03D920C7F8C9E002C470F /* Build configuration list for PBXNativeTarget "ZipTest1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAF03D930C7F8C9E002C470F /* Debug */,
+				CAF03D940C7F8C9E002C470F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -64,6 +64,19 @@ const int NPT_ERROR_HTTP_NO_PROXY              = NPT_ERROR_BASE_HTTP - 2;
 typedef unsigned int NPT_HttpStatusCode;
 
 /*----------------------------------------------------------------------
+|   NPT_HttpUrl
++---------------------------------------------------------------------*/
+class NPT_HttpUrl : public NPT_Url {
+public:
+    // constructors
+    NPT_HttpUrl() {}
+    NPT_HttpUrl(const char* url, bool ignore_scheme = false);
+
+    // methods
+    virtual NPT_String ToString(bool with_fragment = true) const;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpProtocol
 +---------------------------------------------------------------------*/
 class NPT_HttpProtocol
@@ -71,80 +84,6 @@ class NPT_HttpProtocol
 public:
     // class methods
     const char* GetSatusCodeString(NPT_HttpStatusCode status_code);
-};
-
-/*----------------------------------------------------------------------
-|   NPT_HttpUrlQuery
-+---------------------------------------------------------------------*/
-class NPT_HttpUrlQuery
-{
-public:
-    // types
-    struct Field {
-        Field(const char* name, const char* value) :
-            m_Name(name), m_Value(value) {}
-        NPT_String m_Name;
-        NPT_String m_Value;
-    };
-
-    // constructor
-    NPT_HttpUrlQuery() {}
-    NPT_HttpUrlQuery(const char* query);
-
-    // accessors
-    NPT_List<Field>& GetFields() { return m_Fields; }
-
-    // methods
-    NPT_Result  AddField(const char* name, const char* value);
-    const char* GetField(const char* name);
-    NPT_String  ToString();
-
-private:
-    // members
-    NPT_List<Field> m_Fields;
-};
-
-/*----------------------------------------------------------------------
-|   NPT_HttpUrl
-+---------------------------------------------------------------------*/
-class NPT_HttpUrl : public NPT_Uri {
-public:
-    // constructors and destructor
-    NPT_HttpUrl();
-    NPT_HttpUrl(const char* url, bool ignore_scheme = false);
-    NPT_HttpUrl(const char* host, 
-                NPT_UInt16  port, 
-                const char* path,
-                const char* query = NULL,
-                const char* fragment = NULL);
-
-    // methods
-    NPT_UInt16        GetPort() const     { return m_Port;     }
-    const NPT_String& GetHost() const     { return m_Host;     }
-    const NPT_String& GetPath() const     { return m_Path;     }
-    const NPT_String& GetQuery() const    { return m_Query;    }
-    const NPT_String& GetFragment() const { return m_Fragment; }
-    bool              IsValid() const;
-    bool              HasQuery()    const { return m_HasQuery;    } 
-    bool              HasFragment() const { return m_HasFragment; }
-    NPT_Result        SetHost(const char*  host);
-    NPT_Result        SetPort(NPT_UInt16 port);
-    NPT_Result        SetPath(const char*  path);
-    NPT_Result        SetPathPlus(const char* path_plus);
-    NPT_Result        SetQuery(const char* query);
-    NPT_Result        SetFragment(const char* fragment);
-    NPT_String        ToRequestString(bool with_fragment = false) const;
-    NPT_String        ToString(bool with_fragment = true) const;
-
-private:
-    // members
-    NPT_String m_Host;
-    NPT_UInt16 m_Port;
-    NPT_String m_Path;
-    bool       m_HasQuery;
-    NPT_String m_Query;
-    bool       m_HasFragment;
-    NPT_String m_Fragment;
 };
 
 /*----------------------------------------------------------------------
@@ -585,3 +524,4 @@ protected:
 };
 
 #endif // _NPT_HTTP_H_
+

@@ -558,7 +558,7 @@ NPT_BsdSocketFd::SetBlockingMode(bool blocking)
 {
     int flags = fcntl(m_SocketFd, F_GETFL, 0);
     if (blocking) {
-        flags ^= O_NONBLOCK;
+        flags &= ~O_NONBLOCK;
     } else {
         flags |= O_NONBLOCK;
     }

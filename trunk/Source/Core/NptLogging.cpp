@@ -266,7 +266,6 @@ NPT_LogManager::NPT_LogManager() :
     m_Configured(false),
     m_Root(NULL)
 {
-    NPT_Debug("NPT_LogManager::NPT_LogManager()\n");
 }
 
 /*----------------------------------------------------------------------
@@ -274,8 +273,6 @@ NPT_LogManager::NPT_LogManager() :
 +---------------------------------------------------------------------*/
 NPT_LogManager::~NPT_LogManager()
 {
-    NPT_Debug("NPT_LogManager::~NPT_LogManager()\n");
-    
     /* destroy everything we've created */
     for (NPT_List<NPT_Logger*>::Iterator i = m_Loggers.GetFirstItem();
          i;

@@ -51,6 +51,7 @@
 #include "NptConsole.h"
 #include "NptLogging.h"
 #include "NptSerialPort.h"
+#include "NptZip.h"
 #include "NptVersion.h"
 
 #endif // _NEPTUNE_H_

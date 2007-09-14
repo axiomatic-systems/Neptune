@@ -117,7 +117,7 @@ TestParse(ParseTestVector* vector, int test_index)
         }
     }    
     if (url.HasQuery() != (vector->expected_query != NULL)) {
-        fprintf(stderr, "TEST %02d: expected a query, did not get one\n");
+        fprintf(stderr, "TEST %02d: expected a query, did not get one\n", test_index);
         return;
     }
     if (vector->expected_query) {
@@ -170,7 +170,7 @@ main(int /*argc*/, char** /*argv*/)
     printf("--- test starting\n");
     
     // parsing test vectors
-    for (int i=0; i<sizeof(ParseTestVectors)/sizeof(ParseTestVectors[0]); i++) {
+    for (unsigned int i=0; i<sizeof(ParseTestVectors)/sizeof(ParseTestVectors[0]); i++) {
         ParseTestVector* vector = &ParseTestVectors[i];
         TestParse(vector, i);
     }

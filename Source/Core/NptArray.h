@@ -202,6 +202,7 @@ NPT_Array<T>::operator=(const NPT_Array<T>& copy)
 
     // copy all elements from the other object
     Reserve(copy.GetItemCount());
+	m_ItemCount = copy.m_ItemCount;
     for (NPT_Ordinal i=0; i<copy.m_ItemCount; i++) {
         new ((void*)&m_Items[i]) T(copy.m_Items[i]);
     }
@@ -356,7 +357,7 @@ NPT_Array<T>::Insert(Iterator where, const T& item, NPT_Cardinal repeat)
     if (where > &m_Items[m_ItemCount] || repeat == 0) return NPT_ERROR_INVALID_PARAMETERS;
 
     NPT_Cardinal needed = m_ItemCount+repeat;
-    if (needed < m_Capacity) {
+    if (needed > m_Capacity) {
         // allocate more memory
         NPT_Cardinal new_capacity;
         T* new_items = Allocate(needed, new_capacity);

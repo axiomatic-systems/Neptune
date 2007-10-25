@@ -106,7 +106,8 @@ public:
     NPT_Url(const char* url, 
             SchemeId    expected_scheme = SCHEME_ID_UNKNOWN, 
             NPT_UInt16  default_port = NPT_URL_INVALID_PORT);
-    NPT_Url(const char* host, 
+    NPT_Url(const char* scheme,
+            const char* host, 
             NPT_UInt16  port, 
             const char* path,
             const char* query = NULL,

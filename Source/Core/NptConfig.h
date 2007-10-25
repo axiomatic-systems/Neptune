@@ -86,6 +86,12 @@
 #undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
 #endif
 
+/* symbian */
+#if defined(__SYMBIAN32__)
+/* If defined, specify the stack size of each NPT_Thread. */
+#define NPT_CONFIG_THREAD_STACK_SIZE   0x14000
+#endif
+
 /*----------------------------------------------------------------------
 |   compiler specifics
 +---------------------------------------------------------------------*/

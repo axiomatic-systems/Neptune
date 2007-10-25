@@ -101,6 +101,7 @@
 		CA50456B0C5AF0090060E6FE /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5044470C5AEAE90060E6FE /* libNeptune.a */; };
 		CA50456C0C5AF0140060E6FE /* XmlTest1Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5044220C5AEA810060E6FE /* XmlTest1Data.cpp */; };
 		CA50456D0C5AF0160060E6FE /* XmlTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5044210C5AEA810060E6FE /* XmlTest1.cpp */; };
+		CAE7A4930CBC433000C254B1 /* ZipTestData1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE7A4920CBC433000C254B1 /* ZipTestData1.cpp */; };
 		CAF03D8B0C7F8C65002C470F /* ZipTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */; };
 		CAF03D8F0C7F8C7F002C470F /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA5044470C5AEAE90060E6FE /* libNeptune.a */; };
 /* End PBXBuildFile section */
@@ -397,14 +398,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
 		CAF03DAF0C7F91AC002C470F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA5043EC0C5AEA510060E6FE /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CAF03D860C7F8C47002C470F /* ZipTest1 */;
+			remoteGlobalIDString = CAF03D860C7F8C47002C470F;
 			remoteInfo = ZipTest1;
 		};
 /* End PBXContainerItemProxy section */
@@ -454,8 +455,9 @@
 		CA5045530C5AEFAF0060E6FE /* UdpTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UdpTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA50455D0C5AEFD30060E6FE /* UrlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = UrlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA5045670C5AEFFD0060E6FE /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XmlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAE7A4920CBC433000C254B1 /* ZipTestData1.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ZipTestData1.cpp; sourceTree = "<group>"; };
 		CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = ZipTest1.cpp; sourceTree = "<group>"; };
-		CAF03D870C7F8C47002C470F /* ZipTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = ZipTest1; path = build/Debug/ZipTest1; sourceTree = "<group>"; };
+		CAF03D870C7F8C47002C470F /* ZipTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ZipTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -871,6 +873,7 @@
 		CAF03D820C7F8C1E002C470F /* Zip1 */ = {
 			isa = PBXGroup;
 			children = (
+				CAE7A4920CBC433000C254B1 /* ZipTestData1.cpp */,
 				CAF03D830C7F8C1E002C470F /* ZipTest1.cpp */,
 			);
 			path = Zip1;
@@ -1432,6 +1435,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAF03D8B0C7F8C65002C470F /* ZipTest1.cpp in Sources */,
+				CAE7A4930CBC433000C254B1 /* ZipTestData1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

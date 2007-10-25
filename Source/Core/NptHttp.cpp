@@ -38,6 +38,18 @@ NPT_HttpUrl::NPT_HttpUrl(const char* url, bool ignore_scheme) :
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpUrl::NPT_HttpUrl
++---------------------------------------------------------------------*/
+NPT_HttpUrl::NPT_HttpUrl(const char* host, 
+                         NPT_UInt16  port, 
+                         const char* path,
+                         const char* query,
+                         const char* fragment) :
+    NPT_Url("http", host, port, path, query, fragment)
+{
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpUrl::ToString
 +---------------------------------------------------------------------*/
 NPT_String

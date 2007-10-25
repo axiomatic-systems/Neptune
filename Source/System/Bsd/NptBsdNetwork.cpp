@@ -141,7 +141,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         if (query.ifr_flags & IFF_MULTICAST) {
             flags |= NPT_NETWORK_INTERFACE_FLAG_MULTICAST;
         }
-#endif
+#endif // defined(SIOCGIFFLAGS)
   
         // get the mac address        
         NPT_MacAddress mac;

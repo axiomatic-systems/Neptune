@@ -474,7 +474,8 @@ NPT_Url::NPT_Url(const char* url, SchemeId expected_scheme, NPT_UInt16 default_p
 /*----------------------------------------------------------------------
 |   NPT_Url::NPT_Url
 +---------------------------------------------------------------------*/
-NPT_Url::NPT_Url(const char* host, 
+NPT_Url::NPT_Url(const char* scheme,
+                 const char* host, 
                          NPT_UInt16  port, 
                          const char* path,
                          const char* query,
@@ -487,7 +488,7 @@ NPT_Url::NPT_Url(const char* host,
     m_HasFragment(fragment != NULL),
     m_Fragment(fragment)
 {
-    SetScheme("http");
+    SetScheme(scheme);
 }    
 
 /*----------------------------------------------------------------------

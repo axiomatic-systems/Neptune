@@ -193,8 +193,8 @@ main(int /*argc*/, char** /*argv*/)
     CHECK(i_array != j_array);
     CHECK(!(i_array == j_array));
 
-	NPT_Array<int> k_array;
-	k_array.Add(1);
-	k_array = i_array;
-	CHECK(k_array == i_array);
+    NPT_Array<int> k_array;
+    k_array.Add(1);
+    k_array = i_array;
+    CHECK(k_array == i_array);
 }

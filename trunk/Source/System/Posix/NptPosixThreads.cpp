@@ -447,8 +447,17 @@ NPT_PosixThread::Start()
 {
     NPT_Debug(":: NPT_PosixThread::Start - creating thread\n");
 
+    pthread_attr_t *attributes = NULL;
+
+#if defined(NPT_CONFIG_THREAD_STACK_SIZE)
+    pthread_attr_t stack_size_attributes;
+    pthread_attr_init(&stack_size_attributes);
+    pthread_attr_setstacksize(&stack_size_attributes, NPT_CONFIG_THREAD_STACK_SIZE);
+    attributes = &stack_size_attributes;
+#endif
+
     // create the native thread
-    int result = pthread_create(&m_ThreadId, NULL, EntryPoint, 
+    int result = pthread_create(&m_ThreadId, attributes, EntryPoint, 
                                 reinterpret_cast<void*>(this));
     NPT_Debug(":: NPT_PosixThread::Start - id = %d, res=%d\n", 
               m_ThreadId, result);
@@ -524,17 +533,4 @@ NPT_Thread::NPT_Thread(NPT_Runnable& target, bool detached)
 {
     m_Delegate = new NPT_PosixThread(this, target, detached);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

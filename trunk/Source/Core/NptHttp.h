@@ -51,6 +51,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_LOCATION            "Location"
 #define NPT_HTTP_HEADER_RANGE               "Range"
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
+#define NPT_HTTP_HEADER_COOKIE              "Cookie"
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
 const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
@@ -62,6 +63,7 @@ const int NPT_ERROR_HTTP_NO_PROXY              = NPT_ERROR_BASE_HTTP - 2;
 |   types
 +---------------------------------------------------------------------*/
 typedef unsigned int NPT_HttpStatusCode;
+typedef NPT_UrlQuery NPT_HttpUrlQuery; // for backward compatibility
 
 /*----------------------------------------------------------------------
 |   NPT_HttpUrl
@@ -70,6 +72,11 @@ class NPT_HttpUrl : public NPT_Url {
 public:
     // constructors
     NPT_HttpUrl() {}
+    NPT_HttpUrl(const char* host, 
+                NPT_UInt16  port, 
+                const char* path,
+                const char* query = NULL,
+                const char* fragment = NULL);
     NPT_HttpUrl(const char* url, bool ignore_scheme = false);
 
     // methods
@@ -83,7 +90,7 @@ class NPT_HttpProtocol
 {
 public:
     // class methods
-    const char* GetSatusCodeString(NPT_HttpStatusCode status_code);
+    const char* GetStatusCodeString(NPT_HttpStatusCode status_code);
 };
 
 /*----------------------------------------------------------------------

@@ -21,6 +21,7 @@
     do {                                                \
       if (!(x)) {                                       \
         fprintf(stderr, "ERROR line %d \n", __LINE__);  \
+        error_hook();                                   \
         return -1;                                      \
       }                                                 \
     } while(0)
@@ -28,19 +29,38 @@
 /*----------------------------------------------------------------------
 |       test vectors
 +---------------------------------------------------------------------*/
-static unsigned char t1_gz[] = {
-  0x1f, 0x8b, 0x08, 0x08, 0xf3, 0x53, 0xcf, 0x46, 0x02, 0x03, 0x68, 0x65,
-  0x6c, 0x6c, 0x6f, 0x2e, 0x74, 0x78, 0x74, 0x00, 0xf3, 0x48, 0xcd, 0xc9,
-  0xc9, 0x57, 0xf0, 0x4b, 0x2d, 0x28, 0x29, 0xcd, 0x4b, 0x05, 0x00, 0xf2,
-  0xed, 0xac, 0x76, 0x0d, 0x00, 0x00, 0x00
-};
-static unsigned int t1_gz_len = 43;
+extern unsigned char t1[];
+extern unsigned int  t1_len;
+extern unsigned char t1_gz[];
+extern unsigned int  t1_gz_len;
+extern unsigned int  t1_gz_header_len;
 
-static unsigned char t1[] = {
-  0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x4e, 0x65, 0x70, 0x74, 0x75, 0x6e,
-  0x65
+extern unsigned char t2[];
+extern unsigned int  t2_len;
+extern unsigned char t2_gz[];
+extern unsigned int  t2_gz_len;
+extern unsigned int  t2_gz_header_len;
+
+typedef struct {
+    unsigned char* uncompressed;
+    unsigned int   uncompressed_len;
+    unsigned char* compressed;
+    unsigned int   compressed_len;
+    unsigned int   compressed_header_len;
+} TestVector;
+TestVector TestVectors[] = {
+    {t1, t1_len, t1_gz, t1_gz_len, t1_gz_header_len},
+    {t2, t2_len, t2_gz, t2_gz_len, t2_gz_header_len},
 };
-static unsigned int t1_len = 13;
+
+/*----------------------------------------------------------------------
+|       error_hook
++---------------------------------------------------------------------*/
+static void
+error_hook() 
+{
+    fprintf(stderr, "STOPPING\n");
+}
 
 /*----------------------------------------------------------------------
 |       main
@@ -60,14 +80,16 @@ main(int /*argc*/, char** /*argv*/)
     //freopen("CONOUT$", "w", stdout);
 #endif 
 
-    NPT_DataBuffer in1(t1_gz, t1_gz_len);
+for (unsigned int t=0; t<sizeof(TestVectors)/sizeof(TestVectors[0]); t++) {
+    TestVector* v = &TestVectors[t];
+    NPT_DataBuffer in1(v->compressed, v->compressed_len);
     NPT_DataBuffer out1;
     NPT_Result result = NPT_Zip::Inflate(in1, out1);
     CHECK(result == NPT_SUCCESS);
-    CHECK(out1.GetDataSize() == t1_len);
-    CHECK(NPT_MemoryEqual(out1.GetData(), t1, t1_len));
+    CHECK(out1.GetDataSize() == v->uncompressed_len);
+    CHECK(NPT_MemoryEqual(out1.GetData(), v->uncompressed, v->uncompressed_len));
     
-    NPT_DataBuffer in2(t1, t1_len);
+    NPT_DataBuffer in2(v->uncompressed, v->uncompressed_len);
     NPT_DataBuffer out2;
     NPT_DataBuffer out2_check;
     result = NPT_Zip::Deflate(in2, out2, NPT_ZIP_COMPRESSION_LEVEL_MAX, NPT_Zip::GZIP);
@@ -75,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
     result = NPT_Zip::Inflate(out2, out2_check);
     CHECK(result == NPT_SUCCESS);
     CHECK(out2_check.GetDataSize() == in2.GetDataSize());
-    CHECK(NPT_MemoryEqual(t1, out2_check.GetData(), in2.GetDataSize()));
+    CHECK(NPT_MemoryEqual(v->uncompressed, out2_check.GetData(), in2.GetDataSize()));
     
     // try with random data
     NPT_DataBuffer in3(300000);
@@ -105,6 +127,67 @@ main(int /*argc*/, char** /*argv*/)
     result = NPT_Zip::Inflate(out3, out3_check);
     CHECK(result == NPT_SUCCESS);
     CHECK(in3 == out3_check);
+
+    // streams
+    for (unsigned int x=0; x<1000; x++) {
+        NPT_MemoryStream* ms_gz = new NPT_MemoryStream(v->compressed, v->compressed_len);
+        NPT_InputStreamReference ms_gz_ref(ms_gz);
+        NPT_ZipInflatingInputStream ziis(ms_gz_ref);
+        NPT_DataBuffer buffer;
+        NPT_Position position = 0;
+        bool expect_eos = false;
+        for (;;) {
+            NPT_Size chunk = NPT_System::GetRandomInteger()%40000;
+            buffer.SetDataSize(chunk);
+            NPT_Size bytes_read = 0;
+            result = ziis.Read(buffer.UseData(), chunk, &bytes_read);
+            if (expect_eos) {
+                CHECK(result == NPT_ERROR_EOS);
+                break;
+            }
+            if (result == NPT_ERROR_EOS) {
+                CHECK(position == v->uncompressed_len);
+            } else {
+                CHECK(result == NPT_SUCCESS);
+            }
+            CHECK(bytes_read <= chunk);
+            if (bytes_read != chunk) expect_eos = true;
+            CHECK(NPT_MemoryEqual(v->uncompressed+position, 
+                                  buffer.GetData(),
+                                  bytes_read));
+            position += bytes_read;
+        }
+        CHECK(position == v->uncompressed_len);
+    }
+
+    for (unsigned int x=0; x<1000; x++) {
+        NPT_MemoryStream* ms = new NPT_MemoryStream(v->uncompressed, v->uncompressed_len);
+        NPT_InputStreamReference ms_ref(ms);
+        NPT_ZipDeflatingInputStream zdis(ms_ref, NPT_ZIP_COMPRESSION_LEVEL_MAX, NPT_Zip::GZIP);
+        NPT_DataBuffer buffer;
+        NPT_Position position = 0;
+        bool expect_eos = false;
+        for (;;) {
+            NPT_Size chunk = NPT_System::GetRandomInteger()%40000;
+            buffer.Reserve(buffer.GetDataSize()+chunk);
+            NPT_Size bytes_read = 0;
+            result = zdis.Read(buffer.UseData()+buffer.GetDataSize(), chunk, &bytes_read);
+            if (expect_eos) {
+                CHECK(result == NPT_ERROR_EOS);
+                break;
+            }
+            CHECK(result == NPT_SUCCESS);
+            CHECK(bytes_read <= chunk);
+            if (bytes_read != chunk) expect_eos = true;
+            position += bytes_read;
+            buffer.SetDataSize(buffer.GetDataSize()+bytes_read);
+        }
+        NPT_DataBuffer out;
+        NPT_DataBuffer check(v->uncompressed, v->uncompressed_len);
+        CHECK(NPT_Zip::Inflate(buffer, out) == NPT_SUCCESS);
+        CHECK(out == check);
+    }
+}
 
     return 0;
 }

@@ -87,6 +87,7 @@ public:
     NPT_List<Field>& GetFields() { return m_Fields; }
 
     // methods
+    NPT_Result  Parse(const char* query);
     NPT_Result  AddField(const char* name, const char* value);
     const char* GetField(const char* name);
     NPT_String  ToString();

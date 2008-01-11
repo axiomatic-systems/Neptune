@@ -127,10 +127,10 @@ public:
     // methods
     NPT_Result Emit(NPT_OutputStream& stream) const;
     NPT_List<NPT_HttpHeader*>& GetHeaders() { return m_Headers; }
-    NPT_HttpHeader* GetHeader(const char* name) const;
-    NPT_Result SetHeader(const char* name, const char* value);
-    NPT_Result GetHeaderValue(const char* name, NPT_String& value);
-    NPT_Result AddHeader(const char* name, const char* value);
+    NPT_HttpHeader*   GetHeader(const char* name) const;
+    const NPT_String* GetHeaderValue(const char* name) const;
+    NPT_Result        SetHeader(const char* name, const char* value);
+    NPT_Result        AddHeader(const char* name, const char* value);
 
 private:
     // members
@@ -362,6 +362,33 @@ protected:
 };
 
 /*----------------------------------------------------------------------
+|   NPT_HttpRequestContext
++---------------------------------------------------------------------*/
+class NPT_HttpRequestContext
+{
+public:
+    // constructor
+    NPT_HttpRequestContext() {}
+    NPT_HttpRequestContext(const NPT_SocketAddress* local_address,
+                           const NPT_SocketAddress* remote_address);
+                  
+    // methods
+    const NPT_SocketAddress& GetLocalAddress()   const { return m_LocalAddress;  }
+    const NPT_SocketAddress& GetRemoteAddress() const { return m_RemoteAddress; }
+    void SetLocalAddress(const NPT_SocketAddress& address) {
+        m_LocalAddress = address;
+    }
+    void SetRemoteAddress(const NPT_SocketAddress& address) {
+        m_RemoteAddress = address;
+    }
+    
+private:
+    // members
+    NPT_SocketAddress m_LocalAddress;
+    NPT_SocketAddress m_RemoteAddress;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpRequestHandler
 +---------------------------------------------------------------------*/
 class NPT_HttpRequestHandler 
@@ -371,8 +398,9 @@ public:
     virtual ~NPT_HttpRequestHandler() {}
 
     // methods
-    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request,
-                                     NPT_HttpResponse& response) = 0;
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&              request,
+                                     const NPT_HttpRequestContext& context,
+                                     NPT_HttpResponse&             response) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -383,16 +411,17 @@ class NPT_HttpStaticRequestHandler : public NPT_HttpRequestHandler
 public:
     // constructors
     NPT_HttpStaticRequestHandler(const char* document, 
-                                 const char* mime_type,
+                                 const char* mime_type = "text/html",
                                  bool        copy = true);
     NPT_HttpStaticRequestHandler(const void* data,
                                  NPT_Size    size,
-                                 const char* mime_type,
+                                 const char* mime_type = "text/html",
                                  bool        copy = true);
 
     // NPT_HttpRequetsHandler methods
-    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response);
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
+                                     const NPT_HttpRequestContext& context,
+                                     NPT_HttpResponse&             response);
 
 private:
     NPT_String     m_MimeType;
@@ -410,8 +439,9 @@ public:
                                const char* file_root);
 
     // NPT_HttpRequetsHandler methods
-    virtual NPT_Result SetupResponse(NPT_HttpRequest&  request, 
-                                     NPT_HttpResponse& response);
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
+                                     const NPT_HttpRequestContext& context,
+                                     NPT_HttpResponse&             response);
 
     // accessors
     NPT_Map<NPT_String,NPT_String>& GetFileTypeMap() { return m_FileTypeMap; }
@@ -456,8 +486,8 @@ public:
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout, NPT_Timeout io_timeout);
     NPT_Result WaitForNewClient(NPT_InputStreamReference&  input,
                                 NPT_OutputStreamReference& output,
-                                NPT_SocketAddress*         local_address  = NULL,
-                                NPT_SocketAddress*         remote_address = NULL);
+                                NPT_HttpRequestContext*    context);
+    NPT_Result Loop();
     
     /**
      * Add a request handler. The ownership of the handler is NOT transfered to this object,
@@ -469,9 +499,9 @@ public:
     /**
      * Parse the request from a new client, form a response, and send it back. 
      */
-    NPT_Result RespondToClient(NPT_InputStreamReference&  input,
-                               NPT_OutputStreamReference& output,
-                               NPT_SocketAddress*         local_address = NULL);
+    NPT_Result RespondToClient(NPT_InputStreamReference&     input,
+                               NPT_OutputStreamReference&    output,
+                               const NPT_HttpRequestContext& context);
 
 protected:
     // types
@@ -518,8 +548,8 @@ public:
     // methods
     NPT_Result SetConfig(const Config& config);
     NPT_Result SetTimeout(NPT_Timeout io_timeout);
-    NPT_Result ParseRequest(NPT_HttpRequest*&  request,
-                            NPT_SocketAddress* local_address = NULL);
+    NPT_Result ParseRequest(NPT_HttpRequest*&        request,
+                            const NPT_SocketAddress* local_address = NULL);
     NPT_Result SendResponse(NPT_HttpResponse& response,
                             bool              headers_only = false);
 

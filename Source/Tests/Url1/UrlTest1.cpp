@@ -235,6 +235,19 @@ main(int /*argc*/, char** /*argv*/)
     query = "url1=http%3A%2F%2Ffoo.bar%2Ffoo%3Fq%3D3%26bar%3D%2B7%2F3&url2=12+34";
     CHECK(query.ToString() == "url1=http%3A%2F%2Ffoo.bar%2Ffoo%3Fq%3D3%26bar%3D%2B7%2F3&url2=12%2B34");
 
+    // url query decoding
+    NPT_UrlQuery query2("a=1+2+3&b=http%3A%2F%2Ffoo.bar%2Ffoo%3Fq%3D3%26bar%3D%2B7%2F3%26boo%3Da%3Db%26bli%3Da+b");
+    const char* a_field = query2.GetField("a");
+    const char* b_field = query2.GetField("b");
+    const char* c_field = query2.GetField("c");
+    CHECK(a_field != NULL);
+    CHECK(NPT_StringsEqual(a_field, "1+2+3"));
+    CHECK(NPT_UrlQuery::UrlDecode(a_field) == "1 2 3");
+    CHECK(b_field != NULL);
+    CHECK(NPT_StringsEqual(b_field, "http%3A%2F%2Ffoo.bar%2Ffoo%3Fq%3D3%26bar%3D%2B7%2F3%26boo%3Da%3Db%26bli%3Da+b"));
+    CHECK(NPT_UrlQuery::UrlDecode(b_field) == "http://foo.bar/foo?q=3&bar= 7/3&boo=a=b&bli=a b");
+    CHECK(c_field == NULL);
+    
     printf("--- test done\n");
     
     return 0;

@@ -13,7 +13,9 @@
 #if (defined(_WIN32) || defined(_WIN32_WCE)) && !defined(__SYMBIAN32__)
 
 // Win32 includes
+#if !defined(__WIN32__) 
 #define __WIN32__
+#endif
 #endif
 #if defined(__WIN32__)
 #define STRICT
@@ -137,7 +139,9 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EAGAIN       WSAEWOULDBLOCK 
 #endif
 
+#if !defined(__MINGW32__)
 typedef int         ssize_t;
+#endif
 typedef int         socklen_t;
 typedef char*       SocketBuffer;
 typedef const char* SocketConstBuffer;

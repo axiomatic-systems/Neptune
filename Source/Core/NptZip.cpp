@@ -7,6 +7,8 @@
 |
  ****************************************************************/
 
+#if defined(NPT_CONFIG_ENABLE_ZIP)
+
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
@@ -468,3 +470,5 @@ NPT_Zip::Inflate(const NPT_DataBuffer& in,
     err = inflateEnd(&stream);
     return MapError(err);
 }
+
+#endif // NPT_CONFIG_ENABLE_ZIP

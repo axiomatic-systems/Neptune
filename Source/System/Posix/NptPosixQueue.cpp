@@ -17,7 +17,12 @@
 #include "NptQueue.h"
 #include "NptThreads.h"
 #include "NptList.h"
-#include "NptDebug.h"
+#include "NptLogging.h"
+
+/*----------------------------------------------------------------------
+|       logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.queue.posix")
 
 /*----------------------------------------------------------------------
 |       NPT_PosixQueue
@@ -46,7 +51,7 @@ private:
 NPT_PosixQueue::NPT_PosixQueue(NPT_Cardinal max_items) : 
     m_MaxItems(max_items)
 {
-    NPT_Debug(":: NPT_PosixQueue::NPT_PosixQueue\n");
+    NPT_LOG_FINER("NPT_PosixQueue::NPT_PosixQueue");
 
     pthread_mutex_init(&m_Mutex, NULL);
     pthread_cond_init(&m_CanPushOrPopCondition, NULL);
@@ -139,8 +144,7 @@ NPT_PosixQueue::Pop(NPT_QueueItem*& item, bool blocking)
 NPT_GenericQueue*
 NPT_GenericQueue::CreateInstance(NPT_Cardinal max_items)
 {
-    NPT_Debug(":: NPT_GenericQueue::CreateInstance - queue max_items = %ld\n", 
-           max_items);
+    NPT_LOG_FINER_1("NPT_GenericQueue::CreateInstance - queue max_items = %ld", max_items);
     return new NPT_PosixQueue(max_items);
 }
 

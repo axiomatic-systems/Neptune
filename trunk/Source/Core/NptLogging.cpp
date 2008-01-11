@@ -294,8 +294,6 @@ NPT_LogManager::Configure()
     NPT_String  config_sources_env;
     const char* config_sources = NPT_LOG_DEFAULT_CONFIG_SOURCE;
 
-    NPT_Debug("NPT_LogManager::Initialize()\n");
-
     // exit if we're already initialized
     if (m_Configured) return NPT_SUCCESS;
 
@@ -894,7 +892,6 @@ NPT_LogFileHandler::Create(const char*     logger_name,
                                   NPT_FILE_OPEN_MODE_WRITE  |
                                   (append?NPT_FILE_OPEN_MODE_APPEND:0));
     if (NPT_FAILED(result)) {
-        NPT_Debug("NPT_LogFileHandler::Create - cannot open log file '%s' (%d)\n", filename, result);
         return result;
     }
 
@@ -954,8 +951,6 @@ NPT_LogTcpHandler::Connect()
     NPT_Result result = tcp_socket.Connect(NPT_SocketAddress(ip_address, m_Port), 
                                            NPT_LOG_TCP_HANDLER_DEFAULT_CONNECT_TIMEOUT);
     if (NPT_FAILED(result)) {
-        NPT_Debug("NPT_LogTcpHandler_Connect - failed to connect to %s:%d (%d)\n",
-                  m_Host.GetChars(), m_Port, result);
         return result;
     }
 

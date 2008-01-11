@@ -23,7 +23,12 @@
 #include "NptConfig.h"
 #include "NptTypes.h"
 #include "NptThreads.h"
-#include "NptDebug.h"
+#include "NptLogging.h"
+
+/*----------------------------------------------------------------------
+|       logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.threads.posix")
 
 /*----------------------------------------------------------------------
 |       NPT_PosixMutex
@@ -386,7 +391,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
     m_ThreadId(0),
     m_Joined(false)
 {
-    NPT_Debug(":: NPT_PosixThread::NPT_PosixThread\n");
+    NPT_LOG_FINE("NPT_PosixThread::NPT_PosixThread");
 }
 
 /*----------------------------------------------------------------------
@@ -394,7 +399,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
 +---------------------------------------------------------------------*/
 NPT_PosixThread::~NPT_PosixThread()
 {
-    NPT_Debug(":: NPT_PosixThread::~NPT_PosixThread %d\n", m_ThreadId);
+    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %d\n", m_ThreadId);
 
     if (!m_Detached) {
         // we're not detached, and not in the Run() method, so we need to 
@@ -422,12 +427,12 @@ NPT_PosixThread::EntryPoint(void* argument)
 {
     NPT_PosixThread* thread = reinterpret_cast<NPT_PosixThread*>(argument);
 
-    NPT_Debug(":: NPT_PosixThread::EntryPoint - in =======================\n");
+    NPT_LOG_FINE("NPT_PosixThread::EntryPoint - in =======================");
 
     // run the thread 
     thread->Run();
     
-    NPT_Debug(":: NPT_PosixThread::EntryPoint - out ======================\n");
+    NPT_LOG_FINE("NPT_PosixThread::EntryPoint - out ======================");
 
     // we're done with the thread object
     // if we're detached, we need to delete ourselves
@@ -445,7 +450,7 @@ NPT_PosixThread::EntryPoint(void* argument)
 NPT_Result
 NPT_PosixThread::Start()
 {
-    NPT_Debug(":: NPT_PosixThread::Start - creating thread\n");
+    NPT_LOG_FINE("NPT_PosixThread::Start - creating thread");
 
     pthread_attr_t *attributes = NULL;
 
@@ -459,8 +464,8 @@ NPT_PosixThread::Start()
     // create the native thread
     int result = pthread_create(&m_ThreadId, attributes, EntryPoint, 
                                 reinterpret_cast<void*>(this));
-    NPT_Debug(":: NPT_PosixThread::Start - id = %d, res=%d\n", 
-              m_ThreadId, result);
+    NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %d, res=%d", 
+                   m_ThreadId, result);
     if (result) {
         // failed
         return NPT_FAILURE;
@@ -491,7 +496,7 @@ NPT_PosixThread::Wait()
     void* return_value;
     int   result;
 
-    NPT_Debug(":: NPT_PosixThread::Wait - waiting for id %d\n", m_ThreadId);
+    NPT_LOG_FINE_1("NPT_PosixThread::Wait - waiting for id %d", m_ThreadId);
 
     // check that we're not detached
     if (m_ThreadId == 0 || m_Detached) {
@@ -501,12 +506,10 @@ NPT_PosixThread::Wait()
     // wait for the thread to finish
     m_JoinLock.Lock();
     if (m_Joined) {
-        NPT_Debug(":: NPT_PosixThread::Wait - %d already joined\n", 
-                  m_ThreadId);
+        NPT_LOG_FINE_1("NPT_PosixThread::Wait - %d already joined", m_ThreadId);
         result = NPT_SUCCESS;
     } else {
-        NPT_Debug(":: NPT_PosixThread::Wait - joining thread id %d\n", 
-                  m_ThreadId);
+        NPT_LOG_FINE_1("NPT_PosixThread::Wait - joining thread id %d", m_ThreadId);
         result = pthread_join(m_ThreadId, &return_value);
         m_Joined = true;
     }

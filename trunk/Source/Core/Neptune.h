@@ -2,7 +2,7 @@
 |
 |   Neptune - Toplevel Include
 |
-|   (c) 2001-2006 Gilles Boccon-Gibod
+|   (c) 2001-2007 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -51,7 +51,9 @@
 #include "NptConsole.h"
 #include "NptLogging.h"
 #include "NptSerialPort.h"
-#include "NptZip.h"
 #include "NptVersion.h"
+
+// optional modules
+#include "NptZip.h"
 
 #endif // _NEPTUNE_H_

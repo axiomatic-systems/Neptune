@@ -264,28 +264,7 @@ NPT_Uri::PercentDecode(const char* str)
 +---------------------------------------------------------------------*/ 
 NPT_UrlQuery::NPT_UrlQuery(const char* query)
 {
-    const char* cursor = query;
-    NPT_String  name;
-    NPT_String  value;
-    bool        in_name = true;
-    do {
-        if (*cursor == '\0' || *cursor == '&') {
-            if (!name.IsEmpty() && !value.IsEmpty()) {
-                AddField(name, value);   
-            }
-            name.SetLength(0);
-            value.SetLength(0);
-            in_name = true;
-        } else if (*cursor == '=' && in_name) {
-            in_name = false;
-        } else {
-            if (in_name) {
-                name += *cursor;
-            } else {
-                value += *cursor;
-            }
-        }
-    } while (*cursor++);
+    Parse(query);
 }
 
 /*----------------------------------------------------------------------
@@ -302,6 +281,17 @@ NPT_UrlQuery::UrlEncode(const char* str, bool encode_percents)
     encoded.Replace(' ','+');
     
     return encoded;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_UrlQuery::UrlDecode
++---------------------------------------------------------------------*/
+NPT_String
+NPT_UrlQuery::UrlDecode(const char* str)
+{
+    NPT_String decoded = NPT_Uri::PercentDecode(str);
+    decoded.Replace('+', ' ');
+    return decoded;
 }
 
 /*----------------------------------------------------------------------
@@ -324,6 +314,38 @@ NPT_UrlQuery::ToString()
     }
 
     return encoded;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_UrlQuery::Parse
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_UrlQuery::Parse(const char* query)
+{
+    const char* cursor = query;
+    NPT_String  name;
+    NPT_String  value;
+    bool        in_name = true;
+    do {
+        if (*cursor == '\0' || *cursor == '&') {
+            if (!name.IsEmpty() && !value.IsEmpty()) {
+                AddField(name, value);   
+            }
+            name.SetLength(0);
+            value.SetLength(0);
+            in_name = true;
+        } else if (*cursor == '=' && in_name) {
+            in_name = false;
+        } else {
+            if (in_name) {
+                name += *cursor;
+            } else {
+                value += *cursor;
+            }
+        }
+    } while (*cursor++);
+    
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------

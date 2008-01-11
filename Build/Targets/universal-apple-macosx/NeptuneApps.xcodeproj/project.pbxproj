@@ -1228,6 +1228,7 @@
 		CA5043EC0C5AEA510060E6FE /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = CA5043ED0C5AEA510060E6FE /* Build configuration list for PBXProject "NeptuneApps" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = CA5043EA0C5AEA510060E6FE;
 			productRefGroup = CA5044270C5AEAC90060E6FE /* Products */;
@@ -1238,6 +1239,7 @@
 					ProjectRef = CA50442C0C5AEAE90060E6FE /* Neptune.xcodeproj */;
 				},
 			);
+			projectRoot = ../../..;
 			targets = (
 				CA5044A90C5AEC660060E6FE /* All */,
 				CA50456F0C5AF02D0060E6FE /* Tests */,

@@ -189,8 +189,8 @@ class NPT_Thread : public NPT_ThreadInterface
     static ThreadId GetCurrentThreadId();
 
     // methods
-    NPT_Thread(bool detached = false);
-    NPT_Thread(NPT_Runnable& target, bool detached = false);
+    explicit NPT_Thread(bool detached = false);
+    explicit NPT_Thread(NPT_Runnable& target, bool detached = false);
    ~NPT_Thread() { delete m_Delegate; }
 
     // NPT_ThreadInterface methods

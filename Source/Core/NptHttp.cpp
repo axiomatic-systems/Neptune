@@ -950,11 +950,8 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         if (!content_encoding.IsEmpty()) {
             headers.SetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING, content_encoding);
         }
-    } else {
-        // force content length to 0 is there is no message body
-        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, "0");
     }
-
+    
     // create a memory stream to buffer the headers
     NPT_MemoryStream header_stream;
 
@@ -977,7 +974,10 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
 
     // parse the response
     NPT_CHECK(NPT_HttpResponse::Parse(*buffered_input_stream, response));
-
+    NPT_LOG_FINE_2("NPT_HttpClient::SendRequestOnce - got response, code=%d, msg=%s",
+                   response->GetStatusCode(),
+                   response->GetReasonPhrase().GetChars());
+    
     // unbuffer the stream
     buffered_input_stream->SetBufferSize(0);
 
@@ -1002,6 +1002,15 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
     bool         keep_going;
     NPT_Result   result;
 
+    // default value
+    response = NULL;
+    
+    // check that for GET requests there is no entity
+    if (request.GetEntity() != NULL &&
+        request.GetMethod() == NPT_HTTP_METHOD_GET) {
+        return NPT_ERROR_HTTP_INVALID_REQUEST;
+    }
+    
     do {
         keep_going = false;
         result = SendRequestOnce(request, response);
@@ -1348,7 +1357,7 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
 
     // add computed headers
     NPT_HttpEntity* entity = response.GetEntity();
-    if (entity) {
+    if (entity && !headers_only) {
         // content length
         headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
             NPT_String::FromInteger(entity->GetContentLength()));
@@ -1364,11 +1373,8 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
         if (!content_encoding.IsEmpty()) {
             headers.SetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING, content_encoding);
         }
-    } else {
-        // force content length to 0 is there is no message body
-        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, "0");
     }
-
+    
     // create a memory stream to buffer the response line and headers
     NPT_MemoryStream buffer;
 
@@ -1379,7 +1385,7 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
     NPT_CHECK(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
 
     // send the body
-    if (!headers_only && entity) {
+    if (entity && !headers_only) {
         NPT_InputStreamReference body_stream;
         entity->GetInputStream(body_stream);
         if (!body_stream.IsNull()) return NPT_StreamToStreamCopy(*body_stream, *m_Output);

@@ -942,6 +942,15 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
                    SO_REUSEADDR, 
                    (SocketOption)&option, 
                    sizeof(option));
+#if defined(SO_REUSEPORT) 
+        // some implementations (BSD 4.4) need this in addition to SO_REUSEADDR
+        option = 1;
+        setsockopt(m_SocketFdReference->m_SocketFd, 
+                   SOL_SOCKET, 
+                   SO_REUSEPORT, 
+                   (SocketOption)&option, 
+                   sizeof(option));
+#endif
     }
     
     // convert the address
@@ -1537,6 +1546,14 @@ protected:
 NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0))
 {
+#if defined(SO_NOSIGPIPE)
+    int option = 1;
+    setsockopt(m_SocketFdReference->m_SocketFd, 
+               SOL_SOCKET, 
+               SO_NOSIGPIPE, 
+               (SocketOption)&option, 
+               sizeof(option));
+#endif
 }
 
 /*----------------------------------------------------------------------

@@ -301,8 +301,9 @@ NPT_StdcFile::~NPT_StdcFile()
 NPT_Result
 NPT_StdcFile::Open(NPT_File::OpenMode mode)
 {
-    FILE* file = NULL;
-
+    FILE* file      = NULL;
+    bool  need_size = false;
+    
     // check if we're already open
     if (!m_FileReference.IsNull()) {
         return NPT_ERROR_FILE_ALREADY_OPEN;
@@ -362,13 +363,13 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
             } else {
                 return NPT_FAILURE;
             }
-        } else {
-            // get the size
-            if (fseek(file, 0, SEEK_END) >= 0) {
-                m_Size = ftell(file);
-                fseek(file, 0, SEEK_SET);
-            }
         }
+
+        // mark that we need the size (we do this here because
+        // we must measure the size after any possible call
+        // to setvbuf in order to avoid throwing away data
+        // read into the buffer by a seek() call
+        need_size = true;
     }
 
     // unbuffer the file if needed 
@@ -378,6 +379,14 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 #endif
     }   
 
+    // get the size if required
+    if (need_size) {
+        if (fseek(file, 0, SEEK_END) >= 0) {
+            m_Size = ftell(file);
+            fseek(file, 0, SEEK_SET);
+        }
+    }
+    
     // create a reference to the FILE object
     m_FileReference = new NPT_StdcFileWrapper(file);
 

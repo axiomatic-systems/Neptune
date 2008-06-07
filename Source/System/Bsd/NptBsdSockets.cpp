@@ -2,7 +2,7 @@
 |
 |   Neptune - Sockets :: BSD/Winsock Implementation
 |
-|   (c) 2001-2006 Gilles Boccon-Gibod
+|   (c) 2001-2008 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -1546,6 +1546,14 @@ protected:
 NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0))
 {
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
++---------------------------------------------------------------------*/
+NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
+{
+    // disable the SIGPIPE signal
 #if defined(SO_NOSIGPIPE)
     int option = 1;
     setsockopt(m_SocketFdReference->m_SocketFd, 
@@ -1554,13 +1562,6 @@ NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() :
                (SocketOption)&option, 
                sizeof(option));
 #endif
-}
-
-/*----------------------------------------------------------------------
-|   NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
-+---------------------------------------------------------------------*/
-NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
-{
 }
 
 /*----------------------------------------------------------------------
@@ -1774,6 +1775,15 @@ NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket() :
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0)),
     m_ListenMax(0)
 {
+    // disable the SIGPIPE signal
+#if defined(SO_NOSIGPIPE)
+    int option = 1;
+    setsockopt(m_SocketFdReference->m_SocketFd, 
+               SOL_SOCKET, 
+               SO_NOSIGPIPE, 
+               (SocketOption)&option, 
+               sizeof(option));
+#endif
 }
 
 /*----------------------------------------------------------------------

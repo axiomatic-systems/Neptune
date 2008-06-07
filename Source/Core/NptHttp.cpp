@@ -1357,7 +1357,7 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
 
     // add computed headers
     NPT_HttpEntity* entity = response.GetEntity();
-    if (entity && !headers_only) {
+    if (entity) {
         // content length
         headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
             NPT_String::FromInteger(entity->GetContentLength()));

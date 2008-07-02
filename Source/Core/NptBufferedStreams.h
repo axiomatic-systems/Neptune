@@ -25,7 +25,7 @@
 const NPT_Size NPT_BUFFERED_BYTE_STREAM_DEFAULT_SIZE = 4096;
 
 /*----------------------------------------------------------------------
-|   NPT_BufferedByteStream
+|   NPT_BufferedInputStream
 +---------------------------------------------------------------------*/
 class NPT_BufferedInputStream : public NPT_InputStream
 {
@@ -37,10 +37,12 @@ public:
 
     // methods
     virtual NPT_Result ReadLine(NPT_String& line,
-                                NPT_Size    max_chars = 4096);
+                                NPT_Size    max_chars = 4096,
+                                bool        break_on_cr = false);
     virtual NPT_Result ReadLine(char*     buffer, 
                                 NPT_Size  buffer_size,
-                                NPT_Size* chars_read);
+                                NPT_Size* chars_read = NULL,
+                                bool      break_on_cr = false);
     virtual NPT_Result SetBufferSize(NPT_Size size);
 
     // NPT_InputStream methods

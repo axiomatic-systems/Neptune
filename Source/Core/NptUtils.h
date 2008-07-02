@@ -16,6 +16,7 @@
 #include "NptConfig.h"
 #include "NptTypes.h"
 #include "NptStrings.h"
+#include "NptMap.h"
 
 #if defined (NPT_CONFIG_HAVE_STDIO_H)
 #include <stdio.h>
@@ -70,6 +71,13 @@ NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
                  void*       function_parameter,
                  const char* format, 
                  va_list     args);
+
+/*----------------------------------------------------------------------
+|    parsing
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_ParseMimeParameters(const char*                      encoded,
+                        NPT_Map<NPT_String, NPT_String>& parameters);
 
 /*----------------------------------------------------------------------
 |    environment variables

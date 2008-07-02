@@ -368,7 +368,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
         // mark that we need the size (we do this here because
         // we must measure the size after any possible call
         // to setvbuf in order to avoid throwing away data
-        // read into the buffer by a seek() call
+        // read into the buffer by a seek() call)
         need_size = true;
     }
 

@@ -95,7 +95,9 @@ public:
             NPT_Result result = m_Queue.Pop(item, timeout);
             if (NPT_SUCCEEDED(result)) {
                 CHECK(item != NULL);
-                switch (item->m_Message) {
+                Item::Message msg = item->m_Message;
+                delete item;
+                switch (msg) {
                     case Item::MSG_INCREMENT_COUNTER:
                         ++m_Counter;
                         NPT_Debug("READER %s new counter=%d\n", (const char*)m_Name, m_Counter);
@@ -120,6 +122,7 @@ public:
                 NPT_Debug("READER %s pop returned %d\n", (const char*)m_Name, result);
                 if (timeout == 0) {
                     CHECK(result == NPT_ERROR_LIST_EMPTY);
+                    NPT_System::Sleep(0.01f);
                 } else if (timeout != NPT_TIMEOUT_INFINITE) {
                     CHECK(result == NPT_ERROR_TIMEOUT);
                     ++m_NbTimeouts;

@@ -34,7 +34,7 @@ class NPT_GenericQueue
     virtual           ~NPT_GenericQueue() {}
     virtual NPT_Result Push(NPT_QueueItem* item) = 0; 
     virtual NPT_Result Pop(NPT_QueueItem*& item, 
-                           bool            blocking = true) = 0;
+                           NPT_Timeout     timeout) = 0;
 
  protected:
     // methods
@@ -55,9 +55,9 @@ class NPT_Queue
     virtual NPT_Result Push(T* item) {
         return m_Delegate->Push(reinterpret_cast<NPT_QueueItem*>(item));
     }
-    virtual NPT_Result Pop(T*& item, bool blocking = true) {
+    virtual NPT_Result Pop(T*& item, NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
         return m_Delegate->Pop(reinterpret_cast<NPT_QueueItem*&>(item), 
-                               blocking);
+                               timeout);
     }
 
  protected:

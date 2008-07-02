@@ -342,3 +342,177 @@ NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
     (*function)(function_parameter, buffer);
     if (buffer != local_buffer) delete[] buffer;
 }
+
+/*----------------------------------------------------------------------
+|   local types
++---------------------------------------------------------------------*/
+typedef enum {
+    NPT_MIME_PARAMETER_PARSER_STATE_NEED_NAME,
+    NPT_MIME_PARAMETER_PARSER_STATE_IN_NAME,
+    NPT_MIME_PARAMETER_PARSER_STATE_NEED_EQUALS,
+    NPT_MIME_PARAMETER_PARSER_STATE_NEED_VALUE,
+    NPT_MIME_PARAMETER_PARSER_STATE_IN_VALUE,
+    NPT_MIME_PARAMETER_PARSER_STATE_IN_QUOTED_VALUE,
+    NPT_MIME_PARAMETER_PARSER_STATE_NEED_SEPARATOR
+} NPT_MimeParameterParserState;
+
+/*----------------------------------------------------------------------
+|   NPT_ParseMimeParameters
+|
+|     From RFC 822 and RFC 2045
+|
+|                                                 ; (  Octal, Decimal.)
+|     CHAR        =  <any ASCII character>        ; (  0-177,  0.-127.)
+|     ALPHA       =  <any ASCII alphabetic character>
+|                                                 ; (101-132, 65.- 90.)
+|                                                 ; (141-172, 97.-122.)
+|     DIGIT       =  <any ASCII decimal digit>    ; ( 60- 71, 48.- 57.)
+|     CTL         =  <any ASCII control           ; (  0- 37,  0.- 31.)
+|                     character and DEL>          ; (    177,     127.)
+|     CR          =  <ASCII CR, carriage return>  ; (     15,      13.)
+|     LF          =  <ASCII LF, linefeed>         ; (     12,      10.)
+|     SPACE       =  <ASCII SP, space>            ; (     40,      32.)
+|     HTAB        =  <ASCII HT, horizontal-tab>   ; (     11,       9.)
+|     <">         =  <ASCII quote mark>           ; (     42,      34.)
+|     CRLF        =  CR LF
+|
+|     LWSP-char   =  SPACE / HTAB                 ; semantics = SPACE
+|
+|     linear-white-space =  1*([CRLF] LWSP-char)  ; semantics = SPACE
+|                                                 ; CRLF => folding
+|
+|     parameter := attribute "=" value
+|
+|     attribute := token
+|                  ; Matching of attributes
+|                  ; is ALWAYS case-insensitive.
+|
+|     value := token / quoted-string
+|
+|     token := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
+|
+|     tspecials :=  "(" / ")" / "<" / ">" / "@" /
+|                   "," / ";" / ":" / "\" / <">
+|                   "/" / "[" / "]" / "?" / "="
+|
+|     quoted-string = <"> *(qtext/quoted-pair) <">; Regular qtext or
+|                                                 ;   quoted chars.
+|
+|     qtext       =  <any CHAR excepting <">,     ; => may be folded
+|                     "\" & CR, and including
+|                     linear-white-space>
+|
+|     quoted-pair =  "\" CHAR                     ; may quote any char
+|
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_ParseMimeParameters(const char*                      encoded,
+                        NPT_Map<NPT_String, NPT_String>& parameters)
+{
+    // check parameters
+    if (encoded == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+    
+    // reserve some space 
+    NPT_String param_name;
+    NPT_String param_value;
+    param_name.Reserve(64);
+    param_value.Reserve(64);
+
+    NPT_MimeParameterParserState state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_NAME;
+    bool quoted_char = false;
+    for (;;) {
+        char c = *encoded++;
+        if (!quoted_char && (c == 0x0A || c == 0x0D)) continue; // ignore EOL chars
+        switch (state) {
+            case NPT_MIME_PARAMETER_PARSER_STATE_NEED_NAME:
+                if (c == '\0') break; // END
+                if (c == ' ' || c == '\t') continue; // ignore leading whitespace
+                if (c <  ' ') return NPT_ERROR_INVALID_SYNTAX; // CTLs are invalid
+                param_name += c; // we're not strict: accept all other chars
+                state = NPT_MIME_PARAMETER_PARSER_STATE_IN_NAME;
+                break;
+                
+            case NPT_MIME_PARAMETER_PARSER_STATE_IN_NAME:
+                if (c <  ' ') return NPT_ERROR_INVALID_SYNTAX; // END or CTLs are invalid
+                if (c == ' ') {
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_EQUALS;
+                } else if (c == '=') {
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_VALUE;
+                } else {
+                    param_name += c; // we're not strict: accept all other chars
+                }
+                break;
+                
+            case NPT_MIME_PARAMETER_PARSER_STATE_NEED_EQUALS:
+                if (c <  ' ') return NPT_ERROR_INVALID_SYNTAX; // END or CTLs are invalid
+                if (c == ' ' || c == '\t') continue; // ignore leading whitespace
+                if (c != '=') return NPT_ERROR_INVALID_SYNTAX;
+                state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_VALUE;
+                break;
+
+            case NPT_MIME_PARAMETER_PARSER_STATE_NEED_VALUE:
+                if (c <  ' ') return NPT_ERROR_INVALID_SYNTAX; // END or CTLs are invalid
+                if (c == ' ' || c == '\t') continue; // ignore leading whitespace
+                if (c == '"') {
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_IN_QUOTED_VALUE;
+                } else {
+                    param_value += c; // we're not strict: accept all other chars
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_IN_VALUE;
+                }
+                break;
+                
+            case NPT_MIME_PARAMETER_PARSER_STATE_IN_QUOTED_VALUE:
+                if (quoted_char) {
+                    quoted_char = false;
+                    if (c == '\0') return NPT_ERROR_INVALID_SYNTAX;
+                    param_value += c; // accept all chars
+                    break;
+                } else if (c == '\\') {
+                    quoted_char = true;
+                    break;
+                } else if (c == '"') {
+                    // add the parameter to the map
+                    param_name.TrimRight();
+                    param_value.TrimRight();
+                    parameters[param_name] = param_value;
+                    param_name.SetLength(0);
+                    param_value.SetLength(0);
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_SEPARATOR;
+                } else if (c <  ' ') {
+                    return NPT_ERROR_INVALID_SYNTAX; // END or CTLs are invalid
+                } else {
+                    param_value += c; // we're not strict: accept all other chars
+                }
+                break;
+                
+            case NPT_MIME_PARAMETER_PARSER_STATE_IN_VALUE:
+                if (c == '\0' || c == ';') {
+                    // add the parameter to the map
+                    param_name.TrimRight();
+                    param_value.TrimRight();
+                    parameters[param_name] = param_value;
+                    param_name.SetLength(0);
+                    param_value.SetLength(0);
+                    state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_NAME;
+                } else if (c < ' ') {
+                    // CTLs are invalid
+                    return NPT_ERROR_INVALID_SYNTAX;
+                } else {
+                    param_value += c; // we're not strict: accept all other chars
+                }
+                break;
+
+            case NPT_MIME_PARAMETER_PARSER_STATE_NEED_SEPARATOR:
+                if (c == '\0') break;
+                if (c <  ' ') return NPT_ERROR_INVALID_SYNTAX; // CTLs are invalid
+                if (c == ' ' || c == '\t') continue; // ignore whitespace
+                if (c != ';') return NPT_ERROR_INVALID_SYNTAX;
+                state = NPT_MIME_PARAMETER_PARSER_STATE_NEED_NAME;
+                break;
+        }
+        if (c == '\0') break; // end of buffer
+    }
+    
+    return NPT_SUCCESS;
+}
+

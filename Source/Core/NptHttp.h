@@ -126,6 +126,7 @@ public:
     ~NPT_HttpHeaders();
 
     // methods
+    NPT_Result Parse(NPT_BufferedInputStream& stream);
     NPT_Result Emit(NPT_OutputStream& stream) const;
     NPT_List<NPT_HttpHeader*>& GetHeaders() { return m_Headers; }
     NPT_HttpHeader*   GetHeader(const char* name) const;

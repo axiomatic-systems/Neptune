@@ -27,7 +27,6 @@ typedef long          NPT_Timeout;
 typedef void          NPT_Interface;
 typedef unsigned char NPT_Byte;
 typedef unsigned int  NPT_Flags;
-typedef int           NPT_Integer;
 
 /*----------------------------------------------------------------------
 |   sized types

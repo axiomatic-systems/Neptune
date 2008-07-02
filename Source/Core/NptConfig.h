@@ -97,6 +97,7 @@
 +---------------------------------------------------------------------*/
 /* GCC */
 #if defined(__GNUC__)
+#define NPT_LocalFunctionName __FUNCTION__
 #define NPT_COMPILER_UNUSED(p) (void)p
 #else
 #define NPT_COMPILER_UNUSED(p) 
@@ -120,6 +121,7 @@
 
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
+#define NPT_LocalFunctionName __FUNCTION__
 #if defined(_WIN64)
 typedef __int64 NPT_PointerLong;
 #else
@@ -174,6 +176,9 @@ typedef __w64 long NPT_PointerLong;
 #endif
 #if !defined(NPT_vsnprintf)
 #define NPT_vsnprintf vsnprintf
+#endif
+#if !defined(NPT_LocalFunctionName)
+#define NPT_LocalFunctionName (NULL)
 #endif
 
 /*----------------------------------------------------------------------

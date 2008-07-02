@@ -124,6 +124,69 @@ NPT_HttpHeaders::~NPT_HttpHeaders()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpHeaders::Parse
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpHeaders::Parse(NPT_BufferedInputStream& stream)
+{
+    NPT_String header_name;
+    NPT_String header_value;
+    bool       header_pending = false;
+    NPT_String line;
+
+    while (NPT_SUCCEEDED(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH))) {
+        if (line.GetLength() == 0) {
+            // empty line, end of headers
+            break;
+        }
+        if (header_pending && (line[0] == ' ' || line[0] == '\t')) {
+            // continuation (folded header)
+            header_value.Append(line.GetChars()+1, line.GetLength()-1);
+        } else {
+            // add the pending header to the list
+            if (header_pending) {
+                header_value.Trim();
+                AddHeader(header_name, header_value);
+                header_pending = false;
+                NPT_LOG_FINEST_2("NPT_HttpHeaders::Parse - %s: %s", 
+                                 header_name.GetChars(),
+                                 header_value.GetChars());
+            }
+
+            // find the colon separating the name and the value
+            int colon_index = line.Find(':');
+            if (colon_index < 1) {
+                // invalid syntax, ignore
+                continue;
+            }
+            header_name = line.Left(colon_index);
+
+            // the field value starts at the first non-whitespace
+            const char* value = line.GetChars()+colon_index+1;
+            while (*value == ' ' || *value == '\t') {
+                value++;
+            }
+            header_value = value;
+           
+            // the header is pending
+            header_pending = true;
+        }
+    }
+
+    // if we have a header pending, add it now
+    if (header_pending) {
+        header_value.Trim();
+        AddHeader(header_name, header_value);
+        header_pending = false;
+        NPT_LOG_FINEST_2("NPT_HttpHeaders::Parse - %s: %s", 
+                         header_name.GetChars(),
+                         header_value.GetChars());
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpHeaders::Emit
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -391,59 +454,7 @@ NPT_HttpMessage::SetEntity(NPT_HttpEntity* entity)
 NPT_Result 
 NPT_HttpMessage::ParseHeaders(NPT_BufferedInputStream& stream)
 {
-    NPT_String header_name;
-    NPT_String header_value;
-    bool       header_pending = false;
-    NPT_String line;
-
-    while (NPT_SUCCEEDED(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH))) {
-        if (line.GetLength() == 0) {
-            // empty line, end of headers
-            if (header_pending) {
-                header_value.Trim();
-                m_Headers.AddHeader(header_name, header_value);
-                header_pending = false;
-                NPT_LOG_FINEST_2("NPT_HttpMessage::ParseHeaders - %s: %s", 
-                                 header_name.GetChars(),
-                                 header_value.GetChars());
-            }
-            break;
-        }
-        char first_char = line[0];
-        if ((first_char == ' ' || first_char == '\t') && header_pending) {
-            header_value.Append(line.GetChars()+1, line.GetLength()-1);
-        } else {
-            // add the pending header to the list
-            if (header_pending) {
-                header_value.Trim();
-                m_Headers.AddHeader(header_name, header_value);
-                header_pending = false;
-                NPT_LOG_FINEST_2("NPT_HttpMessage::ParseHeaders - %s: %s", 
-                                 header_name.GetChars(),
-                                 header_value.GetChars());
-            }
-
-            // find the colon separating the name and the value
-            int colon_index = line.Find(':');
-            if (colon_index < 1) {
-                // invalid syntax, ignore
-                continue;
-            }
-            header_name = line.Left(colon_index);
-
-            // the field value starts at the first non-whitespace
-            const char* value = line.GetChars()+colon_index+1;
-            while (*value == ' ' || *value == '\t') {
-                value++;
-            }
-            header_value = value;
-           
-            // the header is pending
-            header_pending = true;
-        }
-    }
-
-    return NPT_SUCCESS;
+    return m_Headers.Parse(stream);
 }
 
 /*----------------------------------------------------------------------
@@ -725,7 +736,7 @@ NPT_HttpTcpConnector::Connect(const char*                    hostname,
     NPT_CHECK(address.ResolveName(hostname, name_resolver_timeout));
 
     // connect to the server
-    NPT_LOG_FINE_2("NPT_HttpClient::SendRequest - will connect to %s:%d", hostname, port);
+    NPT_LOG_FINE_2("will connect to %s:%d", hostname, port);
     NPT_TcpClientSocket connection;
     connection.SetReadTimeout(io_timeout);
     connection.SetWriteTimeout(io_timeout);
@@ -974,7 +985,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
 
     // parse the response
     NPT_CHECK(NPT_HttpResponse::Parse(*buffered_input_stream, response));
-    NPT_LOG_FINE_2("NPT_HttpClient::SendRequestOnce - got response, code=%d, msg=%s",
+    NPT_LOG_FINE_2("got response, code=%d, msg=%s",
                    response->GetStatusCode(),
                    response->GetReasonPhrase().GetChars());
     
@@ -1027,7 +1038,7 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
             if (location) {
                 // replace the request url
                 if (NPT_SUCCEEDED(request.SetUrl(location->GetValue()))) {
-                    NPT_LOG_FINE_1("NPT_HttpClient::SendRequest - redirecting to %s", location->GetValue().GetChars());
+                    NPT_LOG_FINE_1("redirecting to %s", location->GetValue().GetChars());
                     keep_going = true;
                     delete response;
                     response = NULL;
@@ -1135,7 +1146,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
 
     // wait for a connection
     NPT_Socket*         client;
-    NPT_LOG_FINE_1("NPT_HttpServer::WaitForRequest - waiting for connection on port %d...", m_Config.m_ListenPort);
+    NPT_LOG_FINE_1("waiting for connection on port %d...", m_Config.m_ListenPort);
     NPT_CHECK(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
     if (client == NULL) return NPT_ERROR_INTERNAL;
 
@@ -1147,7 +1158,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
         context->SetLocalAddress(client_info.local_address);
         context->SetRemoteAddress(client_info.remote_address);
 
-        NPT_LOG_FINE_2("NPT_HttpServer::WaitForRequest - client connected (%s)",
+        NPT_LOG_FINE_2("client connected (%s)",
                        client_info.local_address.ToString().GetChars(),
                        client_info.remote_address.ToString().GetChars());
     }
@@ -1179,11 +1190,11 @@ NPT_HttpServer::Loop()
     
     do {
         result = WaitForNewClient(input, output, &context);
-        NPT_LOG_FINE_1("NPT_HttpServer::Loop - WaitForNewClient returned %d", result);
+        NPT_LOG_FINE_1("WaitForNewClient returned %d", result);
         if (NPT_FAILED(result)) break;
 
         result = RespondToClient(input, output, context);
-        NPT_LOG_FINE_1("NPT_HttpServer::Loop - ResponToClient returned %d", result);
+        NPT_LOG_FINE_1("ResponToClient returned %d", result);
     } while (NPT_SUCCEEDED(result));
     
     return result;

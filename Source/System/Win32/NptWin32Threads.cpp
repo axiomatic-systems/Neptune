@@ -333,7 +333,7 @@ class NPT_Win32AtomicVariable : public NPT_AtomicVariableInterface
 
  private:
     // members
-    volatile LONG m_Value;
+    volatile long m_Value;
 };
 
 /*----------------------------------------------------------------------
@@ -357,7 +357,7 @@ NPT_Win32AtomicVariable::~NPT_Win32AtomicVariable()
 int
 NPT_Win32AtomicVariable::Increment()
 {
-    return InterlockedIncrement(&m_Value);
+    return InterlockedIncrement((long*)&m_Value);
 }
 
 /*----------------------------------------------------------------------
@@ -366,7 +366,7 @@ NPT_Win32AtomicVariable::Increment()
 int
 NPT_Win32AtomicVariable::Decrement()
 {
-    return InterlockedDecrement(&m_Value);
+    return InterlockedDecrement((long*)&m_Value);
 }
 
 /*----------------------------------------------------------------------

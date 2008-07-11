@@ -26,23 +26,22 @@ do {                                                    \
     }                                                   \
 } while(0)
 
-#ifdef TEST_WRITER
 /*----------------------------------------------------------------------
-|       WriterTest1
+|       TestWriter
 +---------------------------------------------------------------------*/
 static void
-WriterTest1()
+TestWriter()
 {
     NPT_XmlElementNode* top = new NPT_XmlElementNode("top");
     NPT_XmlElementNode* child1 = new NPT_XmlElementNode("child1");
-    child1->AddAttribute("someAttribute", "someValue");
+    child1->SetAttribute("someAttribute", "someValue");
     top->AddChild(child1);
     NPT_XmlElementNode* child2 = new NPT_XmlElementNode("child2");
-    child2->AddAttribute("someOtherAttribute", "someOtherValue");
+    child2->SetAttribute("someOtherAttribute", "someOtherValue");
     child2->AddText("Some Text");
     child1->AddChild(child2);
     NPT_XmlElementNode* child3 = new NPT_XmlElementNode("child3");
-    child3->AddAttribute("thirdArrtibute", "3");
+    child3->SetAttribute("thirdArrtibute", "3");
     child2->AddChild(child3);
     
     NPT_XmlWriter writer;
@@ -53,7 +52,6 @@ WriterTest1()
     
     writer.Serialize(*top, *out_stream);
 }
-#endif
 
 #if defined(_WIN32) && defined(_DEBUG) && !defined(UNDER_CE)
 #include <crtdbg.h>
@@ -65,7 +63,7 @@ WriterTest1()
 static void
 TestFinders()
 {
-    const char* xml = "<a b='foo' c='bar' ns:b='bla' ns:d='123' xmlns:ns='ns-uri' xmlns:ns1='ns1-uri' xmlns:ns2='ns2-uri' xmlns:ns3='ns3-uri'><b xmlns='ns4-uri'></b><b ba='123'></b><ns2:b></ns2:b><ns1:b></ns1:b></a>";
+    const char* xml = "<a b='foo' c='bar' ns:b='bla' ns:d='123' xmlns:ns='ns-uri' xmlns:ns1='ns1-uri' xmlns:ns2='ns2-uri' xmlns:ns3='ns3-uri'><b xmlns='ns4-uri' ba='123' ns2:bo='345'></b><b ba='123' ns2:bo='345'></b><ns2:b></ns2:b><ns1:b></ns1:b></a>";
     NPT_XmlParser parser;
     NPT_XmlNode* root;
     CHECK(NPT_SUCCEEDED(parser.Parse(xml, root)));
@@ -89,6 +87,12 @@ TestFinders()
     NPT_XmlElementNode* child;
     child = elem->GetChild("b");
     CHECK(child != NULL && *child->GetAttribute("ba") == "123");
+    child = elem->GetChild("b", "ns4-uri");
+    CHECK(child != NULL &&  child->GetAttribute("ba", "ns4-uri") == NULL);
+    CHECK(child != NULL && *child->GetAttribute("bo", NPT_XML_ANY_NAMESPACE) == "345");
+    CHECK(child != NULL &&  child->GetAttribute("bo", NPT_XML_NO_NAMESPACE)  == NULL);
+    CHECK(child != NULL &&  child->GetAttribute("bo", "foo") == NULL);
+    CHECK(child != NULL && *child->GetAttribute("bo", "ns2-uri") == "345");
     child = elem->GetChild("b", NPT_XML_ANY_NAMESPACE);
     CHECK(child != NULL && *child->GetNamespace() == "ns4-uri");
     child = elem->GetChild("b", "ns2-uri");
@@ -499,7 +503,6 @@ TestFile(const char* filename)
     }
 
 
-#ifdef TEST_WRITER
     // dump the tree
     NPT_XmlWriter writer(2);
     NPT_File output(NPT_FILE_STANDARD_OUTPUT);
@@ -507,7 +510,6 @@ TestFile(const char* filename)
     NPT_OutputStreamReference output_stream_ref;
     output.GetOutputStream(output_stream_ref);
     writer.Serialize(*tree, *output_stream_ref);
-#endif
 
     // delete the tree
     delete tree;
@@ -550,6 +552,7 @@ main(int argc, char** argv)
     TestMakeStandalone();
     TestCanonicalizer();
     TestFinders();
-
+    TestWriter();
+    
     return 0;
 }

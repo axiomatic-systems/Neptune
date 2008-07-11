@@ -232,5 +232,6 @@ main(int argc, char** argv)
     delete client1;
     delete client2;
     delete server;
+    delete queue;
     printf("MessagesTest2:: end\n");
 }

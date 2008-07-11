@@ -65,8 +65,13 @@ public:
                 } else {
                     // match if the attribute has the SPECIFIC namespace
                     // we're looking for
-                    const NPT_String* namespc = m_Element.GetNamespaceUri(prefix);
-                    return namespc && *namespc == m_Namespace;
+                    if (prefix.IsEmpty()) {
+                        // attributes without a prefix don't have a namespace
+                        return false;
+                    } else {
+                        const NPT_String* namespc = m_Element.GetNamespaceUri(prefix);
+                        return namespc && *namespc == m_Namespace;
+                    }
                 }
             } else {
                 // ANY namespace will match

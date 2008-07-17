@@ -13,6 +13,7 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#include "NptConfig.h"
 
 /*----------------------------------------------------------------------
 |   named types       
@@ -29,14 +30,16 @@ typedef unsigned char NPT_Byte;
 typedef unsigned int  NPT_Flags;
 
 /*----------------------------------------------------------------------
-|   sized types
+|   sized types (this assumes that ints are 32 bits)
 +---------------------------------------------------------------------*/
-typedef unsigned int   NPT_UInt32;
-typedef int            NPT_Int32;
-typedef unsigned short NPT_UInt16;
-typedef short          NPT_Int16;
-typedef unsigned char  NPT_UInt8;
-typedef char           NPT_Int8;
-typedef float          NPT_Float;
+typedef NPT_CONFIG_INT64_TYPE          NPT_Int64;
+typedef unsigned NPT_CONFIG_INT64_TYPE NPT_UInt64;
+typedef unsigned int                   NPT_UInt32;
+typedef int                            NPT_Int32;
+typedef unsigned short                 NPT_UInt16;
+typedef short                          NPT_Int16;
+typedef unsigned char                  NPT_UInt8;
+typedef char                           NPT_Int8;
+typedef float                          NPT_Float;
 
 #endif // _NPT_TYPES_H_

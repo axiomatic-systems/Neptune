@@ -90,6 +90,8 @@
 		CA84EC700C7E540900CC9622 /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = CA84EC5C0C7E540900CC9622 /* zutil.c */; };
 		CA84EC710C7E540900CC9622 /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = CA84EC5D0C7E540900CC9622 /* zutil.h */; };
 		CA84EC7B0C7E5A7000CC9622 /* NptZip.h in Headers */ = {isa = PBXBuildFile; fileRef = CA84EC7A0C7E5A7000CC9622 /* NptZip.h */; };
+		CA97E0250E2FDFDD0090CC9B /* StreamsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA97E01C0E2FDFA10090CC9B /* StreamsTest1.cpp */; };
+		CA97E0320E2FEA540090CC9B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A070CF164E000C01909 /* XmlTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F80CF1648300C01909 /* XmlTest1.cpp */; };
 		CAA97A080CF164E300C01909 /* XmlTest1Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F90CF1648300C01909 /* XmlTest1Data.cpp */; };
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
@@ -228,6 +230,13 @@
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA97E0480E2FEB6F0090CC9B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			remoteInfo = Neptune;
 		};
 		CAA97A050CF164B500C01909 /* PBXContainerItemProxy */ = {
@@ -565,6 +574,8 @@
 		CA84EC5C0C7E540900CC9622 /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = "../../../ThirdParty/zlib-1.2.3/zutil.c"; sourceTree = SOURCE_ROOT; };
 		CA84EC5D0C7E540900CC9622 /* zutil.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zutil.h; path = "../../../ThirdParty/zlib-1.2.3/zutil.h"; sourceTree = SOURCE_ROOT; };
 		CA84EC7A0C7E5A7000CC9622 /* NptZip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptZip.h; sourceTree = "<group>"; };
+		CA97E01C0E2FDFA10090CC9B /* StreamsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamsTest1.cpp; sourceTree = "<group>"; };
+		CA97E0200E2FDFB30090CC9B /* StreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = StreamsTest1; path = build/Debug/StreamsTest1; sourceTree = "<group>"; };
 		CAA979D70CF1648300C01909 /* ArraysTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArraysTest1.cpp; sourceTree = "<group>"; };
 		CAA979D90CF1648300C01909 /* BufferedStreamsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferedStreamsTest1.cpp; sourceTree = "<group>"; };
 		CAA979DB0CF1648300C01909 /* HttpClientTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpClientTest1.cpp; sourceTree = "<group>"; };
@@ -703,6 +714,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA97E01E0E2FDFB30090CC9B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA97E0320E2FEA540090CC9B /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -927,6 +946,14 @@
 			name = ThirdParty;
 			sourceTree = "<group>";
 		};
+		CA97E01B0E2FDFA10090CC9B /* Streams1 */ = {
+			isa = PBXGroup;
+			children = (
+				CA97E01C0E2FDFA10090CC9B /* StreamsTest1.cpp */,
+			);
+			path = Streams1;
+			sourceTree = "<group>";
+		};
 		CAA979D50CF1648300C01909 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -942,6 +969,7 @@
 				CAA979E60CF1648300C01909 /* Messages2 */,
 				CAA979E80CF1648300C01909 /* Misc1 */,
 				CAA979EA0CF1648300C01909 /* RingBuffer1 */,
+				CA97E01B0E2FDFA10090CC9B /* Streams1 */,
 				CAA979EC0CF1648300C01909 /* Strings1 */,
 				CAA979EE0CF1648300C01909 /* Threads1 */,
 				CAA979F00CF1648300C01909 /* Udp1 */,
@@ -1175,6 +1203,7 @@
 				CAE417C80E0DC1B400A530D1 /* NetConfig */,
 				CAE417D50E0DC1D600A530D1 /* NetPing */,
 				CA197D1E0E1AE4360018E87C /* QueueTest1 */,
+				CA97E0200E2FDFB30090CC9B /* StreamsTest1 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1396,6 +1425,23 @@
 			name = HttpServerTest1;
 			productName = XmlTest1;
 			productReference = CA550D550D20A37E00B22D72 /* HttpServerTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA97E0270E2FDFFB0090CC9B /* Build configuration list for PBXNativeTarget "StreamsTest1" */;
+			buildPhases = (
+				CA97E01D0E2FDFB30090CC9B /* Sources */,
+				CA97E01E0E2FDFB30090CC9B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA97E0490E2FEB6F0090CC9B /* PBXTargetDependency */,
+			);
+			name = StreamsTest1;
+			productName = StreamsTest1;
+			productReference = CA97E0200E2FDFB30090CC9B /* StreamsTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
 		CAA97A000CF164A700C01909 /* XmlTest1 */ = {
@@ -1794,6 +1840,7 @@
 				CAE417BA0E0DC19400A530D1 /* NetEcho */,
 				CAE417C70E0DC1B400A530D1 /* NetConfig */,
 				CAE417D40E0DC1D600A530D1 /* NetPing */,
+				CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */,
 			);
 		};
 /* End PBXProject section */
@@ -1812,6 +1859,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA97E01D0E2FDFB30090CC9B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA97E0250E2FDFDD0090CC9B /* StreamsTest1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2048,6 +2103,11 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */;
+		};
+		CA97E0490E2FEB6F0090CC9B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA97E0480E2FEB6F0090CC9B /* PBXContainerItemProxy */;
 		};
 		CAA97A060CF164B500C01909 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2360,6 +2420,48 @@
 			};
 			name = Release;
 		};
+		CA97E0220E2FDFB30090CC9B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = StreamsTest1;
+			};
+			name = Debug;
+		};
+		CA97E0230E2FDFB30090CC9B /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = StreamsTest1;
+			};
+			name = Coverage;
+		};
+		CA97E0240E2FDFB30090CC9B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = StreamsTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		CAA97A030CF164A800C01909 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2459,6 +2561,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-Wno-long-long",
 				);
 			};
 			name = Coverage;
@@ -3393,6 +3496,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-Wno-long-long",
 				);
 			};
 			name = Debug;
@@ -3436,6 +3540,7 @@
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
+					"-Wno-long-long",
 				);
 			};
 			name = Release;
@@ -3493,6 +3598,16 @@
 				CA550D520D20A37E00B22D72 /* Debug */,
 				CA550D530D20A37E00B22D72 /* Coverage */,
 				CA550D540D20A37E00B22D72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA97E0270E2FDFFB0090CC9B /* Build configuration list for PBXNativeTarget "StreamsTest1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA97E0220E2FDFB30090CC9B /* Debug */,
+				CA97E0230E2FDFB30090CC9B /* Coverage */,
+				CA97E0240E2FDFB30090CC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -498,10 +498,10 @@ NPT_Url::NPT_Url(const char* url, SchemeId expected_scheme, NPT_UInt16 default_p
 +---------------------------------------------------------------------*/
 NPT_Url::NPT_Url(const char* scheme,
                  const char* host, 
-                         NPT_UInt16  port, 
-                         const char* path,
-                         const char* query,
-                         const char* fragment) :
+                 NPT_UInt16  port, 
+                 const char* path,
+                 const char* query,
+                 const char* fragment) :
     m_Host(host),
     m_Port(port),
     m_Path(path),

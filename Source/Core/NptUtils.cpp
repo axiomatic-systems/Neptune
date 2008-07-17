@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "NptConfig.h"
+#include "NptTypes.h"
 #include "NptDebug.h"
 #include "NptUtils.h"
 #include "NptResults.h"
@@ -23,6 +24,23 @@
 const unsigned int NPT_FORMAT_LOCAL_BUFFER_SIZE = 1024;
 const unsigned int NPT_FORMAT_BUFFER_INCREMENT  = 4096;
 const unsigned int NPT_FORMAT_BUFFER_MAX_SIZE   = 65536;
+
+/*----------------------------------------------------------------------
+|   NPT_BytesToInt64Be
++---------------------------------------------------------------------*/
+NPT_UInt64 
+NPT_BytesToInt64Be(const unsigned char* bytes)
+{
+    return 
+        ( ((NPT_UInt64)bytes[0])<<56 ) |
+        ( ((NPT_UInt64)bytes[1])<<48 ) |
+        ( ((NPT_UInt64)bytes[2])<<40 ) |
+        ( ((NPT_UInt64)bytes[3])<<32 ) |
+        ( ((NPT_UInt64)bytes[4])<<24 ) |
+        ( ((NPT_UInt64)bytes[5])<<16 ) |
+        ( ((NPT_UInt64)bytes[6])<<8  ) |
+        ( ((NPT_UInt64)bytes[7])     );    
+}
 
 /*----------------------------------------------------------------------
 |   NPT_BytesToInt32Be
@@ -38,6 +56,18 @@ NPT_BytesToInt32Be(const unsigned char* bytes)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_BytesToInt24Be
++---------------------------------------------------------------------*/
+NPT_UInt32 
+NPT_BytesToInt24Be(const unsigned char* bytes)
+{
+    return 
+        ( ((NPT_UInt32)bytes[0])<<16 ) |
+        ( ((NPT_UInt32)bytes[1])<<8  ) |
+        ( ((NPT_UInt32)bytes[2])     );    
+}
+
+/*----------------------------------------------------------------------
 |   NPT_BytesToInt16Be
 +---------------------------------------------------------------------*/
 NPT_UInt16
@@ -46,6 +76,22 @@ NPT_BytesToInt16Be(const unsigned char* bytes)
     return 
         ( ((NPT_UInt16)bytes[0])<<8  ) |
         ( ((NPT_UInt16)bytes[1])     );    
+}
+
+/*----------------------------------------------------------------------
+|    NPT_BytesFromInt64Be
++---------------------------------------------------------------------*/
+void 
+NPT_BytesFromInt64Be(unsigned char* buffer, NPT_UInt64 value)
+{
+    buffer[0] = (unsigned char)(value>>56) & 0xFF;
+    buffer[1] = (unsigned char)(value>>48) & 0xFF;
+    buffer[2] = (unsigned char)(value>>40) & 0xFF;
+    buffer[3] = (unsigned char)(value>>32) & 0xFF;
+    buffer[4] = (unsigned char)(value>>24) & 0xFF;
+    buffer[5] = (unsigned char)(value>>16) & 0xFF;
+    buffer[6] = (unsigned char)(value>> 8) & 0xFF;
+    buffer[7] = (unsigned char)(value    ) & 0xFF;
 }
 
 /*----------------------------------------------------------------------
@@ -58,6 +104,17 @@ NPT_BytesFromInt32Be(unsigned char* buffer, NPT_UInt32 value)
     buffer[1] = (unsigned char)(value>>16) & 0xFF;
     buffer[2] = (unsigned char)(value>> 8) & 0xFF;
     buffer[3] = (unsigned char)(value    ) & 0xFF;
+}
+
+/*----------------------------------------------------------------------
+|    NPT_BytesFromInt24Be
++---------------------------------------------------------------------*/
+void 
+NPT_BytesFromInt24Be(unsigned char* buffer, NPT_UInt32 value)
+{
+    buffer[0] = (unsigned char)(value>>16) & 0xFF;
+    buffer[1] = (unsigned char)(value>> 8) & 0xFF;
+    buffer[2] = (unsigned char)(value    ) & 0xFF;
 }
 
 /*----------------------------------------------------------------------

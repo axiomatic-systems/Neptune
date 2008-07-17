@@ -28,7 +28,7 @@
 NPT_Result
 NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)
 {
-	interfaces.Clear();
+    interfaces.Clear();
     return NPT_SUCCESS;
 }
 

@@ -38,14 +38,22 @@
 /*----------------------------------------------------------------------
 |   byte I/O
 +---------------------------------------------------------------------*/
+extern void NPT_BytesFromInt64Be(unsigned char* buffer, NPT_UInt64 value);
 extern void NPT_BytesFromInt32Be(unsigned char* buffer, NPT_UInt32 value);
+extern void NPT_BytesFromInt24Be(unsigned char* buffer, NPT_UInt32 value);
 extern void NPT_BytesFromInt16Be(unsigned char* buffer, NPT_UInt16 value);
+extern NPT_UInt64 NPT_BytesToInt64Be(const unsigned char* buffer);
 extern NPT_UInt32 NPT_BytesToInt32Be(const unsigned char* buffer);
+extern NPT_UInt32 NPT_BytesToInt24Be(const unsigned char* buffer);
 extern NPT_UInt16 NPT_BytesToInt16Be(const unsigned char* buffer);
 
+extern void NPT_BytesFromInt64Le(unsigned char* buffer, NPT_UInt64 value);
 extern void NPT_BytesFromInt32Le(unsigned char* buffer, NPT_UInt32 value);
+extern void NPT_BytesFromInt24Le(unsigned char* buffer, NPT_UInt32 value);
 extern void NPT_BytesFromInt16Le(unsigned char* buffer, NPT_UInt16 value);
+extern NPT_UInt64 NPT_BytesToInt64Le(const unsigned char* buffer);
 extern NPT_UInt32 NPT_BytesToInt32Le(const unsigned char* buffer);
+extern NPT_UInt32 NPT_BytesToInt24Le(const unsigned char* buffer);
 extern NPT_UInt16 NPT_BytesToInt16Le(const unsigned char* buffer);
 
 extern void NPT_ByteToHex(NPT_Byte b, char* buffer);

@@ -113,6 +113,116 @@ NPT_InputStream::ReadFully(void* buffer, NPT_Size bytes_to_read)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_InputStream::ReadUI64
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadUI64(NPT_UInt64& value)
+{
+    unsigned char buffer[8];
+
+    // read bytes from the stream
+    NPT_Result result;
+    result = ReadFully((void*)buffer, 8);
+    if (NPT_FAILED(result)) {
+        value = 0;
+        return result;
+    }
+
+    // convert bytes to value
+    value = NPT_BytesToInt64Be(buffer);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_InputStream::ReadUI32
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadUI32(NPT_UInt32& value)
+{
+    unsigned char buffer[4];
+
+    // read bytes from the stream
+    NPT_Result result;
+    result = ReadFully((void*)buffer, 4);
+    if (NPT_FAILED(result)) {
+        value = 0;
+        return result;
+    }
+
+    // convert bytes to value
+    value = NPT_BytesToInt32Be(buffer);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_InputStream::ReadUI24
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadUI24(NPT_UInt32& value)
+{
+    unsigned char buffer[3];
+
+    // read bytes from the stream
+    NPT_Result result;
+    result = ReadFully((void*)buffer, 3);
+    if (NPT_FAILED(result)) {
+        value = 0;
+        return result;
+    }
+
+    // convert bytes to value
+    value = NPT_BytesToInt24Be(buffer);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_InputStream::ReadUI16
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadUI16(NPT_UInt16& value)
+{
+    unsigned char buffer[2];
+
+    // read bytes from the stream
+    NPT_Result result;
+    result = ReadFully((void*)buffer, 2);
+    if (NPT_FAILED(result)) {
+        value = 0;
+        return result;
+    }
+
+    // convert bytes to value
+    value = NPT_BytesToInt16Be(buffer);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_InputStream::ReadUI08
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_InputStream::ReadUI08(NPT_UInt8& value)
+{
+    unsigned char buffer[1];
+
+    // read bytes from the stream
+    NPT_Result result;
+    result = ReadFully((void*)buffer, 1);
+    if (NPT_FAILED(result)) {        
+        value = 0;
+        return result;
+    }
+
+    // convert bytes to value
+    value = buffer[0];
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_InputStream::Skip
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -175,6 +285,75 @@ NPT_OutputStream::WriteLine(const char* buffer)
     NPT_CHECK(WriteFully((const void*)"\r\n", 2));
 
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_OutputStream::WriteUI64
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteUI64(NPT_UInt64 value)
+{
+    unsigned char buffer[8];
+
+    // convert value to bytes
+    NPT_BytesFromInt64Be(buffer, value);
+
+    // write bytes to the stream
+    return WriteFully((void*)buffer, 8);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_OutputStream::WriteUI32
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteUI32(NPT_UInt32 value)
+{
+    unsigned char buffer[4];
+
+    // convert value to bytes
+    NPT_BytesFromInt32Be(buffer, value);
+
+    // write bytes to the stream
+    return WriteFully((void*)buffer, 4);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_OutputStream::WriteUI24
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteUI24(NPT_UInt32 value)
+{
+    unsigned char buffer[3];
+
+    // convert value to bytes
+    NPT_BytesFromInt24Be(buffer, value);
+
+    // write bytes to the stream
+    return WriteFully((void*)buffer, 3);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_OutputStream::WriteUI16
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteUI16(NPT_UInt16 value)
+{
+    unsigned char buffer[2];
+
+    // convert value to bytes
+    NPT_BytesFromInt16Be(buffer, value);
+
+    // write bytes to the stream
+    return WriteFully((void*)buffer, 2);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_OutputStream::WriteUI08
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_OutputStream::WriteUI08(NPT_UInt8 value)
+{
+    return WriteFully((void*)&value, 1);
 }
 
 /*----------------------------------------------------------------------

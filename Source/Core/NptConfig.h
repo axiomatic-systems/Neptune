@@ -121,6 +121,7 @@
 
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
+#define NPT_CONFIG_INT64_TYPE __int64
 #define NPT_LocalFunctionName __FUNCTION__
 #if defined(_WIN64)
 typedef __int64 NPT_PointerLong;
@@ -166,6 +167,10 @@ typedef __w64 long NPT_PointerLong;
 +---------------------------------------------------------------------*/
 #ifndef NPT_POINTER_TO_LONG
 #define NPT_POINTER_TO_LONG(_p) ((long)(_p))
+#endif
+
+#if !defined(NPT_CONFIG_INT64_TYPE)
+#define NPT_CONFIG_INT64_TYPE long long
 #endif
 
 #if !defined(NPT_snprintf)

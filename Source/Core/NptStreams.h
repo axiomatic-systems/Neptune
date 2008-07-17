@@ -53,6 +53,13 @@ class NPT_InputStream
     virtual NPT_Result Tell(NPT_Position& offset) = 0;
     virtual NPT_Result GetSize(NPT_Size& size) = 0;
     virtual NPT_Result GetAvailable(NPT_Size& available) = 0;
+    
+    // data access methods
+    NPT_Result ReadUI64(NPT_UInt64& value);
+    NPT_Result ReadUI32(NPT_UInt32& value);
+    NPT_Result ReadUI24(NPT_UInt32& value);
+    NPT_Result ReadUI16(NPT_UInt16& value);
+    NPT_Result ReadUI08(NPT_UInt8&  value);    
 };
 
 typedef NPT_Reference<NPT_InputStream> NPT_InputStreamReference;
@@ -77,6 +84,13 @@ public:
     virtual NPT_Result Seek(NPT_Position offset) = 0;
     virtual NPT_Result Tell(NPT_Position& offset) = 0;
     virtual NPT_Result Flush() { return NPT_SUCCESS; }
+    
+    // data access methods
+    NPT_Result WriteUI64(NPT_UInt64 value);
+    NPT_Result WriteUI32(NPT_UInt32 value);
+    NPT_Result WriteUI24(NPT_UInt32 value);
+    NPT_Result WriteUI16(NPT_UInt16 value);
+    NPT_Result WriteUI08(NPT_UInt8  value);    
 };
 
 typedef NPT_Reference<NPT_OutputStream> NPT_OutputStreamReference;

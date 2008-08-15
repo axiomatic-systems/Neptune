@@ -86,7 +86,7 @@ public:
     /**
      * Returns the reference counter value.
      */
-    NPT_Cardinal GetCounter() const { return m_Counter; }
+    NPT_Cardinal GetCounter() const { return *m_Counter; }
     
     /**
      * Returns wether this references a NULL object.
@@ -100,7 +100,9 @@ public:
      * After the method returns, this reference does not point to any shared object.
      */
     void Detach() {
-        if (m_Counter) --(*m_Counter);
+        if (m_Counter && --(*m_Counter) == 0) {
+            delete m_Counter; 
+        }
         m_Counter = NULL;
         m_Object  = NULL;
     }

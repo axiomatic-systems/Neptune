@@ -1445,6 +1445,8 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
             } else if (c == '&') {
                 m_Entity.Reset();
                 SetState(STATE_IN_ENTITY_REF);
+            } else if (NPT_XML_CHAR_IS_WHITESPACE(c)) {
+                m_Value.Append(' ');
             } else if (NPT_XML_CHAR_IS_VALUE_CHAR(c)) {
                 m_Value.Append(c);
             } else {

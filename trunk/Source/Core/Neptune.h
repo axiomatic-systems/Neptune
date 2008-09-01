@@ -52,6 +52,7 @@
 #include "NptLogging.h"
 #include "NptSerialPort.h"
 #include "NptVersion.h"
+#include "NptDynamicLibraries.h"
 
 // optional modules
 #include "NptZip.h"

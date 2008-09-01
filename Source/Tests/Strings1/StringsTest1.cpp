@@ -142,7 +142,7 @@ main(int /*argc*/, char** /*argv*/)
     StringTest("constructor(const NPT_String& = empty)", s07, "");
     NPT_String s08("");
     StringTest("constructor(const char* = \"\")", s08, "");
-    NPT_String s09("jkhlkjh\0fgsdfg\0fgsdfg", 0, 10);
+    NPT_String s09("jkhlkjh\0fgsdfg\0fgsdfg", 10);
     StringTest("NPT_String s09(\"jkhlkjh\0fgsdfg\0fgsdfg\", 0, 10)", s09, "jkhlkjh");
     NPT_String s10((const char*)NULL, 0);
     StringTest("NPT_String s10(NULL, 0)", s10, "");
@@ -540,6 +540,63 @@ main(int /*argc*/, char** /*argv*/)
     IntTest("", tf00.ToFloat(fl00, true), NPT_SUCCESS);
     FloatTest("", fl00, -1.234f);
     IntTest("", tf00.ToFloat(fl00, false), NPT_ERROR_INVALID_PARAMETERS);
+    
+    
+    NPT_List<NPT_String> sl;
+    sl = NPT_String("").Split("");
+    IntTest("", sl.GetItemCount(), 1);
+    StringTest("", *sl.GetFirstItem(), "");
+    
+    sl = NPT_String("").Split("#");
+    IntTest("", sl.GetItemCount(), 1);
+    StringTest("", *sl.GetFirstItem(), "");
+
+    sl = NPT_String("aaa").Split("");
+    IntTest("", sl.GetItemCount(), 1);
+    StringTest("", *sl.GetFirstItem(), "aaa");
+
+    sl = NPT_String("aaa").Split("b");
+    IntTest("", sl.GetItemCount(), 1);
+    StringTest("", *sl.GetFirstItem(), "aaa");
+
+    sl = NPT_String("aaa").Split("a");
+    IntTest("", sl.GetItemCount(), 4);
+    NPT_String* sli;
+    sl.Get(0, sli);
+    StringTest("", *sli, "");
+    sl.Get(1, sli);
+    StringTest("", *sli, "");
+    sl.Get(2, sli);
+    StringTest("", *sli, "");
+    sl.Get(3, sli);
+    StringTest("", *sli, "");
+    
+    sl = NPT_String("aaa").Split("aa");
+    IntTest("", sl.GetItemCount(), 2);
+    sl.Get(0, sli);
+    StringTest("", *sli, "");
+    sl.Get(1, sli);
+    StringTest("", *sli, "a");
+
+    sl = NPT_String("aaa").Split("aaa");
+    IntTest("", sl.GetItemCount(), 2);
+    sl.Get(0, sli);
+    StringTest("", *sli, "");
+    sl.Get(1, sli);
+    StringTest("", *sli, "");
+
+    sl = NPT_String("a;b;c;d;e").Split(";");    
+    IntTest("", sl.GetItemCount(), 5);
+    sl.Get(0, sli);
+    StringTest("", *sli, "a");
+    sl.Get(1, sli);
+    StringTest("", *sli, "b");
+    sl.Get(2, sli);
+    StringTest("", *sli, "c");
+    sl.Get(3, sli);
+    StringTest("", *sli, "d");
+    sl.Get(4, sli);
+    StringTest("", *sli, "e");
     
     printf("------------------------- done -----\n");
     return 0;

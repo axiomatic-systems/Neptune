@@ -2,7 +2,7 @@
 |
 |   Neptune - Types
 |
-|      (c) 2001-2006 Gilles Boccon-Gibod
+|      (c) 2001-2008 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (boK@bok.net)
 |
  ****************************************************************/
@@ -16,20 +16,6 @@
 #include "NptConfig.h"
 
 /*----------------------------------------------------------------------
-|   named types       
-+---------------------------------------------------------------------*/
-typedef int           NPT_Result;
-typedef unsigned int  NPT_Cardinal;
-typedef unsigned int  NPT_Ordinal;
-typedef unsigned long NPT_Size;
-typedef signed   long NPT_Offset;
-typedef unsigned long NPT_Position;
-typedef long          NPT_Timeout;
-typedef void          NPT_Interface;
-typedef unsigned char NPT_Byte;
-typedef unsigned int  NPT_Flags;
-
-/*----------------------------------------------------------------------
 |   sized types (this assumes that ints are 32 bits)
 +---------------------------------------------------------------------*/
 typedef NPT_CONFIG_INT64_TYPE          NPT_Int64;
@@ -41,5 +27,21 @@ typedef short                          NPT_Int16;
 typedef unsigned char                  NPT_UInt8;
 typedef char                           NPT_Int8;
 typedef float                          NPT_Float;
+
+/*----------------------------------------------------------------------
+|   named types       
++---------------------------------------------------------------------*/
+typedef int           NPT_Result;
+typedef unsigned int  NPT_Cardinal;
+typedef unsigned int  NPT_Ordinal;
+typedef unsigned long NPT_Size;
+typedef NPT_UInt64    NPT_LargeSize;
+typedef signed   long NPT_Offset;
+typedef unsigned long NPT_Position;
+typedef long          NPT_Timeout;
+typedef void          NPT_Interface;
+typedef unsigned char NPT_Byte;
+typedef unsigned int  NPT_Flags;
+
 
 #endif // _NPT_TYPES_H_

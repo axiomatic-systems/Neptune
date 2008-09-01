@@ -131,30 +131,6 @@ NPT_String::NPT_String(const NPT_String& str)
 /*----------------------------------------------------------------------
 |   NPT_String::NPT_String
 +---------------------------------------------------------------------*/
-NPT_String::NPT_String(const char* str,
-                       NPT_Ordinal first, 
-                       NPT_Size    length)
-{
-    // shortcut
-    if (str != NULL && length != 0) {
-        // truncate length      
-        NPT_Size str_length = StringLength(str);
-        if (first < str_length) {
-            if (first+length > str_length) {
-                length = str_length-first;
-            }
-            if (length != 0) {
-                m_Chars = Buffer::Create(str+first, length);
-                return;
-            }
-        }
-    } 
-    m_Chars = NULL;
-}
-
-/*----------------------------------------------------------------------
-|   NPT_String::NPT_String
-+---------------------------------------------------------------------*/
 NPT_String::NPT_String(char c, NPT_Cardinal repeat)
 {
     if (repeat != 0) {
@@ -373,12 +349,45 @@ NPT_String::CompareN(const char* s1, const char *s2, NPT_Size count, bool ignore
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::Split
++---------------------------------------------------------------------*/
+NPT_List<NPT_String> 
+NPT_String::Split(const char* separator) const
+{
+    NPT_List<NPT_String> result;
+    NPT_Size             separator_length = NPT_StringLength(separator);
+    
+    // sepcial case for empty separators
+    if (separator_length == 0) {
+        result.Add(*this);
+        return result;
+    }
+    
+    int current = 0;  
+    int next;  
+    do {
+        next = Find(separator, current);
+        unsigned int end = (next>=0?next:GetLength());
+        result.Add(SubString(current, end-current));
+        current = next+separator_length;
+    } while (next >= 0);
+    
+    return result;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_String::SubString
 +---------------------------------------------------------------------*/
 NPT_String
 NPT_String::SubString(NPT_Ordinal first, NPT_Size length) const
 {
-    return NPT_String(*this, first, length);
+    if (first >= GetLength()) {
+        first = GetLength();
+        length = 0;
+    } else if (first+length >= GetLength()) {
+        length = GetLength()-first;
+    }
+    return NPT_String(GetChars()+first, length);
 }
 
 /*----------------------------------------------------------------------

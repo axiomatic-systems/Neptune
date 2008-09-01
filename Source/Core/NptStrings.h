@@ -19,6 +19,7 @@
 #endif
 #include "NptTypes.h"
 #include "NptConstants.h"
+#include "NptList.h"
 #include "NptDebug.h"
 
 /*----------------------------------------------------------------------
@@ -40,7 +41,6 @@ public:
     NPT_String(const NPT_String& str);
     NPT_String(const char* str);
     NPT_String(const char* str, NPT_Size length);
-    NPT_String(const char* str, NPT_Ordinal first, NPT_Size length);
     NPT_String(char c, NPT_Cardinal repeat = 1);
     NPT_String() : m_Chars(NULL) {}
    ~NPT_String() { if (m_Chars) delete GetBuffer(); }
@@ -71,7 +71,8 @@ public:
                *this : 
                SubString(GetLength()-length, length);
     }
-
+    NPT_List<NPT_String> Split(const char* separator) const;
+    
     // buffer management
     void       Reserve(NPT_Size length);
 

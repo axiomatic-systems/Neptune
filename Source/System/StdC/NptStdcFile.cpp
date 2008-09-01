@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <dirent.h>
 #endif
 
 #include "NptConfig.h"
@@ -47,6 +48,23 @@ static int fopen_s(FILE**      file,
     return 0;
 }
 #endif // defined(NPT_CONFIG_HAVE_FOPEN_S
+
+/*----------------------------------------------------------------------
+|   MapErrno
++---------------------------------------------------------------------*/
+static NPT_Result
+MapErrno(int err) {
+    switch (errno) {
+      case EACCES:       return NPT_ERROR_PERMISSION_DENIED;
+      case EPERM:        return NPT_ERROR_PERMISSION_DENIED;
+      case ENOENT:       return NPT_ERROR_NO_SUCH_FILE;
+      case ENAMETOOLONG: return NPT_ERROR_INVALID_PARAMETERS;
+      case EBUSY:        return NPT_ERROR_FILE_BUSY;
+      case EROFS:        return NPT_ERROR_FILE_NOT_WRITABLE;
+      case ENOTDIR:      return NPT_ERROR_FILE_NOT_DIRECTORY;
+      default:           return NPT_ERROR_ERRNO(err);
+    }
+}
 
 /*----------------------------------------------------------------------
 |   NPT_StdcFileWrapper
@@ -259,31 +277,28 @@ class NPT_StdcFile: public NPT_FileInterface
 {
 public:
     // constructors and destructor
-    NPT_StdcFile(const char* name);
+    NPT_StdcFile(NPT_File& delegator);
    ~NPT_StdcFile();
 
     // NPT_FileInterface methods
     NPT_Result Open(OpenMode mode);
     NPT_Result Close();
-    NPT_Result GetSize(NPT_Size& size);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
 
 private:
     // members
-    NPT_String            m_Name;
+    NPT_File&             m_Delegator;
     OpenMode              m_Mode;
     NPT_StdcFileReference m_FileReference;
-    NPT_Size              m_Size;
 };
 
 /*----------------------------------------------------------------------
 |   NPT_StdcFile::NPT_StdcFile
 +---------------------------------------------------------------------*/
-NPT_StdcFile::NPT_StdcFile(const char* name) :
-    m_Name(name),
-    m_Mode(0),
-    m_Size(0)
+NPT_StdcFile::NPT_StdcFile(NPT_File& delegator) :
+    m_Delegator(delegator),
+    m_Mode(0)
 {
 }
 
@@ -301,8 +316,7 @@ NPT_StdcFile::~NPT_StdcFile()
 NPT_Result
 NPT_StdcFile::Open(NPT_File::OpenMode mode)
 {
-    FILE* file      = NULL;
-    bool  need_size = false;
+    FILE* file = NULL;
     
     // check if we're already open
     if (!m_FileReference.IsNull()) {
@@ -313,7 +327,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
     m_Mode = mode;
 
     // check for special names
-    const char* name = (const char*)m_Name;
+    const char* name = (const char*)m_Delegator.GetPath();
     if (NPT_StringsEqual(name, NPT_FILE_STANDARD_INPUT)) {
         file = stdin;
     } else if (NPT_StringsEqual(name, NPT_FILE_STANDARD_OUTPUT)) {
@@ -355,21 +369,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 #endif
 
         // test the result of the open
-        if (open_result != 0) {
-            if (open_result == ENOENT) {
-                return NPT_ERROR_NO_SUCH_FILE;
-            } else if (open_result == EACCES) {
-                return NPT_ERROR_PERMISSION_DENIED;
-            } else {
-                return NPT_FAILURE;
-            }
-        }
-
-        // mark that we need the size (we do this here because
-        // we must measure the size after any possible call
-        // to setvbuf in order to avoid throwing away data
-        // read into the buffer by a seek() call)
-        need_size = true;
+        if (open_result != 0) return MapErrno(errno);
     }
 
     // unbuffer the file if needed 
@@ -378,14 +378,6 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
         setvbuf(file, NULL, _IONBF, 0);
 #endif
     }   
-
-    // get the size if required
-    if (need_size) {
-        if (fseek(file, 0, SEEK_END) >= 0) {
-            m_Size = ftell(file);
-            fseek(file, 0, SEEK_SET);
-        }
-    }
     
     // create a reference to the FILE object
     m_FileReference = new NPT_StdcFileWrapper(file);
@@ -409,24 +401,6 @@ NPT_StdcFile::Close()
 }
 
 /*----------------------------------------------------------------------
-|   NPT_StdcFile::GetSize
-+---------------------------------------------------------------------*/
-NPT_Result 
-NPT_StdcFile::GetSize(NPT_Size& size)
-{
-    // default value
-    size = 0;
-
-    // check that the file is open
-    if (m_FileReference.IsNull()) return NPT_ERROR_FILE_NOT_OPEN;
-
-    // return the size
-    size = m_Size;
-
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |   NPT_StdcFile::GetInputStream
 +---------------------------------------------------------------------*/
 NPT_Result 
@@ -444,7 +418,9 @@ NPT_StdcFile::GetInputStream(NPT_InputStreamReference& stream)
     }
 
     // create a stream
-    stream = new NPT_StdcFileInputStream(m_FileReference, m_Size);
+    NPT_LargeSize size = 0;
+    m_Delegator.GetSize(size);
+    stream = new NPT_StdcFileInputStream(m_FileReference, size);
 
     return NPT_SUCCESS;
 }
@@ -473,9 +449,64 @@ NPT_StdcFile::GetOutputStream(NPT_OutputStreamReference& stream)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_StdcFile::ListDirectory
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
+{
+    // default return value
+    entries.Clear();
+    
+    // check the arguments
+    if (path == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+    
+    // list the entries
+    DIR *directory = opendir(path);
+    if (directory == NULL) return NPT_ERROR_OUT_OF_MEMORY;
+    
+    for (;;) {
+        struct dirent* entry_pointer = NULL;
+#if defined(NPT_CONFIG_HAVE_READDIR_R)
+        struct dirent entry;
+        int result = readdir_r(directory, &entry, &entry_pointer);
+        if (result != 0 || entry_pointer == NULL) break;
+#else
+        entry_pointer = readdir(directory);
+        if (entry_pointer == NULL) break;
+#endif
+        // ignore odd names
+        if (entry_pointer->d_namlen == 0) continue;
+
+        // ignore . and ..
+        if (entry_pointer->d_namlen  == 1 && 
+            entry_pointer->d_name[0] == '.') {
+            continue;
+        }
+        if (entry_pointer->d_namlen  == 2   && 
+            entry_pointer->d_name[0] == '.' &&
+            entry_pointer->d_name[1] == '.') {
+            continue;
+        }        
+        
+        entries.Add(NPT_String(entry_pointer->d_name));
+    }
+    
+    closedir(directory);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_File::NPT_File
 +---------------------------------------------------------------------*/
-NPT_File::NPT_File(const char* name)
+NPT_File::NPT_File(const char* path) :
+    m_Path(path)
 {
-    m_Delegate = new NPT_StdcFile(name);
+    m_Delegate = new NPT_StdcFile(*this);
+    
+    if (NPT_StringsEqual(path, NPT_FILE_STANDARD_INPUT)  ||
+        NPT_StringsEqual(path, NPT_FILE_STANDARD_OUTPUT) ||
+        NPT_StringsEqual(path, NPT_FILE_STANDARD_ERROR)) {
+        m_Info.m_Type = NPT_FileInfo::FILE_TYPE_SPECIAL;
+    } 
 }

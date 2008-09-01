@@ -475,16 +475,16 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
         if (entry_pointer == NULL) break;
 #endif
         // ignore odd names
-        if (entry_pointer->d_namlen == 0) continue;
+        if (entry_pointer->d_name[0] == '\0') continue;
 
         // ignore . and ..
-        if (entry_pointer->d_namlen  == 1 && 
-            entry_pointer->d_name[0] == '.') {
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '\0') {
             continue;
         }
-        if (entry_pointer->d_namlen  == 2   && 
-            entry_pointer->d_name[0] == '.' &&
-            entry_pointer->d_name[1] == '.') {
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '.' &&
+            entry_pointer->d_name[2] == '\0') {
             continue;
         }        
         

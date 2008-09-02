@@ -15,8 +15,17 @@
 #include "NptUtils.h"
 
 #include <sys/stat.h>
-#include <unistd.h>
+
 #include <errno.h>
+
+#if defined(_WIN32)
+#include <direct.h>
+#include <stdlib.h>
+#include <stdio.h>
+#else
+#include <unistd.h>
+#include <dirent.h>
+#endif
 
 /*----------------------------------------------------------------------
 |   logging
@@ -24,11 +33,24 @@
 //NPT_SET_LOCAL_LOGGER("neptune.posix.file")
 
 /*----------------------------------------------------------------------
+|   Win32 adaptation
++---------------------------------------------------------------------*/
+#if defined(_WIN32)
+#define mkdir(_path,_mode) _mkdir(_path)
+#define getcwd _getcwd
+#define unlink _unlink
+#define rmdir  _rmdir
+#define S_ISDIR(_m) (((_m)&_S_IFMT) == _S_IFDIR) 
+#define S_ISREG(_m) (((_m)&_S_IFMT) == _S_IFREG) 
+#define S_IWUSR _S_IWRITE
+#endif
+
+/*----------------------------------------------------------------------
 |   MapErrno
 +---------------------------------------------------------------------*/
 static NPT_Result
 MapErrno(int err) {
-    switch (errno) {
+    switch (err) {
       case EACCES:       return NPT_ERROR_PERMISSION_DENIED;
       case EPERM:        return NPT_ERROR_PERMISSION_DENIED;
       case ENOENT:       return NPT_ERROR_NO_SUCH_FILE;
@@ -46,8 +68,11 @@ MapErrno(int err) {
 /*----------------------------------------------------------------------
 |   NPT_FilePath::Separator
 +---------------------------------------------------------------------*/
+#if !defined(_WIN32)
 const NPT_String NPT_FilePath::Separator("/");
+#endif
 
+#if !defined(_WIN32)
 /*----------------------------------------------------------------------
 |   NPT_File::GetRoots
 +---------------------------------------------------------------------*/
@@ -58,6 +83,7 @@ NPT_File::GetRoots(NPT_List<NPT_String>& roots)
     roots.Add("/");
     return NPT_SUCCESS;
 }
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_File::CreateDirectory
@@ -114,7 +140,7 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
             info->m_Type = NPT_FileInfo::FILE_TYPE_OTHER;
         }
         info->m_AttributesMask &= NPT_FILE_ATTRIBUTE_READ_ONLY;
-        if (stat_buffer.st_mode & S_IWUSR == 0) {
+        if ((stat_buffer.st_mode & S_IWUSR) == 0) {
             info->m_Attributes &= NPT_FILE_ATTRIBUTE_READ_ONLY;
         }
     }
@@ -157,3 +183,53 @@ NPT_File::Rename(const char* from_path, const char* to_path)
     
     return NPT_SUCCESS;
 }
+
+#if !defined(_WIN32)
+/*----------------------------------------------------------------------
+|   NPT_File::ListDirectory
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
+{
+    // default return value
+    entries.Clear();
+
+    // check the arguments
+    if (path == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    // list the entries
+    DIR *directory = opendir(path);
+    if (directory == NULL) return NPT_ERROR_OUT_OF_MEMORY;
+
+    for (;;) {
+        struct dirent* entry_pointer = NULL;
+#if defined(NPT_CONFIG_HAVE_READDIR_R)
+        struct dirent entry;
+        int result = readdir_r(directory, &entry, &entry_pointer);
+        if (result != 0 || entry_pointer == NULL) break;
+#else
+        entry_pointer = readdir(directory);
+        if (entry_pointer == NULL) break;
+#endif
+        // ignore odd names
+        if (entry_pointer->d_name[0] == '\0') continue;
+
+        // ignore . and ..
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '\0') {
+                continue;
+        }
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '.' &&
+            entry_pointer->d_name[2] == '\0') {
+                continue;
+        }        
+
+        entries.Add(NPT_String(entry_pointer->d_name));
+    }
+
+    closedir(directory);
+
+    return NPT_SUCCESS;
+}
+#endif // !defined(_WIN32)

@@ -19,7 +19,8 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const NPT_Size NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK = 4096;
+const NPT_Size      NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK = 4096;
+const NPT_LargeSize NPT_INPUT_STREAM_LOAD_MAX_SIZE           = 0x100000; // 1GB
 
 /*----------------------------------------------------------------------
 |   NPT_InputStream::Load
@@ -27,31 +28,39 @@ const NPT_Size NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK = 4096;
 NPT_Result
 NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
 {
-    NPT_Result result;
-    NPT_Size   total_bytes_read;
+    NPT_Result    result;
+    NPT_LargeSize total_bytes_read;
 
     // reset the buffer
     buffer.SetDataSize(0);
 
+    // check the limits
+    if (max_read > NPT_INPUT_STREAM_LOAD_MAX_SIZE) {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+
     // try to get the stream size
-    NPT_Size size;
+    NPT_LargeSize size;
     if (NPT_SUCCEEDED(GetSize(size))) { 
         // make sure we don't read more than max_read
         if (max_read && max_read < size) size = max_read;
+        if (size > NPT_INPUT_STREAM_LOAD_MAX_SIZE) {
+            return NPT_ERROR_OUT_OF_RANGE;
+        }
     } else {
         size = max_read;
     } 
-
+        
     // pre-allocate the buffer
     if (size) NPT_CHECK(buffer.Reserve(size));
 
     // read the data from the file
     total_bytes_read = 0;
     do {
-        NPT_Size  available = 0;
-        NPT_Size  bytes_to_read;
-        NPT_Size  bytes_read;
-        NPT_Byte* data;
+        NPT_LargeSize available = 0;
+        NPT_LargeSize bytes_to_read;
+        NPT_Size      bytes_read;
+        NPT_Byte*     data;
 
         // check if we know how much data is available
         result = GetAvailable(available);
@@ -71,6 +80,10 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
         if (bytes_to_read == 0) break;
 
         // ensure that the buffer has enough space
+        if (total_bytes_read+bytes_to_read > NPT_INPUT_STREAM_LOAD_MAX_SIZE) {
+            buffer.SetBufferSize(0);
+            return NPT_ERROR_OUT_OF_RANGE;
+        }
         NPT_CHECK(buffer.Reserve(total_bytes_read+bytes_to_read));
 
         // read the data

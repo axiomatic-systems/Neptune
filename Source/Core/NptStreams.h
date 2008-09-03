@@ -49,10 +49,10 @@ class NPT_InputStream
     virtual NPT_Result ReadFully(void*     buffer, 
                                  NPT_Size  bytes_to_read);
     virtual NPT_Result Seek(NPT_Position offset) = 0;
-    virtual NPT_Result Skip(NPT_Position offset);
+    virtual NPT_Result Skip(NPT_Size offset);
     virtual NPT_Result Tell(NPT_Position& offset) = 0;
-    virtual NPT_Result GetSize(NPT_Size& size) = 0;
-    virtual NPT_Result GetAvailable(NPT_Size& available) = 0;
+    virtual NPT_Result GetSize(NPT_LargeSize& size) = 0;
+    virtual NPT_Result GetAvailable(NPT_LargeSize& available) = 0;
     
     // data access methods
     NPT_Result ReadUI64(NPT_UInt64& value);
@@ -175,12 +175,12 @@ public:
     NPT_Result Read(void*     buffer, 
                     NPT_Size  bytes_to_read, 
                     NPT_Size* bytes_read = NULL);
-    NPT_Result GetSize(NPT_Size& size)  { 
+    NPT_Result GetSize(NPT_LargeSize& size)  { 
         size = m_Buffer.GetDataSize();    
         return NPT_SUCCESS;
     }
-    NPT_Result GetAvailable(NPT_Size& available) { 
-        available = m_Buffer.GetDataSize()-m_ReadOffset; 
+    NPT_Result GetAvailable(NPT_LargeSize& available) { 
+        available = (NPT_LargeSize)m_Buffer.GetDataSize()-m_ReadOffset; 
         return NPT_SUCCESS;
     }
 

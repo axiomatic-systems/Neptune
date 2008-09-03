@@ -170,7 +170,7 @@ public:
 private:
     // members
     NPT_InputStreamReference m_InputStream;
-    NPT_Size                 m_ContentLength;
+    NPT_LargeSize            m_ContentLength;
     NPT_String               m_ContentType;
     NPT_String               m_ContentEncoding;
 };

@@ -81,7 +81,8 @@ NPT_Result
 NPT_PosixDynamicLibrary::FindSymbol(const char* name, void*& symbol)
 {
     if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-    if (m_Library == NULL) return NULL;
+    symbol = NULL;
+    if (m_Library == NULL) return NPT_ERROR_NO_SUCH_ITEM;
     
     NPT_LOG_FINE_1("finding symbol %s", name);
     symbol = dlsym(m_Library, name);

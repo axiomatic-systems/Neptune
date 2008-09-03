@@ -16,9 +16,12 @@
 
 #include <stdio.h>
 #if !defined(_WIN32_WCE)
-#include <errno.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <errno.h>
+#else
+#include <stdio.h>
+#define errno GetLastError()
 #endif
 
 #include "NptConfig.h"
@@ -61,7 +64,9 @@ MapErrno(int err) {
       case EACCES:       return NPT_ERROR_PERMISSION_DENIED;
       case EPERM:        return NPT_ERROR_PERMISSION_DENIED;
       case ENOENT:       return NPT_ERROR_NO_SUCH_FILE;
+#if defined(ENAMETOOLONG)
       case ENAMETOOLONG: return NPT_ERROR_INVALID_PARAMETERS;
+#endif
       case EBUSY:        return NPT_ERROR_FILE_BUSY;
       case EROFS:        return NPT_ERROR_FILE_NOT_WRITABLE;
       case ENOTDIR:      return NPT_ERROR_FILE_NOT_DIRECTORY;

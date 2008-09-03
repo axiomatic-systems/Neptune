@@ -51,8 +51,8 @@ public:
                     NPT_Size* bytes_read = NULL);
     NPT_Result Seek(NPT_Position offset);
     NPT_Result Tell(NPT_Position& offset);
-    NPT_Result GetSize(NPT_Size& size);
-    NPT_Result GetAvailable(NPT_Size& available);
+    NPT_Result GetSize(NPT_LargeSize& size);
+    NPT_Result GetAvailable(NPT_LargeSize& available);
 
 private:
     // members

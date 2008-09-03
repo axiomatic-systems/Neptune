@@ -37,7 +37,7 @@ typedef unsigned int  NPT_Ordinal;
 typedef unsigned long NPT_Size;
 typedef NPT_UInt64    NPT_LargeSize;
 typedef signed   long NPT_Offset;
-typedef unsigned long NPT_Position;
+typedef NPT_UInt64    NPT_Position;
 typedef long          NPT_Timeout;
 typedef void          NPT_Interface;
 typedef unsigned char NPT_Byte;

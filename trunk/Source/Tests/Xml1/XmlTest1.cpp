@@ -165,7 +165,7 @@ TestNamespaces()
     NPT_XmlWriter    writer;
     NPT_MemoryStream output;
     writer.Serialize(*root, output);
-    NPT_Size size;
+    NPT_LargeSize size;
     output.GetSize(size);
     printf(NPT_String((const char*)output.GetData(), size).GetChars());
 
@@ -195,7 +195,7 @@ TestSerializer()
     NPT_XmlWriter    writer;
     NPT_MemoryStream output;
     NPT_String       check;
-    NPT_Size         size;
+    NPT_LargeSize    size;
 
     //
     // test without namespaces

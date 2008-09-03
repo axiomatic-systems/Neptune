@@ -691,8 +691,8 @@ public:
     NPT_Result Tell(NPT_Position& where) {
         return NPT_BsdSocketStream::Tell(where);
     }
-    NPT_Result GetSize(NPT_Size& size);
-    NPT_Result GetAvailable(NPT_Size& available);
+    NPT_Result GetSize(NPT_LargeSize& size);
+    NPT_Result GetAvailable(NPT_LargeSize& available);
 };
 
 /*----------------------------------------------------------------------
@@ -734,7 +734,7 @@ NPT_BsdSocketInputStream::Read(void*     buffer,
 |   NPT_BsdSocketInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
+NPT_BsdSocketInputStream::GetSize(NPT_LargeSize& size)
 {
     // generic socket streams have no size
     size = 0;
@@ -746,7 +746,7 @@ NPT_BsdSocketInputStream::GetSize(NPT_Size& size)
 |   NPT_BsdSocketInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdSocketInputStream::GetAvailable(NPT_Size&)
+NPT_BsdSocketInputStream::GetAvailable(NPT_LargeSize&)
 {
     return NPT_ERROR_NOT_SUPPORTED;
 }
@@ -755,7 +755,7 @@ NPT_BsdSocketInputStream::GetAvailable(NPT_Size&)
 |   NPT_BsdSocketInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BsdSocketInputStream::GetAvailable(NPT_Size& available)
+NPT_BsdSocketInputStream::GetAvailable(NPT_LargeSize& available)
 {
     unsigned long ready = 0;
     int io_result = ioctlsocket(m_SocketFdReference->m_SocketFd, FIONREAD, &ready); 

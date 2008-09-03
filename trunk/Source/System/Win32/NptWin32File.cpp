@@ -22,6 +22,20 @@
 //NPT_SET_LOCAL_LOGGER("neptune.win32.file")
 
 /*----------------------------------------------------------------------
+|   Windows CE support
++---------------------------------------------------------------------*/
+#if defined(_WIN32_WCE)
+#include "NptWinCeUtils.h"
+#define NPT_WIN32_USE_CHAR_CONVERSION USES_CONVERSION
+#define NPT_WIN32_W2A(_s) W2A(_s)
+#define NPT_WIN32_A2W(_s) A2W(_s)
+#else
+#define NPT_WIN32_USE_CHAR_CONVERSION
+#define NPT_WIN32_W2A(_s) (_s)
+#define NPT_WIN32_A2W(_s) (_s)
+#endif
+
+/*----------------------------------------------------------------------
 |   MapError
 +---------------------------------------------------------------------*/
 static NPT_Result
@@ -48,6 +62,9 @@ NPT_Result
 NPT_File::GetRoots(NPT_List<NPT_String>& roots)
 {
     roots.Clear();
+#if defined(_WIN32_WCE)
+    return NPT_ERROR_NOT_IMPLEMENTED;
+#else
     DWORD drives = GetLogicalDrives();
     for (unsigned int i=0; i<26; i++) {
         if (drives & (1<<i)) {
@@ -55,8 +72,66 @@ NPT_File::GetRoots(NPT_List<NPT_String>& roots)
             roots.Add(drive_name);
         }
     }
-    return NPT_ERROR_NOT_SUPPORTED;
+    return NPT_SUCCESS;
+#endif
 }
+
+#if defined(_WIN32_WCE)
+/*----------------------------------------------------------------------
+|   NPT_File::CreateDirectory
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::CreateDirectory(const char* path)
+{
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::GetWorkingDirectory
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::GetWorkingDirectory(NPT_String& path)
+{
+    path.SetLength(0);
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::GetInfo
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
+{
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::DeleteFile
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::DeleteFile(const char* path)
+{
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::DeleteDirectory
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::DeleteDirectory(const char* path)
+{
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Rename
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::Rename(const char* from_path, const char* to_path)
+{
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_File_ProcessFindData
@@ -64,7 +139,8 @@ NPT_File::GetRoots(NPT_List<NPT_String>& roots)
 static void
 NPT_File_ProcessFindData(WIN32_FIND_DATA* find_data, NPT_List<NPT_String>& entries)
 {
-    entries.Add(find_data->cFileName);
+    NPT_WIN32_USE_CHAR_CONVERSION;
+    entries.Add(NPT_WIN32_W2A(find_data->cFileName));
 }
 
 /*----------------------------------------------------------------------
@@ -73,6 +149,8 @@ NPT_File_ProcessFindData(WIN32_FIND_DATA* find_data, NPT_List<NPT_String>& entri
 NPT_Result 
 NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
 {
+    NPT_WIN32_USE_CHAR_CONVERSION;
+
     // default return value
     entries.Clear();
 
@@ -81,7 +159,7 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
 
     // list the entries
     WIN32_FIND_DATA find_data;
-    HANDLE find_handle = FindFirstFile(path, &find_data);
+    HANDLE find_handle = FindFirstFile(NPT_WIN32_A2W(path), &find_data);
     if (find_handle == INVALID_HANDLE_VALUE) return MapError(GetLastError());
     NPT_File_ProcessFindData(&find_data, entries);
     while (FindNextFile(find_handle, &find_data)) {

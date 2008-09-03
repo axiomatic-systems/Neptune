@@ -10,9 +10,9 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptLogging.h"
-#include "NptFile.h"
-#include "NptUtils.h"
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE_SOURCE64
+#define _FILE_OFFSET_BITS 64
 
 #include <sys/stat.h>
 
@@ -26,6 +26,10 @@
 #include <unistd.h>
 #include <dirent.h>
 #endif
+
+#include "NptLogging.h"
+#include "NptFile.h"
+#include "NptUtils.h"
 
 /*----------------------------------------------------------------------
 |   logging
@@ -125,8 +129,8 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
     if (info) NPT_SetMemory(info, 0, sizeof(*info));
     
     // get the file info
-    struct stat stat_buffer;
-    int result = stat(path, &stat_buffer);
+    NPT_stat_struct stat_buffer;
+    int result = NPT_stat(path, &stat_buffer);
     if (result != 0) return MapErrno(errno);
     
     // setup the returned fields
@@ -183,53 +187,3 @@ NPT_File::Rename(const char* from_path, const char* to_path)
     
     return NPT_SUCCESS;
 }
-
-#if !defined(_WIN32)
-/*----------------------------------------------------------------------
-|   NPT_File::ListDirectory
-+---------------------------------------------------------------------*/
-NPT_Result 
-NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
-{
-    // default return value
-    entries.Clear();
-
-    // check the arguments
-    if (path == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-
-    // list the entries
-    DIR *directory = opendir(path);
-    if (directory == NULL) return NPT_ERROR_OUT_OF_MEMORY;
-
-    for (;;) {
-        struct dirent* entry_pointer = NULL;
-#if defined(NPT_CONFIG_HAVE_READDIR_R)
-        struct dirent entry;
-        int result = readdir_r(directory, &entry, &entry_pointer);
-        if (result != 0 || entry_pointer == NULL) break;
-#else
-        entry_pointer = readdir(directory);
-        if (entry_pointer == NULL) break;
-#endif
-        // ignore odd names
-        if (entry_pointer->d_name[0] == '\0') continue;
-
-        // ignore . and ..
-        if (entry_pointer->d_name[0] == '.' && 
-            entry_pointer->d_name[1] == '\0') {
-                continue;
-        }
-        if (entry_pointer->d_name[0] == '.' && 
-            entry_pointer->d_name[1] == '.' &&
-            entry_pointer->d_name[2] == '\0') {
-                continue;
-        }        
-
-        entries.Add(NPT_String(entry_pointer->d_name));
-    }
-
-    closedir(directory);
-
-    return NPT_SUCCESS;
-}
-#endif // !defined(_WIN32)

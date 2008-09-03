@@ -177,6 +177,54 @@ NPT_File::DeleteDirectory(const char* path)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_File::ListDirectory
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
+{
+    // default return value
+    entries.Clear();
+    
+    // check the arguments
+    if (path == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+    
+    // list the entries
+    DIR *directory = opendir(path);
+    if (directory == NULL) return NPT_ERROR_OUT_OF_MEMORY;
+    
+    for (;;) {
+        struct dirent* entry_pointer = NULL;
+#if defined(NPT_CONFIG_HAVE_READDIR_R)
+        struct dirent entry;
+        int result = readdir_r(directory, &entry, &entry_pointer);
+        if (result != 0 || entry_pointer == NULL) break;
+#else
+        entry_pointer = readdir(directory);
+        if (entry_pointer == NULL) break;
+#endif
+        // ignore odd names
+        if (entry_pointer->d_name[0] == '\0') continue;
+
+        // ignore . and ..
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '\0') {
+            continue;
+        }
+        if (entry_pointer->d_name[0] == '.' && 
+            entry_pointer->d_name[1] == '.' &&
+            entry_pointer->d_name[2] == '\0') {
+            continue;
+        }        
+        
+        entries.Add(NPT_String(entry_pointer->d_name));
+    }
+    
+    closedir(directory);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_File::Rename
 +---------------------------------------------------------------------*/
 NPT_Result

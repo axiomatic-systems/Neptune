@@ -323,7 +323,7 @@ NPT_BufferedInputStream::Tell(NPT_Position& offset)
 |   NPT_BufferedInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_BufferedInputStream::GetSize(NPT_Size& size)
+NPT_BufferedInputStream::GetSize(NPT_LargeSize& size)
 {
     return m_Source->GetSize(size);
 }
@@ -332,10 +332,10 @@ NPT_BufferedInputStream::GetSize(NPT_Size& size)
 |   NPT_BufferedInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_BufferedInputStream::GetAvailable(NPT_Size& available)
+NPT_BufferedInputStream::GetAvailable(NPT_LargeSize& available)
 {
-    NPT_Size source_available = 0;
-    NPT_Result result = m_Source->GetAvailable(source_available);
+    NPT_LargeSize source_available = 0;
+    NPT_Result    result = m_Source->GetAvailable(source_available);
     if (NPT_SUCCEEDED(result)) {
         available = m_Buffer.valid-m_Buffer.offset + source_available;
         return NPT_SUCCESS;

@@ -2,7 +2,7 @@
 |
 |   Neptune - Files :: Standard C Implementation
 |
-|   (c) 2001-2006 Gilles Boccon-Gibod
+|   (c) 2001-2008 Gilles Boccon-Gibod
 |   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -10,6 +10,10 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#define _LARGEFILE_SOURCE
+#define _LARGEFILE_SOURCE64
+#define _FILE_OFFSET_BITS 64
+
 #include <stdio.h>
 #if !defined(_WIN32_WCE)
 #include <errno.h>
@@ -122,7 +126,7 @@ NPT_StdcFileStream::Seek(NPT_Position offset)
 {
     size_t result;
 
-    result = fseek(m_FileReference->GetFile(), offset, SEEK_SET);
+    result = NPT_fseek(m_FileReference->GetFile(), offset, SEEK_SET);
     if (result == 0) {
         return NPT_SUCCESS;
     } else {
@@ -136,7 +140,7 @@ NPT_StdcFileStream::Seek(NPT_Position offset)
 NPT_Result
 NPT_StdcFileStream::Tell(NPT_Position& offset)
 {
-    offset = ftell(m_FileReference->GetFile());
+    offset = NPT_ftell(m_FileReference->GetFile());
     return NPT_SUCCESS;
 }
 
@@ -149,7 +153,7 @@ class NPT_StdcFileInputStream : public NPT_InputStream,
 {
 public:
     // constructors and destructor
-    NPT_StdcFileInputStream(NPT_StdcFileReference& file, NPT_LargeSize size) :
+    NPT_StdcFileInputStream(NPT_StdcFileReference& file, NPT_Size size) :
         NPT_StdcFileStream(file), m_Size(size) {}
 
     // NPT_InputStream methods
@@ -162,8 +166,8 @@ public:
     NPT_Result Tell(NPT_Position& offset) {
         return NPT_StdcFileStream::Tell(offset);
     }
-    NPT_Result GetSize(NPT_Size& size);
-    NPT_Result GetAvailable(NPT_Size& available);
+    NPT_Result GetSize(NPT_LargeSize& size);
+    NPT_Result GetAvailable(NPT_LargeSize& available);
 
 private:
     // members
@@ -203,9 +207,9 @@ NPT_StdcFileInputStream::Read(void*     buffer,
 |   NPT_StdcFileInputStream::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_StdcFileInputStream::GetSize(NPT_Size& size)
+NPT_StdcFileInputStream::GetSize(NPT_LargeSize& size)
 {
-    size = (NPT_Size)m_Size;
+    size = m_Size;
     return NPT_SUCCESS;
 }
 
@@ -213,11 +217,11 @@ NPT_StdcFileInputStream::GetSize(NPT_Size& size)
 |   NPT_StdcFileInputStream::GetAvailable
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_StdcFileInputStream::GetAvailable(NPT_Size& available)
+NPT_StdcFileInputStream::GetAvailable(NPT_LargeSize& available)
 {
-    long offset = ftell(m_FileReference->GetFile());
-    if (offset >= 0 && (NPT_Size)offset <= m_Size) {
-        available = (NPT_Size)(m_Size - offset);
+    NPT_Int64 offset = NPT_ftell(m_FileReference->GetFile());
+    if (offset >= 0 && (NPT_LargeSize)offset <= m_Size) {
+        available = m_Size - offset;
         return NPT_SUCCESS;
     } else {
         available = 0;

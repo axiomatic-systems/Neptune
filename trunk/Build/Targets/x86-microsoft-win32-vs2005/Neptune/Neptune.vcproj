@@ -67,7 +67,7 @@
 				Name="VCLibrarianTool"
 				AdditionalDependencies="ws2_32.lib"
 				OutputFile="$(OutDir)/Neptune.lib"
-				SuppressStartupBanner="false"
+				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -139,6 +139,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="$(OutDir)/Neptune.lib"
+				SuppressStartupBanner="true"
 			/>
 			<Tool
 				Name="VCALinkTool"

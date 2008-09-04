@@ -386,14 +386,15 @@ NPT_HttpEntity::Load(NPT_DataBuffer& buffer)
     if (m_InputStream.IsNull()) return NPT_ERROR_INVALID_STATE;
 
     // load the stream into the buffer
-    return m_InputStream->Load(buffer, m_ContentLength);
+    if (m_ContentLength > 0xFFFFFFFF) return NPT_ERROR_OUT_OF_RANGE;
+    return m_InputStream->Load(buffer, (NPT_Size)m_ContentLength);
 }
 
 /*----------------------------------------------------------------------
 |   NPT_HttpEntity::SetContentLength
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_HttpEntity::SetContentLength(NPT_Size length)
+NPT_HttpEntity::SetContentLength(NPT_LargeSize length)
 {
     m_ContentLength = length;
     return NPT_SUCCESS;
@@ -1371,7 +1372,7 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
     if (entity) {
         // content length
         headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
-            NPT_String::FromInteger(entity->GetContentLength()));
+                          NPT_String::FromInteger(entity->GetContentLength()));
 
         // content type
         NPT_String content_type = entity->GetContentType();

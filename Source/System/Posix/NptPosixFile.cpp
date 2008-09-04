@@ -176,6 +176,7 @@ NPT_File::DeleteDirectory(const char* path)
     return NPT_SUCCESS;
 }
 
+#if !defined(_WIN32)
 /*----------------------------------------------------------------------
 |   NPT_File::ListDirectory
 +---------------------------------------------------------------------*/
@@ -223,6 +224,7 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
     
     return NPT_SUCCESS;
 }
+#endif // !defined(_WIN32)
 
 /*----------------------------------------------------------------------
 |   NPT_File::Rename

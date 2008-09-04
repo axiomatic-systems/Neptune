@@ -43,7 +43,7 @@ char NPT_String::EmptyString = '\0';
 |   NPT_String::FromInteger
 +---------------------------------------------------------------------*/
 NPT_String
-NPT_String::FromInteger(long value)
+NPT_String::FromInteger(NPT_Int64 value)
 {
     char str[32];
     char* c = &str[31];
@@ -58,7 +58,7 @@ NPT_String::FromInteger(long value)
 
     // process the digits
     do {
-        int digit = value%10;
+        int digit = (int)(value%10);
         *c-- = '0'+digit;
         value /= 10;
     } while(value);
@@ -76,7 +76,7 @@ NPT_String::FromInteger(long value)
 |   NPT_String::FromIntegerU
 +---------------------------------------------------------------------*/
 NPT_String
-NPT_String::FromIntegerU(unsigned long value)
+NPT_String::FromIntegerU(NPT_UInt64 value)
 {
     char str[32];
     char* c = &str[31];
@@ -84,7 +84,7 @@ NPT_String::FromIntegerU(unsigned long value)
 
     // process the digits
     do {
-        int digit = value%10;
+        int digit = (int)(value%10);
         *--c = '0'+digit;
         value /= 10;
     } while(value);

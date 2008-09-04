@@ -215,8 +215,8 @@ private:
 protected:
     // members
     NPT_DataBuffer m_Buffer;
-    NPT_Position   m_ReadOffset;
-    NPT_Position   m_WriteOffset;
+    NPT_Size       m_ReadOffset;
+    NPT_Size       m_WriteOffset;
 };
 
 typedef NPT_Reference<NPT_MemoryStream> NPT_MemoryStreamReference;

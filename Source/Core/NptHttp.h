@@ -162,8 +162,8 @@ public:
     // field access
     NPT_Result        SetContentType(const char* type);
     NPT_Result        SetContentEncoding(const char* encoding);
-    NPT_Result        SetContentLength(NPT_Size length);
-    NPT_Size          GetContentLength()   { return m_ContentLength;   }
+    NPT_Result        SetContentLength(NPT_LargeSize length);
+    NPT_LargeSize     GetContentLength()   { return m_ContentLength;   }
     const NPT_String& GetContentType()     { return m_ContentType;     }
     const NPT_String& GetContentEncoding() { return m_ContentEncoding; }
 

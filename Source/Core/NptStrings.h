@@ -34,8 +34,8 @@ class NPT_String
 {
 public:
     // factories
-    static NPT_String FromInteger(long value);
-    static NPT_String FromIntegerU(unsigned long value);
+    static NPT_String FromInteger(NPT_Int64 value);
+    static NPT_String FromIntegerU(NPT_UInt64 value);
 
     // constructors
     NPT_String(const NPT_String& str);

@@ -158,7 +158,7 @@ class NPT_StdcFileInputStream : public NPT_InputStream,
 {
 public:
     // constructors and destructor
-    NPT_StdcFileInputStream(NPT_StdcFileReference& file, NPT_Size size) :
+    NPT_StdcFileInputStream(NPT_StdcFileReference& file, NPT_LargeSize size) :
         NPT_StdcFileStream(file), m_Size(size) {}
 
     // NPT_InputStream methods

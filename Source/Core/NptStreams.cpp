@@ -52,7 +52,7 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
     } 
         
     // pre-allocate the buffer
-    if (size) NPT_CHECK(buffer.Reserve(size));
+    if (size) NPT_CHECK(buffer.Reserve((NPT_Size)size));
 
     // read the data from the file
     total_bytes_read = 0;
@@ -84,14 +84,14 @@ NPT_InputStream::Load(NPT_DataBuffer& buffer, NPT_Size max_read /* = 0 */)
             buffer.SetBufferSize(0);
             return NPT_ERROR_OUT_OF_RANGE;
         }
-        NPT_CHECK(buffer.Reserve(total_bytes_read+bytes_to_read));
+        NPT_CHECK(buffer.Reserve((NPT_Size)(total_bytes_read+bytes_to_read)));
 
         // read the data
         data = buffer.UseData()+total_bytes_read;
-        result = Read((void*)data, bytes_to_read, &bytes_read);
+        result = Read((void*)data, (NPT_Size)bytes_to_read, &bytes_read);
         if (NPT_SUCCEEDED(result) && bytes_read != 0) {
             total_bytes_read += bytes_read;
-            buffer.SetDataSize(total_bytes_read);
+            buffer.SetDataSize((NPT_Size)total_bytes_read);
         }
     } while(NPT_SUCCEEDED(result) && (size==0 || total_bytes_read < size));
 
@@ -426,9 +426,9 @@ NPT_Result
 NPT_MemoryStream::InputSeek(NPT_Position offset)
 {
     if (offset > m_Buffer.GetDataSize()) {
-        return NPT_ERROR_INVALID_PARAMETERS;
+        return NPT_ERROR_OUT_OF_RANGE;
     } else {
-        m_ReadOffset = offset;
+        m_ReadOffset = (NPT_Size)offset;
         return NPT_SUCCESS;
     }
 }
@@ -460,10 +460,10 @@ NPT_Result
 NPT_MemoryStream::OutputSeek(NPT_Position offset)
 {
     if (offset <= m_Buffer.GetDataSize()) {
-        m_WriteOffset = offset;
+        m_WriteOffset = (NPT_Size)offset;
         return NPT_SUCCESS;
     } else {
-        return NPT_ERROR_INVALID_PARAMETERS;
+        return NPT_ERROR_OUT_OF_RANGE;
     }
 }
 

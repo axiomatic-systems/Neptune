@@ -60,10 +60,10 @@ private:
     bool                     m_SkipNewline;
     bool                     m_Eos;
     struct {
-        NPT_Byte*    data;
-        NPT_Position offset;
-        NPT_Size     valid;
-        NPT_Size     size;
+        NPT_Byte* data;
+        NPT_Size  offset;
+        NPT_Size  valid;
+        NPT_Size  size;
     } m_Buffer;
 
     // methods

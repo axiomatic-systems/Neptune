@@ -450,7 +450,7 @@ TestAttributes()
 static void
 TestAttributeNormalization()
 {
-    const char* xml = "<x a='\n\n xyz abc &#xD; &#xA; 12\r\n3\r4\n5 6  '/>";
+    const char* xml = "<x a='\n\n xyz abc &#xD; &#xA; &#x9; &#x20; 12\r\n3\r4\n5 6  '/>";
     NPT_XmlParser parser;
     NPT_XmlNode* root = NULL;
     NPT_Result result = parser.Parse(xml, root);
@@ -458,7 +458,7 @@ TestAttributeNormalization()
     CHECK(root != NULL);
     CHECK(root->AsElementNode() != NULL);
     const NPT_String* a = root->AsElementNode()->GetAttribute("a");
-    CHECK(*a == "   xyz abc \r \n 12 3 4 5 6  ");
+    CHECK(*a == "   xyz abc \r \n \t   12 3 4 5 6  ");
     delete root;
 }
 

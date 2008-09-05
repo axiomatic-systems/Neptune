@@ -135,7 +135,6 @@ public:
     // methods
     NPT_Result          Load(NPT_DataBuffer& buffer);
     const NPT_String&   GetPath() { return m_Path; }
-    NPT_Result          GetSize(NPT_Size& size);
     NPT_Result          GetSize(NPT_LargeSize &size);
     NPT_Result          GetInfo(NPT_FileInfo& info);
     NPT_Result          ListDirectory(NPT_List<NPT_String>& entries);
@@ -154,6 +153,9 @@ public:
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream) {
         return m_Delegate->GetOutputStream(stream);
     }
+
+    // operators
+    NPT_File& operator=(const NPT_File& file);
 
 protected:
     // members

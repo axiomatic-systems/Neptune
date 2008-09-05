@@ -132,18 +132,6 @@ NPT_File::GetInfo(NPT_FileInfo& info)
 |   NPT_File::GetSize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::GetSize(NPT_Size& size)
-{
-    NPT_LargeSize large_size;
-    NPT_Result result = GetSize(large_size);
-    size = (NPT_Size)large_size;
-    return result;
-}
-
-/*----------------------------------------------------------------------
-|   NPT_File::GetSize
-+---------------------------------------------------------------------*/
-NPT_Result
 NPT_File::GetSize(NPT_LargeSize& size)
 {
     // default value

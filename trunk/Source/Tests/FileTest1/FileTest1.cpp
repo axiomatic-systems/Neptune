@@ -20,17 +20,27 @@
 |    CreateNewFile
 +---------------------------------------------------------------------*/
 NPT_Result
-CreateNewFile(const char* filename, NPT_Size size)
+CreateNewFile(const char* filename, NPT_Size chunk_count, NPT_Size chunk_size=1)
 {
     NPT_File file(filename);
     NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_CREATE|NPT_FILE_OPEN_MODE_WRITE));
     NPT_OutputStreamReference out;
     file.GetOutputStream(out);
-    for (unsigned int i=0; i<size; i++) {
-        char c = (char)i;
-        NPT_ASSERT(NPT_SUCCEEDED(out->WriteFully(&c, 1))); 
+    unsigned char* chunk_buffer = new unsigned char[chunk_size];
+    for (unsigned int i=0; i<chunk_size; i++) {
+        chunk_buffer[i] = (unsigned char)i;
     }
+    for (unsigned int i=0; i<chunk_count; i++) {
+        NPT_ASSERT(NPT_SUCCEEDED(out->WriteFully(chunk_buffer, chunk_size))); 
+    }
+    delete[] chunk_buffer;
     file.Close();
+    out = NULL;
+    
+    NPT_FileInfo info;
+    NPT_Result result = NPT_File::GetInfo(filename, &info);
+    NPT_ASSERT(NPT_SUCCEEDED(result));
+    NPT_ASSERT(info.m_Size == (NPT_LargeSize)chunk_count*(NPT_LargeSize)chunk_size);
     
     return NPT_SUCCESS;
 }
@@ -39,7 +49,7 @@ CreateNewFile(const char* filename, NPT_Size size)
 |       main
 +---------------------------------------------------------------------*/
 int
-main(int /*argc*/, char** /*argv*/)
+main(int argc, char** argv)
 {
     NPT_Result result;
     NPT_FileInfo info;
@@ -81,7 +91,7 @@ main(int /*argc*/, char** /*argv*/)
     }
     {
         NPT_File f1("foobar.file1");
-        NPT_Size size;
+        NPT_LargeSize size;
         result = f1.GetSize(size);
         NPT_ASSERT(NPT_SUCCEEDED(result));
         NPT_ASSERT(size == 9);
@@ -192,6 +202,43 @@ main(int /*argc*/, char** /*argv*/)
     NPT_ASSERT(test == NPT_FilePath::Separator);
     test = NPT_FilePath::DirectoryName(NPT_FilePath::Separator);
     NPT_ASSERT(test == NPT_FilePath::Separator);
+    
+    // large files
+    if (argc == 2) {
+        result = CreateNewFile(argv[1], 0x10000, 0x10007);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+
+        NPT_String new_name = argv[1];
+        new_name += ".renamed";
+        result = NPT_File::Rename(argv[1], new_name);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        file = NPT_File(new_name);
+        result = file.Open(NPT_FILE_OPEN_MODE_READ);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        NPT_InputStreamReference input;
+        file.GetInputStream(input);
+        NPT_Position position;
+        result = input->Tell(position);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        NPT_ASSERT(position == 0);
+        NPT_LargeSize large_size = (NPT_LargeSize)0x10007 * (NPT_LargeSize)0x10000;
+        result = input->Seek(large_size-0x10007);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        result = input->Tell(position);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        NPT_ASSERT(position == large_size-0x10007);        
+        unsigned char* buffer = new unsigned char[0x10007];
+        result = input->ReadFully(buffer, 0x10007);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        result = input->Tell(position);
+        NPT_ASSERT(NPT_SUCCEEDED(result));
+        NPT_ASSERT(position == large_size);
+        for (unsigned int i=0; i<0x10007; i++) {
+            NPT_ASSERT(buffer[i] == (unsigned char)i);
+        }        
+        file.Close();
+        NPT_File::DeleteFile(new_name);
+    }
     
     return 0;
 }

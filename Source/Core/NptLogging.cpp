@@ -864,7 +864,7 @@ NPT_LogFileHandler::Log(const NPT_LogRecord& record)
 |   NPT_LogFileHandler::Create
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_LogFileHandler::Create(const char*     logger_name,
+NPT_LogFileHandler::Create(const char*      logger_name,
                            NPT_LogHandler*& handler)
 {
     /* compute a prefix for the configuration of this handler */

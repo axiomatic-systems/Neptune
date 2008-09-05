@@ -470,3 +470,18 @@ NPT_File::NPT_File(const char* path) :
         m_Info.m_Type = NPT_FileInfo::FILE_TYPE_SPECIAL;
     } 
 }
+
+/*----------------------------------------------------------------------
+|   NPT_File::operator=
++---------------------------------------------------------------------*/
+NPT_File& 
+NPT_File::operator=(const NPT_File& file)
+{
+    if (this != &file) {
+        delete m_Delegate;
+        m_Path = file.m_Path;
+        m_Info = file.m_Info;
+        m_Delegate = new NPT_StdcFile(*this);
+    }
+    return *this;
+}

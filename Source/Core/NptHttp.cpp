@@ -386,7 +386,7 @@ NPT_HttpEntity::Load(NPT_DataBuffer& buffer)
     if (m_InputStream.IsNull()) return NPT_ERROR_INVALID_STATE;
 
     // load the stream into the buffer
-    if (m_ContentLength > 0xFFFFFFFF) return NPT_ERROR_OUT_OF_RANGE;
+    if (m_ContentLength != (NPT_Size)m_ContentLength) return NPT_ERROR_OUT_OF_RANGE;
     return m_InputStream->Load(buffer, (NPT_Size)m_ContentLength);
 }
 

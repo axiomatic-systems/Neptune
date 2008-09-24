@@ -25,9 +25,13 @@ public:
     // methods
              NPT_SelectableMessageQueue();
     virtual ~NPT_SelectableMessageQueue();
+    
+    // NPT_MessageQueue methods
+    virtual NPT_Result PumpMessage(NPT_Timeout timeout);
     virtual NPT_Result QueueMessage(NPT_Message*        message,
                                     NPT_MessageHandler* handler);
-    virtual NPT_Result PumpMessage(NPT_Timeout timeout);
+
+    // methods
     int  GetEventFd() { return m_Pipe[0]; }
  
 private:

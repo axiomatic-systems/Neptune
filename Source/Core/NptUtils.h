@@ -122,34 +122,38 @@ extern void NPT_CopyMemory(void* dest, void* src, NPT_Size size);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_STRCMP)
-#define NPT_StringsEqual(s1, s2) \
-(strcmp((s1), (s2)) == 0)
+#define NPT_StringsEqual(s1, s2) (strcmp((s1), (s2)) == 0)
 #else
 extern int NPT_StringsEqual(const char* s1, const char* s2);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_STRNCMP)
-#define NPT_StringsEqualN(s1, s2, n) \
-(strncmp((s1), (s2), (n)) == 0)
+#define NPT_StringsEqualN(s1, s2, n) (strncmp((s1), (s2), (n)) == 0)
 #else
 extern int NPT_StringsEqualN(const char* s1, const char* s2, unsigned long size);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_STRLEN)
-#define NPT_StringLength(s) \
-(NPT_Size)(strlen(s))
+#define NPT_StringLength(s) (NPT_Size)(strlen(s))
 #else
 extern unsigned long NPT_StringLength(const char* s);
 #endif
 
 #if defined(NPT_CONFIG_HAVE_STRCPY)
-#define NPT_CopyString(dst, src) ((void)strcpy((dst), (src)))
+#define NPT_CopyString(dst, src) ((void)NPT_strcpy((dst), (src)))
 #else
 extern void NPT_CopyString(char* dst, const char* src);
 #endif
 
+/**
+ * Copy up to n characters from src to dst.
+ * The destination buffer will be null-terminated, so it must
+ * have enough space for n+1 characters (n from the source plus
+ * the null terminator).
+ */
 #if defined(NPT_CONFIG_HAVE_STRNCPY)
-#define NPT_CopyStringN(dst, src, n) ((void)NPT_strncpy((dst), (src), n))
+#define NPT_CopyStringN(dst, src, n) \
+do { ((void)NPT_strncpy((dst), (src), n)); (dst)[(n)] = '\0'; } while(0)
 #else
 extern int NPT_CopyStringN(char* dst, const char* src, unsigned long n);
 #endif

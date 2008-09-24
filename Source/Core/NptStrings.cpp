@@ -23,6 +23,9 @@
 +---------------------------------------------------------------------*/
 #define NPT_STRINGS_WHITESPACE_CHARS "\r\n\t "
 
+const unsigned int NPT_STRING_FORMAT_BUFFER_DEFAULT_SIZE = 256;
+const unsigned int NPT_STRING_FORMAT_BUFFER_MAX_SIZE     = 0x80000; // 512k
+
 /*----------------------------------------------------------------------
 |   helpers
 +---------------------------------------------------------------------*/
@@ -90,6 +93,41 @@ NPT_String::FromIntegerU(NPT_UInt64 value)
     } while(value);
 
     return NPT_String(c);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_String::Format
++---------------------------------------------------------------------*/
+NPT_String
+NPT_String::Format(const char* format, ...)
+{
+    NPT_String result;
+    NPT_Size   buffer_size = NPT_STRING_FORMAT_BUFFER_DEFAULT_SIZE; // default value
+    
+    va_list  args;
+    va_start(args, format);
+
+    for(;;) {
+        /* try to format (it might not fit) */
+        result.Reserve(buffer_size);
+        char* buffer = result.UseChars();
+        int f_result = NPT_FormatStringVN(buffer, buffer_size, format, args);
+        if (f_result >= (int)(buffer_size)) f_result = -1;
+        if (f_result >= 0) {
+            result.SetLength(f_result);
+            break;
+        }
+        
+        /* the buffer was too small, try something bigger         */
+        /* (we don't trust the return value of NPT_FormatStringVN */
+        /* for the actual size needed)                            */
+        buffer_size *= 2;
+        if (buffer_size > NPT_STRING_FORMAT_BUFFER_MAX_SIZE) break;
+    }
+
+    va_end(args);
+    
+    return result;
 }
 
 /*----------------------------------------------------------------------

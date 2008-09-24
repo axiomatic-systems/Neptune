@@ -138,7 +138,8 @@ typedef __w64 long NPT_PointerLong;
 #define NPT_CONFIG_HAVE_SHARE_H
 #define NPT_vsnprintf(s,c,f,a)  _vsnprintf_s(s,c,_TRUNCATE,f,a)
 #define NPT_snprintf(s,c,f,...) _snprintf_s(s,c,_TRUNCATE,f,__VA_ARGS__)
-#define NPT_strncpy(d,s,c)       strncpy_s(d,c,s,_TRUNCATE)
+#define NPT_strncpy(d,s,c)       strncpy_s(d,c+1,s,c)
+#define NPT_strcpy(d,s)          strcpy_s(d,strlen(s)+1,s)
 #undef NPT_CONFIG_HAVE_GETENV
 #define NPT_CONFIG_HAVE_DUPENV_S
 #define dupenv_s _dupenv_s
@@ -180,6 +181,10 @@ typedef __w64 long NPT_PointerLong;
 
 #if !defined(NPT_snprintf)
 #define NPT_snprintf snprintf
+#endif
+
+#if !defined(NPT_strcpy)
+#define NPT_strcpy strcpy
 #endif
 
 #if !defined(NPT_strncpy)

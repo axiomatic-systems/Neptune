@@ -36,7 +36,8 @@ public:
     // factories
     static NPT_String FromInteger(NPT_Int64 value);
     static NPT_String FromIntegerU(NPT_UInt64 value);
-
+    static NPT_String Format(const char* format, ...);
+    
     // constructors
     NPT_String(const NPT_String& str);
     NPT_String(const char* str);

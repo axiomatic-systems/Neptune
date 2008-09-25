@@ -43,7 +43,7 @@
 				Optimization="0"
 				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="..\..\..\..\Source\Core;..\..\..\..\Source\System\Win32"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;NPT_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;NPT_DEBUG;NPT_CONFIG_ENABLE_LOGGING"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"

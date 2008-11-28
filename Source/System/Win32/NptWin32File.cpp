@@ -157,9 +157,17 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
     // check the arguments
     if (path == NULL) return NPT_ERROR_INVALID_PARAMETERS;
 
+    // construct a path name with a \* wildcard at the end
+    NPT_String path_pattern = path;
+    if (path_pattern.EndsWith("\\") || path_pattern.EndsWith("/")) {
+        path_pattern += "*";
+    } else {
+        path_pattern += "\\*";
+    }
+
     // list the entries
     WIN32_FIND_DATA find_data;
-    HANDLE find_handle = FindFirstFile(NPT_WIN32_A2W(path), &find_data);
+    HANDLE find_handle = FindFirstFile(NPT_WIN32_A2W(path_pattern.GetChars()), &find_data);
     if (find_handle == INVALID_HANDLE_VALUE) return MapError(GetLastError());
     NPT_File_ProcessFindData(&find_data, entries);
     while (FindNextFile(find_handle, &find_data)) {

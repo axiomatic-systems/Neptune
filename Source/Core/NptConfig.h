@@ -142,6 +142,7 @@
 
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
+#define NPT_FORMAT_64 "I64"
 #define NPT_CONFIG_INT64_TYPE __int64
 #define NPT_LocalFunctionName __FUNCTION__
 #define NPT_fseek _fseeki64
@@ -193,7 +194,11 @@ typedef __w64 long NPT_PointerLong;
 /*----------------------------------------------------------------------
 |   defaults
 +---------------------------------------------------------------------*/
-#ifndef NPT_POINTER_TO_LONG
+#if !defined(NPT_FORMAT_64)
+#define NPT_FORMAT_64 "ll"
+#endif
+
+#if !defined(NPT_POINTER_TO_LONG)
 #define NPT_POINTER_TO_LONG(_p) ((long)(_p))
 #endif
 

@@ -41,7 +41,7 @@
 do {                                \
     NPT_Result _result = (_x);      \
     if (_result != NPT_SUCCESS) {   \
-        NPT_Debug("%s(%d): @@@ NPT_CHECK failed, result=%d\n", __FILE__, __LINE__, _result); \
+        NPT_Debug("%s(%d): @@@ NPT_CHECK failed, result=%d (%s)\n", __FILE__, __LINE__, _result, NPT_ResultText(_result)); \
         return _result;             \
     }                               \
 } while(0)
@@ -56,7 +56,7 @@ do {                                          \
 do {                                \
     NPT_Result _result = (x);       \
     if (_result != NPT_SUCCESS) {   \
-        NPT_Debug("%s(%d): @@@ NPT_CHECK failed, result=%d\n", __FILE__, __LINE__, _result); \
+        NPT_Debug("%s(%d): @@@ NPT_CHECK failed, result=%d (%s)\n", __FILE__, __LINE__, _result, NPT_ResultText(_result)); \
         goto label;                 \
     }                               \
 } while(0)
@@ -109,6 +109,7 @@ const int NPT_ERROR_BASE_UNIX           = NPT_ERROR_BASE-700;
 const int NPT_ERROR_BASE_HTTP           = NPT_ERROR_BASE-800;
 const int NPT_ERROR_BASE_THREADS        = NPT_ERROR_BASE-900;
 const int NPT_ERROR_BASE_SERIAL_PORT    = NPT_ERROR_BASE-1000;
+const int NPT_ERROR_BASE_TLS            = NPT_ERROR_BASE-1100;
 
 // general errors
 const int NPT_ERROR_INVALID_PARAMETERS  = NPT_ERROR_BASE_GENERAL - 0;
@@ -136,5 +137,10 @@ const int NPT_ERROR_OUT_OF_RANGE        = NPT_ERROR_BASE_GENERAL - 17;
 /* where errno is the positive integer from errno.h      */
 const int NPT_ERROR_BASE_ERRNO          = NPT_ERROR_BASE-2000;
 #define NPT_ERROR_ERRNO(e)              (NPT_ERROR_BASE_ERRNO - (e))
+
+/*----------------------------------------------------------------------
+|   functions
++---------------------------------------------------------------------*/
+const char* NPT_ResultText(int result);
 
 #endif // _NPT_RESULTS_H_

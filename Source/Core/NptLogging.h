@@ -39,7 +39,6 @@
 |   includes
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
-#include "NptDebug.h"
 #include "NptTypes.h"
 #include "NptTime.h"
 #include "NptStrings.h"

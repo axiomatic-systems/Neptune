@@ -36,6 +36,14 @@
 #include <share.h>
 #endif
 
+#if defined(_WIN32)
+extern FILE *NPT_fsopen_utf8(const char* path, const char* mode, int sh_flags);
+extern FILE *NPT_fopen_utf8(const char* path, const char* mode);
+#define fopen   NPT_fopen_utf8
+#define fopen_s NPT_fopen_s_utf8
+#define _fsopen NPT_fsopen_utf8
+#endif
+
 /*----------------------------------------------------------------------
 |   compatibility wrappers
 +---------------------------------------------------------------------*/

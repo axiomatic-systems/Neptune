@@ -145,9 +145,14 @@
 #define NPT_FORMAT_64 "I64"
 #define NPT_CONFIG_INT64_TYPE __int64
 #define NPT_LocalFunctionName __FUNCTION__
+#if !defined(_WIN32_WCE)
 #define NPT_fseek _fseeki64
 #define NPT_ftell _ftelli64
-#define NPT_stat  _stat64
+#else
+#define NPT_fseek(a,b,c) fseek((a),(long)(b), (c))
+#define NPT_ftell ftell
+#endif
+#define NPT_stat  NPT_stat_utf8
 #define NPT_stat_struct struct __stat64
 #if defined(_WIN64)
 typedef __int64 NPT_PointerLong;

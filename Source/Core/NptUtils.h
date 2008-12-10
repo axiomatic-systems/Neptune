@@ -78,9 +78,6 @@ extern NPT_UInt32 NPT_BytesToInt32Le(const unsigned char* buffer);
 extern NPT_UInt32 NPT_BytesToInt24Le(const unsigned char* buffer);
 extern NPT_UInt16 NPT_BytesToInt16Le(const unsigned char* buffer);
 
-extern void NPT_ByteToHex(NPT_Byte b, char* buffer);
-extern NPT_Result NPT_HexToByte(const char* buffer, NPT_Byte& b);
-
 /*----------------------------------------------------------------------
 |    conversion utilities
 +---------------------------------------------------------------------*/
@@ -101,6 +98,13 @@ NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
                  void*       function_parameter,
                  const char* format, 
                  va_list     args);
+
+void NPT_ByteToHex(NPT_Byte b, char* buffer, bool uppercase=false);
+NPT_Result NPT_HexToByte(const char* buffer, NPT_Byte& b);
+NPT_String NPT_HexString(const unsigned char* data, 
+                         NPT_Size             data_size,
+                         const char*          separator = NULL,
+                         bool                 uppercase=false);
 
 /*----------------------------------------------------------------------
 |    parsing

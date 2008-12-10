@@ -1213,11 +1213,15 @@ NPT_HttpServer::Loop()
     
     do {
         result = WaitForNewClient(input, output, &context);
-        NPT_LOG_FINE_1("WaitForNewClient returned %d", result);
+        NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)", 
+                       result,
+                       NPT_ResultText(result));
         if (NPT_FAILED(result)) break;
 
         result = RespondToClient(input, output, context);
-        NPT_LOG_FINE_1("ResponToClient returned %d", result);
+        NPT_LOG_FINE_2("ResponToClient returned %d", 
+                       result,
+                       NPT_ResultText(result));
     } while (NPT_SUCCEEDED(result));
     
     return result;

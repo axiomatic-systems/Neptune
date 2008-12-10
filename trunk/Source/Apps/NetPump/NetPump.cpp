@@ -667,7 +667,7 @@ main(int argc, char** argv)
         NPT_InputStreamReference in;
         result = GetEndPointStreams(&in_endpoint, &in, NULL);
         if (NPT_FAILED(result)) {
-            NPT_Debug("ERROR: failed to get stream for input (%d)\n", result);
+            NPT_Debug("ERROR: failed to get stream for input (%d : %s)\n", result, NPT_ResultText(result));
             exit(1);
         }
 

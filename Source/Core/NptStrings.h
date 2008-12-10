@@ -72,7 +72,7 @@ public:
     bool       IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
     NPT_Size   GetLength()   const { return m_Chars ? GetBuffer()->GetLength() : 0;    }
     NPT_Size   GetCapacity() const { return m_Chars ? GetBuffer()->GetAllocated() : 0; }
-    NPT_Result SetLength(NPT_Size length);
+    NPT_Result SetLength(NPT_Size length, bool pad = false);
     void       Assign(const char* chars, NPT_Size size);
     void       Append(const char* chars, NPT_Size size);
     void       Append(const char* s) { Append(s, StringLength(s)); }

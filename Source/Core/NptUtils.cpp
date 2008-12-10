@@ -164,10 +164,14 @@ NPT_FormatString(char* /*str*/, NPT_Size /*size*/, const char* /*format*/, ...)
 /*----------------------------------------------------------------------
 |   NPT_NibbleToHex
 +---------------------------------------------------------------------*/
-static char NPT_NibbleToHex(unsigned int nibble)
+static char NPT_NibbleToHex(unsigned int nibble, bool uppercase = true)
 {
     NPT_ASSERT(nibble < 16);
-    return (nibble < 10) ? ('0' + nibble) : ('A' + (nibble-10));
+    if (uppercase) {
+        return (nibble < 10) ? ('0' + nibble) : ('A' + (nibble-10));
+    } else {
+        return (nibble < 10) ? ('0' + nibble) : ('a' + (nibble-10));
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -190,10 +194,10 @@ static int NPT_HexToNibble(char hex)
 |   NPT_ByteToHex
 +---------------------------------------------------------------------*/
 void
-NPT_ByteToHex(NPT_Byte b, char* buffer)
+NPT_ByteToHex(NPT_Byte b, char* buffer, bool uppercase)
 {
-    buffer[0] = NPT_NibbleToHex((b>>4) & 0x0F);
-    buffer[1] = NPT_NibbleToHex(b      & 0x0F);
+    buffer[0] = NPT_NibbleToHex((b>>4) & 0x0F, uppercase);
+    buffer[1] = NPT_NibbleToHex(b      & 0x0F, uppercase);
 }
 
 /*----------------------------------------------------------------------
@@ -210,6 +214,39 @@ NPT_HexToByte(const char* buffer, NPT_Byte& b)
 
     b = (nibble_0 << 4) | nibble_1;
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HexString
++---------------------------------------------------------------------*/
+NPT_String 
+NPT_HexString(const unsigned char* data,
+              NPT_Size             data_size,
+              const char*          separator,
+              bool                 uppercase)
+{
+    NPT_String result;
+    
+    // quick check 
+    if (data == NULL || data_size == 0) return result;
+        
+    // set the result size
+    NPT_Size separator_length = separator?NPT_StringLength(separator):0;
+    result.SetLength(data_size*2+(data_size-1)*separator_length);
+    
+    // build the string
+    const unsigned char* src = data;
+    char* dst = result.UseChars();
+    while (data_size--) {
+        NPT_ByteToHex(*src++, dst, uppercase);
+        dst += 2;
+        if (data_size) {
+            NPT_CopyMemory(dst, separator, separator_length);
+            dst += separator_length;
+        }
+    }
+    
+    return result;
 }
 
 /*----------------------------------------------------------------------

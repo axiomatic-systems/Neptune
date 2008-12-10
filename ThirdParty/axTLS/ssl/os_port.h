@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|   Neptune - Toplevel Include
+|   abstraction layer for axTLS
 |
 | Copyright (c) 2002-2008, Axiomatic Systems, LLC.
 | All rights reserved.
@@ -29,55 +29,36 @@
 |
  ****************************************************************/
 
-#ifndef _NEPTUNE_H_
-#define _NEPTUNE_H_
-
-/*----------------------------------------------------------------------
-|   flags
-+---------------------------------------------------------------------*/
-#define NPT_EXTERNAL_USE /* do not expose internal definitions */
+#ifndef _OS_PORT_H_
+#define _OS_PORT_H_
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptConfig.h"
-#include "NptCommon.h"
-#include "NptResults.h"
-#include "NptTypes.h"
-#include "NptConstants.h"
-#include "NptReferences.h"
-#include "NptStreams.h"
-#include "NptBufferedStreams.h"
-#include "NptFile.h"
-#include "NptNetwork.h"
-#include "NptSockets.h"
-#include "NptTime.h"
-#include "NptThreads.h"
-#include "NptSystem.h"
-#include "NptMessaging.h"
-#include "NptQueue.h"
-#include "NptSimpleMessageQueue.h"
-#include "NptSelectableMessageQueue.h"
-#include "NptXml.h"
-#include "NptStrings.h"
-#include "NptArray.h"
-#include "NptList.h"
-#include "NptMap.h"
-#include "NptStack.h"
-#include "NptUri.h"
-#include "NptHttp.h"
-#include "NptDataBuffer.h"
-#include "NptUtils.h"
-#include "NptRingBuffer.h"
-#include "NptBase64.h"
-#include "NptConsole.h"
-#include "NptLogging.h"
-#include "NptSerialPort.h"
-#include "NptVersion.h"
-#include "NptDynamicLibraries.h"
+#include <stdlib.h>
+#include <time.h>
 
-// optional modules
-#include "NptZip.h"
-#include "NptTls.h"
+/*----------------------------------------------------------------------
+|   types
++---------------------------------------------------------------------*/
+typedef struct SSL_SOCKET SSL_SOCKET;
 
-#endif // _NEPTUNE_H_
+struct SSL_SOCKET {
+    int (*Read)(SSL_SOCKET* self, void* buffer, unsigned int size);
+    int (*Write)(SSL_SOCKET* self, const void* buffer, unsigned int size);
+};
+
+#define STDCALL
+#define EXP_FUNC
+
+#define SSL_CTX_MUTEX_INIT(A)
+#define SSL_CTX_MUTEX_DESTROY(A)
+#define SSL_CTX_LOCK(A)
+#define SSL_CTX_UNLOCK(A)
+
+#define TTY_FLUSH(X)
+#define SOCKET_BLOCK(X)
+#define SOCKET_READ(s,b,z) (s)->Read((s), (b), (z))
+#define SOCKET_WRITE(s,b,z) (s)->Write((s), (b), (z))
+
+#endif /* _OS_PORT_H_ */

@@ -41,7 +41,7 @@
 +---------------------------------------------------------------------*/
 #if defined(_WIN32)
 extern int NPT_stat_utf8(const char* path, NPT_stat_struct* info);
-extern char* NPT_getcwd_utf8(const char* path, NPT_stat_struct* info);
+extern char* NPT_getcwd_utf8(char* path, unsigned int path_size);
 #define getcwd NPT_getcwd_utf8
 #define S_ISDIR(_m) (((_m)&_S_IFMT) == _S_IFDIR) 
 #define S_ISREG(_m) (((_m)&_S_IFMT) == _S_IFREG) 
@@ -184,6 +184,7 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
     
     return NPT_SUCCESS;
 }
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_File::GetWorkingDirectory
@@ -198,7 +199,6 @@ NPT_File::GetWorkingDirectory(NPT_String& path)
     
     return NPT_SUCCESS;
 }
-#endif
 
 /*----------------------------------------------------------------------
 |   NPT_File::GetInfo

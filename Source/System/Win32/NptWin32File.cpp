@@ -15,6 +15,7 @@
 #include "NptUtils.h"
 
 #include <windows.h>
+#include <assert.h>
 
 /*----------------------------------------------------------------------
 |   logging
@@ -179,7 +180,7 @@ NPT_stat_utf8(const char* path, struct __stat64* info)
 |   NPT_getcwd_utf8
 +---------------------------------------------------------------------*/
 char*
-NPT_getcwd_utf8(char* dir, int max_size)
+NPT_getcwd_utf8(char* dir, unsigned int max_size)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
     WCHAR* wdir = (WCHAR*)alloca(2*(max_size+1));

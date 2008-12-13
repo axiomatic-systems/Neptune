@@ -218,7 +218,7 @@ NPT_HttpHeaders::Emit(NPT_OutputStream& stream) const
     NPT_List<NPT_HttpHeader*>::Iterator header = m_Headers.GetFirstItem();
     while (header) {
         // emit the header
-        NPT_CHECK((*header)->Emit(stream));
+        NPT_CHECK_WARNING((*header)->Emit(stream));
         ++header;
     }
     return NPT_SUCCESS;
@@ -259,13 +259,15 @@ NPT_HttpHeaders::AddHeader(const char* name, const char* value)
 |   NPT_HttpHeaders::SetHeader
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpHeaders::SetHeader(const char* name, const char* value)
+NPT_HttpHeaders::SetHeader(const char* name, const char* value, bool replace)
 {
     NPT_HttpHeader* header = GetHeader(name);
     if (header == NULL) {
         return AddHeader(name, value);
-    } else {
+    } else if (replace) {
         return header->SetValue(value);
+    } else {
+        return NPT_SUCCESS;
     }
 }
 
@@ -302,7 +304,7 @@ NPT_HttpEntity::NPT_HttpEntity(const NPT_HttpHeaders& headers) :
     // Content-Length
     header = headers.GetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH);
     if (header != NULL) {
-        long length;
+        NPT_LargeSize length;
         if (NPT_SUCCEEDED(header->GetValue().ToInteger(length))) {
             m_ContentLength = length;
         } else {
@@ -320,6 +322,12 @@ NPT_HttpEntity::NPT_HttpEntity(const NPT_HttpHeaders& headers) :
     header = headers.GetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING);
     if (header != NULL) {
         m_ContentEncoding = header->GetValue();
+    }
+
+    // Transfer-Encoding
+    header = headers.GetHeader(NPT_HTTP_HEADER_TRANSFER_ENCODING);
+    if (header != NULL) {
+        m_TransferEncoding = header->GetValue();
     }
 }
 
@@ -537,7 +545,7 @@ NPT_HttpRequest::Parse(NPT_BufferedInputStream& stream,
 
     // read the response line
     NPT_String line;
-    NPT_CHECK(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
+    NPT_CHECK_WARNING(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
 
     // check the request line
     int first_space = line.Find(' ');
@@ -697,7 +705,7 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
 
     // read the response line
     NPT_String line;
-    NPT_CHECK(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
+    NPT_CHECK_WARNING(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
     
     // check the response line
     int first_space = line.Find(' ');
@@ -714,7 +722,7 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
                                               line.GetLength()-(first_space+1+3+1));
 
     // create a response object
-    long status_code_int = 0;
+    NPT_UInt32 status_code_int = 0;
     status_code.ToInteger(status_code_int);
     response = new NPT_HttpResponse(status_code_int, reason_phrase, protocol);
 
@@ -746,13 +754,13 @@ class NPT_HttpTcpConnector : public NPT_HttpClient::Connector
 |   NPT_HttpTcpConnector::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpTcpConnector::Connect(const char*                    hostname, 
-                               NPT_UInt16                    port, 
-                               NPT_Timeout                   connection_timeout,
-                               NPT_Timeout                   io_timeout,
-                               NPT_Timeout                   name_resolver_timeout,
-                               NPT_InputStreamReference&     input_stream, 
-                               NPT_OutputStreamReference&    output_stream)
+NPT_HttpTcpConnector::Connect(const char*                hostname, 
+                              NPT_UInt16                 port, 
+                              NPT_Timeout                connection_timeout,
+                              NPT_Timeout                io_timeout,
+                              NPT_Timeout                name_resolver_timeout,
+                              NPT_InputStreamReference&  input_stream, 
+                              NPT_OutputStreamReference& output_stream)
 {
     // get the address and port to which we need to connect
     NPT_IpAddress address;
@@ -773,6 +781,9 @@ NPT_HttpTcpConnector::Connect(const char*                    hostname,
     return NPT_SUCCESS;
 }
 
+/*----------------------------------------------------------------------
+|   NPT_HttpProxySelector::GetSystemDefault()
++---------------------------------------------------------------------*/
 //// temporary place holder implementation
 NPT_HttpProxySelector*
 NPT_HttpProxySelector::GetSystemDefault()
@@ -892,6 +903,17 @@ NPT_HttpClient::SetProxySelector(NPT_HttpProxySelector* selector)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpClient::SetConnector
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpClient::SetConnector(Connector* connector)
+{
+    delete m_Connector;
+    m_Connector = connector;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpClient::SetTimeouts
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -955,9 +977,9 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
 
     // add any headers that may be missing
     NPT_HttpHeaders& headers = request.GetHeaders();
-    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close");
+    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close", false); // set but don't replace
     headers.SetHeader(NPT_HTTP_HEADER_USER_AGENT, 
-                      "Neptune/" NPT_NEPTUNE_VERSION_STRING);
+                      "Neptune/" NPT_NEPTUNE_VERSION_STRING, false); // set but don't replace
     NPT_String host = request.GetUrl().GetHost();
     if (request.GetUrl().GetPort() != NPT_HTTP_DEFAULT_PORT) {
         host += ":";
@@ -993,11 +1015,11 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     request.Emit(header_stream, use_proxy);
 
     // send the headers
-    NPT_CHECK(output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
+    NPT_CHECK_WARNING(output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
 
     // send request body
-    if (!body_stream.IsNull()) {
-        NPT_CHECK(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer()));
+    if (!body_stream.IsNull() && entity->GetContentLength()) {
+        NPT_CHECK_FATAL(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength()));
     }
 
     // flush the output stream so that everything is sent to the server
@@ -1007,7 +1029,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     NPT_BufferedInputStreamReference buffered_input_stream(new NPT_BufferedInputStream(input_stream));
 
     // parse the response
-    NPT_CHECK(NPT_HttpResponse::Parse(*buffered_input_stream, response));
+    NPT_CHECK_WARNING(NPT_HttpResponse::Parse(*buffered_input_stream, response));
     NPT_LOG_FINE_2("got response, code=%d, msg=%s",
                    response->GetStatusCode(),
                    response->GetReasonPhrase().GetChars());
@@ -1089,6 +1111,19 @@ NPT_HttpRequestContext::NPT_HttpRequestContext(const NPT_SocketAddress* local_ad
 NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
     m_BoundPort(0)
 {
+    m_Config.m_ListenAddress     = NPT_IpAddress::Any;
+    m_Config.m_ListenPort        = listen_port;
+    m_Config.m_IoTimeout         = NPT_HTTP_SERVER_DEFAULT_IO_TIMEOUT;
+    m_Config.m_ConnectionTimeout = NPT_HTTP_SERVER_DEFAULT_CONNECTION_TIMEOUT;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::NPT_HttpServer
++---------------------------------------------------------------------*/
+NPT_HttpServer::NPT_HttpServer(NPT_IpAddress listen_address, NPT_UInt16 listen_port) :
+    m_BoundPort(0)
+{
+    m_Config.m_ListenAddress     = listen_address;
     m_Config.m_ListenPort        = listen_port;
     m_Config.m_IoTimeout         = NPT_HTTP_SERVER_DEFAULT_IO_TIMEOUT;
     m_Config.m_ConnectionTimeout = NPT_HTTP_SERVER_DEFAULT_CONNECTION_TIMEOUT;
@@ -1157,6 +1192,16 @@ NPT_HttpServer::SetTimeouts(NPT_Timeout connection_timeout,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpServer::Abort
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpServer::Abort()
+{
+    //m_Socket.Disconnect();
+    return NPT_ERROR_NOT_IMPLEMENTED;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpServer::WaitForNewClient
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -1170,7 +1215,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
     // wait for a connection
     NPT_Socket*         client;
     NPT_LOG_FINE_1("waiting for connection on port %d...", m_Config.m_ListenPort);
-    NPT_CHECK(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
+    NPT_CHECK_WARNING(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
     if (client == NULL) return NPT_ERROR_INTERNAL;
 
     // get the client info
@@ -1295,7 +1340,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
     NPT_Result        result = NPT_SUCCESS;
 
     NPT_HttpResponder responder(input, output);
-    NPT_CHECK(responder.ParseRequest(request, &context.GetLocalAddress()));
+    NPT_CHECK_WARNING(responder.ParseRequest(request, &context.GetLocalAddress()));
 
     NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
     if (handler == NULL) {
@@ -1308,7 +1353,9 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
         response->SetEntity(new NPT_HttpEntity());
 
         // ask the handler to setup the response
-        handler->SetupResponse(*request, context, *response);
+        if (NPT_FAILED(handler->SetupResponse(*request, context, *response))) {
+            response->SetStatus(500, "Internal Server Error");
+        }
     }
 
     // send the response
@@ -1369,10 +1416,16 @@ NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&        request,
                                 const NPT_SocketAddress* local_address)
 {
     // parse the request
-    NPT_CHECK(NPT_HttpRequest::Parse(*m_Input, local_address, request));
+    NPT_CHECK_WARNING(NPT_HttpRequest::Parse(*m_Input, local_address, request));
 
     // unbuffer the stream
     m_Input->SetBufferSize(0);
+
+    // don't create entity if no body is expected
+    if (request->GetMethod() == NPT_HTTP_METHOD_GET ||
+        request->GetMethod() == NPT_HTTP_METHOD_HEAD) {
+        return NPT_SUCCESS;
+    }
 
     // set the entity info
     NPT_HttpEntity* entity = new NPT_HttpEntity(request->GetHeaders());
@@ -1391,7 +1444,7 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
 {
     // add default headers
     NPT_HttpHeaders& headers = response.GetHeaders();
-    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close");
+    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close", false);
 
     // add computed headers
     NPT_HttpEntity* entity = response.GetEntity();
@@ -1411,16 +1464,19 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
         if (!content_encoding.IsEmpty()) {
             headers.SetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING, content_encoding);
         }
+    } else {
+        // force content length to 0 if there is no message body
+        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, "0");
     }
     
     // create a memory stream to buffer the response line and headers
     NPT_MemoryStream buffer;
 
     // emit the response line
-    NPT_CHECK(response.Emit(buffer));
+    NPT_CHECK_WARNING(response.Emit(buffer));
 
     // send the buffer
-    NPT_CHECK(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
+    NPT_CHECK_WARNING(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
 
     // send the body
     if (entity && !headers_only) {

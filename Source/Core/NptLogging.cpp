@@ -543,7 +543,7 @@ NPT_LogManager::ConfigureLogger(NPT_Logger* logger)
     /* configure the level */
     NPT_String* level_value = GetConfigValue(logger->m_Name,".level");
     if (level_value) {
-        long value;
+        NPT_Int32 value;
         /* try a symbolic name */
         value = NPT_Log::GetLogLevel(*level_value);
         if (value < 0) {
@@ -852,7 +852,7 @@ NPT_LogConsoleHandler::Create(const char*      logger_name,
     instance->m_FormatFilter = 0;
     filter = LogManager.GetConfigValue(logger_prefix,".filter");
     if (filter) {
-        long flags = 0;
+        NPT_UInt32 flags = 0;
         filter->ToInteger(flags, true);
         instance->m_FormatFilter = flags;
     }
@@ -954,7 +954,7 @@ NPT_LogTcpHandler::Create(const char* logger_name, NPT_LogHandler*& handler)
     }
     const NPT_String* port = LogManager.GetConfigValue(logger_prefix, ".port");
     if (port) {
-        long port_int;
+        NPT_UInt32 port_int;
         if (NPT_SUCCEEDED(port->ToInteger(port_int, true))) {
             instance->m_Port = (NPT_UInt16)port_int;
         } else {

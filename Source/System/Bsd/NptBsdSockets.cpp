@@ -17,7 +17,7 @@
 #define __WIN32__
 #endif
 #endif
-#if defined(__WIN32__)
+#if defined(__WIN32__) && !defined(_XBOX)
 #define STRICT
 #define NPT_WIN32_USE_WINSOCK2
 #ifdef NPT_WIN32_USE_WINSOCK2
@@ -807,10 +807,18 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
         if (result != NPT_SUCCESS) return result;
     }
 
+    int flags = 0;
+
+    // on some BSD implementations, signal we don't want a SIGPIPE
+    // but instead return EPIPE
+#ifdef MSG_NOSIGNAL
+    flags |= MSG_NOSIGNAL;
+#endif
+
     // write to the socket
     ssize_t nb_written = send(m_SocketFdReference->m_SocketFd, 
-                             (SocketConstBuffer)buffer, 
-                             bytes_to_write, 0);
+                              (SocketConstBuffer)buffer, 
+                              bytes_to_write, flags);
 
     if (nb_written > 0) {
         if (bytes_written) *bytes_written = nb_written;
@@ -915,6 +923,16 @@ NPT_BsdSocket::NPT_BsdSocket(SocketFd fd, bool force_blocking) :
     m_SocketFdReference(new NPT_BsdSocketFd(fd)),
     m_Blocking(true)
 {
+    // disable the SIGPIPE signal
+#if defined(SO_NOSIGPIPE)
+    int option = 1;
+    setsockopt(m_SocketFdReference->m_SocketFd, 
+               SOL_SOCKET, 
+               SO_NOSIGPIPE, 
+               (SocketOption)&option, 
+               sizeof(option));
+#endif
+
     if (force_blocking) m_SocketFdReference->SetBlockingMode(true);
     RefreshInfo();
 }
@@ -957,6 +975,13 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
     struct sockaddr_in inet_address;
     SocketAddressToInetAddress(address, &inet_address);
     
+#ifdef _XBOX
+    if( address.GetIpAddress().AsLong() != NPT_IpAddress::Any.AsLong() ) {
+        //Xbox can't bind to specific address, defaulting to ANY
+        SocketAddressToInetAddress(NPT_SocketAddress(NPT_IpAddress::Any, address.GetPort()), &inet_address);
+    }
+#endif
+
     // bind the socket
     if (bind(m_SocketFdReference->m_SocketFd, 
              (struct sockaddr*)&inet_address, 
@@ -1149,6 +1174,14 @@ NPT_BsdUdpSocket::NPT_BsdUdpSocket() :
                SO_BROADCAST, 
                (SocketOption)&option, 
                sizeof(option));
+
+#ifdef _XBOX
+    // set flag on the socket to allow sending of multicast
+    if (!NPT_BSD_SOCKET_IS_INVALID(m_SocketFdReference->m_SocketFd)) {
+        *(DWORD*)((char*)m_SocketFdReference->m_SocketFd+0xc) |= 0x02000000;
+    }
+#endif
+
 }
 
 /*----------------------------------------------------------------------
@@ -1344,6 +1377,14 @@ class NPT_BsdUdpMulticastSocket : public    NPT_UdpMulticastSocketInterface,
 +---------------------------------------------------------------------*/
 NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket()
 {
+#ifndef _XBOX
+        int option = 1;
+        setsockopt(m_SocketFdReference->m_SocketFd, 
+                   IPPROTO_IP, 
+                   IP_MULTICAST_LOOP,
+                   (SocketOption)&option,
+                   sizeof(option));
+#endif
 }
 
 /*----------------------------------------------------------------------
@@ -1361,7 +1402,7 @@ NPT_Result
 NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
                                      const NPT_IpAddress& iface)
 {
-    return NPT_ERROR_NOT_IMPLEMENTED;
+    return NPT_SUCCESS;
 }
 #else
 /*----------------------------------------------------------------------
@@ -1399,7 +1440,7 @@ NPT_Result
 NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
                                       const NPT_IpAddress& iface)
 {
-    return NPT_ERROR_NOT_IMPLEMENTED;
+    return NPT_SUCCESS;
 }
 #else
 /*----------------------------------------------------------------------
@@ -1436,7 +1477,7 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
 NPT_Result
 NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
 {
-    return NPT_ERROR_NOT_IMPLEMENTED;
+    return NPT_SUCCESS;
 }
 #else
 /*----------------------------------------------------------------------
@@ -1571,7 +1612,6 @@ NPT_Result
 NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address, 
                                 NPT_Timeout              timeout)
 {
-    SocketFd socket_fd = m_SocketFdReference->m_SocketFd;
     bool was_blocking = m_Blocking;
 
     // set the socket to nonblocking so that we can timeout on connect
@@ -1585,7 +1625,7 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
 
     // initiate connection
     int io_result;
-    io_result = connect(socket_fd, 
+    io_result = connect(m_SocketFdReference->m_SocketFd, 
                         (struct sockaddr *)&inet_address, 
                         sizeof(inet_address));
     if (io_result == 0) {
@@ -1847,7 +1887,7 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client,
     if (timeout != NPT_TIMEOUT_INFINITE) {
         timeout_value.tv_sec = timeout/1000;
         timeout_value.tv_usec = 1000*(timeout-1000*(timeout/1000));
-    };
+    }
     
     int io_result = select((int)m_SocketFdReference->m_SocketFd+1, 
                             &read_set, &write_set, &except_set, 

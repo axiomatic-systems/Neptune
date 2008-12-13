@@ -195,7 +195,7 @@ class NPT_ThreadInterface: public NPT_Runnable, public NPT_Interruptible
     // methods
     virtual           ~NPT_ThreadInterface() {}
     virtual NPT_Result Start() = 0;
-    virtual NPT_Result Wait()  = 0;
+    virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE)  = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -216,8 +216,12 @@ class NPT_Thread : public NPT_ThreadInterface
    ~NPT_Thread() { delete m_Delegate; }
 
     // NPT_ThreadInterface methods
-    NPT_Result Start() { return m_Delegate->Start(); } 
-    NPT_Result Wait()  { return m_Delegate->Wait();  }
+    NPT_Result Start() { 
+        return m_Delegate->Start(); 
+    } 
+    NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE)  { 
+        return m_Delegate->Wait(timeout);  
+    }
 
     // NPT_Runnable methods
     virtual void Run() {}

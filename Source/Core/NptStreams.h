@@ -123,7 +123,7 @@ typedef NPT_Reference<NPT_OutputStream> NPT_OutputStreamReference;
 NPT_Result NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                                   NPT_OutputStream& to,
                                   NPT_Position      offset = 0,
-                                  NPT_Size          size   = 0 /* 0 means the entire stream */);
+                                  NPT_LargeSize     size   = 0 /* 0 means the entire stream */);
 
 /*----------------------------------------------------------------------
 |    NPT_DelegatingInputStream
@@ -214,7 +214,8 @@ public:
     // methods delegated to m_Buffer
     const NPT_Byte* GetData() const { return m_Buffer.GetData(); }
     NPT_Byte*       UseData()       { return m_Buffer.UseData(); }
-    NPT_Size        GetDataSize() const { return m_Buffer.GetDataSize(); }
+    NPT_Size        GetDataSize() const   { return m_Buffer.GetDataSize(); }
+    NPT_Size        GetBufferSize() const { return m_Buffer.GetBufferSize();}
 
     // methods
     NPT_Result SetSize(NPT_Size size);

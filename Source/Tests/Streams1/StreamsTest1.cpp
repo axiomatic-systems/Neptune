@@ -31,9 +31,11 @@ main(int /*argc*/, char** /*argv*/)
     
     NPT_MemoryStream mems;
     NPT_ASSERT(mems.GetDataSize() == 0);
-    NPT_Size available;
+    NPT_LargeSize available;
     NPT_ASSERT(mems.GetAvailable(available) == NPT_SUCCESS);
     NPT_ASSERT(available == 0);
+    NPT_COMPILER_UNUSED(available);
+    
     mems.WriteUI08(1);
     mems.WriteUI16(0x0203);
     mems.WriteUI24(0x040506);

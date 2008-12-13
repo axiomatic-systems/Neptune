@@ -513,7 +513,7 @@ NPT_Result
 NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                        NPT_OutputStream& to,
                        NPT_Position      offset /* = 0 */,
-                       NPT_Size          size   /* = 0, 0 means the entire stream */)
+                       NPT_LargeSize     size   /* = 0, 0 means the entire stream */)
 {
     // seek into the input if required
     if (offset) {
@@ -521,8 +521,8 @@ NPT_StreamToStreamCopy(NPT_InputStream&  from,
     }
 
     // allocate a buffer for the transfer
-    NPT_Size bytes_transfered = 0;
-    NPT_Byte* buffer = new NPT_Byte[NPT_STREAM_COPY_BUFFER_SIZE];
+    NPT_LargeSize bytes_transfered = 0;
+    NPT_Byte*     buffer = new NPT_Byte[NPT_STREAM_COPY_BUFFER_SIZE];
     NPT_Result result = NPT_SUCCESS;
     if (buffer == NULL) return NPT_ERROR_OUT_OF_MEMORY;
 
@@ -533,8 +533,8 @@ NPT_StreamToStreamCopy(NPT_InputStream&  from,
         NPT_Size   bytes_read = 0;
         if (size) {
             // a max size was specified
-            if (bytes_to_read > size-bytes_transfered) {
-                bytes_to_read = size-bytes_transfered;
+            if (size-bytes_transfered < NPT_STREAM_COPY_BUFFER_SIZE) {
+                bytes_to_read = (NPT_Size)(size-bytes_transfered);
             }
         }
         result = from.Read(buffer, bytes_to_read, &bytes_read);

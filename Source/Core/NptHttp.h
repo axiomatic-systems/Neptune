@@ -70,6 +70,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_CONTENT_LENGTH      "Content-Length"
 #define NPT_HTTP_HEADER_CONTENT_TYPE        "Content-Type"
 #define NPT_HTTP_HEADER_CONTENT_ENCODING    "Content-Encoding"
+#define NPT_HTTP_HEADER_TRANSFER_ENCODING   "Transfer-Encoding"
 #define NPT_HTTP_HEADER_LOCATION            "Location"
 #define NPT_HTTP_HEADER_RANGE               "Range"
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
@@ -153,7 +154,7 @@ public:
     NPT_List<NPT_HttpHeader*>& GetHeaders() { return m_Headers; }
     NPT_HttpHeader*   GetHeader(const char* name) const;
     const NPT_String* GetHeaderValue(const char* name) const;
-    NPT_Result        SetHeader(const char* name, const char* value);
+    NPT_Result        SetHeader(const char* name, const char* value, bool replace=true);
     NPT_Result        AddHeader(const char* name, const char* value);
 
 private:
@@ -188,6 +189,7 @@ public:
     NPT_LargeSize     GetContentLength()   { return m_ContentLength;   }
     const NPT_String& GetContentType()     { return m_ContentType;     }
     const NPT_String& GetContentEncoding() { return m_ContentEncoding; }
+    const NPT_String& GetTransferEncoding(){ return m_TransferEncoding; }
 
 private:
     // members
@@ -195,6 +197,7 @@ private:
     NPT_LargeSize            m_ContentLength;
     NPT_String               m_ContentType;
     NPT_String               m_ContentEncoding;
+    NPT_String               m_TransferEncoding;
 };
 
 /*----------------------------------------------------------------------
@@ -369,6 +372,7 @@ public:
     NPT_Result SetConfig(const Config& config);
     NPT_Result SetProxy(const char* hostname, NPT_UInt16 port);
     NPT_Result SetProxySelector(NPT_HttpProxySelector* selector);
+    NPT_Result SetConnector(Connector* connector);
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout,
                            NPT_Timeout io_timeout,
                            NPT_Timeout name_resolver_timeout);
@@ -495,19 +499,23 @@ class NPT_HttpServer {
 public:
     // types
     struct Config {
-        NPT_Timeout m_ConnectionTimeout;
-        NPT_Timeout m_IoTimeout;
-        NPT_UInt16  m_ListenPort;
+        NPT_Timeout   m_ConnectionTimeout;
+        NPT_Timeout   m_IoTimeout;
+        NPT_IpAddress m_ListenAddress;
+        NPT_UInt16    m_ListenPort;
     };
 
     // constructors and destructor
     NPT_HttpServer(NPT_UInt16 listen_port = NPT_HTTP_DEFAULT_PORT);
+    NPT_HttpServer(NPT_IpAddress listen_address, 
+                   NPT_UInt16    listen_port = NPT_HTTP_DEFAULT_PORT);
     virtual ~NPT_HttpServer();
 
     // methods
     NPT_Result SetConfig(const Config& config);
     NPT_Result SetListenPort(NPT_UInt16 port);
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout, NPT_Timeout io_timeout);
+    NPT_Result Abort();
     NPT_Result WaitForNewClient(NPT_InputStreamReference&  input,
                                 NPT_OutputStreamReference& output,
                                 NPT_HttpRequestContext*    context);

@@ -523,8 +523,8 @@ main(int /*argc*/, char** /*argv*/)
 
     printf(":: testing ToInteger");
     NPT_String ti00("123");
-    unsigned long ul00;
-    long          l00;
+    unsigned int ul00;
+    int          l00;
     IntTest("", ti00.ToInteger(ul00), NPT_SUCCESS);
     IntTest("", ul00, 123);
     IntTest("", ti00.ToInteger(l00), NPT_SUCCESS);

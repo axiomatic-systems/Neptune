@@ -554,8 +554,8 @@ NPT_Url::SetHost(const char* host)
     while (*port && *port != ':') port++;
     if (*port) {
         m_Host.Assign(host, (NPT_Size)(port-host));
-        long port_number;
-        if (NPT_SUCCEEDED(NPT_ParseInteger(port+1, port_number, false))) {
+        NPT_UInt32 port_number;
+        if (NPT_SUCCEEDED(NPT_ParseInteger32U(port+1, port_number, false))) {
             m_Port = (short)port_number;
         }
     } else {
@@ -690,7 +690,7 @@ NPT_Url::ToRequestString(bool with_fragment) const
     }
     if (m_HasQuery) {
         result += "?";
-        result += PercentEncode(m_Query, QueryCharsToEncode, false);;
+        result += PercentEncode(m_Query, QueryCharsToEncode, false);
     }
     if (with_fragment && m_HasFragment) {
         result += "#";

@@ -122,6 +122,7 @@ public:
     // NPT_FileInterface methods
     NPT_Result Seek(NPT_Position offset);
     NPT_Result Tell(NPT_Position& offset);
+    NPT_Result Flush();
 
 protected:
     // constructors and destructors
@@ -153,7 +154,22 @@ NPT_StdcFileStream::Seek(NPT_Position offset)
 NPT_Result
 NPT_StdcFileStream::Tell(NPT_Position& offset)
 {
-    offset = NPT_ftell(m_FileReference->GetFile());
+    offset = 0;
+
+    NPT_Int64 pos = NPT_ftell(m_FileReference->GetFile());
+    if (pos <=0) return NPT_FAILURE;
+
+    offset = pos;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_StdcFileStream::Flush
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_StdcFileStream::Flush()
+{
+    fflush(m_FileReference->GetFile());
     return NPT_SUCCESS;
 }
 
@@ -262,6 +278,9 @@ public:
     }
     NPT_Result Tell(NPT_Position& offset) {
         return NPT_StdcFileStream::Tell(offset);
+    }
+    NPT_Result Flush() {
+        return NPT_StdcFileStream::Flush();
     }
 };
 
@@ -493,3 +512,4 @@ NPT_File::operator=(const NPT_File& file)
     }
     return *this;
 }
+

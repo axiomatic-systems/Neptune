@@ -1,23 +1,23 @@
 /*****************************************************************
 |
-|      Neptune - Network :: Winsock Implementation
+|  Neptune - Network :: Xbox Winsock Implementation
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|  (c) 2001-2005 Gilles Boccon-Gibod
+|  Author: Gilles Boccon-Gibod (bok@bok.net)
 |
- ****************************************************************/
+****************************************************************/
 
 /*----------------------------------------------------------------------
-|       includes
+|   includes
 +---------------------------------------------------------------------*/
-//#define STRICT
 #include <xtl.h>
 #include <winsockx.h>
+
 #include "NptNetwork.h"
 #include "NptXboxNetwork.h"
 
 /*----------------------------------------------------------------------
-|       static initializer
+|   static initializer
 +---------------------------------------------------------------------*/
 NPT_WinsockSystem::NPT_WinsockSystem() {
     XNetStartupParams xnsp;

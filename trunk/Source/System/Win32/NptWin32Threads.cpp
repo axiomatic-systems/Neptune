@@ -26,6 +26,8 @@
 #include "NptDebug.h"
 #include "NptResults.h"
 #include "NptWin32Threads.h"
+#include "NptTime.h"
+#include "NptSystem.h"
 #include "NptLogging.h"
 
 /*----------------------------------------------------------------------
@@ -36,14 +38,14 @@ NPT_SET_LOCAL_LOGGER("neptune.threads.win32")
 /*----------------------------------------------------------------------
 |   configuration macros
 +---------------------------------------------------------------------*/
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) || defined(_XBOX)
 #define NPT_WIN32_USE_CREATE_THREAD
 #endif
 
 #if defined(NPT_WIN32_USE_CREATE_THREAD)
-#define _beginthreadex(security, stack_size, start_proc, arg, flags,pid) \
-CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,  \
-             arg, flags, pid)
+#define _beginthreadex(security, stack_size, start_proc, arg, flags, pid) \
+CreateThread(security, stack_size, (LPTHREAD_START_ROUTINE) start_proc,   \
+             arg, flags, (LPDWORD)pid)
 #define _endthreadex ExitThread
 #endif
 
@@ -132,31 +134,11 @@ NPT_Win32CriticalSection::Unlock()
 }
 
 /*----------------------------------------------------------------------
-|   NPT_Win32Event
-+---------------------------------------------------------------------*/
-class NPT_Win32Event
-{
-public:
-    // methods
-    NPT_Win32Event(bool bManual = false);
-    virtual ~NPT_Win32Event();
-
-    // NPT_Mutex methods
-    virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
-    virtual void       Signal();
-    virtual void       Reset();
-
-private:
-    // members
-    HANDLE m_Event;
-};
-
-/*----------------------------------------------------------------------
 |   NPT_Win32Event::NPT_Win32Event
 +---------------------------------------------------------------------*/
-NPT_Win32Event::NPT_Win32Event(bool bManual)
+NPT_Win32Event::NPT_Win32Event(bool manual /* = false */, bool initial /* = false */)
 {
-    m_Event = CreateEvent(NULL, (bManual==true)?TRUE:FALSE, FALSE, NULL);
+    m_Event = CreateEvent(NULL, (manual==true)?TRUE:FALSE, (initial==true)?TRUE:FALSE, NULL);
 }
 
 /*----------------------------------------------------------------------
@@ -407,7 +389,7 @@ class NPT_Win32Thread : public NPT_ThreadInterface
                                 bool          detached);
                ~NPT_Win32Thread();
     NPT_Result  Start(); 
-    NPT_Result  Wait();
+    NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
 
  private:
     // methods
@@ -468,10 +450,16 @@ NPT_Win32Thread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("thread in =======================");
 
+    // set random seed per thread
+    NPT_TimeStamp now;
+    NPT_System::GetCurrentTimeStamp(now);
+    NPT_System::SetRandomSeed(now.m_NanoSeconds + thread->m_ThreadId);
+
     // run the thread 
     thread->Run();
     
-    NPT_LOG_FINE("thread out ======================");
+    // Logging here will cause a crash on exit because LogManager may already be destroyed
+    //NPT_LOG_FINE("thread out ======================");
 
     // if the thread is detached, delete it
     if (thread->m_Detached) {
@@ -507,7 +495,7 @@ NPT_Win32Thread::Start()
 #endif
     m_ThreadHandle = (HANDLE)
         _beginthreadex(NULL, 
-                       0, 
+                       NPT_CONFIG_THREAD_STACK_SIZE, 
                        EntryPoint, 
                        reinterpret_cast<void*>(this), 
                        0, 
@@ -535,7 +523,7 @@ NPT_Win32Thread::Run()
 |   NPT_Win32Thread::Wait
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32Thread::Wait()
+NPT_Win32Thread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
 {
     // check that we're not detached
     if (m_ThreadHandle == 0 || m_Detached) {
@@ -543,8 +531,10 @@ NPT_Win32Thread::Wait()
     }
 
     // wait for the thread to finish
-    NPT_LOG_FINE_1("joining thread id %d", m_ThreadId);
-    DWORD result = WaitForSingleObject(m_ThreadHandle, INFINITE);
+    // Logging here will cause a crash on exit because LogManager may already be destroyed
+    //NPT_LOG_FINE_1("joining thread id %d", m_ThreadId);
+    DWORD result = WaitForSingleObject(m_ThreadHandle, 
+                                       timeout==NPT_TIMEOUT_INFINITE?INFINITE:timeout);
     if (result != WAIT_OBJECT_0) {
         return NPT_FAILURE;
     } else {

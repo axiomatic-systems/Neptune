@@ -78,7 +78,7 @@ NPT_SimpleMessageQueue::QueueMessage(NPT_Message*        message,
 |   NPT_SimpleMessageQueue::PumpMessage
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_SimpleMessageQueue::PumpMessage(NPT_Timeout timeout)
+NPT_SimpleMessageQueue::PumpMessage(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
 {
     NPT_SimpleMessageCapsule* capsule;
     NPT_Result result = m_Queue.Pop(capsule, timeout);

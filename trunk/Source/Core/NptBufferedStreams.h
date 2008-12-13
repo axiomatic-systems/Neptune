@@ -55,7 +55,7 @@ public:
     // constructors and destructor
     NPT_BufferedInputStream(NPT_InputStreamReference& stream,
                             NPT_Size buffer_size = NPT_BUFFERED_BYTE_STREAM_DEFAULT_SIZE);
-    ~NPT_BufferedInputStream();
+    virtual ~NPT_BufferedInputStream();
 
     // methods
     virtual NPT_Result ReadLine(NPT_String& line,
@@ -76,7 +76,7 @@ public:
     NPT_Result GetSize(NPT_LargeSize& size);
     NPT_Result GetAvailable(NPT_LargeSize& available);
 
-private:
+protected:
     // members
     NPT_InputStreamReference m_Source;
     bool                     m_SkipNewline;
@@ -89,8 +89,8 @@ private:
     } m_Buffer;
 
     // methods
-    NPT_Result FillBuffer();
-    NPT_Result ReleaseBuffer();
+    virtual NPT_Result FillBuffer();
+    virtual NPT_Result ReleaseBuffer();
 };
 
 typedef NPT_Reference<NPT_BufferedInputStream> NPT_BufferedInputStreamReference;

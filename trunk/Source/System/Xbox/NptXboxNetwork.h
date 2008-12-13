@@ -1,14 +1,14 @@
 /*****************************************************************
 |
-|      Neptune - Network :: Winsock Implementation
+|   Neptune - Network :: Xbox Winsock Implementation
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
-|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|   (c) 2001-2005 Gilles Boccon-Gibod
+|   Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
 
 /*----------------------------------------------------------------------
-|       static initializer
+|   static initializer
 +---------------------------------------------------------------------*/
 class NPT_WinsockSystem {
 public:

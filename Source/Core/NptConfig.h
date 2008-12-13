@@ -41,6 +41,7 @@
 #define NPT_CONFIG_HAVE_STDIO_H
 #define NPT_CONFIG_HAVE_STDARG_H
 #define NPT_CONFIG_HAVE_STRING_H
+#define NPT_CONFIG_HAVE_LIMITS_H
 
 /*----------------------------------------------------------------------
 |   standard C runtime
@@ -73,6 +74,15 @@
 #define NPT_CONFIG_HAVE_VSNPRINTF
 #endif /* NPT_CONFIG_HAVE_STDIO_H */
 
+#if defined(NPT_CONFIG_HAVE_LIMITS_H)
+#define NPT_CONFIG_HAVE_INT_MIN
+#define NPT_CONFIG_HAVE_INT_MAX
+#define NPT_CONFIG_HAVE_UINT_MAX
+#define NPT_CONFIG_HAVE_LONG_MIN
+#define NPT_CONFIG_HAVE_LONG_MAX
+#define NPT_CONFIG_HAVE_ULONG_MAX
+#endif
+
 /*----------------------------------------------------------------------
 |   standard C++ runtime
 +---------------------------------------------------------------------*/
@@ -91,6 +101,11 @@
 #if !defined(STRICT)
 #define STRICT
 #endif
+#endif
+
+/* XBox */
+#if defined(_XBOX)
+#define NPT_CONFIG_THREAD_STACK_SIZE 0x10000
 #endif
 
 /* QNX */
@@ -144,6 +159,11 @@
 #if defined(_MSC_VER)
 #define NPT_FORMAT_64 "I64"
 #define NPT_CONFIG_INT64_TYPE __int64
+#define NPT_INT64_MIN _I64_MIN
+#define NPT_INT64_MAX _I64_MAX
+#define NPT_UINT64_MAX _UI64_MAX
+#define NPT_INT64_C(_x) _x##i64
+#define NPT_UINT64_C(_x) _x##ui64
 #define NPT_LocalFunctionName __FUNCTION__
 #if !defined(_WIN32_WCE)
 #define NPT_fseek _fseeki64
@@ -211,6 +231,14 @@ typedef __w64 long NPT_PointerLong;
 #define NPT_CONFIG_INT64_TYPE long long
 #endif
 
+#if !defined(NPT_INT64_C)
+#define NPT_INT64_C(_x) _x##LL
+#endif
+
+#if !defined(NPT_UINT64_C)
+#define NPT_UINT64_C(_x) _x##ULL
+#endif
+
 #if !defined(NPT_snprintf)
 #define NPT_snprintf snprintf
 #endif
@@ -229,6 +257,10 @@ typedef __w64 long NPT_PointerLong;
 
 #if !defined(NPT_LocalFunctionName)
 #define NPT_LocalFunctionName (NULL)
+#endif
+
+#if !defined(NPT_CONFIG_THREAD_STACK_SIZE)
+#define NPT_CONFIG_THREAD_STACK_SIZE 0
 #endif
 
 #if !defined(NPT_fseek)

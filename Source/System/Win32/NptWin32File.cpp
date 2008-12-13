@@ -14,7 +14,11 @@
 #include "NptFile.h"
 #include "NptUtils.h"
 
+#if defined(_XBOX)
+#include <xtl.h>
+#else
 #include <windows.h>
+#endif
 #include <assert.h>
 
 /*----------------------------------------------------------------------

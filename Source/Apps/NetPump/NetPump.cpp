@@ -274,8 +274,8 @@ GetEndPointStreams(EndPoint*                  endpoint,
             }
 
             // bind to the address
-            server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, 
-                        endpoint->info.tcp_server.port));
+            NPT_CHECK(server.Bind(NPT_SocketAddress(NPT_IpAddress::Any, 
+                        endpoint->info.tcp_server.port)));
 
             // wait for connection
             NPT_CHECK(server.WaitForNewClient(client));
@@ -593,7 +593,7 @@ main(int argc, char** argv)
                 exit(1);
             }
             if (argv[0]) {
-                long speed = 0;
+                int speed = 0;
                 if (NPT_FAILED(NPT_ParseInteger(*argv++, speed))) {
                     NPT_Debug("ERROR: invalid speed for 'serial' endpoint\n");
                     exit(1);
@@ -695,6 +695,7 @@ main(int argc, char** argv)
         } while (NPT_SUCCEEDED(result));
     }
 
+    delete buffer;
     return 0;
 }
 

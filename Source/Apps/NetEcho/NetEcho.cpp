@@ -96,12 +96,16 @@ TcpServerLoop(int port)
 {
     NPT_TcpServerSocket listener;
 
-    listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, port));
+    NPT_Result result = listener.Bind(NPT_SocketAddress(NPT_IpAddress::Any, port)); 
+    if (NPT_FAILED(result)) {
+        NPT_Debug("ERROR: Bind() failed (%d : %s)\n", result, NPT_ResultText(result));
+    }
+		
     NPT_Socket* client;
 
     for (;;) {
         NPT_Debug("waiting for client on port %d\n", port);
-        NPT_Result result = listener.WaitForNewClient(client);
+        result = listener.WaitForNewClient(client);
         NPT_SocketInfo socket_info;
         client->GetInfo(socket_info);
         NPT_Debug("client connected from %s:%d\n",

@@ -52,13 +52,20 @@ do {                                          \
         return NPT_ERROR_INVALID_PARAMETERS;  \
     }                                         \
 } while(0)
-#define NPT_CHECK_LABEL(x, label)   \
+#define NPT_CHECK_LABEL(_x, label)  \
 do {                                \
-    NPT_Result _result = (x);       \
+    NPT_Result _result = (_x);      \
     if (_result != NPT_SUCCESS) {   \
         NPT_Debug("%s(%d): @@@ NPT_CHECK failed, result=%d (%s)\n", __FILE__, __LINE__, _result, NPT_ResultText(_result)); \
         goto label;                 \
     }                               \
+} while(0)
+#define NPT_CHECK_POINTER_LABEL(_p, label)   \
+do {                                         \
+    if (_p == NULL) {                        \
+        NPT_Debug("%s(%d): @@@ NULL pointer parameter\n", __FILE__, __LINE__); \
+        goto label;                          \
+    }                                        \
 } while(0)
 #else
 #define NPT_CHECK(_x)               \
@@ -72,12 +79,18 @@ do {                                \
 do {                                                        \
     if ((_p) == NULL) return NPT_ERROR_INVALID_PARAMETERS;  \
 } while(0)
-#define NPT_CHECK_LABEL(x, label)   \
+#define NPT_CHECK_LABEL(_x, label)  \
 do {                                \
-    NPT_Result _result = (x);       \
+    NPT_Result _result = (_x);      \
     if (_result != NPT_SUCCESS) {   \
         goto label;                 \
     }                               \
+} while(0)
+#define NPT_CHECK_POINTER_LABEL(_p, label)   \
+do {                                         \
+    if ((_p) == NULL) {                      \
+        goto label;                          \
+    }                                        \
 } while(0)
 #endif
 

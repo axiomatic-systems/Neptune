@@ -85,10 +85,19 @@ extern NPT_Result
 NPT_ParseFloat(const char* str, float& result, bool relaxed = true);
 
 extern NPT_Result 
-NPT_ParseInteger(const char* str, long& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
+NPT_ParseInteger(const char* str, int& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
 
 extern NPT_Result 
-NPT_ParseInteger32(const char* str, NPT_Int32& result, bool relaxed = true);
+NPT_ParseInteger32(const char* str, NPT_Int32& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
+
+extern NPT_Result 
+NPT_ParseInteger32U(const char* str, NPT_UInt32& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
+
+extern NPT_Result 
+NPT_ParseInteger64(const char* str, NPT_Int64& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
+
+extern NPT_Result 
+NPT_ParseInteger64U(const char* str, NPT_UInt64& result, bool relaxed = true, NPT_Cardinal* chars_used = 0);
 
 /*----------------------------------------------------------------------
 |    formatting

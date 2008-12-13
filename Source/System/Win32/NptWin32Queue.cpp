@@ -10,7 +10,11 @@
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
+#if defined(_XBOX)
+#include <xtl.h>
+#else
 #include <windows.h>
+#endif
 
 #include "NptConfig.h"
 #include "NptTypes.h"
@@ -35,16 +39,17 @@ public:
     // methods
                NPT_Win32Queue(NPT_Cardinal max_items);
               ~NPT_Win32Queue();
-    NPT_Result Push(NPT_QueueItem* item); 
+    NPT_Result Push(NPT_QueueItem* item, NPT_Timeout timeout); 
     NPT_Result Pop(NPT_QueueItem*& item, NPT_Timeout timeout);
+    NPT_Result Peek(NPT_QueueItem*& item, NPT_Timeout timeout);
 
 
 private:
     // members
     NPT_Cardinal             m_MaxItems;
     NPT_Win32CriticalSection m_Mutex;
-    HANDLE                   m_CanPushCondition;
-    HANDLE                   m_CanPopCondition;
+    NPT_Win32Event*          m_CanPushCondition;
+    NPT_Win32Event*          m_CanPopCondition;
     NPT_List<NPT_QueueItem*> m_Items; // should be volatile ?
 };
 
@@ -54,9 +59,8 @@ private:
 NPT_Win32Queue::NPT_Win32Queue(NPT_Cardinal max_items) : 
     m_MaxItems(max_items)
 {
-    // create manual-reset events
-    m_CanPushCondition = CreateEvent(NULL, TRUE, TRUE,  NULL);
-    m_CanPopCondition  = CreateEvent(NULL, TRUE, FALSE, NULL);
+    m_CanPushCondition = new NPT_Win32Event(true, true);
+    m_CanPopCondition  = new NPT_Win32Event(true, false);
 }
 
 /*----------------------------------------------------------------------
@@ -65,15 +69,15 @@ NPT_Win32Queue::NPT_Win32Queue(NPT_Cardinal max_items) :
 NPT_Win32Queue::~NPT_Win32Queue()
 {
     // destroy resources
-    CloseHandle(m_CanPushCondition);
-    CloseHandle(m_CanPopCondition);
+    delete m_CanPushCondition;
+    delete m_CanPopCondition;
 }
 
 /*----------------------------------------------------------------------
 |   NPT_Win32Queue::Push
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Win32Queue::Push(NPT_QueueItem* item)
+NPT_Win32Queue::Push(NPT_QueueItem* item, NPT_Timeout timeout)
 {
     // lock the mutex that protects the list
     NPT_CHECK(m_Mutex.Lock());
@@ -84,19 +88,13 @@ NPT_Win32Queue::Push(NPT_QueueItem* item)
             // we must wait until some items have been removed
 
             // reset the condition to indicate that the queue is full
-            ResetEvent(m_CanPushCondition);
+            m_CanPushCondition->Reset();
 
             // unlock the mutex so that another thread can pop
             m_Mutex.Unlock();
 
             // wait for the condition to signal that we can push
-            DWORD result;
-            result = WaitForSingleObject(m_CanPushCondition, INFINITE);
-            if (result == WAIT_TIMEOUT) {
-                return NPT_ERROR_TIMEOUT;
-            } else if (result != WAIT_OBJECT_0) {
-                return NPT_FAILURE;
-            }
+            NPT_CHECK(m_CanPushCondition->Wait(timeout));
 
             // relock the mutex so that we can check the list again
             NPT_CHECK(m_Mutex.Lock());
@@ -107,7 +105,7 @@ NPT_Win32Queue::Push(NPT_QueueItem* item)
     m_Items.Add(item);
 
     // wake up the threads waiting to pop
-    SetEvent(m_CanPopCondition);
+    m_CanPopCondition->Signal();
 
     // unlock the mutex
     m_Mutex.Unlock();
@@ -121,6 +119,9 @@ NPT_Win32Queue::Push(NPT_QueueItem* item)
 NPT_Result
 NPT_Win32Queue::Pop(NPT_QueueItem*& item, NPT_Timeout timeout)
 {
+    // default value
+    item = NULL;
+    
     // lock the mutex that protects the list
     NPT_CHECK(m_Mutex.Lock());
 
@@ -130,19 +131,13 @@ NPT_Win32Queue::Pop(NPT_QueueItem*& item, NPT_Timeout timeout)
             // no item in the list, wait for one
 
             // reset the condition to indicate that the queue is empty
-            ResetEvent(m_CanPopCondition);
+            m_CanPopCondition->Reset();
 
             // unlock the mutex so that another thread can push
             m_Mutex.Unlock();
 
             // wait for the condition to signal that we can pop
-            DWORD result;
-            result = WaitForSingleObject(m_CanPopCondition, timeout);
-            if (result == WAIT_TIMEOUT) {
-                return NPT_ERROR_TIMEOUT;
-            } else if (result != WAIT_OBJECT_0) {
-                return NPT_FAILURE;
-            }
+            NPT_CHECK(m_CanPopCondition->Wait(timeout));
 
             // relock the mutex so that we can check the list again
             NPT_CHECK(m_Mutex.Lock());
@@ -153,12 +148,57 @@ NPT_Win32Queue::Pop(NPT_QueueItem*& item, NPT_Timeout timeout)
     
     if (m_MaxItems && (result == NPT_SUCCESS)) {
         // wake up the threads waiting to push
-        SetEvent(m_CanPushCondition);
+        m_CanPushCondition->Signal();
     }
 
     // unlock the mutex
     m_Mutex.Unlock();
  
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Win32Queue::Peek
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Win32Queue::Peek(NPT_QueueItem*& item, NPT_Timeout timeout)
+{
+    // default value
+    item = NULL;
+    
+    // lock the mutex that protects the list
+    NPT_CHECK(m_Mutex.Lock());
+
+    NPT_Result result = NPT_SUCCESS;
+    NPT_List<NPT_QueueItem*>::Iterator head = m_Items.GetFirstItem();
+    if (timeout) {
+        while (!head) {
+            // no item in the list, wait for one
+
+            // reset the condition to indicate that the queue is empty
+            m_CanPopCondition->Reset();
+
+            // unlock the mutex so that another thread can push
+            m_Mutex.Unlock();
+
+            // wait for the condition to signal that we can pop
+            NPT_CHECK(m_CanPopCondition->Wait(timeout));
+
+            // relock the mutex so that we can check the list again
+            NPT_CHECK(m_Mutex.Lock());
+
+            // try again
+            head = m_Items.GetFirstItem();
+        }
+    } else {
+        if (!head) result = NPT_ERROR_LIST_EMPTY;
+    }
+
+    if (head) item = *head;
+
+    // unlock the mutex
+    m_Mutex.Unlock();
+
     return result;
 }
 

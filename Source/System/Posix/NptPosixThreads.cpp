@@ -27,6 +27,8 @@
 #include "NptTypes.h"
 #include "NptThreads.h"
 #include "NptLogging.h"
+#include "NptTime.h"
+#include "NptSystem.h"
 
 /*----------------------------------------------------------------------
 |       logging
@@ -362,7 +364,7 @@ class NPT_PosixThread : public NPT_ThreadInterface
                                 bool          detached);
                ~NPT_PosixThread();
     NPT_Result  Start(); 
-    NPT_Result  Wait();
+    NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
 
  private:
     // methods
@@ -375,12 +377,13 @@ class NPT_PosixThread : public NPT_ThreadInterface
     NPT_Result Interrupt() { return NPT_ERROR_NOT_IMPLEMENTED; }
 
     // members
-    NPT_Thread*    m_Delegator;
-    NPT_Runnable&  m_Target;
-    bool           m_Detached;
-    pthread_t      m_ThreadId;
-    bool           m_Joined;
-    NPT_PosixMutex m_JoinLock;
+    NPT_Thread*        m_Delegator;
+    NPT_Runnable&      m_Target;
+    bool               m_Detached;
+    pthread_t          m_ThreadId;
+    bool               m_Joined;
+    NPT_PosixMutex     m_JoinLock;
+    NPT_SharedVariable m_Done;
 };
 
 /*----------------------------------------------------------------------
@@ -396,6 +399,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
     m_Joined(false)
 {
     NPT_LOG_FINE("NPT_PosixThread::NPT_PosixThread");
+    m_Done.SetValue(0);
 }
 
 /*----------------------------------------------------------------------
@@ -422,7 +426,6 @@ NPT_Thread::GetCurrentThreadId()
     return (NPT_Thread::ThreadId)((void*)pid);
 }
 
-
 /*----------------------------------------------------------------------
 |       NPT_PosixThread::EntryPoint
 +---------------------------------------------------------------------*/
@@ -433,15 +436,24 @@ NPT_PosixThread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("NPT_PosixThread::EntryPoint - in =======================");
 
+    // set random seed per thread
+    NPT_TimeStamp now;
+    NPT_System::GetCurrentTimeStamp(now);
+    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread->m_ThreadId));
+
     // run the thread 
     thread->Run();
     
-    NPT_LOG_FINE("NPT_PosixThread::EntryPoint - out ======================");
+    // Logging here will cause a crash on exit because LogManager may already be destroyed    
+    //NPT_LOG_FINE("NPT_PosixThread::EntryPoint - out ======================");
 
     // we're done with the thread object
     // if we're detached, we need to delete ourselves
     if (thread->m_Detached) {
         delete thread->m_Delegator;
+    } else {
+        // notify we're done
+        thread->m_Done.SetValue(1);
     }
 
     // done
@@ -465,18 +477,24 @@ NPT_PosixThread::Start()
     attributes = &stack_size_attributes;
 #endif
 
+    // create a stack local id, as this object, may be deleted
+    // before we get to call detach on the given thread
+    pthread_t id;
+
     // create the native thread
-    int result = pthread_create(&m_ThreadId, attributes, EntryPoint, 
+    int result = pthread_create(&id, attributes, EntryPoint, 
                                 reinterpret_cast<void*>(this));
     NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %d, res=%d", 
-                   m_ThreadId, result);
+                   id, result);
     if (result) {
         // failed
         return NPT_FAILURE;
     } else {
         // detach the thread if we're not joinable
         if (m_Detached) {
-            pthread_detach(m_ThreadId);
+            pthread_detach(id);
+        } else {
+            m_ThreadId = id;
         }
         return NPT_SUCCESS;
     }
@@ -495,7 +513,7 @@ NPT_PosixThread::Run()
 |       NPT_PosixThread::Wait
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_PosixThread::Wait()
+NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
 {
     void* return_value;
     int   result;
@@ -514,9 +532,19 @@ NPT_PosixThread::Wait()
         result = NPT_SUCCESS;
     } else {
         NPT_LOG_FINE_1("NPT_PosixThread::Wait - joining thread id %d", m_ThreadId);
+        if (timeout != NPT_TIMEOUT_INFINITE) {
+            result = m_Done.WaitUntilEquals(1, timeout);
+            if (NPT_FAILED(result)) {
+                result = -1;
+                goto timedout;
+            }
+        }
+
         result = pthread_join(m_ThreadId, &return_value);
         m_Joined = true;
     }
+
+timedout:
     m_JoinLock.Unlock();
     if (result != 0) {
         return NPT_FAILURE;

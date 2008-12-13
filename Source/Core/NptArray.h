@@ -78,13 +78,13 @@ public:
     NPT_Result   Erase(NPT_Ordinal first, NPT_Ordinal last) { return Erase(&m_Items[first], &m_Items[last]); }
     NPT_Result   Insert(Iterator where, const T& item, NPT_Cardinal count = 1);
     NPT_Result   Reserve(NPT_Cardinal count);
-    NPT_Cardinal GetCapacity(NPT_Cardinal count) const;
+    NPT_Cardinal GetCapacity() const { return m_Capacity; }
     NPT_Result   Resize(NPT_Cardinal count);
     NPT_Result   Resize(NPT_Cardinal count, const T& fill);
     NPT_Result   Clear();
     bool         Contains(const T& data) const;
     Iterator     GetFirstItem() const { return m_ItemCount?&m_Items[0]:NULL; }
-    Iterator     GetLastItem() const  { return m_ItemCount?m_Items[&m_ItemCount-1]:NULL; }
+    Iterator     GetLastItem() const  { return m_ItemCount?&m_Items[m_ItemCount-1]:NULL; }
     Iterator     GetItem(NPT_Ordinal n) { return n<m_ItemCount?&m_Items[n]:NULL; }
 
     // template list operations
@@ -112,10 +112,13 @@ public:
     }
 
     template <typename X> 
-    T* Find(const X& predicate, NPT_Ordinal n=0) const
+    T* Find(const X& predicate, NPT_Ordinal n=0, NPT_Ordinal* pos = NULL) const
     {
+        if (pos) *pos = -1;
+
         for (unsigned int i=0; i<m_ItemCount; i++) {
             if (predicate(m_Items[i])) {
+                if (pos) *pos = i;
                 if (n == 0) return &m_Items[i];
                 --n;
             }

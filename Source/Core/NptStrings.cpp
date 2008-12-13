@@ -767,29 +767,36 @@ NPT_String::Erase(NPT_Ordinal start, NPT_Cardinal count /* = 1 */)
 |    NPT_String::ToInteger
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_String::ToInteger(unsigned long& value, bool relaxed) const
+NPT_String::ToInteger(NPT_Int32& value, bool relaxed) const
 {
-    long tmp;
-    NPT_Result res = ToInteger(tmp, relaxed);
-    if (NPT_FAILED(res)) {
-        return res;
-    }
-
-    if (tmp < 0) {
-        return NPT_ERROR_INVALID_PARAMETERS;
-    }
-
-    value = (unsigned long)tmp;
-    return NPT_SUCCESS;
+    return NPT_ParseInteger32(GetChars(), value, relaxed);
 }
 
 /*----------------------------------------------------------------------
 |    NPT_String::ToInteger
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_String::ToInteger(long& value, bool relaxed) const
+NPT_String::ToInteger(NPT_UInt32& value, bool relaxed) const
 {
-    return NPT_ParseInteger(GetChars(), value, relaxed);
+    return NPT_ParseInteger32U(GetChars(), value, relaxed);
+}
+
+/*----------------------------------------------------------------------
+|    NPT_String::ToInteger
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_String::ToInteger(NPT_Int64& value, bool relaxed) const
+{
+    return NPT_ParseInteger64(GetChars(), value, relaxed);
+}
+
+/*----------------------------------------------------------------------
+|    NPT_String::ToInteger
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_String::ToInteger(NPT_UInt64& value, bool relaxed) const
+{
+    return NPT_ParseInteger64U(GetChars(), value, relaxed);
 }
 
 /*----------------------------------------------------------------------
@@ -971,6 +978,23 @@ operator+(const char* s1, const NPT_String& s2)
     NPT_String::CopyBuffer(start, s1, s1_length);
     NPT_String::CopyString(start+s1_length, s2.GetChars());
     
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_String::operator+(const NPT_String& , char)
++---------------------------------------------------------------------*/
+NPT_String 
+operator+(const NPT_String& s1, char c)
+{
+    // allocate space for the new string
+    NPT_String result;
+    result.Reserve(s1.GetLength()+1);
+    
+    // append
+    result = s1;
+    result += c;
+
     return result;
 }
 

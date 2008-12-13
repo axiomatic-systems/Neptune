@@ -59,6 +59,8 @@ class NPT_RingBuffer
     NPT_Result    MoveIn(NPT_Position offset);
     NPT_Result    MoveOut(NPT_Position offset);
     NPT_Result    Flush();
+    NPT_Result    Close();
+    bool          IsClosed() { return m_Closed; }
 
     // accessors
     unsigned char* GetWritePointer()  { return m_In; }
@@ -74,6 +76,7 @@ class NPT_RingBuffer
     unsigned char* m_Out;
     NPT_Size       m_Size;
     bool           m_BufferIsLocal;
+    bool           m_Closed;
 };
 
 typedef NPT_Reference<NPT_RingBuffer> NPT_RingBufferReference;

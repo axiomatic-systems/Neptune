@@ -379,9 +379,11 @@ MapErrorCode(int error)
 #endif
             return NPT_ERROR_WOULD_BLOCK;
 
+#if defined(EPIPE)
         case EPIPE:
             return NPT_ERROR_CONNECTION_RESET;
-            
+#endif
+
         default:
             return NPT_FAILURE;
     }

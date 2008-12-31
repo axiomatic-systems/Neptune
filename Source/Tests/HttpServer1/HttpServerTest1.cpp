@@ -46,6 +46,14 @@ public:
                  msg += " = ";
                  msg += field.m_Value;
                  msg += " </LI>";
+                 
+                 // check for a 'delay' field
+                 if (field.m_Name == "delay") {
+                    NPT_UInt32 delay = 0;
+                    field.m_Value.ToInteger(delay);
+                    NPT_Debug("DELAY: %d seconds\n", delay);
+                    NPT_System::Sleep(NPT_TimeInterval((float)delay));
+                 }
             }
         }
         msg += "</UL></HTML>";
@@ -95,11 +103,11 @@ TestHttp()
     NPT_Result result = server.WaitForNewClient(input, 
                                                 output,
                                                 &context);
-    NPT_Debug("WaitForNewClient returned %d\n", result);
+    NPT_Debug("WaitForNewClient returned %d (%s)\n", result, NPT_ResultText(result));
     if (NPT_FAILED(result)) return result;
 
     result = server.RespondToClient(input, output, context);
-    NPT_Debug("ResponToClient returned %d\n", result);
+    NPT_Debug("ResponToClient returned %d (%s)\n", result, NPT_ResultText(result));
 
     delete static_handler;
     delete file_handler;

@@ -44,6 +44,13 @@
 #include "NptStrings.h"
 #include "NptList.h"
 #include "NptStreams.h"
+#include "NptThreads.h"
+#include "NptHttp.h"
+
+/*----------------------------------------------------------------------
+|   class references
++---------------------------------------------------------------------*/
+class NPT_LogManager;
 
 /*----------------------------------------------------------------------
 |   types
@@ -67,14 +74,15 @@ public:
                              NPT_LogHandler*& handler);
 
     // methods
-    virtual void Log(const NPT_LogRecord& record) = 0;
     virtual ~NPT_LogHandler() {}
+    virtual void       Log(const NPT_LogRecord& record) = 0;
+    virtual NPT_String ToString() { return ""; }
 };
 
 class NPT_Logger {
 public:
     // methods
-    NPT_Logger(const char* name);
+    NPT_Logger(const char* name, NPT_LogManager& manager);
     ~NPT_Logger();
     void Log(int          level, 
              const char*  source_file,
@@ -84,11 +92,16 @@ public:
                           ...);
 
     NPT_Result AddHandler(NPT_LogHandler* handler);
+    NPT_Result DeleteHandlers();
     NPT_Result SetParent(NPT_Logger* parent);
-    int        GetLevel() const { return m_Level; }
+    const NPT_String& GetName()  const { return m_Name;  }
+    int               GetLevel() const { return m_Level; }
+    bool              GetForwardToParent() const { return m_ForwardToParent; }
+    NPT_List<NPT_LogHandler*>& GetHandlers() { return m_Handlers; }
 
 private:
     // members
+    NPT_LogManager&           m_Manager;
     NPT_String                m_Name;
     int                       m_Level;
     bool                      m_LevelIsInherited;
@@ -128,6 +141,7 @@ public:
 class NPT_LogManager {
 public:
     // class methods
+    static NPT_LogManager& GetDefault();
     static bool ConfigValueIsBooleanTrue(NPT_String& value);
     static bool ConfigValueIsBooleanFalse(NPT_String& value);
     static NPT_Logger* GetLogger(const char* name);
@@ -135,8 +149,12 @@ public:
     // methods
     NPT_LogManager();
     ~NPT_LogManager();
-    NPT_String* GetConfigValue(const char* prefix, const char* suffix);
-    NPT_Result  Configure();
+    NPT_Result                    Configure(const char* config_sources = NULL);
+    NPT_String*                   GetConfigValue(const char* prefix, const char* suffix);
+    NPT_List<NPT_Logger*>&        GetLoggers() { return m_Loggers; }
+    NPT_List<NPT_LogConfigEntry>& GetConfig()  { return m_Config;  }
+    void Lock()   { m_Lock.Lock();   }
+    void Unlock() { m_Lock.Unlock(); }
 
 private:
     // methods
@@ -149,10 +167,31 @@ private:
     NPT_Result  ConfigureLogger(NPT_Logger* logger);
 
     // members
+    NPT_Mutex                    m_Lock;
     bool                         m_Configured;
     NPT_List<NPT_LogConfigEntry> m_Config;
     NPT_List<NPT_Logger*>        m_Loggers;
     NPT_Logger*                  m_Root;
+};
+
+const unsigned short NPT_HTTP_LOGGER_CONFIGURATOR_DEFAULT_PORT = 6378;
+class NPT_HttpLoggerConfigurator : NPT_HttpRequestHandler, public NPT_Thread {
+public:
+    // constructor and destructor
+    NPT_HttpLoggerConfigurator(NPT_UInt16 port = NPT_HTTP_LOGGER_CONFIGURATOR_DEFAULT_PORT);
+    virtual ~NPT_HttpLoggerConfigurator();
+
+    // NPT_Runnable (NPT_Thread) methods
+    virtual void Run();
+
+private:
+    // NPT_HttpRequestHandler methods
+    virtual NPT_Result SetupResponse(NPT_HttpRequest&              request,
+                                     const NPT_HttpRequestContext& context,
+                                     NPT_HttpResponse&             response);
+
+    // members
+    NPT_HttpServer* m_Server;
 };
 
 /*----------------------------------------------------------------------
@@ -179,7 +218,7 @@ private:
 
 #if defined(NPT_CONFIG_ENABLE_LOGGING)
 
-#define NPT_DEFINE_LOGGER(_logger, _name) static NPT_LoggerReference _logger = { NULL, (_name) };
+#define NPT_DEFINE_LOGGER(_logger, _name) static volatile NPT_LoggerReference _logger = { NULL, (_name) };
 
 #define NPT_LOG_X(_logger, _level, _argsx)                              \
 do {                                                                    \
@@ -423,3 +462,4 @@ do {                                                                    \
 
 
 #endif /* _NPT_LOGGING_H_ */
+

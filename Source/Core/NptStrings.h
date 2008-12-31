@@ -102,10 +102,14 @@ public:
     // conversions
     NPT_String ToLowercase() const;
     NPT_String ToUppercase() const;
-    NPT_Result ToInteger(NPT_Int32& value, bool relaxed = true) const;
-    NPT_Result ToInteger(NPT_UInt32& value, bool relaxed = true) const;
-    NPT_Result ToInteger(NPT_Int64& value, bool relaxed = true) const;
-    NPT_Result ToInteger(NPT_UInt64& value, bool relaxed = true) const;
+    NPT_Result ToInteger(int& value, bool relaxed = true) const;
+    NPT_Result ToInteger(unsigned int& value, bool relaxed = true) const;
+    NPT_Result ToInteger(long& value, bool relaxed = true) const;
+    NPT_Result ToInteger(unsigned long& value, bool relaxed = true) const;
+    NPT_Result ToInteger32(NPT_Int32& value, bool relaxed = true) const;
+    NPT_Result ToInteger32(NPT_UInt32& value, bool relaxed = true) const;
+    NPT_Result ToInteger64(NPT_Int64& value, bool relaxed = true) const;
+    NPT_Result ToInteger64(NPT_UInt64& value, bool relaxed = true) const;
     NPT_Result ToFloat(float& value, bool relaxed = true) const;
     
     // processing

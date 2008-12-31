@@ -295,7 +295,7 @@ main(int /*argc*/, char** /*argv*/)
 
     // number parsing
     float      f;
-    int        i;
+    long       i;
     NPT_Int32  i32;
     NPT_UInt32 ui32;
     NPT_Int64  i64;

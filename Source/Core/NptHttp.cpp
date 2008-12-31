@@ -50,6 +50,8 @@ NPT_SET_LOCAL_LOGGER("neptune.http")
 |   constants
 +---------------------------------------------------------------------*/
 const unsigned int NPT_HTTP_MAX_REDIRECTS = 20;
+const char* const NPT_HTTP_DEFAULT_404_HTML = "<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></html>";
+const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal Error</title></head><body><h1>Internal Error</h1><p>The server encountered an unexpected condition which prevented it from fulfilling the request.</p></html>";
 
 /*----------------------------------------------------------------------
 |   NPT_HttpUrl::NPT_HttpUrl
@@ -1274,16 +1276,22 @@ NPT_HttpServer::Loop()
     NPT_Result                result;
     
     do {
+        // wait for a client to connect
         result = WaitForNewClient(input, output, &context);
         NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)", 
                        result,
                        NPT_ResultText(result));
         if (NPT_FAILED(result)) break;
 
+        // send a response
         result = RespondToClient(input, output, context);
         NPT_LOG_FINE_2("ResponToClient returned %d", 
                        result,
                        NPT_ResultText(result));
+
+        // release the stream references to that the socket can be closed
+        input = NULL;
+        output = NULL;
     } while (NPT_SUCCEEDED(result));
     
     return result;
@@ -1354,26 +1362,36 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
 {
     NPT_HttpRequest*  request;
     NPT_HttpResponse* response;
-    NPT_Result        result = NPT_SUCCESS;
+    NPT_Result        result = NPT_ERROR_NO_SUCH_ITEM;
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK_WARNING(responder.ParseRequest(request, &context.GetLocalAddress()));
     NPT_LOG_FINE_1("request, path=%s", request->GetUrl().GetPath().GetChars());
     
+    // prepare the response body
+    NPT_HttpEntity* body = new NPT_HttpEntity();
+
     NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
-    if (handler == NULL) {
-        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
-    } else {
+    if (handler) {
         // create a response object
         response = new NPT_HttpResponse(200, "OK", NPT_HTTP_PROTOCOL_1_0);
-
-        // prepare the response
-        response->SetEntity(new NPT_HttpEntity());
+        response->SetEntity(body);
 
         // ask the handler to setup the response
-        if (NPT_FAILED(handler->SetupResponse(*request, context, *response))) {
-            response->SetStatus(500, "Internal Server Error");
-        }
+        result = handler->SetupResponse(*request, context, *response);
+
+
+    }
+    if (result == NPT_ERROR_NO_SUCH_ITEM || handler == NULL) {
+        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
+        response->SetEntity(body);
+        body->SetInputStream(NPT_HTTP_DEFAULT_404_HTML);
+        body->SetContentType("text/html");
+    } else if (NPT_FAILED(result)) {
+        response->SetStatus(500, "Internal Error", NPT_HTTP_PROTOCOL_1_0);
+        response->SetEntity(body);
+        body->SetInputStream(NPT_HTTP_DEFAULT_500_HTML);
+        body->SetContentType("text/html");
     }
 
     // send the response

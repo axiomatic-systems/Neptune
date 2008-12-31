@@ -47,6 +47,11 @@
 #include "NptConsole.h"
 
 /*----------------------------------------------------------------------
+|   logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.logging")
+
+/*----------------------------------------------------------------------
 |   types
 +---------------------------------------------------------------------*/
 class NPT_LogConsoleHandler : public NPT_LogHandler {
@@ -316,14 +321,20 @@ NPT_LogManager::~NPT_LogManager()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_LogManager::GetDefault
++---------------------------------------------------------------------*/
+NPT_LogManager&
+NPT_LogManager::GetDefault()
+{
+    return LogManager;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_LogManager::Configure
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_LogManager::Configure() 
+NPT_LogManager::Configure(const char* config_sources) 
 {
-    NPT_String  config_sources_env;
-    const char* config_sources = NPT_LOG_DEFAULT_CONFIG_SOURCE;
-
     // exit if we're already initialized
     if (m_Configured) return NPT_SUCCESS;
 
@@ -331,6 +342,10 @@ NPT_LogManager::Configure()
     SetConfigValue(".handlers", NPT_LOG_ROOT_DEFAULT_HANDLER);
 
     /* see if the config sources have been set to non-default values */
+    NPT_String config_sources_env;
+    if (config_sources == NULL) {
+        config_sources = NPT_LOG_DEFAULT_CONFIG_SOURCE;
+    }
     if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_LOG_CONFIG_ENV, config_sources_env))) {
         config_sources = config_sources_env;
     }
@@ -352,7 +367,7 @@ NPT_LogManager::Configure()
     }
 
     /* create the root logger */
-    LogManager.m_Root = new NPT_Logger("");
+    LogManager.m_Root = new NPT_Logger("", *this);
     LogManager.m_Root->m_Level = NPT_LOG_ROOT_DEFAULT_LOG_LEVEL;
     LogManager.m_Root->m_LevelIsInherited = false;
     ConfigureLogger(LogManager.m_Root);
@@ -558,6 +573,9 @@ NPT_LogManager::ConfigureLogger(NPT_Logger* logger)
         }
     }
 
+    /* remove any existing handlers */
+    logger->DeleteHandlers();
+
     /* configure the handlers */
     NPT_String* handlers = GetConfigValue(logger->m_Name,".handlers");
     if (handlers) {
@@ -619,7 +637,7 @@ NPT_LogManager::FindLogger(const char* name)
 NPT_Logger*
 NPT_LogManager::GetLogger(const char* name)
 {
-    NPT_Logger* logger;
+    NPT_AutoLock lock(LogManager.m_Lock);
 
     /* check that the manager is initialized */
     if (!LogManager.m_Configured) {
@@ -629,11 +647,11 @@ NPT_LogManager::GetLogger(const char* name)
     }
 
     /* check if this logger is already configured */
-    logger = LogManager.FindLogger(name);
+    NPT_Logger* logger = LogManager.FindLogger(name);
     if (logger) return logger;
 
     /* create a new logger */
-    logger = new NPT_Logger(name);
+    logger = new NPT_Logger(name, LogManager);
     if (logger == NULL) return NULL;
 
     /* configure the logger */
@@ -676,7 +694,8 @@ NPT_LogManager::GetLogger(const char* name)
 /*----------------------------------------------------------------------
 |   NPT_Logger::NPT_Logger
 +---------------------------------------------------------------------*/
-NPT_Logger::NPT_Logger(const char* name) :
+NPT_Logger::NPT_Logger(const char* name, NPT_LogManager& manager) :
+    m_Manager(manager),
     m_Name(name),
     m_Level(NPT_LOG_LEVEL_OFF),
     m_LevelIsInherited(true),
@@ -690,13 +709,23 @@ NPT_Logger::NPT_Logger(const char* name) :
 +---------------------------------------------------------------------*/
 NPT_Logger::~NPT_Logger()
 {
-    /* destroy all handlers */
-    for (NPT_List<NPT_LogHandler*>::Iterator i = m_Handlers.GetFirstItem();
-         i;
-         ++i) {
-        NPT_LogHandler* handler = *i;
-        delete handler;
+    /* delete all handlers */
+    m_Handlers.Apply(NPT_ObjectDeleter<NPT_LogHandler>());
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Logger::DeleteHandlers
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Logger::DeleteHandlers()
+{
+    /* delete all handlers and empty the list */
+    if (m_Handlers.GetItemCount()) {
+        m_Handlers.Apply(NPT_ObjectDeleter<NPT_LogHandler>());
+        m_Handlers.Clear();
     }
+
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -714,13 +743,13 @@ NPT_Logger::Log(int          level,
     NPT_Size buffer_size = sizeof(buffer);
     char*    message = buffer;
     int      result;
-    va_list  args;
-
-    va_start(args, msg);
 
     /* check the log level (in case filtering has not already been done) */
     if (level < m_Level) return;
         
+    /* format the message */
+    va_list  args;
+    va_start(args, msg);
     for(;;) {
         /* try to format the message (it might not fit) */
         result = NPT_FormatStringVN(message, buffer_size-1, msg, args);
@@ -750,6 +779,7 @@ NPT_Logger::Log(int          level,
     NPT_System::GetCurrentTimeStamp(record.m_TimeStamp);
 
     /* call all handlers for this logger and parents */
+    m_Manager.Lock();
     while (logger) {
         /* call all handlers for the current logger */
         for (NPT_List<NPT_LogHandler*>::Iterator i = logger->m_Handlers.GetFirstItem();
@@ -766,6 +796,7 @@ NPT_Logger::Log(int          level,
             break;
         }
     }
+    m_Manager.Unlock();
 
     /* free anything we may have allocated */
     if (message != buffer) delete[] message;
@@ -1032,5 +1063,100 @@ NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
     /* emit the formatted record */
     if (NPT_FAILED(m_Stream->WriteString(msg))) {
         m_Stream = NULL;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpLoggerConfigurator::NPT_HttpLoggerConfigurator
++---------------------------------------------------------------------*/
+NPT_HttpLoggerConfigurator::NPT_HttpLoggerConfigurator(NPT_UInt16 port)
+{
+    // create the server
+    m_Server = new NPT_HttpServer(port);
+
+    // attach a handler to response to the requests
+    m_Server->AddRequestHandler(this, "/", true);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpLoggerConfigurator::~NPT_HttpLoggerConfigurator
++---------------------------------------------------------------------*/
+NPT_HttpLoggerConfigurator::~NPT_HttpLoggerConfigurator()
+{
+    // TODO: send a command to the server to tell it to abort
+    
+    // cleanup
+    delete m_Server;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpLoggerConfigurator::SetupResponse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpLoggerConfigurator::SetupResponse(NPT_HttpRequest&              request,
+                                          const NPT_HttpRequestContext& context,
+                                          NPT_HttpResponse&             response)
+{
+    // we only support GET here
+    if (request.GetMethod() != NPT_HTTP_METHOD_GET) return NPT_ERROR_HTTP_METHOD_NOT_SUPPORTED;
+
+    // construct the response message
+    NPT_String msg;
+    
+    msg = "<ul>";
+    NPT_List<NPT_LogConfigEntry>& config = LogManager.GetConfig();
+    NPT_List<NPT_LogConfigEntry>::Iterator cit = config.GetFirstItem();
+    for (; cit; ++cit) {
+        NPT_LogConfigEntry& entry = (*cit);
+        msg += "<li>";
+        msg += entry.m_Key;
+        msg += "=";
+        msg += entry.m_Value;
+        msg += "</li>";
+    }
+    msg += "</ul>";
+
+    msg += "<ul>";
+    NPT_List<NPT_Logger*>& loggers = LogManager.GetLoggers();
+    NPT_List<NPT_Logger*>::Iterator lit = loggers.GetFirstItem();
+    for (;lit;++lit) {
+        NPT_Logger* logger = (*lit);
+        msg += "<li>";
+        msg += logger->GetName();
+        msg += ", level=";
+        msg += NPT_String::FromInteger(logger->GetLevel());
+
+        NPT_List<NPT_LogHandler*>& handlers = logger->GetHandlers();
+        NPT_List<NPT_LogHandler*>::Iterator hit = handlers.GetFirstItem();
+        msg += ", handlers=";
+        for (;hit;++hit) {
+            NPT_LogHandler* handler = (*hit);
+            msg += handler->ToString();
+        }
+        msg += "</li>";
+    }
+    msg += "</ul>";
+
+    // setup the response body
+    NPT_HttpEntity* entity = response.GetEntity();
+    entity->SetContentType("text/html");
+    entity->SetInputStream(msg);
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpLoggerConfigurator::Run
++---------------------------------------------------------------------*/
+void
+NPT_HttpLoggerConfigurator::Run()
+{
+    for (;;) {
+        NPT_Result result;
+        result = m_Server->Loop();
+        if (NPT_FAILED(result)) {
+            NPT_LOG_FINE_1("server exits with status %d", result);
+            break;
+        }
     }
 }

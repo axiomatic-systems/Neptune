@@ -183,9 +183,10 @@ public:
     NPT_Result SetHeaders(const NPT_HttpHeaders& headers);
 
     // field access
+    NPT_Result        SetContentLength(NPT_LargeSize length);
     NPT_Result        SetContentType(const char* type);
     NPT_Result        SetContentEncoding(const char* encoding);
-    NPT_Result        SetContentLength(NPT_LargeSize length);
+    NPT_Result        SetTransferEncoding(const char* encoding);
     NPT_LargeSize     GetContentLength()   { return m_ContentLength;   }
     const NPT_String& GetContentType()     { return m_ContentType;     }
     const NPT_String& GetContentEncoding() { return m_ContentEncoding; }
@@ -590,6 +591,32 @@ protected:
     Config                           m_Config;
     NPT_BufferedInputStreamReference m_Input;
     NPT_OutputStreamReference        m_Output;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream
++---------------------------------------------------------------------*/
+class NPT_HttpChunkedInputStream : public NPT_InputStream
+{
+public:
+    // constructors and destructor
+    NPT_HttpChunkedInputStream(NPT_BufferedInputStreamReference& stream);
+    virtual ~NPT_HttpChunkedInputStream();
+
+    // NPT_InputStream methods
+    NPT_Result Read(void*     buffer, 
+                    NPT_Size  bytes_to_read, 
+                    NPT_Size* bytes_read = NULL);
+    NPT_Result Seek(NPT_Position offset);
+    NPT_Result Tell(NPT_Position& offset);
+    NPT_Result GetSize(NPT_LargeSize& size);
+    NPT_Result GetAvailable(NPT_LargeSize& available);
+
+protected:
+    // members
+    NPT_BufferedInputStreamReference m_Source;
+    NPT_UInt32                       m_CurrentChunkSize;
+    bool                             m_Eos;
 };
 
 #endif // _NPT_HTTP_H_

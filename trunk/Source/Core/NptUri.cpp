@@ -554,8 +554,8 @@ NPT_Url::SetHost(const char* host)
     while (*port && *port != ':') port++;
     if (*port) {
         m_Host.Assign(host, (NPT_Size)(port-host));
-        NPT_UInt32 port_number;
-        if (NPT_SUCCEEDED(NPT_ParseInteger32U(port+1, port_number, false))) {
+        unsigned int port_number;
+        if (NPT_SUCCEEDED(NPT_ParseInteger(port+1, port_number, false))) {
             m_Port = (short)port_number;
         }
     } else {

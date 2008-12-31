@@ -1094,7 +1094,7 @@ NPT_HttpLoggerConfigurator::~NPT_HttpLoggerConfigurator()
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpLoggerConfigurator::SetupResponse(NPT_HttpRequest&              request,
-                                          const NPT_HttpRequestContext& context,
+                                          const NPT_HttpRequestContext& /*context*/,
                                           NPT_HttpResponse&             response)
 {
     // we only support GET here

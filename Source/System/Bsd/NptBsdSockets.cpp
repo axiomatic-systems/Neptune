@@ -379,6 +379,9 @@ MapErrorCode(int error)
 #endif
             return NPT_ERROR_WOULD_BLOCK;
 
+        case EPIPE:
+            return NPT_ERROR_CONNECTION_RESET;
+            
         default:
             return NPT_FAILURE;
     }
@@ -809,9 +812,9 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
 
     int flags = 0;
 
-    // on some BSD implementations, signal we don't want a SIGPIPE
-    // but instead return EPIPE
 #ifdef MSG_NOSIGNAL
+    // for some BSD stacks, ask for EPIPE to be returned instead
+    // of sending a SIGPIPE signal to the process
     flags |= MSG_NOSIGNAL;
 #endif
 
@@ -1587,13 +1590,6 @@ protected:
 NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket() : 
     NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0))
 {
-}
-
-/*----------------------------------------------------------------------
-|   NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
-+---------------------------------------------------------------------*/
-NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
-{
     // disable the SIGPIPE signal
 #if defined(SO_NOSIGPIPE)
     int option = 1;
@@ -1603,6 +1599,13 @@ NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
                (SocketOption)&option, 
                sizeof(option));
 #endif
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket
++---------------------------------------------------------------------*/
+NPT_BsdTcpClientSocket::~NPT_BsdTcpClientSocket()
+{
 }
 
 /*----------------------------------------------------------------------

@@ -305,7 +305,7 @@ NPT_HttpEntity::NPT_HttpEntity(const NPT_HttpHeaders& headers) :
     header = headers.GetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH);
     if (header != NULL) {
         NPT_LargeSize length;
-        if (NPT_SUCCEEDED(header->GetValue().ToInteger(length))) {
+        if (NPT_SUCCEEDED(header->GetValue().ToInteger64(length))) {
             m_ContentLength = length;
         } else {
             m_ContentLength = 0;
@@ -447,6 +447,16 @@ NPT_Result
 NPT_HttpEntity::SetContentEncoding(const char* encoding)
 {
     m_ContentEncoding = encoding;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntity::SetTransferEncoding
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpEntity::SetTransferEncoding(const char* encoding)
+{
+    m_TransferEncoding = encoding;
     return NPT_SUCCESS;
 }
 
@@ -1040,7 +1050,14 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     // create an entity if one is expected in the response
     if (request.GetMethod() == NPT_HTTP_METHOD_GET || request.GetMethod() == NPT_HTTP_METHOD_POST) {
         NPT_HttpEntity* response_entity = new NPT_HttpEntity(response->GetHeaders());
-        response_entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);
+        
+        // check for chunked Transfer-Encoding
+        if (response_entity->GetTransferEncoding() == "chunked") {
+            response_entity->SetInputStream(NPT_InputStreamReference(new NPT_HttpChunkedInputStream(buffered_input_stream)));
+            response_entity->SetTransferEncoding(NULL);
+        } else {
+            response_entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);
+        }
         response->SetEntity(response_entity);
     }
     
@@ -1341,7 +1358,8 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK_WARNING(responder.ParseRequest(request, &context.GetLocalAddress()));
-
+    NPT_LOG_FINE_1("request, path=%s", request->GetUrl().GetPath().GetChars());
+    
     NPT_HttpRequestHandler* handler = FindRequestHandler(*request);
     if (handler == NULL) {
         response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
@@ -1633,4 +1651,150 @@ NPT_HttpFileRequestHandler::GetContentType(const NPT_String& filename)
     }
 
     return m_DefaultMimeType;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::NPT_HttpChunkedInputStream
++---------------------------------------------------------------------*/
+NPT_HttpChunkedInputStream::NPT_HttpChunkedInputStream(
+    NPT_BufferedInputStreamReference& stream) :
+    m_Source(stream),
+    m_CurrentChunkSize(0),
+    m_Eos(false)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::~NPT_HttpChunkedInputStream
++---------------------------------------------------------------------*/
+NPT_HttpChunkedInputStream::~NPT_HttpChunkedInputStream()
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::NPT_HttpChunkedInputStream
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpChunkedInputStream::Read(void*     buffer, 
+                                 NPT_Size  bytes_to_read, 
+                                 NPT_Size* bytes_read /* = NULL */)
+{
+    // set the initial state of return values
+    if (bytes_read) *bytes_read = 0;
+
+    // check for end of stream
+    if (m_Eos) return NPT_ERROR_EOS;
+    
+    // shortcut
+    if (bytes_to_read == 0) return NPT_SUCCESS;
+    
+    // read next chunk size if needed
+    if (m_CurrentChunkSize == 0) {
+        // buffered mode
+        m_Source->SetBufferSize(4096);
+
+        NPT_String size_line;
+        NPT_CHECK(m_Source->ReadLine(size_line));
+
+        // decode size (in hex)
+        m_CurrentChunkSize = 0;
+        if (size_line < 1) {
+            NPT_LOG_WARNING("empty chunk size line");
+            return NPT_ERROR_INVALID_FORMAT;
+        }
+        const char* size_hex = size_line.GetChars();
+        while (*size_hex != '\0' &&
+               *size_hex != ' '  && 
+               *size_hex != ';'  && 
+               *size_hex != '\r' && 
+               *size_hex != '\n') {
+            int nibble = NPT_HexToNibble(*size_hex);
+            if (nibble < 0) {
+                NPT_LOG_WARNING_1("invalid chunk size format (%s)", size_line.GetChars());
+                return NPT_ERROR_INVALID_FORMAT;
+            }
+            m_CurrentChunkSize = (m_CurrentChunkSize<<4)|nibble;
+            ++size_hex;
+        }
+        NPT_LOG_FINE_1("start of chunk, size=%d", m_CurrentChunkSize);
+
+        // 0 = end of body
+        if (m_CurrentChunkSize == 0) {
+            NPT_LOG_FINE("end of chunked stream, reading trailers");
+            
+            // read footers until empty line
+            NPT_String footer;
+            do {
+                NPT_CHECK(m_Source->ReadLine(footer));
+            } while (!footer.IsEmpty());
+            m_Eos = true;
+            
+            NPT_LOG_FINE("end of chunked stream, done");
+            return NPT_ERROR_EOS;
+        }
+
+        // unbuffer source
+        m_Source->SetBufferSize(0);
+    }
+
+    // read no more than what's left in chunk
+    NPT_Size chunk_bytes_read;
+    if (bytes_to_read > m_CurrentChunkSize) bytes_to_read = m_CurrentChunkSize;
+    NPT_CHECK(m_Source->Read(buffer, bytes_to_read, &chunk_bytes_read));
+
+    // ready to go to next chunk?
+    m_CurrentChunkSize -= chunk_bytes_read;
+    if (m_CurrentChunkSize == 0) {
+        NPT_LOG_FINEST("reading end of chunk");
+        
+        // when a chunk is finished, a \r\n follows
+        char newline[2];
+        NPT_CHECK(m_Source->ReadFully(newline, 2));
+        if (newline[0] != '\r' || newline[1] != '\n') {
+            NPT_LOG_WARNING("invalid end of chunk (expected \\r\\n)");
+            return NPT_ERROR_INVALID_FORMAT;
+        }
+    }
+
+    // update output params
+    if (bytes_read) *bytes_read = chunk_bytes_read;
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::Seek
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpChunkedInputStream::Seek(NPT_Position /*offset*/)
+{
+    return NPT_ERROR_NOT_SUPPORTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::Tell
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpChunkedInputStream::Tell(NPT_Position& offset)
+{
+    offset = 0;
+    return NPT_ERROR_NOT_SUPPORTED;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::GetSize
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpChunkedInputStream::GetSize(NPT_LargeSize& size)
+{
+    return m_Source->GetSize(size);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedInputStream::GetAvailable
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpChunkedInputStream::GetAvailable(NPT_LargeSize& available)
+{
+    return m_Source->GetAvailable(available);
 }

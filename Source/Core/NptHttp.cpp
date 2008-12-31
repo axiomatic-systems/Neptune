@@ -1361,7 +1361,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
                                 const NPT_HttpRequestContext& context)
 {
     NPT_HttpRequest*  request;
-    NPT_HttpResponse* response;
+    NPT_HttpResponse* response = NULL;
     NPT_Result        result = NPT_ERROR_NO_SUCH_ITEM;
 
     NPT_HttpResponder responder(input, output);

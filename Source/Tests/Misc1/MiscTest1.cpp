@@ -338,10 +338,10 @@ main(int /*argc*/, char** /*argv*/)
     SHOULD_FAIL(NPT_ParseInteger32("-21474836480", i32, false));
     SHOULD_FAIL(NPT_ParseInteger32("21474836470", i32, false));
 
-    SHOULD_SUCCEED(NPT_ParseInteger32U("4294967295", ui32, false));
+    SHOULD_SUCCEED(NPT_ParseInteger32("4294967295", ui32, false));
     SHOULD_EQUAL_I(ui32, 4294967295U);
-    SHOULD_FAIL(NPT_ParseInteger32U("4294967296", ui32, false));
-    SHOULD_FAIL(NPT_ParseInteger32U("-1", ui32, false));
+    SHOULD_FAIL(NPT_ParseInteger32("4294967296", ui32, false));
+    SHOULD_FAIL(NPT_ParseInteger32("-1", ui32, false));
 
     SHOULD_SUCCEED(NPT_ParseInteger64("9223372036854775807", i64, false));
     SHOULD_EQUAL_I(i64, NPT_INT64_C(9223372036854775807));
@@ -354,10 +354,10 @@ main(int /*argc*/, char** /*argv*/)
     SHOULD_FAIL(NPT_ParseInteger64("-9223372036854775897", i64, false));
     SHOULD_FAIL(NPT_ParseInteger64("9223372036854775897", i64, false));
 
-    SHOULD_SUCCEED(NPT_ParseInteger64U("18446744073709551615", ui64, false));
+    SHOULD_SUCCEED(NPT_ParseInteger64("18446744073709551615", ui64, false));
     SHOULD_EQUAL_I(ui64, NPT_UINT64_C(18446744073709551615));
-    SHOULD_FAIL(NPT_ParseInteger64U("18446744073709551616", ui64, false));
-    SHOULD_FAIL(NPT_ParseInteger64U("-1", ui64, false));
+    SHOULD_FAIL(NPT_ParseInteger64("18446744073709551616", ui64, false));
+    SHOULD_FAIL(NPT_ParseInteger64("-1", ui64, false));
 
     SHOULD_FAIL(NPT_ParseFloat("ssdfsdf", f, false));
     SHOULD_FAIL(NPT_ParseFloat("", f, false));

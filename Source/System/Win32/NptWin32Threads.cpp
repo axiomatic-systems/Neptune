@@ -450,10 +450,20 @@ NPT_Win32Thread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("thread in =======================");
 
+    // get the current thread ID in this context (it may not yet have been
+    // set in the parent context)
+    DWORD thread_id = ::GetCurrentThreadId();
+
+    // for detached threads, we store the thread ID here, because we cannot
+    // do it from the thread context that called the Start() method
+    if (thread->m_Detached) {
+        thread->m_ThreadId = thread_id;
+    }
+
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed(now.m_NanoSeconds + NPT_Thread::GetCurrentThreadId());
+    NPT_System::SetRandomSeed(now.m_NanoSeconds + thread_id);
 
     // run the thread 
     thread->Run();

@@ -1362,7 +1362,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
 {
     NPT_HttpRequest*  request;
     NPT_HttpResponse* response = NULL;
-    NPT_Result        result = NPT_ERROR_NO_SUCH_ITEM;
+    NPT_Result        result   = NPT_ERROR_NO_SUCH_ITEM;
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK_WARNING(responder.ParseRequest(request, &context.GetLocalAddress()));
@@ -1445,7 +1445,7 @@ NPT_HttpResponder::SetTimeout(NPT_Timeout io_timeout)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_HttpResponder::SetTimeout
+|   NPT_HttpResponder::ParseRequest
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&        request,

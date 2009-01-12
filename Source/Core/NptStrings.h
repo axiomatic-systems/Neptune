@@ -116,6 +116,7 @@ public:
     void MakeLowercase();
     void MakeUppercase();
     void Replace(char a, char b);
+    void Replace(char a, const char* b);
 
     // search
     int  Find(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;

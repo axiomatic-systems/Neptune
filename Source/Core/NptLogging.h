@@ -178,7 +178,8 @@ const unsigned short NPT_HTTP_LOGGER_CONFIGURATOR_DEFAULT_PORT = 6378;
 class NPT_HttpLoggerConfigurator : NPT_HttpRequestHandler, public NPT_Thread {
 public:
     // constructor and destructor
-    NPT_HttpLoggerConfigurator(NPT_UInt16 port = NPT_HTTP_LOGGER_CONFIGURATOR_DEFAULT_PORT);
+    NPT_HttpLoggerConfigurator(NPT_UInt16 port = NPT_HTTP_LOGGER_CONFIGURATOR_DEFAULT_PORT,
+                               bool       detached = true);
     virtual ~NPT_HttpLoggerConfigurator();
 
     // NPT_Runnable (NPT_Thread) methods

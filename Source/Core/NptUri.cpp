@@ -654,7 +654,7 @@ NPT_Result
 NPT_Url::SetQuery(const char* query)
 {
     m_Query = query;
-    m_HasQuery = query!=NULL;
+    m_HasQuery = query!=NULL && NPT_StringLength(query)>0;
 
     return NPT_SUCCESS;
 }

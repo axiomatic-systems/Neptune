@@ -15,6 +15,8 @@
 #include <string.h>
 #include "Neptune.h"
 #include "NptDebug.h"
+#include "NptUtils.h"
+#include "NptTypes.h"
 
 /*----------------------------------------------------------------------
 |       macros
@@ -68,7 +70,38 @@ main(int /*argc*/, char** /*argv*/)
 {
     NPT_Result result;
 
-
+    // misc type tests
+    signed long   sl;
+    unsigned long ul;
+    signed int    si;
+    unsigned int  ui;
+    NPT_Int64     si64;
+    NPT_UInt64    ui64;
+    
+    NPT_ASSERT(sizeof(NPT_UInt32) == sizeof(NPT_Int32));
+    NPT_ASSERT(sizeof(NPT_Int32) >= 4);
+    NPT_ASSERT(sizeof(NPT_UInt64) == sizeof(NPT_Int64));
+    NPT_ASSERT(sizeof(NPT_Int64) >= 8);
+    sl = NPT_LONG_MAX;
+    sl += 1;
+    NPT_ASSERT(sl == NPT_LONG_MIN);
+    si = NPT_INT_MAX;
+    si += 1;
+    NPT_ASSERT(si == NPT_INT_MIN);
+    si64 = NPT_INT64_MAX;
+    si64 += 1;
+    NPT_ASSERT(si64 == NPT_INT64_MIN);
+    ul = NPT_ULONG_MAX;
+    ul += 1;
+    NPT_ASSERT(ul == 0);
+    ui = NPT_UINT_MAX;
+    ui += 1;
+    NPT_ASSERT(ui == 0);
+    ui64 = NPT_UINT64_MAX;
+    ui64 += 1;
+    NPT_ASSERT(ui64 == 0);
+    
+    // base64
     NPT_String t = "hello";
     NPT_String base64;
     NPT_DataBuffer data;
@@ -295,11 +328,10 @@ main(int /*argc*/, char** /*argv*/)
 
     // number parsing
     float      f;
-    long       i;
-    NPT_Int32  i32;
+    int        i;
+    int        l;
+    NPT_Int32  si32;
     NPT_UInt32 ui32;
-    NPT_Int64  i64;
-    NPT_UInt64 ui64;
 
     SHOULD_FAIL(NPT_ParseInteger("ssdfsdf", i, false));
     SHOULD_FAIL(NPT_ParseInteger("", i, false));
@@ -327,32 +359,49 @@ main(int /*argc*/, char** /*argv*/)
     SHOULD_SUCCEED(NPT_ParseInteger("7768", i, true));
     SHOULD_EQUAL_I(i, 7768);
 
-    SHOULD_SUCCEED(NPT_ParseInteger32("2147483647", i32, false));
-    SHOULD_EQUAL_I(i32, 2147483647);
-    SHOULD_SUCCEED(NPT_ParseInteger32("-2147483647", i32, false));
-    SHOULD_EQUAL_I(i32, -2147483647);
-    SHOULD_SUCCEED(NPT_ParseInteger32("-2147483648", i32, false));
-    SHOULD_EQUAL_I(i32, (-2147483647 - 1));
-    SHOULD_FAIL(NPT_ParseInteger32("2147483648", i32, false));
-    SHOULD_FAIL(NPT_ParseInteger32("-2147483649", i32, false));
-    SHOULD_FAIL(NPT_ParseInteger32("-21474836480", i32, false));
-    SHOULD_FAIL(NPT_ParseInteger32("21474836470", i32, false));
+    SHOULD_SUCCEED(NPT_ParseInteger("+1", l, false));
+    SHOULD_EQUAL_I(l, 1);
+    SHOULD_SUCCEED(NPT_ParseInteger("+123", l, false));
+    SHOULD_EQUAL_I(l, 123);
+    SHOULD_SUCCEED(NPT_ParseInteger("-1", l, false));
+    SHOULD_EQUAL_I(l, -1);
+    SHOULD_SUCCEED(NPT_ParseInteger("-123", l, false));
+    SHOULD_EQUAL_I(l, -123);
+    SHOULD_SUCCEED(NPT_ParseInteger("-123fgs", l, true));
+    SHOULD_EQUAL_I(l, -123);
+    SHOULD_SUCCEED(NPT_ParseInteger("  -123fgs", l, true));
+    SHOULD_EQUAL_I(l, -123);
+    SHOULD_SUCCEED(NPT_ParseInteger("0", l, true));
+    SHOULD_EQUAL_I(l, 0);
+    SHOULD_SUCCEED(NPT_ParseInteger("7768", l, true));
+    SHOULD_EQUAL_I(l, 7768);
+
+    SHOULD_SUCCEED(NPT_ParseInteger32("2147483647", si32, false));
+    SHOULD_EQUAL_I(si32, 2147483647);
+    SHOULD_SUCCEED(NPT_ParseInteger32("-2147483647", si32, false));
+    SHOULD_EQUAL_I(si32, -2147483647);
+    SHOULD_SUCCEED(NPT_ParseInteger32("-2147483648", si32, false));
+    SHOULD_EQUAL_I(si32, (-2147483647 - 1));
+    SHOULD_FAIL(NPT_ParseInteger32("2147483648", si32, false));
+    SHOULD_FAIL(NPT_ParseInteger32("-2147483649", si32, false));
+    SHOULD_FAIL(NPT_ParseInteger32("-21474836480", si32, false));
+    SHOULD_FAIL(NPT_ParseInteger32("21474836470", si32, false));
 
     SHOULD_SUCCEED(NPT_ParseInteger32("4294967295", ui32, false));
     SHOULD_EQUAL_I(ui32, 4294967295U);
     SHOULD_FAIL(NPT_ParseInteger32("4294967296", ui32, false));
     SHOULD_FAIL(NPT_ParseInteger32("-1", ui32, false));
 
-    SHOULD_SUCCEED(NPT_ParseInteger64("9223372036854775807", i64, false));
-    SHOULD_EQUAL_I(i64, NPT_INT64_C(9223372036854775807));
-    SHOULD_SUCCEED(NPT_ParseInteger64("-9223372036854775807", i64, false));
-    SHOULD_EQUAL_I(i64, NPT_INT64_C(-9223372036854775807));
-    SHOULD_SUCCEED(NPT_ParseInteger64("-9223372036854775808", i64, false));
-    SHOULD_EQUAL_I(i64, (NPT_INT64_C(-9223372036854775807) - NPT_INT64_C(1)));
-    SHOULD_FAIL(NPT_ParseInteger64("9223372036854775808", i64, false));
-    SHOULD_FAIL(NPT_ParseInteger64("-9223372036854775809", i64, false));
-    SHOULD_FAIL(NPT_ParseInteger64("-9223372036854775897", i64, false));
-    SHOULD_FAIL(NPT_ParseInteger64("9223372036854775897", i64, false));
+    SHOULD_SUCCEED(NPT_ParseInteger64("9223372036854775807", si64, false));
+    SHOULD_EQUAL_I(si64, NPT_INT64_C(9223372036854775807));
+    SHOULD_SUCCEED(NPT_ParseInteger64("-9223372036854775807", si64, false));
+    SHOULD_EQUAL_I(si64, NPT_INT64_C(-9223372036854775807));
+    SHOULD_SUCCEED(NPT_ParseInteger64("-9223372036854775808", si64, false));
+    SHOULD_EQUAL_I(si64, (NPT_INT64_C(-9223372036854775807) - NPT_INT64_C(1)));
+    SHOULD_FAIL(NPT_ParseInteger64("9223372036854775808", si64, false));
+    SHOULD_FAIL(NPT_ParseInteger64("-9223372036854775809", si64, false));
+    SHOULD_FAIL(NPT_ParseInteger64("-9223372036854775897", si64, false));
+    SHOULD_FAIL(NPT_ParseInteger64("9223372036854775897", si64, false));
 
     SHOULD_SUCCEED(NPT_ParseInteger64("18446744073709551615", ui64, false));
     SHOULD_EQUAL_I(ui64, NPT_UINT64_C(18446744073709551615));

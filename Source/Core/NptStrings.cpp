@@ -703,6 +703,38 @@ NPT_String::Replace(char a, char b)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::Replace
++---------------------------------------------------------------------*/
+void
+NPT_String::Replace(char a, const char* str) 
+{
+    // check args
+    if (m_Chars == NULL || a == '\0' || str == NULL || str[0] == '\0') return;
+
+    // optimization
+    if (NPT_StringLength(str) == 1) return Replace(a, str[0]);
+
+    // we are going to create a new string
+    NPT_String dst;
+    char* src = m_Chars;
+
+    // reserve at least as much as input
+    dst.Reserve(GetLength());
+
+    // process the buffer
+    while (*src) {
+        if (*src == a) {
+            dst += str;
+        } else {
+            dst += *src;
+        }
+        src++;
+    }
+
+    Assign(dst.GetChars(), dst.GetLength());
+}
+
+/*----------------------------------------------------------------------
 |   NPT_String::Insert
 +---------------------------------------------------------------------*/
 void

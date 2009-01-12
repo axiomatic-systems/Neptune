@@ -436,17 +436,21 @@ NPT_PosixThread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("NPT_PosixThread::EntryPoint - in =======================");
 
+    // get the thread ID from this context, because m_ThreadId may not yet
+    // have been set by the parent thread in the Start() method
+    pthread_t thread_id = pthread_self();
+    
     // for detached threads, we store the thread ID here because the object
     // should not be accessed from other threads (including the thread that
     // called the Start() method.
     if (thread->m_Detached) {
-        thread->m_ThreadId = (pthread_t)NPT_Thread::GetCurrentThreadId();
+        thread->m_ThreadId = thread_id;
     }
     
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread->m_ThreadId));
+    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread_id));
 
     // run the thread 
     thread->Run();

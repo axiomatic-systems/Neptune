@@ -75,7 +75,7 @@ ShowResponse(NPT_HttpResponse* response, ShowMode mode)
     // show entity
     NPT_HttpEntity* entity = response->GetEntity();
     if (entity != NULL) {
-        NPT_Debug("ENTITY: length=%" NPT_FORMAT_64 "d, type=%s, encoding=%s\n",
+        NPT_Debug("ENTITY: length=%" NPT_FORMAT_64 ", type=%s, encoding=%s\n",
                   entity->GetContentLength(),
                   entity->GetContentType().GetChars(),
                   entity->GetContentEncoding().GetChars());

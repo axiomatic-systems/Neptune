@@ -516,6 +516,11 @@ NPT_LogManager::ParseConfigSource(NPT_String& source)
     } else if (source.StartsWith("plist:")) {
         /* property list source */
         ParseConfig(source.GetChars()+6, source.GetLength()-6);
+    } else if (source.StartsWith("http:port=")) {
+        /* http configurator */
+        unsigned int port = 0;
+        NPT_CHECK_WARNING(NPT_ParseInteger(source.GetChars()+10, port, true));
+        new NPT_HttpLoggerConfigurator(port);
     } else {
         return NPT_ERROR_INVALID_SYNTAX;
     }
@@ -1069,7 +1074,8 @@ NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
 /*----------------------------------------------------------------------
 |   NPT_HttpLoggerConfigurator::NPT_HttpLoggerConfigurator
 +---------------------------------------------------------------------*/
-NPT_HttpLoggerConfigurator::NPT_HttpLoggerConfigurator(NPT_UInt16 port)
+NPT_HttpLoggerConfigurator::NPT_HttpLoggerConfigurator(NPT_UInt16 port, bool detached) :
+    NPT_Thread(detached)
 {
     // create the server
     m_Server = new NPT_HttpServer(port);

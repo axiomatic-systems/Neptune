@@ -18,6 +18,8 @@
 #include <xtl.h>
 #else
 #include <windows.h>
+#include <malloc.h>
+#include <limits.h>
 #endif
 #include <assert.h>
 
@@ -82,6 +84,8 @@ static LPSTR W2AHelper(LPSTR lpa, LPCWSTR lpw, int nChars, UINT acp)
 /*----------------------------------------------------------------------
 |   macros
 +---------------------------------------------------------------------*/
+/* UNICODE support */
+#if !defined(_XBOX)
 #define NPT_WIN32_USE_CHAR_CONVERSION int _convert = 0; LPCWSTR _lpw = NULL; LPCSTR _lpa = NULL
 
 #define NPT_WIN32_A2W(lpa) (\
@@ -95,6 +99,21 @@ static LPSTR W2AHelper(LPSTR lpa, LPCWSTR lpw, int nChars, UINT acp)
     (_convert = (lstrlenW(_lpw)+1), \
     (_convert>INT_MAX/2) ? NULL : \
     W2AHelper((LPSTR) alloca(_convert*sizeof(WCHAR)), _lpw, _convert*sizeof(WCHAR), CP_UTF8))))
+
+#else
+#define NPT_WIN32_USE_CHAR_CONVERSION
+#define NPT_WIN32_W2A(_s)       (_s)
+#define NPT_WIN32_A2W(_s)       (_s)
+#define GetFileAttributesW      GetFileAttributes
+#define FindFirstFileW          FindFirstFile
+#define FindNextFileW           FindNextFile
+#define FindCloseW              FindClose
+#define CreateDirectoryW        CreateDirectoryA
+#define RemoveDirectoryW        RemoveDirectoryA
+#define DeleteFileW             DeleteFileA
+#define MoveFileW               MoveFileA
+#define WIN32_FIND_DATAW        WIN32_FIND_DATA
+#endif
 
 /*----------------------------------------------------------------------
 |   MapError
@@ -166,6 +185,35 @@ NPT_fopen_utf8(const char* path, const char* mode)
     NPT_WIN32_USE_CHAR_CONVERSION;
     return _wfopen(NPT_WIN32_A2W(path), NPT_WIN32_A2W(mode));
 }
+#elif defined(_XBOX)
+#include <sys/stat.h>
+/*----------------------------------------------------------------------
+|   NPT_stat_utf8
++---------------------------------------------------------------------*/
+int
+NPT_stat_utf8(const char* path, struct __stat64* info)
+{
+    return _stat64(path, info);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_getcwd_utf8
++---------------------------------------------------------------------*/
+char*
+NPT_getcwd_utf8(char* dir, unsigned int max_size)
+{
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_fsopen_utf8
++---------------------------------------------------------------------*/
+FILE*
+NPT_fsopen_utf8(const char* path, const char* mode, int sh_flags)
+{
+    NPT_WIN32_USE_CHAR_CONVERSION;
+    return _fsopen(path, mode, sh_flags);
+}
 #else
 #include <sys/stat.h>
 #include <direct.h>
@@ -218,7 +266,7 @@ NPT_Result
 NPT_File::GetRoots(NPT_List<NPT_String>& roots)
 {
     roots.Clear();
-#if defined(_WIN32_WCE)
+#if defined(_WIN32_WCE) || defined(_XBOX)
     return NPT_ERROR_NOT_IMPLEMENTED;
 #else
     DWORD drives = GetLogicalDrives();
@@ -312,18 +360,28 @@ NPT_File::Rename(const char* from_path, const char* to_path)
 /*----------------------------------------------------------------------
 |   NPT_File_ProcessFindData
 +---------------------------------------------------------------------*/
-static void
-NPT_File_ProcessFindData(WIN32_FIND_DATAW* find_data, NPT_List<NPT_String>& entries)
+static bool
+NPT_File_ProcessFindData(WIN32_FIND_DATAW* find_data)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
-    entries.Add(NPT_WIN32_W2A(find_data->cFileName));
+
+    // discard system specific files/shortcuts
+    if (NPT_StringsEqual(NPT_WIN32_W2A(find_data->cFileName), ".") || 
+        NPT_StringsEqual(NPT_WIN32_W2A(find_data->cFileName), "..")) {
+        return false;
+    }
+
+    return true;
 }
 
 /*----------------------------------------------------------------------
 |   NPT_File::ListDirectory
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
+NPT_File::ListDirectory(const char*           path, 
+                        NPT_List<NPT_String>& entries, 
+                        NPT_Ordinal           start /* = 0 */, 
+                        NPT_Cardinal          max   /* = 0 */)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
 
@@ -345,10 +403,20 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
     WIN32_FIND_DATAW find_data;
     HANDLE find_handle = FindFirstFileW(NPT_WIN32_A2W(path_pattern.GetChars()), &find_data);
     if (find_handle == INVALID_HANDLE_VALUE) return MapError(GetLastError());
-    NPT_File_ProcessFindData(&find_data, entries);
-    while (FindNextFileW(find_handle, &find_data)) {
-        NPT_File_ProcessFindData(&find_data, entries);
-    }
+    NPT_Cardinal count = 0;
+    do {
+        if (NPT_File_ProcessFindData(&find_data)) {
+            // continue if we still have entries to skip
+            if (start > 0) {
+                --start;
+                continue;
+            }
+            entries.Add(NPT_WIN32_W2A(find_data.cFileName));
+
+            // stop when we have reached the maximum requested
+            if (max && ++count == max) return NPT_SUCCESS;
+        }
+    } while (FindNextFileW(find_handle, &find_data));
     DWORD last_error = GetLastError();
     FindClose(find_handle);
     if (last_error != ERROR_NO_MORE_FILES) return MapError(last_error);

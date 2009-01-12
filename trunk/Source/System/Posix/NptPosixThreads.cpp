@@ -436,6 +436,13 @@ NPT_PosixThread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("NPT_PosixThread::EntryPoint - in =======================");
 
+    // for detached threads, we store the thread ID here because the object
+    // should not be accessed from other threads (including the thread that
+    // called the Start() method.
+    if (thread->m_Detached) {
+        thread->m_ThreadId = (pthread_t)NPT_Thread::GetCurrentThreadId();
+    }
+    
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
@@ -477,25 +484,25 @@ NPT_PosixThread::Start()
     attributes = &stack_size_attributes;
 #endif
 
-    // create a stack local id, as this object, may be deleted
-    // before we get to call detach on the given thread
-    pthread_t id;
+    // use local copies of some of the object's members, because for
+    // detached threads, the object instance may have deleted itself
+    // before the pthread_create() function returns
+    bool detached = m_Detached;
 
     // create the native thread
-    int result = pthread_create(&id, attributes, EntryPoint, 
+    pthread_t thread_id;
+    int result = pthread_create(&thread_id, attributes, EntryPoint, 
                                 reinterpret_cast<void*>(this));
     NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %d, res=%d", 
-                   id, result);
-    if (result) {
+                   thread_id, result);
+    if (result != 0) {
         // failed
         return NPT_FAILURE;
     } else {
         // detach the thread if we're not joinable
-        if (m_Detached) {
-            pthread_detach(id);
-        } else {
-            m_ThreadId = id;
-        }
+        if (detached) {
+            pthread_detach(thread_id);
+        } 
         return NPT_SUCCESS;
     }
 }
@@ -529,7 +536,7 @@ NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
     m_JoinLock.Lock();
     if (m_Joined) {
         NPT_LOG_FINE_1("NPT_PosixThread::Wait - %d already joined", m_ThreadId);
-        result = NPT_SUCCESS;
+        result = 0;
     } else {
         NPT_LOG_FINE_1("NPT_PosixThread::Wait - joining thread id %d", m_ThreadId);
         if (timeout != NPT_TIMEOUT_INFINITE) {

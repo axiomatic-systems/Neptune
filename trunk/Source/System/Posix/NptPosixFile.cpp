@@ -39,7 +39,7 @@
 /*----------------------------------------------------------------------
 |   Win32 adaptation
 +---------------------------------------------------------------------*/
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(_XBOX)
 extern int NPT_stat_utf8(const char* path, NPT_stat_struct* info);
 extern char* NPT_getcwd_utf8(char* path, unsigned int path_size);
 #define getcwd NPT_getcwd_utf8
@@ -141,7 +141,10 @@ NPT_File::Rename(const char* from_path, const char* to_path)
 |   NPT_File::ListDirectory
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
+NPT_File::ListDirectory(const char*           path, 
+                        NPT_List<NPT_String>& entries, 
+                        NPT_Ordinal           start /* = 0 */, 
+                        NPT_Cardinal          max   /* = 0 */)
 {
     // default return value
     entries.Clear();
@@ -153,6 +156,7 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
     DIR *directory = opendir(path);
     if (directory == NULL) return NPT_ERROR_OUT_OF_MEMORY;
     
+    NPT_Cardinal count = 0;
     for (;;) {
         struct dirent* entry_pointer = NULL;
 #if defined(NPT_CONFIG_HAVE_READDIR_R)
@@ -177,7 +181,15 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
             continue;
         }        
         
+        // continue if we still have some items to skip
+        if (start > 0) {
+            --start;
+            continue;
+        }
         entries.Add(NPT_String(entry_pointer->d_name));
+
+        // stop when we have reached the maximum requested
+        if (max && ++count == max) break;
     }
     
     closedir(directory);
@@ -192,7 +204,7 @@ NPT_File::ListDirectory(const char* path, NPT_List<NPT_String>& entries)
 NPT_Result
 NPT_File::GetWorkingDirectory(NPT_String& path)
 {
-    char* buffer = new char[1024+1];
+    char buffer[1024+1];
     char* dir = getcwd(buffer, 1024+1);
     if (dir == NULL) return MapErrno(errno);
     path = dir;
@@ -209,9 +221,21 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
     // default value
     if (info) NPT_SetMemory(info, 0, sizeof(*info));
     
+#if defined(_WIN32) || defined(_XBOX)
+    // On Windows, stat will fail if a dir ends with a separator
+    NPT_String _path = path;
+    _path.TrimRight("\\/");
+    // keep a separator at the end for drive names such as C:<backslash>
+    if (NPT_StringLength(path) ==  2 && path[1] == ':') {
+        _path += NPT_FilePath::Separator;
+    }
+#else
+#define _path path
+#endif
+
     // get the file info
     NPT_stat_struct stat_buffer;
-    int result = NPT_stat(path, &stat_buffer);
+    int result = NPT_stat(_path, &stat_buffer);
     if (result != 0) return MapErrno(errno);
     
     // setup the returned fields

@@ -49,7 +49,7 @@ public:
     virtual ~NPT_SelectableMessageQueue();
     
     // NPT_MessageQueue methods
-    virtual NPT_Result PumpMessage(NPT_Timeout timeout);
+    virtual NPT_Result PumpMessage(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
     virtual NPT_Result QueueMessage(NPT_Message*        message,
                                     NPT_MessageHandler* handler);
 

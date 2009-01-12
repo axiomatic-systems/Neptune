@@ -105,9 +105,10 @@ public:
     static const NPT_String Separator;
 
     // class methods
-    static NPT_String BaseName(const char* path);
+    static NPT_String BaseName(const char* path, bool with_extension = true);
     static NPT_String DirectoryName(const char* path);
     static NPT_String FileExtension(const char* path);
+    static NPT_String Create(const char* directory, const char* base);
     
 private:
     NPT_FilePath() {} // this class can't have instances
@@ -142,13 +143,17 @@ public:
     static NPT_Result GetRoots(NPT_List<NPT_String>& roots);
     static NPT_Result GetInfo(const char* path, NPT_FileInfo* info = NULL);
     static bool       Exists(const char* path) { return NPT_SUCCEEDED(GetInfo(path)); }
+    static NPT_Result Delete(const char* path);
     static NPT_Result DeleteFile(const char* path);
     static NPT_Result DeleteDirectory(const char* path);
     static NPT_Result Rename(const char* from_path, const char* to_path);
-    static NPT_Result ListDirectory(const char* path, NPT_List<NPT_String>& entries);
+    static NPT_Result ListDirectory(const char* path, NPT_List<NPT_String>& entries, NPT_Ordinal start = 0, NPT_Cardinal count = 0);
     static NPT_Result CreateDirectory(const char* path);
     static NPT_Result GetWorkingDirectory(NPT_String& path);
-    static NPT_Result Load(const char* path, NPT_DataBuffer& buffer);
+    static NPT_Result Load(const char* path, NPT_DataBuffer& buffer, NPT_FileInterface::OpenMode mode = NPT_FILE_OPEN_MODE_READ);
+    static NPT_Result Load(const char* path, NPT_String& data, NPT_FileInterface::OpenMode mode = NPT_FILE_OPEN_MODE_READ);
+    static NPT_Result Save(const char* path, NPT_String& data);
+    static NPT_Result Save(const char* path, const NPT_DataBuffer& buffer);
     
     // constructors and destructor
     NPT_File(const char* path);
@@ -156,6 +161,7 @@ public:
 
     // methods
     NPT_Result          Load(NPT_DataBuffer& buffer);
+    NPT_Result          Save(const NPT_DataBuffer& buffer);
     const NPT_String&   GetPath() { return m_Path; }
     NPT_Result          GetSize(NPT_LargeSize &size);
     NPT_Result          GetInfo(NPT_FileInfo& info);

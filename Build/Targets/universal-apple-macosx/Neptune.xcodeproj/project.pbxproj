@@ -20,6 +20,7 @@
 				CAE417770E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417790E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE4177B0E0DC10600A530D1 /* PBXTargetDependency */,
+				CA30B77A0F0DCEFE0085B46E /* PBXTargetDependency */,
 				CAE4177D0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE4177F0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417810E0DC10600A530D1 /* PBXTargetDependency */,
@@ -117,6 +118,7 @@
 		CA2F54340EC1165700AEBC12 /* TlsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */; };
 		CA2F54390EC1203A00AEBC12 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA2F543A0EC1203A00AEBC12 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
+		CA30B7720F0DCEA70085B46E /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA5041AF0C5AE2180060E6FE /* NptNullSerialPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */; };
 		CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979DD0CF1648300C01909 /* HttpServerTest1.cpp */; };
@@ -303,6 +305,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
 			remoteInfo = axTLS;
+		};
+		CA30B7700F0DCE9F0085B46E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA30B7790F0DCEFE0085B46E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA30B76A0F0DCE990085B46E;
+			remoteInfo = LoggingTest2;
 		};
 		CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -689,6 +705,7 @@
 		CA1D05720E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptPosixDynamicLibraries.cpp; sourceTree = "<group>"; };
 		CA2F54240EC115E600AEBC12 /* TlsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TlsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TlsTest1.cpp; sourceTree = "<group>"; };
+		CA30B76B0F0DCE990085B46E /* LoggingTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest2; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NptNullSerialPort.cpp; sourceTree = "<group>"; };
 		CA550D550D20A37E00B22D72 /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServerTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA84EC4A0C7E540900CC9622 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = adler32.c; path = "../../../ThirdParty/zlib-1.2.3/adler32.c"; sourceTree = SOURCE_ROOT; };
@@ -867,6 +884,14 @@
 			files = (
 				CA2F54390EC1203A00AEBC12 /* libNeptune.a in Frameworks */,
 				CA2F543A0EC1203A00AEBC12 /* libaxTLS.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA30B7690F0DCE990085B46E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA30B7720F0DCEA70085B46E /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1478,6 +1503,7 @@
 				CAF2EFD70E64A27200948C04 /* FileTest1 */,
 				CA1A5EA90EC0152A00A9040C /* libaxTLS.a */,
 				CA2F54240EC115E600AEBC12 /* TlsTest1 */,
+				CA30B76B0F0DCE990085B46E /* LoggingTest2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1757,6 +1783,23 @@
 			name = TlsTest1;
 			productName = TlsTest1;
 			productReference = CA2F54240EC115E600AEBC12 /* TlsTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA30B76A0F0DCE990085B46E /* LoggingTest2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA30B7760F0DCEC60085B46E /* Build configuration list for PBXNativeTarget "LoggingTest2" */;
+			buildPhases = (
+				CA30B7680F0DCE990085B46E /* Sources */,
+				CA30B7690F0DCE990085B46E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA30B7710F0DCE9F0085B46E /* PBXTargetDependency */,
+			);
+			name = LoggingTest2;
+			productName = LoggingTest2;
+			productReference = CA30B76B0F0DCE990085B46E /* LoggingTest2 */;
 			productType = "com.apple.product-type.tool";
 		};
 		CA550D4A0D20A37E00B22D72 /* HttpServerTest1 */ = {
@@ -2191,6 +2234,7 @@
 				CAE416D20E0DBE5A00A530D1 /* HttpClientTest1 */,
 				CAE416DF0E0DBE7F00A530D1 /* ListsTest1 */,
 				CAE416EC0E0DBEAF00A530D1 /* LoggingTest1 */,
+				CA30B76A0F0DCE990085B46E /* LoggingTest2 */,
 				CAE416F90E0DBEDD00A530D1 /* MapsTest1 */,
 				CAE417060E0DBF0900A530D1 /* MessagesTest1 */,
 				CAE417130E0DBF2800A530D1 /* MessagesTest2 */,
@@ -2260,6 +2304,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA2F54340EC1165700AEBC12 /* TlsTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA30B7680F0DCE990085B46E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2537,6 +2588,16 @@
 			isa = PBXTargetDependency;
 			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
 			targetProxy = CA2F542B0EC115F200AEBC12 /* PBXContainerItemProxy */;
+		};
+		CA30B7710F0DCE9F0085B46E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA30B7700F0DCE9F0085B46E /* PBXContainerItemProxy */;
+		};
+		CA30B77A0F0DCEFE0085B46E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA30B76A0F0DCE990085B46E /* LoggingTest2 */;
+			targetProxy = CA30B7790F0DCEFE0085B46E /* PBXContainerItemProxy */;
 		};
 		CA550D4B0D20A37E00B22D72 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2937,6 +2998,48 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = TlsTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CA30B76D0F0DCE9A0085B46E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest2;
+			};
+			name = Debug;
+		};
+		CA30B76E0F0DCE9A0085B46E /* Coverage */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest2;
+			};
+			name = Coverage;
+		};
+		CA30B76F0F0DCE9A0085B46E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = LoggingTest2;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4231,6 +4334,16 @@
 				CA2F54260EC115E600AEBC12 /* Debug */,
 				CA2F54270EC115E600AEBC12 /* Coverage */,
 				CA2F54280EC115E600AEBC12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA30B7760F0DCEC60085B46E /* Build configuration list for PBXNativeTarget "LoggingTest2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA30B76D0F0DCE9A0085B46E /* Debug */,
+				CA30B76E0F0DCE9A0085B46E /* Coverage */,
+				CA30B76F0F0DCE9A0085B46E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

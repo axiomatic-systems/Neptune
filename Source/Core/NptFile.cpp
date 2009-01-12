@@ -48,13 +48,20 @@ NPT_SET_LOCAL_LOGGER("neptune.file")
 |   NPT_FilePath::BaseName
 +---------------------------------------------------------------------*/
 NPT_String 
-NPT_FilePath::BaseName(const char* path)
+NPT_FilePath::BaseName(const char* path, bool with_extension /* = true */)
 {
     NPT_String result = path;
     int separator = result.ReverseFind(Separator);
     if (separator >= 0) {
         result = path+separator+NPT_StringLength(Separator);
     } 
+
+    if (!with_extension) {
+        int dot = result.ReverseFind('.');
+        if (dot >= 0) {
+            result.SetLength(dot);
+        }
+    }
 
     return result;
 }
@@ -98,18 +105,95 @@ NPT_FilePath::FileExtension(const char* path)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_FilePath::Create
++---------------------------------------------------------------------*/
+NPT_String 
+NPT_FilePath::Create(const char* directory, const char* basename)
+{
+    if (!directory || NPT_StringLength(directory) == 0) return basename;
+
+    NPT_String result = directory;
+    if (result.GetLength() != 0 && !result.EndsWith(Separator)) {
+        result += Separator;
+    }
+    result += basename;
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_File::Load
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::Load(const char* path, NPT_DataBuffer& buffer)
+NPT_File::Load(const char* path, NPT_DataBuffer& buffer, NPT_FileInterface::OpenMode mode)
 {
     // create and open the file
     NPT_File file(path);
-    NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_READ);
+    NPT_Result result = file.Open(mode);
     if (NPT_FAILED(result)) return result;
     
     // load the file
     result = file.Load(buffer);
+
+    // close the file
+    file.Close();
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Load
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::Load(const char* path, NPT_String& data, NPT_FileInterface::OpenMode mode)
+{
+    NPT_DataBuffer buffer;
+
+    // reset ouput params
+    data = "";
+
+    // create and open the file
+    NPT_File file(path);
+    NPT_Result result = file.Open(mode);
+    if (NPT_FAILED(result)) return result;
+    
+    // load the file
+    result = file.Load(buffer);
+
+    if (NPT_SUCCEEDED(result) && buffer.GetDataSize() > 0) {
+        data.Assign((const char*)buffer.GetData(), buffer.GetDataSize());
+        data.SetLength(buffer.GetDataSize());
+    }
+
+    // close the file
+    file.Close();
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Save
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::Save(const char* filename, NPT_String& data)
+{
+    NPT_DataBuffer buffer(data.GetChars(), data.GetLength());
+    return NPT_File::Save(filename, buffer);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Save
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::Save(const char* filename, const NPT_DataBuffer& buffer)
+{
+    // create and open the file
+    NPT_File file(filename);
+    NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_WRITE | NPT_FILE_OPEN_MODE_CREATE | NPT_FILE_OPEN_MODE_TRUNCATE);
+    if (NPT_FAILED(result)) return result;
+
+    // load the file
+    result = file.Save(buffer);
 
     // close the file
     file.Close();
@@ -130,6 +214,21 @@ NPT_File::Load(NPT_DataBuffer& buffer)
 
     // read the stream
     return input->Load(buffer);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Save
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::Save(const NPT_DataBuffer& buffer)
+{
+    NPT_OutputStreamReference output;
+
+    // get the output stream for the file
+    NPT_CHECK_WARNING(GetOutputStream(output));
+
+    // write to the stream
+    return output->WriteFully(buffer.GetData(), buffer.GetDataSize());
 }
 
 /*----------------------------------------------------------------------
@@ -166,6 +265,24 @@ NPT_File::GetSize(NPT_LargeSize& size)
     size = info.m_Size;
     
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::Delete
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_File::Delete(const char* path)
+{
+    NPT_FileInfo info;
+
+    // make sure the path exists
+    NPT_CHECK(GetInfo(path, &info));
+
+    if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
+        return DeleteDirectory(path);
+    } else {
+        return DeleteFile(path);
+    }
 }
 
 /*----------------------------------------------------------------------

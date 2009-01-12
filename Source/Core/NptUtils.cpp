@@ -315,7 +315,7 @@ NPT_ParseFloat(const char* str, float& result, bool relaxed)
         } else if (c == 'e' || c == 'E') {
             // exponent
             if (*str == '+' || *str == '-' || (*str >= '0' && *str <= '9')) {
-                long exponent = 0;
+                int exponent = 0;
                 if (NPT_SUCCEEDED(NPT_ParseInteger(str, exponent, relaxed))) {
                     value *= (float)pow(10.0f, (float)exponent);
                     break;

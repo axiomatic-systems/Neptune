@@ -403,7 +403,7 @@ public:
                            const NPT_SocketAddress* remote_address);
                   
     // methods
-    const NPT_SocketAddress& GetLocalAddress()   const { return m_LocalAddress;  }
+    const NPT_SocketAddress& GetLocalAddress()  const { return m_LocalAddress;  }
     const NPT_SocketAddress& GetRemoteAddress() const { return m_RemoteAddress; }
     void SetLocalAddress(const NPT_SocketAddress& address) {
         m_LocalAddress = address;
@@ -431,6 +431,15 @@ public:
     virtual NPT_Result SetupResponse(NPT_HttpRequest&              request,
                                      const NPT_HttpRequestContext& context,
                                      NPT_HttpResponse&             response) = 0;
+                                     
+    /**
+     * Override this method if you want to write the body yourself.
+     * The default implementation will simply write out the entity's
+     * input stream.
+     */
+    virtual NPT_Result SendResponseBody(const NPT_HttpRequestContext& context,
+                                        NPT_HttpResponse&             response,
+                                        NPT_OutputStream&             output);
 };
 
 /*----------------------------------------------------------------------
@@ -466,7 +475,8 @@ class NPT_HttpFileRequestHandler : public NPT_HttpRequestHandler
 public:
     // constructors
     NPT_HttpFileRequestHandler(const char* url_root,
-                               const char* file_root);
+                               const char* file_root,
+                               bool        auto_dir = false);
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
@@ -492,6 +502,7 @@ private:
     NPT_Map<NPT_String, NPT_String> m_FileTypeMap;
     NPT_String                      m_DefaultMimeType;
     bool                            m_UseDefaultFileTypeMap;
+    bool                            m_AutoDir;
 };
 
 /*----------------------------------------------------------------------
@@ -584,8 +595,7 @@ public:
     NPT_Result SetTimeout(NPT_Timeout io_timeout);
     NPT_Result ParseRequest(NPT_HttpRequest*&        request,
                             const NPT_SocketAddress* local_address = NULL);
-    NPT_Result SendResponse(NPT_HttpResponse& response,
-                            bool              headers_only = false);
+    NPT_Result SendResponseHeaders(NPT_HttpResponse& response);
 
 protected:
     // members

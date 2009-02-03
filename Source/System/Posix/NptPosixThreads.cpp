@@ -438,19 +438,12 @@ NPT_PosixThread::EntryPoint(void* argument)
 
     // get the thread ID from this context, because m_ThreadId may not yet
     // have been set by the parent thread in the Start() method
-    pthread_t thread_id = pthread_self();
-    
-    // for detached threads, we store the thread ID here because the object
-    // should not be accessed from other threads (including the thread that
-    // called the Start() method.
-    if (thread->m_Detached) {
-        thread->m_ThreadId = thread_id;
-    }
+    thread->m_ThreadId = pthread_self();
     
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread_id));
+    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread->m_ThreadId));
 
     // run the thread 
     thread->Run();
@@ -496,7 +489,7 @@ NPT_PosixThread::Start()
     // create the native thread
     pthread_t thread_id;
     int result = pthread_create(&thread_id, attributes, EntryPoint, 
-                                reinterpret_cast<void*>(this));
+                                static_cast<NPT_PosixThread*>(this));
     NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %d, res=%d", 
                    thread_id, result);
     if (result != 0) {
@@ -506,6 +499,11 @@ NPT_PosixThread::Start()
         // detach the thread if we're not joinable
         if (detached) {
             pthread_detach(thread_id);
+        } else {
+            // store the thread ID (NOTE: this is also done by the thread Run() method
+            // but it is necessary to do it from both contexts, because we don't know
+            // which one will need it first.
+            m_ThreadId = thread_id;        
         } 
         return NPT_SUCCESS;
     }

@@ -2852,18 +2852,6 @@
 			};
 			name = Debug;
 		};
-		CA197D210E1AE4360018E87C /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = QueueTest1;
-			};
-			name = Coverage;
-		};
 		CA197D220E1AE4360018E87C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2906,31 +2894,6 @@
 				WARNING_CFLAGS = "";
 			};
 			name = Debug;
-		};
-		CA1A5EAB0EC0152C00A9040C /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_CPP_EXCEPTIONS = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_ENABLE_OBJC_EXCEPTIONS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
-				GCC_WARN_PEDANTIC = NO;
-				GCC_WARN_UNUSED_FUNCTION = NO;
-				GCC_WARN_UNUSED_LABEL = NO;
-				GCC_WARN_UNUSED_PARAMETER = NO;
-				GCC_WARN_UNUSED_VALUE = NO;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = axTLS;
-				WARNING_CFLAGS = "";
-			};
-			name = Coverage;
 		};
 		CA1A5EAC0EC0152C00A9040C /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2975,18 +2938,6 @@
 			};
 			name = Debug;
 		};
-		CA2F54270EC115E600AEBC12 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = TlsTest1;
-			};
-			name = Coverage;
-		};
 		CA2F54280EC115E600AEBC12 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3016,18 +2967,6 @@
 				PRODUCT_NAME = LoggingTest2;
 			};
 			name = Debug;
-		};
-		CA30B76E0F0DCE9A0085B46E /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = LoggingTest2;
-			};
-			name = Coverage;
 		};
 		CA30B76F0F0DCE9A0085B46E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3059,23 +2998,6 @@
 			};
 			name = Debug;
 		};
-		CA550D530D20A37E00B22D72 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = "-lgcov";
-				PREBINDING = NO;
-				PRODUCT_NAME = HttpServerTest1;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				ZERO_LINK = YES;
-			};
-			name = Coverage;
-		};
 		CA550D540D20A37E00B22D72 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3104,18 +3026,6 @@
 				PRODUCT_NAME = StreamsTest1;
 			};
 			name = Debug;
-		};
-		CA97E0230E2FDFB30090CC9B /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = StreamsTest1;
-			};
-			name = Coverage;
 		};
 		CA97E0240E2FDFB30090CC9B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3190,103 +3100,6 @@
 			};
 			name = Release;
 		};
-		CAA97A1F0CF165A900C01909 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				COPY_PHASE_STRIP = NO;
-				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
-				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					NPT_DEBUG,
-					NPT_CONFIG_ENABLE_ZIP,
-				);
-				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
-				GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES;
-				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
-				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
-				GCC_WARN_MISSING_PARENTHESES = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
-				GCC_WARN_PEDANTIC = YES;
-				GCC_WARN_SHADOW = YES;
-				GCC_WARN_SIGN_COMPARE = YES;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = NO;
-				GCC_WARN_UNKNOWN_PRAGMAS = YES;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_LABEL = YES;
-				GCC_WARN_UNUSED_PARAMETER = YES;
-				GCC_WARN_UNUSED_VALUE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				USER_HEADER_SEARCH_PATHS = "";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wextra",
-					"-Wno-long-long",
-				);
-			};
-			name = Coverage;
-		};
-		CAA97A200CF165A900C01909 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
-				PRODUCT_NAME = Neptune;
-				ZERO_LINK = YES;
-			};
-			name = Coverage;
-		};
-		CAA97A210CF165A900C01909 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = XmlTest1;
-				ZERO_LINK = YES;
-			};
-			name = Coverage;
-		};
-		CAA97A220CF165A900C01909 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/bin;
-				OTHER_LDFLAGS = "-lgcov";
-				PREBINDING = NO;
-				PRODUCT_NAME = StringsTest1;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				ZERO_LINK = YES;
-			};
-			name = Coverage;
-		};
 		CAE4169D0E0DBD6700A530D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3301,18 +3114,6 @@
 				PRODUCT_NAME = MiscTest1;
 			};
 			name = Debug;
-		};
-		CAE4169E0E0DBD6700A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = MiscTest1;
-			};
-			name = Coverage;
 		};
 		CAE4169F0E0DBD6700A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3344,18 +3145,6 @@
 			};
 			name = Debug;
 		};
-		CAE416BC0E0DBDF800A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = ArraysTest1;
-			};
-			name = Coverage;
-		};
 		CAE416BD0E0DBDF800A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3385,18 +3174,6 @@
 				PRODUCT_NAME = BufferedStreamsTest1;
 			};
 			name = Debug;
-		};
-		CAE416C90E0DBE3000A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = BufferedStreamsTest1;
-			};
-			name = Coverage;
 		};
 		CAE416CA0E0DBE3000A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3428,18 +3205,6 @@
 			};
 			name = Debug;
 		};
-		CAE416D60E0DBE5A00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = HttpClientTest1;
-			};
-			name = Coverage;
-		};
 		CAE416D70E0DBE5A00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3469,18 +3234,6 @@
 				PRODUCT_NAME = ListsTest1;
 			};
 			name = Debug;
-		};
-		CAE416E30E0DBE8000A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = ListsTest1;
-			};
-			name = Coverage;
 		};
 		CAE416E40E0DBE8000A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3512,18 +3265,6 @@
 			};
 			name = Debug;
 		};
-		CAE416F00E0DBEAF00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = LoggingTest1;
-			};
-			name = Coverage;
-		};
 		CAE416F10E0DBEAF00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3553,18 +3294,6 @@
 				PRODUCT_NAME = MapsTest1;
 			};
 			name = Debug;
-		};
-		CAE416FD0E0DBEDD00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = MapsTest1;
-			};
-			name = Coverage;
 		};
 		CAE416FE0E0DBEDD00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3596,18 +3325,6 @@
 			};
 			name = Debug;
 		};
-		CAE4170A0E0DBF0900A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = MessagesTest1;
-			};
-			name = Coverage;
-		};
 		CAE4170B0E0DBF0900A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3637,18 +3354,6 @@
 				PRODUCT_NAME = MessagesTest2;
 			};
 			name = Debug;
-		};
-		CAE417170E0DBF2800A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = MessagesTest2;
-			};
-			name = Coverage;
 		};
 		CAE417180E0DBF2800A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3680,18 +3385,6 @@
 			};
 			name = Debug;
 		};
-		CAE417300E0DC03600A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = RingBufferTest1;
-			};
-			name = Coverage;
-		};
 		CAE417310E0DC03600A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3721,18 +3414,6 @@
 				PRODUCT_NAME = ThreadsTest1;
 			};
 			name = Debug;
-		};
-		CAE4173D0E0DC06700A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = ThreadsTest1;
-			};
-			name = Coverage;
 		};
 		CAE4173E0E0DC06700A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3764,18 +3445,6 @@
 			};
 			name = Debug;
 		};
-		CAE4174A0E0DC08D00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = UdpTest1;
-			};
-			name = Coverage;
-		};
 		CAE4174B0E0DC08D00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3805,18 +3474,6 @@
 				PRODUCT_NAME = UrlTest1;
 			};
 			name = Debug;
-		};
-		CAE417570E0DC0A800A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = UrlTest1;
-			};
-			name = Coverage;
 		};
 		CAE417580E0DC0A800A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3848,18 +3505,6 @@
 			};
 			name = Debug;
 		};
-		CAE417640E0DC0D200A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = ZipTest1;
-			};
-			name = Coverage;
-		};
 		CAE417650E0DC0D200A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3885,13 +3530,6 @@
 			};
 			name = Debug;
 		};
-		CAE4176E0E0DC0FE00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = Tests;
-			};
-			name = Coverage;
-		};
 		CAE4176F0E0DC0FE00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3912,13 +3550,6 @@
 				PRODUCT_NAME = All;
 			};
 			name = Debug;
-		};
-		CAE417940E0DC11800A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = All;
-			};
-			name = Coverage;
 		};
 		CAE417950E0DC11800A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3945,18 +3576,6 @@
 				PRODUCT_NAME = NetPump;
 			};
 			name = Debug;
-		};
-		CAE417A00E0DC13A00A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = NetPump;
-			};
-			name = Coverage;
 		};
 		CAE417A10E0DC13A00A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3988,18 +3607,6 @@
 			};
 			name = Debug;
 		};
-		CAE417BE0E0DC19400A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = NetEcho;
-			};
-			name = Coverage;
-		};
 		CAE417BF0E0DC19400A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4029,18 +3636,6 @@
 				PRODUCT_NAME = NetConfig;
 			};
 			name = Debug;
-		};
-		CAE417CB0E0DC1B500A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = NetConfig;
-			};
-			name = Coverage;
 		};
 		CAE417CC0E0DC1B500A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -4072,18 +3667,6 @@
 			};
 			name = Debug;
 		};
-		CAE417D80E0DC1D600A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = NetPing;
-			};
-			name = Coverage;
-		};
 		CAE417D90E0DC1D600A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4108,13 +3691,6 @@
 				PRODUCT_NAME = Apps;
 			};
 			name = Debug;
-		};
-		CAE417E10E0DC1F600A530D1 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = Apps;
-			};
-			name = Coverage;
 		};
 		CAE417E20E0DC1F600A530D1 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -4141,18 +3717,6 @@
 				PRODUCT_NAME = FileTest1;
 			};
 			name = Debug;
-		};
-		CAF2EFDA0E64A27300948C04 /* Coverage */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
-				PRODUCT_NAME = FileTest1;
-			};
-			name = Coverage;
 		};
 		CAF2EFDB0E64A27300948C04 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -4312,7 +3876,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA197D200E1AE4360018E87C /* Debug */,
-				CA197D210E1AE4360018E87C /* Coverage */,
 				CA197D220E1AE4360018E87C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4322,7 +3885,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA1A5EAA0EC0152C00A9040C /* Debug */,
-				CA1A5EAB0EC0152C00A9040C /* Coverage */,
 				CA1A5EAC0EC0152C00A9040C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4332,7 +3894,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA2F54260EC115E600AEBC12 /* Debug */,
-				CA2F54270EC115E600AEBC12 /* Coverage */,
 				CA2F54280EC115E600AEBC12 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4342,7 +3903,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA30B76D0F0DCE9A0085B46E /* Debug */,
-				CA30B76E0F0DCE9A0085B46E /* Coverage */,
 				CA30B76F0F0DCE9A0085B46E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4352,7 +3912,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA550D520D20A37E00B22D72 /* Debug */,
-				CA550D530D20A37E00B22D72 /* Coverage */,
 				CA550D540D20A37E00B22D72 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4362,7 +3921,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CA97E0220E2FDFB30090CC9B /* Debug */,
-				CA97E0230E2FDFB30090CC9B /* Coverage */,
 				CA97E0240E2FDFB30090CC9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4372,7 +3930,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAA97A030CF164A800C01909 /* Debug */,
-				CAA97A210CF165A900C01909 /* Coverage */,
 				CAA97A040CF164A800C01909 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4382,7 +3939,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAA97A190CF1654A00C01909 /* Debug */,
-				CAA97A220CF165A900C01909 /* Coverage */,
 				CAA97A1A0CF1654A00C01909 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4392,7 +3948,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE4169D0E0DBD6700A530D1 /* Debug */,
-				CAE4169E0E0DBD6700A530D1 /* Coverage */,
 				CAE4169F0E0DBD6700A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4402,7 +3957,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416BB0E0DBDF800A530D1 /* Debug */,
-				CAE416BC0E0DBDF800A530D1 /* Coverage */,
 				CAE416BD0E0DBDF800A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4412,7 +3966,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416C80E0DBE3000A530D1 /* Debug */,
-				CAE416C90E0DBE3000A530D1 /* Coverage */,
 				CAE416CA0E0DBE3000A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4422,7 +3975,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416D50E0DBE5A00A530D1 /* Debug */,
-				CAE416D60E0DBE5A00A530D1 /* Coverage */,
 				CAE416D70E0DBE5A00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4432,7 +3984,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416E20E0DBE8000A530D1 /* Debug */,
-				CAE416E30E0DBE8000A530D1 /* Coverage */,
 				CAE416E40E0DBE8000A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4442,7 +3993,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416EF0E0DBEAF00A530D1 /* Debug */,
-				CAE416F00E0DBEAF00A530D1 /* Coverage */,
 				CAE416F10E0DBEAF00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4452,7 +4002,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE416FC0E0DBEDD00A530D1 /* Debug */,
-				CAE416FD0E0DBEDD00A530D1 /* Coverage */,
 				CAE416FE0E0DBEDD00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4462,7 +4011,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417090E0DBF0900A530D1 /* Debug */,
-				CAE4170A0E0DBF0900A530D1 /* Coverage */,
 				CAE4170B0E0DBF0900A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4472,7 +4020,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417160E0DBF2800A530D1 /* Debug */,
-				CAE417170E0DBF2800A530D1 /* Coverage */,
 				CAE417180E0DBF2800A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4482,7 +4029,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE4172F0E0DC03600A530D1 /* Debug */,
-				CAE417300E0DC03600A530D1 /* Coverage */,
 				CAE417310E0DC03600A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4492,7 +4038,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE4173C0E0DC06700A530D1 /* Debug */,
-				CAE4173D0E0DC06700A530D1 /* Coverage */,
 				CAE4173E0E0DC06700A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4502,7 +4047,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417490E0DC08D00A530D1 /* Debug */,
-				CAE4174A0E0DC08D00A530D1 /* Coverage */,
 				CAE4174B0E0DC08D00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4512,7 +4056,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417560E0DC0A800A530D1 /* Debug */,
-				CAE417570E0DC0A800A530D1 /* Coverage */,
 				CAE417580E0DC0A800A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4522,7 +4065,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417630E0DC0D200A530D1 /* Debug */,
-				CAE417640E0DC0D200A530D1 /* Coverage */,
 				CAE417650E0DC0D200A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4532,7 +4074,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE4176D0E0DC0FE00A530D1 /* Debug */,
-				CAE4176E0E0DC0FE00A530D1 /* Coverage */,
 				CAE4176F0E0DC0FE00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4542,7 +4083,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417930E0DC11800A530D1 /* Debug */,
-				CAE417940E0DC11800A530D1 /* Coverage */,
 				CAE417950E0DC11800A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4552,7 +4092,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE4179F0E0DC13A00A530D1 /* Debug */,
-				CAE417A00E0DC13A00A530D1 /* Coverage */,
 				CAE417A10E0DC13A00A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4562,7 +4101,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417BD0E0DC19400A530D1 /* Debug */,
-				CAE417BE0E0DC19400A530D1 /* Coverage */,
 				CAE417BF0E0DC19400A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4572,7 +4110,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417CA0E0DC1B500A530D1 /* Debug */,
-				CAE417CB0E0DC1B500A530D1 /* Coverage */,
 				CAE417CC0E0DC1B500A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4582,7 +4119,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417D70E0DC1D600A530D1 /* Debug */,
-				CAE417D80E0DC1D600A530D1 /* Coverage */,
 				CAE417D90E0DC1D600A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4592,7 +4128,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAE417E00E0DC1F600A530D1 /* Debug */,
-				CAE417E10E0DC1F600A530D1 /* Coverage */,
 				CAE417E20E0DC1F600A530D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4602,7 +4137,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CAF2EFD90E64A27300948C04 /* Debug */,
-				CAF2EFDA0E64A27300948C04 /* Coverage */,
 				CAF2EFDB0E64A27300948C04 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4612,7 +4146,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F912B6890B8EB12700C1E90D /* Debug */,
-				CAA97A1F0CF165A900C01909 /* Coverage */,
 				F912B68A0B8EB12700C1E90D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4622,7 +4155,6 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F912B6A20B8EB1C800C1E90D /* Debug */,
-				CAA97A200CF165A900C01909 /* Coverage */,
 				F912B6A30B8EB1C800C1E90D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;

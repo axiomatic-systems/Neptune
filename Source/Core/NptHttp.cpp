@@ -50,6 +50,7 @@ NPT_SET_LOCAL_LOGGER("neptune.http")
 |   constants
 +---------------------------------------------------------------------*/
 const unsigned int NPT_HTTP_MAX_REDIRECTS = 20;
+const char* const NPT_HTTP_DEFAULT_403_HTML = "<html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>Access to this URL is forbidden.</p></html>";
 const char* const NPT_HTTP_DEFAULT_404_HTML = "<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></html>";
 const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal Error</title></head><body><h1>Internal Error</h1><p>The server encountered an unexpected condition which prevented it from fulfilling the request.</p></html>";
 
@@ -485,9 +486,11 @@ NPT_HttpMessage::~NPT_HttpMessage()
 NPT_Result
 NPT_HttpMessage::SetEntity(NPT_HttpEntity* entity)
 {
-    delete m_Entity;
-    m_Entity = entity;
-
+    if (entity != m_Entity) {
+        delete m_Entity;
+        m_Entity = entity;
+    }
+    
     return NPT_SUCCESS;
 }
 
@@ -1379,23 +1382,46 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
 
         // ask the handler to setup the response
         result = handler->SetupResponse(*request, context, *response);
-
-
     }
     if (result == NPT_ERROR_NO_SUCH_ITEM || handler == NULL) {
-        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
-        response->SetEntity(body);
         body->SetInputStream(NPT_HTTP_DEFAULT_404_HTML);
         body->SetContentType("text/html");
-    } else if (NPT_FAILED(result)) {
-        response->SetStatus(500, "Internal Error", NPT_HTTP_PROTOCOL_1_0);
+        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
         response->SetEntity(body);
+        handler = NULL;
+    } else if (result == NPT_ERROR_PERMISSION_DENIED) {
+        body->SetInputStream(NPT_HTTP_DEFAULT_403_HTML);
+        body->SetContentType("text/html");
+        response->SetStatus(403, "Forbidden", NPT_HTTP_PROTOCOL_1_0);
+        handler = NULL;
+    } else if (NPT_FAILED(result)) {
         body->SetInputStream(NPT_HTTP_DEFAULT_500_HTML);
         body->SetContentType("text/html");
+        response->SetStatus(500, "Internal Error", NPT_HTTP_PROTOCOL_1_0);
+        handler = NULL;
     }
 
-    // send the response
-    result = responder.SendResponse(*response, request->GetMethod()==NPT_HTTP_METHOD_HEAD);
+    // send the response headers
+    result = responder.SendResponseHeaders(*response);
+    if (NPT_FAILED(result)) {
+        NPT_LOG_WARNING_2("SendResponseHeaders failed (%d:%s)", result, NPT_ResultText(result));
+        goto end;
+    }
+    
+    // send the body
+    if (request->GetMethod() != NPT_HTTP_METHOD_HEAD) {
+        if (handler) {
+            result = handler->SendResponseBody(context, *response, *output);
+        } else {
+            NPT_InputStreamReference body_stream;
+            body->GetInputStream(body_stream);
+            result = NPT_StreamToStreamCopy(*body_stream, *output);
+        }
+    }
+
+end:
+    // flush
+    output->Flush();
 
     // cleanup
     delete response;
@@ -1457,7 +1483,7 @@ NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&        request,
     // unbuffer the stream
     m_Input->SetBufferSize(0);
 
-    // don't create entity if no body is expected
+    // don't create an entity if no body is expected
     if (request->GetMethod() == NPT_HTTP_METHOD_GET ||
         request->GetMethod() == NPT_HTTP_METHOD_HEAD) {
         return NPT_SUCCESS;
@@ -1472,11 +1498,10 @@ NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&        request,
 }
 
 /*----------------------------------------------------------------------
-|   NPT_HttpResponder::SendResponse
+|   NPT_HttpResponder::SendResponseHeaders
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpResponder::SendResponse(NPT_HttpResponse& response, 
-                                bool              headers_only)
+NPT_HttpResponder::SendResponseHeaders(NPT_HttpResponse& response)
 {
     // add default headers
     NPT_HttpHeaders& headers = response.GetHeaders();
@@ -1514,17 +1539,25 @@ NPT_HttpResponder::SendResponse(NPT_HttpResponse& response,
     // send the buffer
     NPT_CHECK_WARNING(m_Output->WriteFully(buffer.GetData(), buffer.GetDataSize()));
 
-    // send the body
-    if (entity && !headers_only) {
-        NPT_InputStreamReference body_stream;
-        entity->GetInputStream(body_stream);
-        if (!body_stream.IsNull()) return NPT_StreamToStreamCopy(*body_stream, *m_Output);
-    }
-
-    // flush
-    m_Output->Flush();
-
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpRequestHandler::SendResponseBody
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpRequestHandler::SendResponseBody(const NPT_HttpRequestContext& /*context*/,
+                                         NPT_HttpResponse&             response,
+                                         NPT_OutputStream&             output)
+{
+    NPT_HttpEntity* entity = response.GetEntity();
+    if (entity == NULL) return NPT_SUCCESS;
+    
+    NPT_InputStreamReference body_stream;
+    entity->GetInputStream(body_stream);
+    if (body_stream.IsNull()) return NPT_SUCCESS;
+
+    return NPT_StreamToStreamCopy(*body_stream, output);
 }
 
 /*----------------------------------------------------------------------
@@ -1574,16 +1607,16 @@ struct NPT_HttpFileRequestHandler_DefaultFileTypeMapEntry {
 };
 static const NPT_HttpFileRequestHandler_DefaultFileTypeMapEntry 
 NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
-    {"xml", "text/html"},
-    {"htm", "text/html"},
-    {"html", "text/html"},
-    {"gif",  "image/gif"},
+    {"xml",  "text/xml"  },
+    {"htm",  "text/html" },
+    {"html", "text/html" },
+    {"gif",  "image/gif" },
     {"jpg",  "image/jpeg"},
     {"jpeg", "image/jpeg"},
     {"jpe",  "image/jpeg"},
-    {"png",  "image/png"},
-    {"bmp",  "image/bmp"},
-    {"css",  "text/css"},
+    {"png",  "image/png" },
+    {"bmp",  "image/bmp" },
+    {"css",  "text/css"  },
     {"js",   "application/javascript"}
 };
 
@@ -1591,11 +1624,13 @@ NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
 |   NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler
 +---------------------------------------------------------------------*/
 NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
-                                                       const char* file_root) :
+                                                       const char* file_root,
+                                                       bool        auto_dir) :
     m_UrlRoot(url_root),
     m_FileRoot(file_root),
     m_DefaultMimeType("text/html"),
-    m_UseDefaultFileTypeMap(true)
+    m_UseDefaultFileTypeMap(true),
+    m_AutoDir(auto_dir)
 {
 }
 
@@ -1626,7 +1661,37 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
 
     // compute the filename
     NPT_String filename = m_FileRoot;
-    filename += request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength();
+    const char* relative_path = request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength();
+    filename += relative_path;
+    
+    // check if this is a directory 
+    NPT_FileInfo info;
+    NPT_File::GetInfo(filename, &info);
+    if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
+        if (m_AutoDir) {
+            NPT_String html = "<hmtl><body>";
+            NPT_List<NPT_String> entries;
+            NPT_File::ListDirectory(filename, entries);
+            for (NPT_List<NPT_String>::Iterator i = entries.GetFirstItem();
+                 i;
+                 ++i) {
+                 html += "<a href='";
+                 html += request.GetUrl().GetPath(); // TODO: escape chars for HTML
+                 html += "/";
+                 html += *i;
+                 html += "'>";
+                 html += *i;
+                 html += "</a><br>";
+            }
+            html += "</body></html>";
+
+            entity->SetContentType("text/html");
+            entity->SetInputStream(html);
+            return NPT_SUCCESS;
+        } else {
+            return NPT_ERROR_PERMISSION_DENIED;
+        }
+    }
     
     // open the file
     NPT_File file(filename);

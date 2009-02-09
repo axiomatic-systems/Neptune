@@ -106,7 +106,7 @@ public:
 
     // class methods
     static NPT_String BaseName(const char* path, bool with_extension = true);
-    static NPT_String DirectoryName(const char* path);
+    static NPT_String DirName(const char* path);
     static NPT_String FileExtension(const char* path);
     static NPT_String Create(const char* directory, const char* base);
     
@@ -143,13 +143,13 @@ public:
     static NPT_Result GetRoots(NPT_List<NPT_String>& roots);
     static NPT_Result GetInfo(const char* path, NPT_FileInfo* info = NULL);
     static bool       Exists(const char* path) { return NPT_SUCCEEDED(GetInfo(path)); }
-    static NPT_Result Delete(const char* path);
-    static NPT_Result DeleteFile(const char* path);
-    static NPT_Result DeleteDirectory(const char* path);
+    static NPT_Result Remove(const char* path);
+    static NPT_Result RemoveFile(const char* path);
+    static NPT_Result RemoveDir(const char* path);
     static NPT_Result Rename(const char* from_path, const char* to_path);
-    static NPT_Result ListDirectory(const char* path, NPT_List<NPT_String>& entries, NPT_Ordinal start = 0, NPT_Cardinal count = 0);
-    static NPT_Result CreateDirectory(const char* path);
-    static NPT_Result GetWorkingDirectory(NPT_String& path);
+    static NPT_Result ListDir(const char* path, NPT_List<NPT_String>& entries, NPT_Ordinal start = 0, NPT_Cardinal count = 0);
+    static NPT_Result CreateDir(const char* path);
+    static NPT_Result GetWorkingDir(NPT_String& path);
     static NPT_Result Load(const char* path, NPT_DataBuffer& buffer, NPT_FileInterface::OpenMode mode = NPT_FILE_OPEN_MODE_READ);
     static NPT_Result Load(const char* path, NPT_String& data, NPT_FileInterface::OpenMode mode = NPT_FILE_OPEN_MODE_READ);
     static NPT_Result Save(const char* path, NPT_String& data);
@@ -165,7 +165,7 @@ public:
     const NPT_String&   GetPath() { return m_Path; }
     NPT_Result          GetSize(NPT_LargeSize &size);
     NPT_Result          GetInfo(NPT_FileInfo& info);
-    NPT_Result          ListDirectory(NPT_List<NPT_String>& entries);
+    NPT_Result          ListDir(NPT_List<NPT_String>& entries);
     NPT_Result          Rename(const char* path);
     
     // NPT_FileInterface methods

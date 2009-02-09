@@ -109,7 +109,8 @@ NPT_HttpHeader::Emit(NPT_OutputStream& stream) const
     stream.WriteFully(": ", 2);
     stream.WriteString(m_Value);
     stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
-
+    NPT_LOG_FINEST_2("header %s: %s", m_Name.GetChars(), m_Value.GetChars());
+    
     return NPT_SUCCESS;
 }
 
@@ -173,7 +174,7 @@ NPT_HttpHeaders::Parse(NPT_BufferedInputStream& stream)
                 header_value.Trim();
                 AddHeader(header_name, header_value);
                 header_pending = false;
-                NPT_LOG_FINEST_2("NPT_HttpHeaders::Parse - %s: %s", 
+                NPT_LOG_FINEST_2("header - %s: %s", 
                                  header_name.GetChars(),
                                  header_value.GetChars());
             }
@@ -203,7 +204,7 @@ NPT_HttpHeaders::Parse(NPT_BufferedInputStream& stream)
         header_value.Trim();
         AddHeader(header_name, header_value);
         header_pending = false;
-        NPT_LOG_FINEST_2("NPT_HttpHeaders::Parse - %s: %s", 
+        NPT_LOG_FINEST_2("header %s: %s", 
                          header_name.GetChars(),
                          header_value.GetChars());
     }
@@ -561,7 +562,8 @@ NPT_HttpRequest::Parse(NPT_BufferedInputStream& stream,
     // read the response line
     NPT_String line;
     NPT_CHECK_WARNING(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
-
+    NPT_LOG_FINEST_1("http request: %s", line.GetChars());
+    
     // check the request line
     int first_space = line.Find(' ');
     if (first_space < 0) return NPT_ERROR_HTTP_INVALID_REQUEST_LINE;
@@ -676,12 +678,20 @@ NPT_HttpResponse::~NPT_HttpResponse()
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_HttpResponse::SetStatus(NPT_HttpStatusCode status_code,
-                            const char*        reason_phrase,
-                            const char*        protocol)
+                            const char*        reason_phrase)
 {
-    m_Protocol = protocol;
     m_StatusCode = status_code;
     m_ReasonPhrase = reason_phrase;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpResponse::SetProtocol
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpResponse::SetProtocol(const char* protocol)
+{
+    m_Protocol = protocol;
     return NPT_SUCCESS;
 }
 
@@ -960,7 +970,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         // we have a proxy selector, ask it to select a proxy for this URL
         NPT_Result result = m_ProxySelector->GetProxyForUrl(request.GetUrl(), proxy);
         if (NPT_FAILED(result) && result != NPT_ERROR_HTTP_NO_PROXY) {
-            NPT_LOG_WARNING_1("NPT_HttpClient::SendRequestOnce - proxy selector failure (%d)", result);
+            NPT_LOG_WARNING_1("proxy selector failure (%d)", result);
             return result;
         }
         use_proxy = true;
@@ -1386,18 +1396,22 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
     if (result == NPT_ERROR_NO_SUCH_ITEM || handler == NULL) {
         body->SetInputStream(NPT_HTTP_DEFAULT_404_HTML);
         body->SetContentType("text/html");
-        response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
+        if (response == NULL) {
+            response = new NPT_HttpResponse(404, "Not Found", NPT_HTTP_PROTOCOL_1_0);
+        } else {
+            response->SetStatus(404, "Not Found");
+        }
         response->SetEntity(body);
         handler = NULL;
     } else if (result == NPT_ERROR_PERMISSION_DENIED) {
         body->SetInputStream(NPT_HTTP_DEFAULT_403_HTML);
         body->SetContentType("text/html");
-        response->SetStatus(403, "Forbidden", NPT_HTTP_PROTOCOL_1_0);
+        response->SetStatus(403, "Forbidden");
         handler = NULL;
     } else if (NPT_FAILED(result)) {
         body->SetInputStream(NPT_HTTP_DEFAULT_500_HTML);
         body->SetContentType("text/html");
-        response->SetStatus(500, "Internal Error", NPT_HTTP_PROTOCOL_1_0);
+        response->SetStatus(500, "Internal Error");
         handler = NULL;
     }
 
@@ -1506,6 +1520,7 @@ NPT_HttpResponder::SendResponseHeaders(NPT_HttpResponse& response)
     // add default headers
     NPT_HttpHeaders& headers = response.GetHeaders();
     headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close", false);
+    headers.SetHeader(NPT_HTTP_HEADER_SERVER, "Neptune/" NPT_NEPTUNE_VERSION_STRING, false);
 
     // add computed headers
     NPT_HttpEntity* entity = response.GetEntity();
@@ -1556,8 +1571,18 @@ NPT_HttpRequestHandler::SendResponseBody(const NPT_HttpRequestContext& /*context
     NPT_InputStreamReference body_stream;
     entity->GetInputStream(body_stream);
     if (body_stream.IsNull()) return NPT_SUCCESS;
-
-    return NPT_StreamToStreamCopy(*body_stream, output);
+    
+    NPT_LOG_FINE_1("sending body stream, %lld bytes", entity->GetContentLength());
+    NPT_LargeSize bytes_written = 0;
+    NPT_Result result = NPT_StreamToStreamCopy(*body_stream, output, 0, entity->GetContentLength(), &bytes_written);
+    if (NPT_FAILED(result)) {
+        NPT_LOG_FINE_3("body stream only partially sent, %lld bytes (%d:%s)", 
+                       bytes_written, 
+                       result, 
+                       NPT_ResultText(result));
+    }
+    
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -1617,7 +1642,33 @@ NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
     {"png",  "image/png" },
     {"bmp",  "image/bmp" },
     {"css",  "text/css"  },
-    {"js",   "application/javascript"}
+    {"js",   "application/javascript"},
+    {"mpg",  "video/mpeg"},
+    {"mpeg", "video/mpeg"},
+    {"mpa",  "audio/mpeg"},
+    {"mp2",  "audio/mpeg"},
+    {"mp3",  "audio/mpeg"},
+    {"mp4",  "video/mp4"},
+    {"m4v",  "video/mp4"},
+    {"m4a",  "audio/mp4"},
+    {"aif",  "audio/x-aiff"},
+    {"aifc", "audio/x-aiff"},
+    {"aiff", "audio/x-aiff"},
+    {"avi",  "video/x-msvideo"},
+    {"bmp",  "image/x-ms-bmp"},
+    {"c",    "text/plain"},
+    {"doc",  "application/msword"},
+    {"eps",  "application/postscript"},
+    {"h",    "text/plain"},
+    {"mov",  "video/quicktime"},
+    {"pdf",  "application/pdf"},
+    {"png",  "image/png"},
+    {"ps",   "application/postscript"},
+    {"tif",  "image/tiff"},
+    {"tiff", "image/tiff"},
+    {"txt",  "text/plain"},
+    {"wav",  "audio/x-wav"},
+    {"zip",  "application/zip"}
 };
 
 /*----------------------------------------------------------------------
@@ -1632,6 +1683,103 @@ NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
     m_UseDefaultFileTypeMap(true),
     m_AutoDir(auto_dir)
 {
+}
+
+/*----------------------------------------------------------------------
+|   helper functions  FIXME: need to move these to a separate module
++---------------------------------------------------------------------*/
+static NPT_UInt32
+_utf8_decode(const char** str)
+{
+  NPT_UInt32   result;
+  NPT_UInt32   min_value;
+  unsigned int bytes_left;
+
+  if (**str == 0) {
+      return ~0;
+  } else if ((**str & 0x80) == 0x00) {
+      result = *(*str)++;
+      bytes_left = 0;
+      min_value = 0;
+  } else if ((**str & 0xE0) == 0xC0) {
+      result = *(*str)++ & 0x1F;
+      bytes_left = 1;
+      min_value  = 0x80;
+  } else if ((**str & 0xF0) == 0xE0) {
+      result = *(*str)++ & 0x0F;
+      bytes_left = 2;
+      min_value  = 0x800;
+  } else if ((**str & 0xF8) == 0xF0) {
+      result = *(*str)++ & 0x07;
+      bytes_left = 3;
+      min_value  = 0x10000;
+  } else {
+      return ~0;
+  }
+
+  while (bytes_left--) {
+      if (**str == 0 || (**str & 0xC0) != 0x80) return ~0;
+      result = (result << 6) | (*(*str)++ & 0x3F);
+  }
+
+  if (result < min_value || (result & 0xFFFFF800) == 0xD800 || result > 0x10FFFF) {
+      return ~0;
+  }
+
+  return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HtmlEncode
++---------------------------------------------------------------------*/
+static NPT_String
+NPT_HtmlEncode(const char* str, const char* chars)
+{
+    NPT_String encoded;
+
+    // check args
+    if (str == NULL) return encoded;
+
+    // reserve at least the size of the current uri
+    encoded.Reserve(NPT_StringLength(str));
+
+    // process each character
+    while (*str) {
+        NPT_UInt32 c = _utf8_decode(&str);
+        bool encode = false;
+        if (c < ' ' || c > '~') {
+            encode = true;
+        } else {
+            const char* match = chars;
+            while (*match) {
+                if (c == (NPT_UInt32)*match) {
+                    encode = true;
+                    break;
+                }
+                ++match;
+            }
+        }
+        if (encode) {
+            // encode
+            char hex[9];
+            encoded += "&#x";
+            unsigned int len = 0;
+            if (c > 0xFFFF) {
+                NPT_ByteToHex((unsigned char)(c>>24), &hex[0], true);
+                NPT_ByteToHex((unsigned char)(c>>16), &hex[2], true);
+                len = 4;
+            }
+            NPT_ByteToHex((unsigned char)(c>>8), &hex[len  ], true);
+            NPT_ByteToHex((unsigned char)(c   ), &hex[len+2], true);
+            hex[len+4] = ';';
+            encoded.Append(hex, len+5);
+        } else {
+            // no encoding required
+            encoded += (char)c;
+        }
+    }
+    
+    return encoded;
 }
 
 /*----------------------------------------------------------------------
@@ -1652,6 +1800,14 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
         return NPT_SUCCESS;
     }
 
+    // set some default headers
+    response.GetHeaders().SetHeader(NPT_HTTP_HEADER_ACCEPT_RANGES, "bytes");
+
+    // declare HTTP/1.1 if the client asked for it
+    if (request.GetProtocol() == NPT_HTTP_PROTOCOL_1_1) {
+        response.SetProtocol(NPT_HTTP_PROTOCOL_1_1);
+    }
+    
     // TODO: we need to normalize the request path
 
     // check that the request's path is an entry under the url root
@@ -1661,29 +1817,53 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
 
     // compute the filename
     NPT_String filename = m_FileRoot;
-    const char* relative_path = request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength();
+    NPT_String relative_path = NPT_Url::PercentDecode(request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength());
+    filename += "/";
     filename += relative_path;
     
-    // check if this is a directory 
+    // get info about the file
     NPT_FileInfo info;
     NPT_File::GetInfo(filename, &info);
+
+    // check if this is a directory 
     if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
         if (m_AutoDir) {
-            NPT_String html = "<hmtl><body>";
+            // get the dir entries
             NPT_List<NPT_String> entries;
-            NPT_File::ListDirectory(filename, entries);
+            NPT_File::ListDir(filename, entries);
+
+            NPT_String html;
+            html.Reserve(1024+128*entries.GetItemCount());
+
+            NPT_String html_dirname = NPT_HtmlEncode(relative_path, "<>&");
+            html += "<hmtl><head><title>Directory Listing for /";
+            html += html_dirname;
+            html += "</title></head><body>";
+            html += "<h2>Directory Listing for /";
+            html += html_dirname;
+            html += "</h2><hr><ul>\r\n";
+            NPT_String url_base_path = NPT_HtmlEncode(request.GetUrl().GetPath(), "<>&\"");
+            
             for (NPT_List<NPT_String>::Iterator i = entries.GetFirstItem();
                  i;
                  ++i) {
-                 html += "<a href='";
-                 html += request.GetUrl().GetPath(); // TODO: escape chars for HTML
-                 html += "/";
-                 html += *i;
-                 html += "'>";
-                 html += *i;
-                 html += "</a><br>";
+                 NPT_String url_filename = NPT_HtmlEncode(*i, "<>&");
+                 html += "<li><a href=\"";
+                 html += url_base_path;
+                 if (!url_base_path.EndsWith("/")) html += "/";
+                 html += url_filename;
+                 html += "\">";
+                 html +=url_filename;
+                
+                 NPT_String full_path = filename;
+                 full_path += "/";
+                 full_path += *i;
+                 NPT_File::GetInfo(full_path, &info);
+                 if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) html += "/";
+                 
+                 html += "</a><br>\r\n";
             }
-            html += "</body></html>";
+            html += "</ul></body></html>";
 
             entity->SetContentType("text/html");
             entity->SetInputStream(html);
@@ -1697,13 +1877,115 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
     NPT_File file(filename);
     NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_READ);
     if (NPT_FAILED(result)) {
-        response.SetStatus(404, "Not Found");
-        return NPT_SUCCESS;
+        return NPT_ERROR_NO_SUCH_ITEM;
     }
     NPT_InputStreamReference stream;
     file.GetInputStream(stream);
+    
+    // check for range requests
+    const NPT_String* range_spec = request.GetHeaders().GetHeaderValue(NPT_HTTP_HEADER_RANGE);
+    if (range_spec) {
+        // measure the file size
+        NPT_LargeSize file_size = 0;
+        result = file.GetSize(file_size);
+        if (NPT_FAILED(result)) {
+            NPT_LOG_WARNING_2("file.GetSize() failed (%d:%s)", result, NPT_ResultText(result));
+            return result;
+        }
+        NPT_LOG_FINE_1("file size=%lld", file_size);
+        if (file_size == 0) return NPT_SUCCESS;
+        
+        if (!range_spec->StartsWith("bytes=")) {
+            NPT_LOG_FINE("unknown range spec");
+            response.SetStatus(400, "Bad Request");
+            return NPT_SUCCESS;
+        }
+        NPT_String range(range_spec->GetChars()+6);
+        if (range.Find(',') >= 0) {
+            NPT_LOG_FINE("multi-range requests not supported");
+            response.SetStatus(416, "Requested Range Not Satisfiable");
+            return NPT_SUCCESS;            
+        }
+        int sep = range.Find('-');
+        NPT_UInt64 range_start  = 0;
+        NPT_UInt64 range_end    = 0;
+        bool has_start = false;
+        bool has_end   = false;
+        bool satisfied = false;
+        if (sep < 0) {
+            NPT_LOG_FINE("invalid syntax");
+            response.SetStatus(400, "Bad Request");
+            return NPT_SUCCESS;
+        } else {
+            if ((unsigned int)sep+1 < range.GetLength()) {
+                result = NPT_ParseInteger64(range.GetChars()+sep+1, range_end);
+                if (NPT_FAILED(result)) {
+                    NPT_LOG_FINE("failed to parse range end");
+                    return result;
+                }
+                range.SetLength(sep);
+                has_end = true;
+            }
+            if (sep > 0) {
+                result = range.ToInteger64(range_start);
+                if (NPT_FAILED(result)) {
+                    NPT_LOG_FINE("failed to parse range start");
+                    return result;
+                }
+                has_start = true;
+            }
+            if (has_start) {
+                if (!has_end) range_end = file_size-1; 
+            } else {
+                if (has_end) {
+                    if (range_end <= file_size) {
+                        range_start = file_size-range_end;
+                        range_end = file_size-1;
+                    }
+                }
+            }
+            NPT_LOG_FINE_2("final range: start=%lld, end=%lld", range_start, range_end);
+            if (range_start > range_end || range_end >= file_size) {
+                NPT_LOG_FINE("out of range");
+                satisfied = false;
+            } else {
+                satisfied = true;
+            }
+        } 
+        if (satisfied && range_start != 0) {
+            // seek in the stream
+            result = stream->Seek(range_start);
+            if (NPT_FAILED(result)) {
+                NPT_LOG_WARNING_2("stream.Seek() failed (%d:%s)", result, NPT_ResultText(result));
+                satisfied = false;
+            }
+        }
+        if (!satisfied) {
+            response.SetStatus(416, "Requested Range Not Satisfiable");
+            NPT_String valid_range = "bytes */";
+            valid_range += NPT_String::FromInteger(file_size);
+            response.GetHeaders().SetHeader(NPT_HTTP_HEADER_CONTENT_RANGE, valid_range.GetChars());
+            return NPT_SUCCESS;            
+        }
+                
+        // use a portion of the file stream as a body
+        entity->SetInputStream(stream, false);
+        entity->SetContentLength(range_end-range_start+1);
+        response.SetStatus(206, "Partial Content");
+        NPT_String valid_range = "bytes ";
+        valid_range += NPT_String::FromInteger(range_start);
+        valid_range += "-";
+        valid_range += NPT_String::FromInteger(range_end);
+        valid_range += "/";
+        valid_range += NPT_String::FromInteger(file_size);
+        response.GetHeaders().SetHeader(NPT_HTTP_HEADER_CONTENT_RANGE, valid_range.GetChars());
+    } else {
+        // use the whole file stream as a body
+        entity->SetInputStream(stream, true);
+    }
+    
+    // set the response body
     entity->SetContentType(GetContentType(filename));
-    entity->SetInputStream(stream, true);
 
     return NPT_SUCCESS;
 }
@@ -1716,10 +1998,14 @@ NPT_HttpFileRequestHandler::GetContentType(const NPT_String& filename)
 {
     int last_dot = filename.ReverseFind('.');
     if (last_dot > 0) {
-        NPT_String extension = filename.GetChars()+filename.GetLength()-last_dot;
+        NPT_String extension = filename.GetChars()+last_dot+1;
         extension.MakeLowercase();
+        
+        NPT_LOG_FINE_1("extension=%s", extension.GetChars());
+        
         NPT_String* mime_type;
         if (NPT_SUCCEEDED(m_FileTypeMap.Get(extension, mime_type))) {
+            NPT_LOG_FINE_1("found mime type in map: %s", mime_type->GetChars());
             return mime_type->GetChars();
         }
 
@@ -1727,12 +2013,15 @@ NPT_HttpFileRequestHandler::GetContentType(const NPT_String& filename)
         if (m_UseDefaultFileTypeMap) {
             for (unsigned int i=0; i<NPT_ARRAY_SIZE(NPT_HttpFileRequestHandler_DefaultFileTypeMap); i++) {
                 if (extension == NPT_HttpFileRequestHandler_DefaultFileTypeMap[i].extension) {
-                    return NPT_HttpFileRequestHandler_DefaultFileTypeMap[i].mime_type;
+                    const char* type = NPT_HttpFileRequestHandler_DefaultFileTypeMap[i].mime_type;
+                    NPT_LOG_FINE_1("using type from default list: %s", type); 
+                    return type;
                 }
             }
         }
     }
 
+    NPT_LOG_FINE("using default mime type");
     return m_DefaultMimeType;
 }
 

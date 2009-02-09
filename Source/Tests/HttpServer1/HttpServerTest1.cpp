@@ -162,7 +162,7 @@ TestHttp()
     server.AddRequestHandler(test_handler2, "/test2", false);
 
     NPT_String cwd;
-    NPT_File::GetWorkingDirectory(cwd);
+    NPT_File::GetWorkingDir(cwd);
     NPT_HttpFileRequestHandler* file_handler_autodir = new NPT_HttpFileRequestHandler("/files-autodir", cwd.GetChars(), true);
     server.AddRequestHandler(file_handler_autodir, "/files-autodir", true);
     NPT_HttpFileRequestHandler* file_handler_noautodir = new NPT_HttpFileRequestHandler("/files", cwd.GetChars(), false);

@@ -67,6 +67,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_HOST                "Host"
 #define NPT_HTTP_HEADER_CONNECTION          "Connection"
 #define NPT_HTTP_HEADER_USER_AGENT          "User-Agent"
+#define NPT_HTTP_HEADER_SERVER              "Server"
 #define NPT_HTTP_HEADER_CONTENT_LENGTH      "Content-Length"
 #define NPT_HTTP_HEADER_CONTENT_TYPE        "Content-Type"
 #define NPT_HTTP_HEADER_CONTENT_ENCODING    "Content-Encoding"
@@ -75,6 +76,8 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_RANGE               "Range"
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 #define NPT_HTTP_HEADER_COOKIE              "Cookie"
+#define NPT_HTTP_HEADER_ACCEPT_RANGES       "Accept-Ranges"
+#define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
 const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
@@ -287,8 +290,8 @@ public:
 
     // methods
     NPT_Result         SetStatus(NPT_HttpStatusCode status_code,
-                                 const char*        reason_phrase,
-                                 const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
+                                 const char*        reason_phrase);
+    NPT_Result         SetProtocol(const char* protocol);
     NPT_HttpStatusCode GetStatusCode()   { return m_StatusCode;   }
     NPT_String&        GetReasonPhrase() { return m_ReasonPhrase; }
     virtual NPT_Result Emit(NPT_OutputStream& stream) const;

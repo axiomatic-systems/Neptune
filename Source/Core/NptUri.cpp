@@ -235,7 +235,7 @@ NPT_Uri::PercentEncode(const char* str, const char* chars, bool encode_percents)
         }
         if (encode) {
             // encode
-            NPT_ByteToHex(c, &escaped[1]);
+            NPT_ByteToHex(c, &escaped[1], true);
             encoded.Append(escaped, 3);
         } else {
             // no encoding required

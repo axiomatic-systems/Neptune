@@ -502,7 +502,7 @@ NPT_PosixThread::Start()
         } else {
             // store the thread ID (NOTE: this is also done by the thread Run() method
             // but it is necessary to do it from both contexts, because we don't know
-            // which one will need it first.
+            // which one will need it first.)
             m_ThreadId = thread_id;        
         } 
         return NPT_SUCCESS;

@@ -282,10 +282,10 @@ NPT_File::GetRoots(NPT_List<NPT_String>& roots)
 
 #if defined(_WIN32_WCE)
 /*----------------------------------------------------------------------
-|   NPT_File::GetWorkingDirectory
+|   NPT_File::GetWorkingDir
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::GetWorkingDirectory(NPT_String& path)
+NPT_File::GetWorkingDir(NPT_String& path)
 {
     path.SetLength(0);
     return NPT_ERROR_NOT_IMPLEMENTED;
@@ -302,10 +302,10 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
 #endif
 
 /*----------------------------------------------------------------------
-|   NPT_File::CreateDirectory
+|   NPT_File::CreateDir
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::CreateDirectory(const char* path)
+NPT_File::CreateDir(const char* path)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
     BOOL result = ::CreateDirectoryW(NPT_WIN32_A2W(path), NULL);
@@ -316,10 +316,10 @@ NPT_File::CreateDirectory(const char* path)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_File::DeleteFile
+|   NPT_File::RemoveFile
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::DeleteFile(const char* path)
+NPT_File::RemoveFile(const char* path)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
     BOOL result = ::DeleteFileW(NPT_WIN32_A2W(path));
@@ -330,10 +330,10 @@ NPT_File::DeleteFile(const char* path)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_File::DeleteDirectory
+|   NPT_File::RemoveDir
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_File::DeleteDirectory(const char* path)
+NPT_File::RemoveDir(const char* path)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
     BOOL result = RemoveDirectoryW(NPT_WIN32_A2W(path));
@@ -375,13 +375,13 @@ NPT_File_ProcessFindData(WIN32_FIND_DATAW* find_data)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_File::ListDirectory
+|   NPT_File::ListDir
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_File::ListDirectory(const char*           path, 
-                        NPT_List<NPT_String>& entries, 
-                        NPT_Ordinal           start /* = 0 */, 
-                        NPT_Cardinal          max   /* = 0 */)
+NPT_File::ListDir(const char*           path, 
+                  NPT_List<NPT_String>& entries, 
+                  NPT_Ordinal           start /* = 0 */, 
+                  NPT_Cardinal          max   /* = 0 */)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
 

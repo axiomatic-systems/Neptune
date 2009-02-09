@@ -67,10 +67,10 @@ NPT_FilePath::BaseName(const char* path, bool with_extension /* = true */)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_FilePath::DirectoryName
+|   NPT_FilePath::DirName
 +---------------------------------------------------------------------*/
 NPT_String 
-NPT_FilePath::DirectoryName(const char* path)
+NPT_FilePath::DirName(const char* path)
 {
     NPT_String result = path;
     int separator = result.ReverseFind(Separator);
@@ -268,10 +268,10 @@ NPT_File::GetSize(NPT_LargeSize& size)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_File::Delete
+|   NPT_File::Remove
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_File::Delete(const char* path)
+NPT_File::Remove(const char* path)
 {
     NPT_FileInfo info;
 
@@ -279,9 +279,9 @@ NPT_File::Delete(const char* path)
     NPT_CHECK(GetInfo(path, &info));
 
     if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
-        return DeleteDirectory(path);
+        return RemoveDir(path);
     } else {
-        return DeleteFile(path);
+        return RemoveFile(path);
     }
 }
 
@@ -299,13 +299,13 @@ NPT_File::Rename(const char* path)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_File::ListDirectory
+|   NPT_File::ListDir
 +---------------------------------------------------------------------*/
 NPT_Result        
-NPT_File::ListDirectory(NPT_List<NPT_String>& entries)
+NPT_File::ListDir(NPT_List<NPT_String>& entries)
 {
     entries.Clear();
-    return ListDirectory(m_Path.GetChars(), entries);
+    return ListDir(m_Path.GetChars(), entries);
 }
 
 

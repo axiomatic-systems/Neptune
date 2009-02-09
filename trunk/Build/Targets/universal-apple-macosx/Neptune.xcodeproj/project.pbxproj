@@ -55,6 +55,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CA7848420F3B6E71009E84AD /* PBXTargetDependency */,
 				CAE417E40E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CAE417E60E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CAE417E80E0DC1FD00A530D1 /* PBXTargetDependency */,
@@ -122,6 +123,8 @@
 		CA5041AF0C5AE2180060E6FE /* NptNullSerialPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */; };
 		CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979DD0CF1648300C01909 /* HttpServerTest1.cpp */; };
+		CA7848450F3B6E9B009E84AD /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA7848480F3B6EB8009E84AD /* MiniHttpServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA7848470F3B6EB8009E84AD /* MiniHttpServer.cpp */; };
 		CA84EC5E0C7E540900CC9622 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = CA84EC4A0C7E540900CC9622 /* adler32.c */; };
 		CA84EC5F0C7E540900CC9622 /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = CA84EC4B0C7E540900CC9622 /* crc32.c */; };
 		CA84EC600C7E540900CC9622 /* crc32.h in Headers */ = {isa = PBXBuildFile; fileRef = CA84EC4C0C7E540900CC9622 /* crc32.h */; };
@@ -321,6 +324,20 @@
 			remoteInfo = LoggingTest2;
 		};
 		CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA7848410F3B6E71009E84AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA78483C0F3B6E69009E84AD;
+			remoteInfo = MiniHttpServer;
+		};
+		CA7848430F3B6E95009E84AD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
@@ -708,6 +725,8 @@
 		CA30B76B0F0DCE990085B46E /* LoggingTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest2; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NptNullSerialPort.cpp; sourceTree = "<group>"; };
 		CA550D550D20A37E00B22D72 /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServerTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA78483D0F3B6E69009E84AD /* minihttpserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = minihttpserver; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA7848470F3B6EB8009E84AD /* MiniHttpServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MiniHttpServer.cpp; sourceTree = "<group>"; };
 		CA84EC4A0C7E540900CC9622 /* adler32.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = adler32.c; path = "../../../ThirdParty/zlib-1.2.3/adler32.c"; sourceTree = SOURCE_ROOT; };
 		CA84EC4B0C7E540900CC9622 /* crc32.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = crc32.c; path = "../../../ThirdParty/zlib-1.2.3/crc32.c"; sourceTree = SOURCE_ROOT; };
 		CA84EC4C0C7E540900CC9622 /* crc32.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = crc32.h; path = "../../../ThirdParty/zlib-1.2.3/crc32.h"; sourceTree = SOURCE_ROOT; };
@@ -900,6 +919,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA78483B0F3B6E69009E84AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7848450F3B6E9B009E84AD /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1196,6 +1223,14 @@
 			path = Null;
 			sourceTree = "<group>";
 		};
+		CA7848460F3B6EB8009E84AD /* MiniHttpServer */ = {
+			isa = PBXGroup;
+			children = (
+				CA7848470F3B6EB8009E84AD /* MiniHttpServer.cpp */,
+			);
+			path = MiniHttpServer;
+			sourceTree = "<group>";
+		};
 		CA84EC460C7E517E00CC9622 /* Zlib */ = {
 			isa = PBXGroup;
 			children = (
@@ -1414,6 +1449,7 @@
 		CAE417A50E0DC16300A530D1 /* Apps */ = {
 			isa = PBXGroup;
 			children = (
+				CA7848460F3B6EB8009E84AD /* MiniHttpServer */,
 				CAE417A60E0DC16300A530D1 /* NetConfig */,
 				CAE417A80E0DC16300A530D1 /* NetEcho */,
 				CAE417AA0E0DC16300A530D1 /* NetPing */,
@@ -1504,6 +1540,7 @@
 				CA1A5EA90EC0152A00A9040C /* libaxTLS.a */,
 				CA2F54240EC115E600AEBC12 /* TlsTest1 */,
 				CA30B76B0F0DCE990085B46E /* LoggingTest2 */,
+				CA78483D0F3B6E69009E84AD /* minihttpserver */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1817,6 +1854,23 @@
 			name = HttpServerTest1;
 			productName = XmlTest1;
 			productReference = CA550D550D20A37E00B22D72 /* HttpServerTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA78483C0F3B6E69009E84AD /* MiniHttpServer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA7848490F3B6EB8009E84AD /* Build configuration list for PBXNativeTarget "MiniHttpServer" */;
+			buildPhases = (
+				CA78483A0F3B6E69009E84AD /* Sources */,
+				CA78483B0F3B6E69009E84AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA7848440F3B6E95009E84AD /* PBXTargetDependency */,
+			);
+			name = MiniHttpServer;
+			productName = MiniHttpServer;
+			productReference = CA78483D0F3B6E69009E84AD /* minihttpserver */;
 			productType = "com.apple.product-type.tool";
 		};
 		CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */ = {
@@ -2254,6 +2308,7 @@
 				CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */,
 				CAF2EFD60E64A27200948C04 /* FileTest1 */,
 				CA2F54230EC115E600AEBC12 /* TlsTest1 */,
+				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
 			);
 		};
 /* End PBXProject section */
@@ -2319,6 +2374,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA78483A0F3B6E69009E84AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA7848480F3B6EB8009E84AD /* MiniHttpServer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2603,6 +2666,16 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */;
+		};
+		CA7848420F3B6E71009E84AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA78483C0F3B6E69009E84AD /* MiniHttpServer */;
+			targetProxy = CA7848410F3B6E71009E84AD /* PBXContainerItemProxy */;
+		};
+		CA7848440F3B6E95009E84AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA7848430F3B6E95009E84AD /* PBXContainerItemProxy */;
 		};
 		CA97E0490E2FEB6F0090CC9B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3008,6 +3081,36 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = HttpServerTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CA78483F0F3B6E6A009E84AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = minihttpserver;
+			};
+			name = Debug;
+		};
+		CA7848400F3B6E6A009E84AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = minihttpserver;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3769,6 +3872,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
@@ -3814,6 +3918,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
@@ -3913,6 +4018,15 @@
 			buildConfigurations = (
 				CA550D520D20A37E00B22D72 /* Debug */,
 				CA550D540D20A37E00B22D72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA7848490F3B6EB8009E84AD /* Build configuration list for PBXNativeTarget "MiniHttpServer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA78483F0F3B6E6A009E84AD /* Debug */,
+				CA7848400F3B6E6A009E84AD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

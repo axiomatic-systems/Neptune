@@ -513,8 +513,12 @@ NPT_Result
 NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                        NPT_OutputStream& to,
                        NPT_Position      offset /* = 0 */,
-                       NPT_LargeSize     size   /* = 0, 0 means the entire stream */)
+                       NPT_LargeSize     size   /* = 0, 0 means the entire stream */,
+                       NPT_LargeSize*    bytes_written /* = NULL */)
 {
+    // default values
+    if (bytes_written) *bytes_written = 0;
+    
     // seek into the input if required
     if (offset) {
         NPT_CHECK(from.Seek(offset));
@@ -544,9 +548,17 @@ NPT_StreamToStreamCopy(NPT_InputStream&  from,
         }
         if (bytes_read == 0) continue;
         
-        // write the data
-        result = to.WriteFully(buffer, bytes_read);
-        if (NPT_FAILED(result)) break;
+        NPT_Size  buffer_bytes_to_write = bytes_read;
+        NPT_Byte* buffer_bytes = (NPT_Byte*)buffer;
+        while (buffer_bytes_to_write) {
+            NPT_Size buffer_bytes_written = 0;
+            result = to.Write(buffer_bytes, buffer_bytes_to_write, &buffer_bytes_written);
+            if (NPT_FAILED(result)) goto end;
+            NPT_ASSERT(buffer_bytes_written <= buffer_bytes_to_write);
+            buffer_bytes_to_write -= buffer_bytes_written;
+            if (bytes_written) *bytes_written += buffer_bytes_written;
+            buffer_bytes += buffer_bytes_written;
+        }
 
         // update the counts
         if (size) {
@@ -555,6 +567,7 @@ NPT_StreamToStreamCopy(NPT_InputStream&  from,
         }
     }
 
+end:
     // free the buffer and return
     delete[] buffer;
     return result;
@@ -596,5 +609,103 @@ NPT_StringOutputStream::Write(const void* buffer, NPT_Size bytes_to_write, NPT_S
 {
      m_String->Append((const char*)buffer, bytes_to_write);
     if (bytes_written) *bytes_written = bytes_to_write;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::NPT_SubInputStream
++---------------------------------------------------------------------*/
+NPT_SubInputStream::NPT_SubInputStream(NPT_InputStreamReference& source, 
+                                       NPT_Position              start,
+                                       NPT_LargeSize             size) :
+    m_Source(source),
+    m_Position(0),
+    m_Start(start),
+    m_Size(size)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::Read
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_SubInputStream::Read(void*     buffer, 
+                         NPT_Size  bytes_to_read, 
+                         NPT_Size* bytes_read)
+{
+    // default values
+    if (bytes_read) *bytes_read = 0;
+
+    // shortcut
+    if (bytes_to_read == 0) {
+        return NPT_SUCCESS;
+    }
+
+    // clamp to range
+    if (m_Position+bytes_to_read > m_Size) {
+        bytes_to_read = (NPT_Size)(m_Size - m_Position);
+    }
+
+    // check for end of substream
+    if (bytes_to_read == 0) {
+        return NPT_ERROR_EOS;
+    }
+
+    // seek inside the source
+    NPT_Result result;
+    result = m_Source->Seek(m_Start+m_Position);
+    if (NPT_FAILED(result)) {
+        return result;
+    }
+
+    // read from the source
+    NPT_Size source_bytes_read = 0;
+    result = m_Source->Read(buffer, bytes_to_read, &source_bytes_read);
+    if (NPT_SUCCEEDED(result)) {
+        m_Position += source_bytes_read;
+        if (bytes_read) *bytes_read = source_bytes_read;
+    }
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::Seek
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_SubInputStream::Seek(NPT_Position position)
+{
+    if (position == m_Position) return NPT_SUCCESS;
+    if (position > m_Size) return NPT_ERROR_OUT_OF_RANGE;
+    m_Position = position;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::Seek
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_SubInputStream::Tell(NPT_Position& position)
+{
+    position = m_Position;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::GetSize
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_SubInputStream::GetSize(NPT_LargeSize& size)
+{
+    size = m_Size;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_SubInputStream::GetAvailable
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_SubInputStream::GetAvailable(NPT_LargeSize& available)
+{
+    available = m_Size-m_Position;
     return NPT_SUCCESS;
 }

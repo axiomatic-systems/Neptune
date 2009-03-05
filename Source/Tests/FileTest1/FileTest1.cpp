@@ -70,7 +70,7 @@ main(int argc, char** argv)
     NPT_ASSERT(info.m_Type == NPT_FileInfo::FILE_TYPE_SPECIAL);
 
     if (NPT_File::Exists("foobar.file1")) {
-        result = NPT_File::DeleteFile("foobar.file1");
+        result = NPT_File::RemoveFile("foobar.file1");
         NPT_ASSERT(NPT_SUCCEEDED(result));
     }
     
@@ -111,7 +111,7 @@ main(int argc, char** argv)
 
     // dirs
     NPT_ASSERT(!NPT_File::Exists("foobar.dir"));
-    result = NPT_File::CreateDirectory("foobar.dir");
+    result = NPT_File::CreateDir("foobar.dir");
     NPT_ASSERT(NPT_SUCCEEDED(result));
     result = NPT_File::GetInfo("foobar.dir", &info);
     NPT_ASSERT(NPT_SUCCEEDED(result));
@@ -142,13 +142,13 @@ main(int argc, char** argv)
     NPT_ASSERT(NPT_SUCCEEDED(result));
 
     NPT_List<NPT_String> entries;
-    result = NPT_File::ListDirectory("foobar.dir", entries);
+    result = NPT_File::ListDir("foobar.dir", entries);
     NPT_ASSERT(NPT_SUCCEEDED(result));
     NPT_ASSERT(entries.GetItemCount() == 3);
     
-    result = NPT_File::DeleteFile("foobar.dir");
+    result = NPT_File::RemoveFile("foobar.dir");
     NPT_ASSERT(NPT_FAILED(result));
-    result = NPT_File::DeleteDirectory("foobar.dir");
+    result = NPT_File::RemoveDir("foobar.dir");
     NPT_ASSERT(result == NPT_ERROR_DIRECTORY_NOT_EMPTY);
     
     result = NPT_File::Rename("foobar.dir", "foobar.dir-r");
@@ -158,20 +158,20 @@ main(int argc, char** argv)
     fname = dirname;
     fname += NPT_FilePath::Separator;
     fname += "file1";
-    result = NPT_File::DeleteFile(fname);
+    result = NPT_File::RemoveFile(fname);
     NPT_ASSERT(NPT_SUCCEEDED(result));
     fname = dirname;
     fname += NPT_FilePath::Separator;
     fname += "file2";
-    result = NPT_File::DeleteFile(fname);
+    result = NPT_File::RemoveFile(fname);
     NPT_ASSERT(NPT_SUCCEEDED(result));
     fname = dirname;
     fname += NPT_FilePath::Separator;
     fname += "file3";
-    result = NPT_File::DeleteFile(fname);
+    result = NPT_File::RemoveFile(fname);
     NPT_ASSERT(NPT_SUCCEEDED(result));
 
-    result = NPT_File::DeleteDirectory("foobar.dir-r");
+    result = NPT_File::RemoveDir("foobar.dir-r");
     NPT_ASSERT(NPT_SUCCEEDED(result));
     NPT_ASSERT(!NPT_File::Exists("foobar.dir-r"));
 
@@ -190,17 +190,17 @@ main(int argc, char** argv)
     test = NPT_FilePath::BaseName(NPT_FilePath::Separator);
     NPT_ASSERT(test == "");
 
-    test = NPT_FilePath::DirectoryName("");
+    test = NPT_FilePath::DirName("");
     NPT_ASSERT(test == "");
-    test = NPT_FilePath::DirectoryName("a");
+    test = NPT_FilePath::DirName("a");
     NPT_ASSERT(test == "");
-    test = NPT_FilePath::DirectoryName("a"+NPT_FilePath::Separator+"b");
+    test = NPT_FilePath::DirName("a"+NPT_FilePath::Separator+"b");
     NPT_ASSERT(test == "a");
-    test = NPT_FilePath::DirectoryName("a"+NPT_FilePath::Separator+"b"+NPT_FilePath::Separator);
+    test = NPT_FilePath::DirName("a"+NPT_FilePath::Separator+"b"+NPT_FilePath::Separator);
     NPT_ASSERT(test == "a"+NPT_FilePath::Separator+"b");
-    test = NPT_FilePath::DirectoryName(NPT_FilePath::Separator+"a");
+    test = NPT_FilePath::DirName(NPT_FilePath::Separator+"a");
     NPT_ASSERT(test == NPT_FilePath::Separator);
-    test = NPT_FilePath::DirectoryName(NPT_FilePath::Separator);
+    test = NPT_FilePath::DirName(NPT_FilePath::Separator);
     NPT_ASSERT(test == NPT_FilePath::Separator);
     
     // small files
@@ -232,7 +232,7 @@ main(int argc, char** argv)
         NPT_ASSERT(buffer[i] == (unsigned char)i);
     }        
     file.Close();
-    NPT_File::DeleteFile(file.GetPath());
+    NPT_File::RemoveFile(file.GetPath());
 
     // large files
     if (argc == 2) {
@@ -246,19 +246,17 @@ main(int argc, char** argv)
         file = NPT_File(new_name);
         result = file.Open(NPT_FILE_OPEN_MODE_READ);
         NPT_ASSERT(NPT_SUCCEEDED(result));
-        NPT_InputStreamReference input;
         file.GetInputStream(input);
-        NPT_Position position;
         result = input->Tell(position);
         NPT_ASSERT(NPT_SUCCEEDED(result));
         NPT_ASSERT(position == 0);
-        NPT_LargeSize large_size = (NPT_LargeSize)0x10007 * (NPT_LargeSize)0x10000;
+        large_size = (NPT_LargeSize)0x10007 * (NPT_LargeSize)0x10000;
         result = input->Seek(large_size-0x10007);
         NPT_ASSERT(NPT_SUCCEEDED(result));
         result = input->Tell(position);
         NPT_ASSERT(NPT_SUCCEEDED(result));
         NPT_ASSERT(position == large_size-0x10007);        
-        unsigned char* buffer = new unsigned char[0x10007];
+        buffer = new unsigned char[0x10007];
         result = input->ReadFully(buffer, 0x10007);
         NPT_ASSERT(NPT_SUCCEEDED(result));
         result = input->Tell(position);
@@ -268,7 +266,7 @@ main(int argc, char** argv)
             NPT_ASSERT(buffer[i] == (unsigned char)i);
         }        
         file.Close();
-        NPT_File::DeleteFile(new_name);
+        NPT_File::RemoveFile(new_name);
     }
     
     return 0;

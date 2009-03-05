@@ -76,7 +76,7 @@ WalkDir(const char* path, unsigned int indent)
              printf("  ");
          }
          printf("%s: type=%s", child.GetChars(), FileTypeName(info.m_Type));
-         if (info.m_Type != NPT_FileInfo::FILE_TYPE_DIRECTORY) printf(" size=%" NPT_FORMAT_64 "d", info.m_Size);
+         if (info.m_Type != NPT_FileInfo::FILE_TYPE_DIRECTORY) printf(" size=%lld", info.m_Size);
          if (info.m_AttributesMask & NPT_FILE_ATTRIBUTE_READ_ONLY &&
              info.m_Attributes     & NPT_FILE_ATTRIBUTE_READ_ONLY) {
             printf(" RO");

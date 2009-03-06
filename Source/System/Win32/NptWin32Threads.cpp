@@ -450,20 +450,15 @@ NPT_Win32Thread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("thread in =======================");
 
-    // get the current thread ID in this context (it may not yet have been
-    // set in the parent context)
-    DWORD thread_id = ::GetCurrentThreadId();
-
-    // for detached threads, we store the thread ID here, because we cannot
-    // do it from the thread context that called the Start() method
-    if (thread->m_Detached) {
-        thread->m_ThreadId = thread_id;
-    }
+    // get the current thread ID and handle in this context 
+    // (they may not yet have been set in the parent context)
+    thread->m_ThreadId     = ::GetCurrentThreadId();
+    thread->m_ThreadHandle = ::GetCurrentThread();
 
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed(now.m_NanoSeconds + thread_id);
+    NPT_System::SetRandomSeed(now.m_NanoSeconds + thread->m_ThreadId);
 
     // run the thread 
     thread->Run();
@@ -508,21 +503,21 @@ NPT_Win32Thread::Start()
     // before we get to call detach on the given thread
     bool detached = m_Detached;
 
-    m_ThreadHandle = (HANDLE)
+    HANDLE thread_handle = (HANDLE)
         _beginthreadex(NULL, 
                        NPT_CONFIG_THREAD_STACK_SIZE, 
                        EntryPoint, 
                        reinterpret_cast<void*>(this), 
                        0, 
                        &thread_id);
-    if (m_ThreadHandle == 0) {
+    if (thread_handle == 0) {
         // failed
-        m_ThreadId = 0;
         return NPT_FAILURE;
     }
 
     if (!detached) {
-        m_ThreadId = (DWORD)thread_id;
+        m_ThreadHandle = thread_handle;
+        m_ThreadId     = (DWORD)thread_id;
     }
 
     return NPT_SUCCESS;

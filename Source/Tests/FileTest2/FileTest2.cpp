@@ -51,7 +51,7 @@ WalkDir(const char* path, unsigned int indent)
     }
 
     NPT_List<NPT_String> entries;
-    result = NPT_File::ListDirectory(path, entries);
+    result = NPT_File::ListDir(path, entries);
     if (NPT_FAILED(result)) {
         fprintf(stderr, "WARNING: NPT_File::ListDirectory returned %d (%s)\n",
                 result, NPT_ResultText(result));

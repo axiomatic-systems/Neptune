@@ -1044,7 +1044,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
 
     // send request body
     if (!body_stream.IsNull() && entity->GetContentLength()) {
-        NPT_CHECK_FATAL(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength()));
+        NPT_CHECK_WARNING(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength()));
     }
 
     // flush the output stream so that everything is sent to the server
@@ -1430,13 +1430,17 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
             NPT_InputStreamReference body_stream;
             body->GetInputStream(body_stream);
             result = NPT_StreamToStreamCopy(*body_stream, *output);
+            if (NPT_FAILED(result)) {
+                NPT_LOG_INFO_2("NPT_StreamToStreamCopy returned %d (%s)", result, NPT_ResultText(result));
+                goto end;
+            }
         }
     }
 
-end:
     // flush
     output->Flush();
 
+end:
     // cleanup
     delete response;
     delete request;

@@ -873,8 +873,14 @@ NPT_BsdSocketOutputStream::Flush()
     }
 
     // send an empty buffer to flush
-    char dummy;
-    send(m_SocketFdReference->m_SocketFd, &dummy, 0, 0); 
+    int flags = 0;
+#ifdef MSG_NOSIGNAL
+    // for some BSD stacks, ask for EPIPE to be returned instead
+    // of sending a SIGPIPE signal to the process
+    flags |= MSG_NOSIGNAL;
+#endif
+    char dummy = 0;
+    send(m_SocketFdReference->m_SocketFd, &dummy, 0, flags); 
 
     // restore the nagle algorithm to its original setting
     args = 0;
@@ -1247,11 +1253,18 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
                            (struct sockaddr *)&inet_address, 
                            sizeof(inet_address));
     } else {
+        int flags = 0;
+#ifdef MSG_NOSIGNAL
+        // for some BSD stacks, ask for EPIPE to be returned instead
+        // of sending a SIGPIPE signal to the process
+        flags |= MSG_NOSIGNAL;
+#endif
+
         // send to whichever addr the socket is connected
         io_result = send(m_SocketFdReference->m_SocketFd, 
                          (SocketConstBuffer)buffer, 
                          buffer_length,
-                         0);
+                         flags);
     }
 
     // check result

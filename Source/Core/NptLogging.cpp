@@ -78,13 +78,14 @@ public:
 
 private:
     // members
-    bool                      m_UseColors;
+    bool                      m_Flush;
     NPT_OutputStreamReference m_Stream;
 };
 
 class NPT_LogTcpHandler : public NPT_LogHandler {
 public:
     // class methods
+    static void       FormatRecord(const NPT_LogRecord& record, NPT_String& msg);
     static NPT_Result Create(const char* logger_name, NPT_LogHandler*& handler);
 
     // methods
@@ -98,6 +99,20 @@ private:
     NPT_String                m_Host;
     NPT_UInt16                m_Port;
     NPT_OutputStreamReference m_Stream;
+};
+
+class NPT_LogUdpHandler : public NPT_LogHandler {
+public:
+    // class methods
+    static NPT_Result Create(const char* logger_name, NPT_LogHandler*& handler);
+
+    // methods
+    void Log(const NPT_LogRecord& record);
+
+private:
+    // members
+    NPT_UdpSocket     m_Socket;
+    NPT_SocketAddress m_Target;
 };
 
 class NPT_LogNullHandler : public NPT_LogHandler {
@@ -133,6 +148,8 @@ public:
 #define NPT_LOG_TCP_HANDLER_DEFAULT_PORT            7723
 #define NPT_LOG_TCP_HANDLER_DEFAULT_CONNECT_TIMEOUT 5000 /* 5 seconds */
 
+#define NPT_LOG_UDP_HANDLER_DEFAULT_PORT            7724
+
 #if defined(_WIN32) || defined(_WIN32_WCE)
 #define NPT_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE false
 #else
@@ -166,6 +183,8 @@ NPT_LogHandler::Create(const char*      logger_name,
         return NPT_LogConsoleHandler::Create(logger_name, handler);
     } else if (NPT_StringsEqual(handler_name, "TcpHandler")) {
         return NPT_LogTcpHandler::Create(logger_name, handler);
+    } else if (NPT_StringsEqual(handler_name, "UdpHandler")) {
+        return NPT_LogUdpHandler::Create(logger_name, handler);
     }
 
     return NPT_ERROR_NO_SUCH_CLASS;
@@ -916,6 +935,7 @@ void
 NPT_LogFileHandler::Log(const NPT_LogRecord& record)
 {
     NPT_Log::FormatRecordToStream(record, *m_Stream, false, 0);
+    if (m_Flush) m_Stream->Flush();
 }
 
 /*----------------------------------------------------------------------
@@ -945,6 +965,14 @@ NPT_LogFileHandler::Create(const char*      logger_name,
     } else {
         /* default name for the root logger */
         filename = NPT_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
+    }
+
+    /* always flush flag */
+    NPT_String* flush = LogManager.GetConfigValue(logger_prefix, ".flush");
+    if (flush && NPT_LogManager::ConfigValueIsBooleanFalse(*flush)) {
+        instance->m_Flush = true;
+    } else {
+        instance->m_Flush = false;
     }
 
     /* append mode */
@@ -1030,15 +1058,9 @@ NPT_LogTcpHandler::Connect()
 |   NPT_LogTcpHandler::Log
 +---------------------------------------------------------------------*/
 void
-NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
+NPT_LogTcpHandler::FormatRecord(const NPT_LogRecord& record, NPT_String& msg)
 {
-    /* ensure we're connected */
-    if (m_Stream.IsNull()) {
-        if (NPT_FAILED(Connect())) return;
-    }
-
     /* format the record */
-    NPT_String msg;
     const char* level_name = NPT_Log::GetLogLevelName(record.m_Level);
     NPT_String  level_string;
 
@@ -1054,6 +1076,8 @@ NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
     msg += level_name;
     msg += "\r\nSource-File: ";
     msg += record.m_SourceFile;
+    msg += "\r\nSource-Function: ";
+    msg += record.m_SourceFunction;
     msg += "\r\nSource-Line: ";
     msg += NPT_String::FromIntegerU(record.m_SourceLine);
     msg += "\r\nTimeStamp: ";
@@ -1064,11 +1088,79 @@ NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
     msg += NPT_String::FromIntegerU(NPT_StringLength(record.m_Message));
     msg += "\r\n\r\n";
     msg += record.m_Message;
+}
 
-    /* emit the formatted record */
+/*----------------------------------------------------------------------
+|   NPT_LogTcpHandler::Log
++---------------------------------------------------------------------*/
+void
+NPT_LogTcpHandler::Log(const NPT_LogRecord& record)
+{
+    // ensure we're connected
+    if (m_Stream.IsNull()) {
+        if (NPT_FAILED(Connect())) return;
+    }
+
+    // format the record
+    NPT_String msg;
+    FormatRecord(record, msg);
+    
+    // log, and disconnect if this fails
     if (NPT_FAILED(m_Stream->WriteString(msg))) {
         m_Stream = NULL;
     }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogUdpHandler::Create
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_LogUdpHandler::Create(const char* logger_name, NPT_LogHandler*& handler)
+{
+    /* compute a prefix for the configuration of this handler */
+    NPT_String logger_prefix = logger_name;
+    logger_prefix += ".UdpHandler";
+
+    /* allocate a new object */
+    NPT_LogUdpHandler* instance = new NPT_LogUdpHandler();
+    handler = instance;
+
+    /* configure the object */
+    const char*       hostname = "localhost";
+    const NPT_String* hostname_prop = LogManager.GetConfigValue(logger_prefix, ".hostname");
+    if (hostname_prop) {
+        hostname = hostname_prop->GetChars();
+    } 
+    NPT_UInt32 port = NPT_LOG_UDP_HANDLER_DEFAULT_PORT;
+    const NPT_String* port_prop = LogManager.GetConfigValue(logger_prefix, ".port");
+    if (port_prop) {
+        if (NPT_FAILED(port_prop->ToInteger(port, true))) {
+            port = NPT_LOG_UDP_HANDLER_DEFAULT_PORT;
+        }
+    } 
+
+    // resolve the target hostname
+    NPT_IpAddress target_ip;
+    target_ip.ResolveName(hostname);
+    instance->m_Target.SetIpAddress(target_ip);
+    instance->m_Target.SetPort(port);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogUdpHandler::Log
++---------------------------------------------------------------------*/
+void
+NPT_LogUdpHandler::Log(const NPT_LogRecord& record)
+{
+    // format the record
+    NPT_String msg;
+    NPT_LogTcpHandler::FormatRecord(record, msg);
+    
+    // send it in a datagram
+    NPT_DataBuffer buffer(msg.GetChars(), msg.GetLength()+1, false);
+    m_Socket.Send(buffer, &m_Target);
 }
 
 /*----------------------------------------------------------------------

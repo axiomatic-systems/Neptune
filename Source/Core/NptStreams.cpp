@@ -42,7 +42,7 @@
 |   constants
 +---------------------------------------------------------------------*/
 const NPT_Size      NPT_INPUT_STREAM_LOAD_DEFAULT_READ_CHUNK = 4096;
-const NPT_LargeSize NPT_INPUT_STREAM_LOAD_MAX_SIZE           = 0x100000; // 1GB
+const NPT_LargeSize NPT_INPUT_STREAM_LOAD_MAX_SIZE           = 0x40000000; // 1GB
 
 /*----------------------------------------------------------------------
 |   NPT_InputStream::Load

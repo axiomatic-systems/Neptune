@@ -701,7 +701,9 @@ NPT_LogManager::GetLogger(const char* name)
 
         /* this parent name does not exist, see if we need to create it */
         if (LogManager.HaveLoggerConfig(parent_name)) {
+            LogManager.m_Lock.Unlock();
             parent = GetLogger(parent_name);
+            LogManager.m_Lock.Lock();
             break;
         }
     }

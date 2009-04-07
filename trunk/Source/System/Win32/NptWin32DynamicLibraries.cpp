@@ -20,6 +20,46 @@
  +---------------------------------------------------------------------*/
  NPT_SET_LOCAL_LOGGER("neptune.win32.dynamic-libraries")
 
+/*----------------------------------------------------------------------
+|   A2WHelper
++---------------------------------------------------------------------*/
+static LPWSTR A2WHelper(LPWSTR lpw, LPCSTR lpa, int nChars, UINT acp)
+{
+    int ret;
+
+    assert(lpa != NULL);
+    assert(lpw != NULL);
+    if (lpw == NULL || lpa == NULL) return NULL;
+
+    lpw[0] = '\0';
+    ret = MultiByteToWideChar(acp, 0, lpa, -1, lpw, nChars);
+    if (ret == 0) {
+        assert(0);
+        return NULL;
+    }        
+    return lpw;
+}
+
+/*----------------------------------------------------------------------
+|   macros
++---------------------------------------------------------------------*/
+/* UNICODE support */
+#if !defined(_XBOX)
+#define NPT_WIN32_USE_CHAR_CONVERSION int _convert = 0; LPCWSTR _lpw = NULL; LPCSTR _lpa = NULL
+
+#define NPT_WIN32_A2W(lpa) (\
+    ((_lpa = lpa) == NULL) ? NULL : (\
+    _convert = (int)(strlen(_lpa)+1),\
+    (INT_MAX/2<_convert)? NULL :  \
+    A2WHelper((LPWSTR) alloca(_convert*sizeof(WCHAR)), _lpa, _convert, CP_UTF8)))
+
+#else
+#define NPT_WIN32_USE_CHAR_CONVERSION
+#define NPT_WIN32_A2W(_s) (_s)
+#define LoadLibraryW      LoadLibrary
+#define GetProcAddressW   GetProcAddress
+#endif
+
  /*----------------------------------------------------------------------
  |   NPT_Win32DynamicLibrary
  +---------------------------------------------------------------------*/
@@ -46,6 +86,8 @@ private:
 NPT_Result 
 NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*& library)
 {
+    NPT_WIN32_USE_CHAR_CONVERSION;
+
     NPT_COMPILER_UNUSED(flags);
     if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
 
@@ -54,7 +96,7 @@ NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*&
 
     // load the lib
     NPT_LOG_FINE_2("loading library %s, flags=%x", name, flags);
-    HMODULE handle = LoadLibrary(name);
+    HMODULE handle = LoadLibraryW(NPT_WIN32_A2W(name));
     if (handle == NULL) {
         NPT_LOG_FINE("library not found");
         return NPT_FAILURE;
@@ -73,12 +115,14 @@ NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*&
 NPT_Result 
 NPT_Win32DynamicLibrary::FindSymbol(const char* name, void*& symbol)
 {
+    NPT_WIN32_USE_CHAR_CONVERSION;
+
     if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
     symbol = NULL;
     if (m_Library == NULL) return NPT_ERROR_NO_SUCH_ITEM;
 
     NPT_LOG_FINE_1("finding symbol %s", name);
-    symbol = GetProcAddress(m_Library, name);
+    symbol = GetProcAddressW(m_Library, NPT_WIN32_A2W(name));
     return symbol?NPT_SUCCESS:NPT_ERROR_NO_SUCH_ITEM;
 }
 

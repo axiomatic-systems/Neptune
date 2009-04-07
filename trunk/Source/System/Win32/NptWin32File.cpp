@@ -29,19 +29,6 @@
 //NPT_SET_LOCAL_LOGGER("neptune.win32.file")
 
 /*----------------------------------------------------------------------
-|   fix windows macros
-+---------------------------------------------------------------------*/
-#if !defined(_WIN32_WCE)
-#if defined(CreateDirectory)
-#undef CreateDirectory
-#endif
-
-#if defined(DeleteFile)
-#undef DeleteFile
-#endif
-#endif
-
-/*----------------------------------------------------------------------
 |   A2WHelper
 +---------------------------------------------------------------------*/
 static LPWSTR A2WHelper(LPWSTR lpw, LPCSTR lpa, int nChars, UINT acp)

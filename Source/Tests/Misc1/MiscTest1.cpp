@@ -17,6 +17,7 @@
 #include "NptDebug.h"
 #include "NptUtils.h"
 #include "NptTypes.h"
+#include "NptDynamicCast.h"
 
 /*----------------------------------------------------------------------
 |       macros
@@ -62,6 +63,37 @@
     } while(0)                                  
 
 
+class BarA 
+{
+public:
+    NPT_IMPLEMENT_DYNAMIC_CAST(BarA)
+    virtual ~BarA() {}
+    virtual int bar() { return 1; }
+};
+
+class FooA 
+{
+public:
+    NPT_IMPLEMENT_DYNAMIC_CAST(FooA)
+    virtual ~FooA() {}
+    virtual int foo() { return 2; }
+};
+
+class FooB : public FooA 
+{
+public:
+    NPT_IMPLEMENT_DYNAMIC_CAST_D(FooB, FooA)
+    virtual int foo() { return 3; }
+};
+
+class FooC : public FooB, public BarA
+{
+public:
+    NPT_IMPLEMENT_DYNAMIC_CAST_D2(FooC, FooB, BarA)
+    virtual int foo() { return 4; }
+    virtual int bar() { return 5; }
+};
+
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -69,6 +101,45 @@ int
 main(int /*argc*/, char** /*argv*/)
 {
     NPT_Result result;
+
+    // dynamic cast
+    BarA* bar_a = new BarA();
+    NPT_ASSERT(bar_a != NULL);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(BarA, bar_a) == bar_a);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooA, bar_a) == NULL);
+    NPT_ASSERT(bar_a->bar() == 1);
+    delete bar_a;
+
+    FooA* foo_a = new FooA();
+    NPT_ASSERT(foo_a != NULL);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooA, foo_a) == foo_a);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooB, foo_a) == NULL);
+    NPT_ASSERT(foo_a->foo() == 2);
+    delete foo_a;
+
+    FooB* foo_b = new FooB();
+    NPT_ASSERT(foo_b != NULL);
+    foo_a = NPT_DYNAMIC_CAST(FooA, foo_b);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooB, foo_b) == foo_b);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooA, foo_b) != NULL);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooC, foo_b) == NULL);
+    NPT_ASSERT(foo_a->foo() == 3);
+    delete foo_b;
+
+    FooC* foo_c = new FooC();
+    NPT_ASSERT(foo_c != NULL);
+    foo_a = NPT_DYNAMIC_CAST(FooA, foo_c);
+    foo_b = NPT_DYNAMIC_CAST(FooB, foo_c);
+    bar_a = NPT_DYNAMIC_CAST(BarA, foo_c);
+    NPT_ASSERT(NPT_DYNAMIC_CAST(FooC, foo_c) == foo_c);
+    NPT_ASSERT(foo_a != NULL);
+    NPT_ASSERT(foo_b != NULL);
+    NPT_ASSERT(bar_a != NULL);
+    NPT_ASSERT(foo_a->foo() == 4);
+    NPT_ASSERT(foo_b->foo() == 4);
+    NPT_ASSERT(foo_c->foo() == 4);
+    NPT_ASSERT(bar_a->bar() == 5);
+    delete foo_c;
 
     // misc type tests
     signed long   sl;

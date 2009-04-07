@@ -220,6 +220,11 @@ typedef long NPT_PointerLong;
 #define NPT_ftell ftell  // no ftello ?
 #endif
 
+/* Android */
+#if defined(ANDROID)
+#define NPT_CONFIG_NO_RTTI
+#endif
+
 /*----------------------------------------------------------------------
 |   defaults
 +---------------------------------------------------------------------*/

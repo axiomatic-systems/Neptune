@@ -115,14 +115,17 @@ NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*&
 NPT_Result 
 NPT_Win32DynamicLibrary::FindSymbol(const char* name, void*& symbol)
 {
-    NPT_WIN32_USE_CHAR_CONVERSION;
-
     if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
     symbol = NULL;
     if (m_Library == NULL) return NPT_ERROR_NO_SUCH_ITEM;
 
     NPT_LOG_FINE_1("finding symbol %s", name);
-    symbol = GetProcAddressW(m_Library, NPT_WIN32_A2W(name));
+#if defined(_WIN32_WCE)
+    NPT_WIN32_USE_CHAR_CONVERSION;
+    symbol = GetProcAddress(m_Library, NPT_WIN32_A2W(name));
+#else
+    symbol = GetProcAddress(m_Library, name);
+#endif
     return symbol?NPT_SUCCESS:NPT_ERROR_NO_SUCH_ITEM;
 }
 

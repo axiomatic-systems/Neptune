@@ -14,6 +14,7 @@
 #include "NptDynamicLibraries.h"
 
 #include <windows.h>
+#include <assert.h>
 
  /*----------------------------------------------------------------------
  |   logging

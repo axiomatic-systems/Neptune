@@ -45,6 +45,7 @@
 #include "NptFile.h"
 #include "NptSystem.h"
 #include "NptConsole.h"
+#include "NptDebug.h"
 
 /*----------------------------------------------------------------------
 |   logging
@@ -56,6 +57,12 @@ NPT_SET_LOCAL_LOGGER("neptune.logging")
 +---------------------------------------------------------------------*/
 class NPT_LogConsoleHandler : public NPT_LogHandler {
 public:
+    // enums
+    enum {
+        OUTPUT_TO_CONSOLE = 1,
+        OUTPUT_TO_DEBUG   = 2
+    };
+
     // class methods
     static NPT_Result Create(const char* logger_name, NPT_LogHandler*& handler);
 
@@ -64,8 +71,9 @@ public:
 
 private:
     // members
-    bool      m_UseColors;
-    NPT_Flags m_FormatFilter;
+    NPT_UInt32 m_Outputs;
+    bool       m_UseColors;
+    NPT_Flags  m_FormatFilter;
 };
 
 class NPT_LogFileHandler : public NPT_LogHandler {
@@ -905,13 +913,19 @@ NPT_LogConsoleHandler::Create(const char*      logger_name,
             instance->m_UseColors = false;
         }
     }
+
+    NPT_String* outputs;
+    instance->m_Outputs = OUTPUT_TO_DEBUG;
+    outputs = LogManager.GetConfigValue(logger_prefix,".outputs");
+    if (outputs) {
+        outputs->ToInteger(instance->m_Outputs, true);
+    }
+
     NPT_String* filter;
     instance->m_FormatFilter = 0;
     filter = LogManager.GetConfigValue(logger_prefix,".filter");
     if (filter) {
-        NPT_UInt32 flags = 0;
-        filter->ToInteger(flags, true);
-        instance->m_FormatFilter = flags;
+        filter->ToInteger(instance->m_FormatFilter, true);
     }
 
     return NPT_SUCCESS;
@@ -927,7 +941,12 @@ NPT_LogConsoleHandler::Log(const NPT_LogRecord& record)
 
     NPT_Log::FormatRecordToStream(record, memory_stream, m_UseColors, m_FormatFilter);
     memory_stream.Write("\0", 1);
-    NPT_Console::Output((const char*)memory_stream.GetData());
+    if (m_Outputs & OUTPUT_TO_CONSOLE) {
+        NPT_Console::Output((const char*)memory_stream.GetData());
+    } 
+    if (m_Outputs & OUTPUT_TO_DEBUG) {
+        NPT_DebugOutput((const char*)memory_stream.GetData());
+    } 
 }
 
 /*----------------------------------------------------------------------

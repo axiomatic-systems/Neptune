@@ -178,7 +178,7 @@ LibraryModule(name                  = 'Neptune',
               extra_cpp_defines     = extra_cpp_flags,
               linked_modules        = env['NPT_EXTRA_LIBS']+['Zlib'])
            
-for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho']:
+for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'MiniHttpServer']:
     Application(app, 'Source/Apps/'+app)
     
 for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1']:

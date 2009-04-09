@@ -70,6 +70,7 @@ public:
     virtual ~BarA() {}
     virtual int bar() { return 1; }
 };
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(BarA)
 
 class FooA 
 {
@@ -78,6 +79,7 @@ public:
     virtual ~FooA() {}
     virtual int foo() { return 2; }
 };
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(FooA)
 
 class FooB : public FooA 
 {
@@ -85,6 +87,7 @@ public:
     NPT_IMPLEMENT_DYNAMIC_CAST_D(FooB, FooA)
     virtual int foo() { return 3; }
 };
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(FooB)
 
 class FooC : public FooB, public BarA
 {
@@ -93,6 +96,7 @@ public:
     virtual int foo() { return 4; }
     virtual int bar() { return 5; }
 };
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(FooC)
 
 /*----------------------------------------------------------------------
 |       main

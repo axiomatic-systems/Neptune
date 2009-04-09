@@ -17,11 +17,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
-#if defined(__SYMBIAN32__)
 #include <errno.h>
-#else
-#include <cerrno>
-#endif
 
 #include "NptConfig.h"
 #include "NptTypes.h"

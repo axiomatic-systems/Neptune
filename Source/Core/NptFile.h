@@ -189,7 +189,7 @@ protected:
     // members
     NPT_FileInterface* m_Delegate;
     NPT_String         m_Path;
-    NPT_FileInfo       m_Info;
+    bool               m_IsSpecial;
 };
 
 #endif // _NPT_FILE_H_ 

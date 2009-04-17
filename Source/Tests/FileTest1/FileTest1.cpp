@@ -23,7 +23,7 @@ NPT_Result
 CreateNewFile(const char* filename, NPT_Size chunk_count, NPT_Size chunk_size=1)
 {
     NPT_File file(filename);
-    NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_CREATE|NPT_FILE_OPEN_MODE_WRITE));
+    NPT_CHECK(file.Open(NPT_FILE_OPEN_MODE_CREATE|NPT_FILE_OPEN_MODE_WRITE|NPT_FILE_OPEN_MODE_TRUNCATE));
     NPT_OutputStreamReference out;
     file.GetOutputStream(out);
     unsigned char* chunk_buffer = new unsigned char[chunk_size];
@@ -268,6 +268,73 @@ main(int argc, char** argv)
         file.Close();
         NPT_File::RemoveFile(new_name);
     }
+    
+    // test dynamic size
+    NPT_LargeSize             size;
+    unsigned char             buff[16] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};  
+    const char*               filename = "pi.\xCF\x80.test";
+    NPT_TimeInterval          wait(2.0f);
+    
+    if (argc > 1) {
+        filename = argv[1];
+    }
+    
+    NPT_File                  file1(filename);
+    NPT_OutputStreamReference output;
+
+    NPT_ASSERT(NPT_SUCCEEDED(file1.Open(NPT_FILE_OPEN_MODE_CREATE | NPT_FILE_OPEN_MODE_WRITE | NPT_FILE_OPEN_MODE_READ | NPT_FILE_OPEN_MODE_TRUNCATE)));
+    NPT_ASSERT(NPT_SUCCEEDED(file1.GetSize(size)));
+    NPT_ASSERT(size == 0);
+    NPT_ASSERT(NPT_SUCCEEDED(file1.GetOutputStream(output)));
+    NPT_ASSERT(NPT_SUCCEEDED(file1.GetInputStream(input)));
+    NPT_ASSERT(NPT_SUCCEEDED(output->Tell(position)));
+    NPT_ASSERT(position == 0);
+    NPT_ASSERT(NPT_SUCCEEDED(input->Tell(position)));
+    NPT_ASSERT(position == 0);
+    NPT_ASSERT(NPT_SUCCEEDED(output->WriteFully(buff, 16)));
+    output->Flush();
+    NPT_System::Sleep(wait);
+    NPT_ASSERT(NPT_SUCCEEDED(file1.GetSize(size)));
+    NPT_ASSERT(size == 16);
+    NPT_ASSERT(NPT_SUCCEEDED(output->Tell(position)));
+    NPT_ASSERT(NPT_SUCCEEDED(input->GetSize(size)));
+    NPT_ASSERT(size == 16);
+    NPT_ASSERT(position == 16);
+    NPT_ASSERT(NPT_SUCCEEDED(input->Tell(position)));
+    NPT_ASSERT(position == 16);
+    NPT_ASSERT(NPT_SUCCEEDED(output->Seek(8)));
+    NPT_ASSERT(NPT_SUCCEEDED(output->Tell(position)));
+    NPT_ASSERT(position == 8);
+    
+    NPT_File                 file2(filename);
+    NPT_InputStreamReference input2;
+
+    NPT_ASSERT(NPT_SUCCEEDED(file2.Open(NPT_FILE_OPEN_MODE_READ)));
+    NPT_ASSERT(NPT_SUCCEEDED(file2.GetSize(size)));
+    NPT_ASSERT(size == 16);
+    NPT_ASSERT(NPT_SUCCEEDED(file2.GetInputStream(input2)));
+    NPT_ASSERT(NPT_SUCCEEDED(input2->GetSize(size)));
+    NPT_ASSERT(size == 16);
+    NPT_ASSERT(NPT_SUCCEEDED(input2->Tell(position)));
+    NPT_ASSERT(position == 0);
+    NPT_ASSERT(NPT_SUCCEEDED(input2->Seek(8)));
+    NPT_ASSERT(NPT_SUCCEEDED(input2->Tell(position)));
+    NPT_ASSERT(position == 8);
+    
+    NPT_ASSERT(NPT_SUCCEEDED(output->WriteFully(buff, 16)));
+    output->Flush();
+    NPT_System::Sleep(wait);
+    NPT_ASSERT(NPT_SUCCEEDED(file2.GetSize(size)));
+    NPT_ASSERT(size == 24);
+    NPT_ASSERT(NPT_SUCCEEDED(output->Tell(position)));
+    NPT_ASSERT(position == 24);
+    NPT_ASSERT(NPT_SUCCEEDED(input->Tell(position)));
+    NPT_ASSERT(position == 24);
+    
+    NPT_ASSERT(NPT_SUCCEEDED(input2->GetSize(size)));
+    NPT_ASSERT(size == 24);
+    NPT_ASSERT(NPT_SUCCEEDED(input2->Seek(20)));
+    NPT_ASSERT(NPT_SUCCEEDED(input2->Read(buff, 4, NULL)));
     
     return 0;
 }

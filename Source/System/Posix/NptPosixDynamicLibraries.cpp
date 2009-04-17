@@ -64,7 +64,7 @@ NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*&
     void* handle = dlopen(name, mode);
     if (handle == NULL) {
 #if defined(NPT_CONFIG_ENABLE_LOGGING)
-        void* error = dlerror();
+        const char* error = dlerror();
         NPT_LOG_FINE_1("library cannot be loaded (%s)", error?error:"");
 #endif
         return NPT_FAILURE;

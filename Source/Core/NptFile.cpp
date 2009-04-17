@@ -237,16 +237,14 @@ NPT_File::Save(const NPT_DataBuffer& buffer)
 NPT_Result
 NPT_File::GetInfo(NPT_FileInfo& info)
 {
-    NPT_Result result = NPT_SUCCESS;
-    
-    // get the file info if we don't already have it
-    if (m_Info.m_Type == NPT_FileInfo::FILE_TYPE_NONE) {
-        result = GetInfo(m_Path.GetChars(), &m_Info);
+    if (m_IsSpecial) {
+        info.m_Type           = NPT_FileInfo::FILE_TYPE_SPECIAL;
+        info.m_Size           = 0;
+        info.m_Attributes     = 0;
+        info.m_AttributesMask = 0;
+        return NPT_SUCCESS;
     }
-    
-    info = m_Info;
-    
-    return result;
+    return GetInfo(m_Path.GetChars(), &info);
 }
 
 /*----------------------------------------------------------------------

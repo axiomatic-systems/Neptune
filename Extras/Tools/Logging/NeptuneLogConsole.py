@@ -50,9 +50,9 @@ class LogRecord:
         return ' '.join(parts)
     
 class Listener:
-    def __init__(self, format='standard'):
+    def __init__(self, format='standard', port=UDP_PORT):
         self.socket = socket(AF_INET,SOCK_DGRAM)
-        self.socket.bind((UDP_ADDR, UDP_PORT))
+        self.socket.bind((UDP_ADDR, port))
         self.format_keys = HEADER_KEYS[format]
         
     def listen(self):
@@ -76,5 +76,5 @@ parser.add_option("-f", "--format", dest="format", help="log format (mini, stand
 (options, args) = parser.parse_args()
 
 print "Listening on port", options.port
-l = Listener(options.format)
+l = Listener(format=options.format, port=options.port)
 l.listen()

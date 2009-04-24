@@ -318,7 +318,7 @@ NPT_Log::FormatRecordToStream(const NPT_LogRecord& record,
     }
     stream.Write(": ", 2, NULL);
     stream.WriteString(record.m_Message);
-    stream.Write("\n", 2, NULL);
+    stream.Write("\r\n", 2, NULL);
 }
 
 /*----------------------------------------------------------------------

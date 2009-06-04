@@ -681,7 +681,7 @@ NPT_SubInputStream::Seek(NPT_Position position)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_SubInputStream::Seek
+|   NPT_SubInputStream::Tell
 +---------------------------------------------------------------------*/
 NPT_Result 
 NPT_SubInputStream::Tell(NPT_Position& position)

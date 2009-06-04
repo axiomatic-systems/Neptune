@@ -67,7 +67,6 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		CA096EF20ED0DBCE00A5103D /* NptResults.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA096EF10ED0DBCE00A5103D /* NptResults.cpp */; };
 		CA197D250E1AE4400018E87C /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA197D280E1AE4790018E87C /* QueueTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA197D1A0E1AE4200018E87C /* QueueTest1.cpp */; };
 		CA1A5EAF0EC0154D00A9040C /* x509.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E850EC0145900A9040C /* x509.c */; };
@@ -116,6 +115,7 @@
 		CA1D05700E68E29C00E3DEE8 /* NptDynamicLibraries.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1D056D0E68E29C00E3DEE8 /* NptDynamicLibraries.h */; };
 		CA1D05710E68E29C00E3DEE8 /* NptSerialPort.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1D056E0E68E29C00E3DEE8 /* NptSerialPort.h */; };
 		CA1D05730E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA1D05720E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp */; };
+		CA2B1E210FC22DBA00B9E79F /* NptResults.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA096EF10ED0DBCE00A5103D /* NptResults.cpp */; };
 		CA2F54340EC1165700AEBC12 /* TlsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */; };
 		CA2F54390EC1203A00AEBC12 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA2F543A0EC1203A00AEBC12 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
@@ -2624,7 +2624,7 @@
 				CA1D05730E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp in Sources */,
 				CA8961860E7689AF00FD1BE1 /* NptCocoaMessageQueue.mm in Sources */,
 				CAFB23700EC760FE009C3459 /* NptTls.cpp in Sources */,
-				CA096EF20ED0DBCE00A5103D /* NptResults.cpp in Sources */,
+				CA2B1E210FC22DBA00B9E79F /* NptResults.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

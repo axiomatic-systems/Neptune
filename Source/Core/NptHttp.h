@@ -77,7 +77,8 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 #define NPT_HTTP_HEADER_COOKIE              "Cookie"
 #define NPT_HTTP_HEADER_ACCEPT_RANGES       "Accept-Ranges"
-#define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
+
+#define NPT_HTTP_TRANSFER_ENCODING_CHUNKED  "chunked"
 
 const int NPT_ERROR_HTTP_INVALID_RESPONSE_LINE = NPT_ERROR_BASE_HTTP - 0;
 const int NPT_ERROR_HTTP_INVALID_REQUEST_LINE  = NPT_ERROR_BASE_HTTP - 1;
@@ -194,7 +195,7 @@ public:
     NPT_LargeSize     GetContentLength()   { return m_ContentLength;   }
     const NPT_String& GetContentType()     { return m_ContentType;     }
     const NPT_String& GetContentEncoding() { return m_ContentEncoding; }
-    const NPT_String& GetTransferEncoding(){ return m_TransferEncoding; }
+    const NPT_String& GetTransferEncoding(){ return m_TransferEncoding;}
 
 private:
     // members
@@ -631,6 +632,29 @@ protected:
     NPT_BufferedInputStreamReference m_Source;
     NPT_UInt32                       m_CurrentChunkSize;
     bool                             m_Eos;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedOutputStream
++---------------------------------------------------------------------*/
+class NPT_HttpChunkedOutputStream : public NPT_OutputStream
+{
+public:
+    // constructors and destructor
+    NPT_HttpChunkedOutputStream(NPT_OutputStream& stream);
+    virtual ~NPT_HttpChunkedOutputStream();
+
+    // NPT_OutputStream methods
+    NPT_Result Write(const void* buffer, 
+                     NPT_Size    bytes_to_write, 
+                     NPT_Size*   bytes_written = NULL);
+    NPT_Result Seek(NPT_Position /*offset*/) { return NPT_ERROR_NOT_SUPPORTED;}
+    NPT_Result Tell(NPT_Position& offset)    { return m_Stream.Tell(offset);  }
+    NPT_Result Flush()                       { return m_Stream.Flush();       }
+
+protected:
+    // members
+    NPT_OutputStream& m_Stream;
 };
 
 #endif // _NPT_HTTP_H_

@@ -43,6 +43,7 @@ public:
 class TestHandler1 : public NPT_HttpRequestHandler
 {
 public:
+    TestHandler1(bool chunked = false) : m_Chunked(chunked) {}
     NPT_Result SetupResponse(NPT_HttpRequest&              request, 
                              const NPT_HttpRequestContext& context,
                              NPT_HttpResponse&             response) {
@@ -96,8 +97,15 @@ public:
         entity->SetContentType("text/html");
         entity->SetInputStream(msg);
 
+        if (m_Chunked) {
+            entity->SetTransferEncoding(NPT_HTTP_TRANSFER_ENCODING_CHUNKED);
+            entity->SetContentLength(0);
+        }
+        
         return NPT_SUCCESS;
     }
+    
+    bool m_Chunked;
 };
 
 /*----------------------------------------------------------------------
@@ -118,13 +126,47 @@ public:
                                 NPT_HttpResponse&             /*response*/,
                                 NPT_OutputStream&             output) {
         output.WriteString("<html><body>\r\n");
-        for (unsigned int i=0; i<100; i++) {
+        for (unsigned int i=0; i<30; i++) {
             output.WriteString("Line ");
             output.WriteString(NPT_String::FromInteger(i).GetChars());
+            output.WriteString("\r\n");
             output.Flush();
-            NPT_System::Sleep(NPT_TimeInterval(1.0f));
+            NPT_System::Sleep(NPT_TimeInterval(0.2f));
         }
         output.WriteString("</body></html>\r\n");
+        return NPT_SUCCESS;
+    }
+};
+
+/*----------------------------------------------------------------------
+|       ChunkedHandler
++---------------------------------------------------------------------*/
+class ChunkedHandler : public NPT_HttpRequestHandler
+{
+public:
+    NPT_Result SetupResponse(NPT_HttpRequest&              /*request*/, 
+                             const NPT_HttpRequestContext& /*context*/,
+                             NPT_HttpResponse&             response) {
+        NPT_HttpEntity* entity = response.GetEntity();
+        entity->SetContentType("text/html");
+        entity->SetTransferEncoding("chunked");
+        response.SetProtocol(NPT_HTTP_PROTOCOL_1_1);
+        return NPT_SUCCESS;
+    }
+    
+    NPT_Result SendResponseBody(const NPT_HttpRequestContext& /*context*/,
+                                NPT_HttpResponse&             /*response*/,
+                                NPT_OutputStream&             output) {
+        NPT_HttpChunkedOutputStream chunker(output);
+        chunker.WriteString("<html><body>\r\n");
+        for (unsigned int i=0; i<30; i++) {
+            NPT_String line = "Line ";
+            line += NPT_String::FromInteger(i).GetChars();
+            chunker.WriteString(line.GetChars());
+            chunker.Flush();
+            NPT_System::Sleep(NPT_TimeInterval(0.2f));
+        }
+        chunker.WriteString("</body></html>\r\n");
         return NPT_SUCCESS;
     }
 };
@@ -147,6 +189,8 @@ TestHttp()
         "<a href='/files'>List files working directory (no autodir)</a><br>"
         "<a href='/test1'>Test 1</a><br>"
         "<a href='/test2'>Test 2</a><br>"
+        "<a href='/chunked1'>Chunked 1</a><br>"
+        "<a href='/chunked2'>Chunked 2</a><br>"
         "<a href='/kill'>Kill Test Server</a><br>"
         "</body></html>", 
         "text/html");
@@ -160,6 +204,12 @@ TestHttp()
 
     TestHandler2* test_handler2 = new TestHandler2();
     server.AddRequestHandler(test_handler2, "/test2", false);
+
+    ChunkedHandler* chunked_handler1 = new ChunkedHandler();
+    server.AddRequestHandler(chunked_handler1, "/chunked1", false);
+
+    TestHandler1* chunked_handler2 = new TestHandler1(true);
+    server.AddRequestHandler(chunked_handler2, "/chunked2", false);
 
     NPT_String cwd;
     NPT_File::GetWorkingDir(cwd);

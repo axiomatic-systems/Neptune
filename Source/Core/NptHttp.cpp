@@ -792,7 +792,7 @@ NPT_HttpTcpConnector::Connect(const char*                hostname,
     NPT_CHECK(address.ResolveName(hostname, name_resolver_timeout));
 
     // connect to the server
-    NPT_LOG_FINE_2("will connect to %s:%d", hostname, port);
+    NPT_LOG_FINE_2("TCP connector will connect to %s:%d", hostname, port);
     NPT_TcpClientSocket connection;
     connection.SetReadTimeout(io_timeout);
     connection.SetWriteTimeout(io_timeout);
@@ -963,6 +963,8 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     // setup default values
     response = NULL;
 
+    NPT_LOG_FINE_1("requesting URL %s", request.GetUrl().ToString().GetChars());
+    
     // get the address and port to which we need to connect
     NPT_HttpProxyAddress proxy;
     bool                 use_proxy = false;
@@ -992,6 +994,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     // connect to the server or proxy
     NPT_InputStreamReference  input_stream;
     NPT_OutputStreamReference output_stream;
+    NPT_LOG_FINE_2("connecting to %s:%d", server_hostname, server_port);
     NPT_CHECK_WARNING(m_Connector->Connect(server_hostname,
                                            server_port,
                                            m_Config.m_ConnectionTimeout,
@@ -1067,7 +1070,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         NPT_HttpEntity* response_entity = new NPT_HttpEntity(response->GetHeaders());
         
         // check for chunked Transfer-Encoding
-        if (response_entity->GetTransferEncoding() == "chunked") {
+        if (response_entity->GetTransferEncoding() == NPT_HTTP_TRANSFER_ENCODING_CHUNKED) {
             response_entity->SetInputStream(NPT_InputStreamReference(new NPT_HttpChunkedInputStream(buffered_input_stream)));
             response_entity->SetTransferEncoding(NULL);
         } else {
@@ -1529,20 +1532,34 @@ NPT_HttpResponder::SendResponseHeaders(NPT_HttpResponse& response)
     // add computed headers
     NPT_HttpEntity* entity = response.GetEntity();
     if (entity) {
-        // content length
-        headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
-                          NPT_String::FromInteger(entity->GetContentLength()));
-
+        // check if an entity stream has been set
+        NPT_InputStreamReference input_stream;
+        entity->GetInputStream(input_stream);
+        if (!input_stream.IsNull()) {
+            // set the content length, unless it is unknown (chunked encoding)
+            if (entity->GetContentLength() != 0 || 
+                entity->GetTransferEncoding() != NPT_HTTP_TRANSFER_ENCODING_CHUNKED) {
+                headers.SetHeader(NPT_HTTP_HEADER_CONTENT_LENGTH, 
+                                  NPT_String::FromInteger(entity->GetContentLength()));
+            }
+        }
+        
         // content type
-        NPT_String content_type = entity->GetContentType();
+        const NPT_String& content_type = entity->GetContentType();
         if (!content_type.IsEmpty()) {
             headers.SetHeader(NPT_HTTP_HEADER_CONTENT_TYPE, content_type);
         }
 
         // content encoding
-        NPT_String content_encoding = entity->GetContentEncoding();
+        const NPT_String& content_encoding = entity->GetContentEncoding();
         if (!content_encoding.IsEmpty()) {
             headers.SetHeader(NPT_HTTP_HEADER_CONTENT_ENCODING, content_encoding);
+        }
+        
+        // transfer encoding
+        const NPT_String& transfer_encoding = entity->GetTransferEncoding();
+        if (!transfer_encoding.IsEmpty()) {
+            headers.SetHeader(NPT_HTTP_HEADER_TRANSFER_ENCODING, transfer_encoding);
         }
     } else {
         // force content length to 0 if there is no message body
@@ -1576,15 +1593,25 @@ NPT_HttpRequestHandler::SendResponseBody(const NPT_HttpRequestContext& /*context
     entity->GetInputStream(body_stream);
     if (body_stream.IsNull()) return NPT_SUCCESS;
     
+    // check for chunked transfer encoding
+    NPT_OutputStream* dest = &output;
+    if (entity->GetTransferEncoding() == NPT_HTTP_TRANSFER_ENCODING_CHUNKED) {
+        dest = new NPT_HttpChunkedOutputStream(output);
+    }
+    
+    // send the body
     NPT_LOG_FINE_1("sending body stream, %lld bytes", entity->GetContentLength());
     NPT_LargeSize bytes_written = 0;
-    NPT_Result result = NPT_StreamToStreamCopy(*body_stream, output, 0, entity->GetContentLength(), &bytes_written);
+    NPT_Result result = NPT_StreamToStreamCopy(*body_stream, *dest, 0, entity->GetContentLength(), &bytes_written);
     if (NPT_FAILED(result)) {
         NPT_LOG_FINE_3("body stream only partially sent, %lld bytes (%d:%s)", 
                        bytes_written, 
                        result, 
                        NPT_ResultText(result));
     }
+    
+    // cleanup
+    if (dest != &output) delete dest;
     
     return result;
 }
@@ -2173,4 +2200,67 @@ NPT_Result
 NPT_HttpChunkedInputStream::GetAvailable(NPT_LargeSize& available)
 {
     return m_Source->GetAvailable(available);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedOutputStream::NPT_HttpChunkedOutputStream
++---------------------------------------------------------------------*/
+NPT_HttpChunkedOutputStream::NPT_HttpChunkedOutputStream(NPT_OutputStream& stream) :
+    m_Stream(stream)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedOutputStream::~NPT_HttpChunkedOutputStream
++---------------------------------------------------------------------*/
+NPT_HttpChunkedOutputStream::~NPT_HttpChunkedOutputStream()
+{
+    // zero size chunk followed by CRLF (no trailer)
+    m_Stream.WriteFully("0" NPT_HTTP_LINE_TERMINATOR NPT_HTTP_LINE_TERMINATOR, 5);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpChunkedOutputStream::Write
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_HttpChunkedOutputStream::Write(const void* buffer, 
+                                   NPT_Size    bytes_to_write, 
+                                   NPT_Size*   bytes_written)
+{
+    // default values
+    if (bytes_written) *bytes_written = 0;
+    
+    // shortcut
+    if (bytes_to_write == 0) return NPT_SUCCESS;
+    
+    // write the chunk header
+    char size[16];
+    size[15] = '\n';
+    size[14] = '\r';
+    char* c = &size[14];
+    unsigned int char_count = 2;
+    unsigned int value = bytes_to_write;
+    do {
+        unsigned int digit = (unsigned int)(value%16);
+        if (digit < 10) {
+            *--c = '0'+digit;
+        } else {
+            *--c = 'A'+digit-10;
+        }
+        char_count++;
+        value /= 16;
+    } while(value);
+    NPT_Result result = m_Stream.WriteFully(c, char_count);
+    if (NPT_FAILED(result)) return result;
+    
+    // write the chunk data
+    result = m_Stream.WriteFully(buffer, bytes_to_write);
+    if (NPT_FAILED(result)) return result;
+    
+    // finish the chunk
+    result = m_Stream.WriteFully(NPT_HTTP_LINE_TERMINATOR, 2);
+    if (NPT_SUCCEEDED(result) && bytes_written) {
+        *bytes_written = bytes_to_write;
+    }
+    return result;
 }

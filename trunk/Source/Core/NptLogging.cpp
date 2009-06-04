@@ -139,18 +139,20 @@ public:
 #define NPT_LOG_STACK_BUFFER_MAX_SIZE 512
 #define NPT_LOG_HEAP_BUFFER_MAX_SIZE  65536
 
-#if !defined(NPT_LOG_CONFIG_ENV)
-#define NPT_LOG_CONFIG_ENV "NEPTUNE_LOG_CONFIG"
+#if !defined(NPT_CONFIG_LOG_CONFIG_ENV)
+#define NPT_CONFIG_LOG_CONFIG_ENV "NEPTUNE_LOG_CONFIG"
 #endif
 
-#if !defined(NPT_LOG_DEFAULT_CONFIG_SOURCE)
-#define NPT_LOG_DEFAULT_CONFIG_SOURCE "file:neptune-logging.properties"
+#if !defined(NPT_CONFIG_DEFAULT_LOG_CONFIG_SOURCE)
+#define NPT_CONFIG_DEFAULT_LOG_CONFIG_SOURCE "file:neptune-logging.properties"
 #endif
 
-#define NPT_LOG_ROOT_DEFAULT_LOG_LEVEL NPT_LOG_LEVEL_INFO
+#if !defined(NPT_CONFIG_DEFAULT_LOG_LEVEL)
+#define NPT_CONFIG_DEFAULT_LOG_LEVEL NPT_LOG_LEVEL_OFF
+#endif
 #define NPT_LOG_ROOT_DEFAULT_HANDLER   "ConsoleHandler"
-#if !defined(NPT_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME)
-#define NPT_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME "_neptune.log"
+#if !defined(NPT_CONFIG_DEFAULT_FILE_HANDLER_FILENAME)
+#define NPT_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME "_neptune.log"
 #endif
 
 #define NPT_LOG_TCP_HANDLER_DEFAULT_PORT            7723
@@ -371,9 +373,9 @@ NPT_LogManager::Configure(const char* config_sources)
     /* see if the config sources have been set to non-default values */
     NPT_String config_sources_env;
     if (config_sources == NULL) {
-        config_sources = NPT_LOG_DEFAULT_CONFIG_SOURCE;
+        config_sources = NPT_CONFIG_DEFAULT_LOG_CONFIG_SOURCE;
     }
-    if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_LOG_CONFIG_ENV, config_sources_env))) {
+    if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_CONFIG_LOG_CONFIG_ENV, config_sources_env))) {
         config_sources = config_sources_env;
     }
 
@@ -395,7 +397,7 @@ NPT_LogManager::Configure(const char* config_sources)
 
     /* create the root logger */
     LogManager.m_Root = new NPT_Logger("", *this);
-    LogManager.m_Root->m_Level = NPT_LOG_ROOT_DEFAULT_LOG_LEVEL;
+    LogManager.m_Root->m_Level = NPT_CONFIG_DEFAULT_LOG_LEVEL;
     LogManager.m_Root->m_LevelIsInherited = false;
     ConfigureLogger(LogManager.m_Root);
 
@@ -985,7 +987,7 @@ NPT_LogFileHandler::Create(const char*      logger_name,
         filename = filename_synth;
     } else {
         /* default name for the root logger */
-        filename = NPT_LOG_ROOT_DEFAULT_FILE_HANDLER_FILENAME;
+        filename = NPT_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME;
     }
 
     /* always flush flag */

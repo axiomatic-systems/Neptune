@@ -1248,7 +1248,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
     NPT_CHECK(Bind());
 
     // wait for a connection
-    NPT_Socket*         client;
+    NPT_Socket* client;
     NPT_LOG_FINE_1("waiting for connection on port %d...", m_Config.m_ListenPort);
     NPT_CHECK_WARNING(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
     if (client == NULL) return NPT_ERROR_INTERNAL;
@@ -1305,8 +1305,8 @@ NPT_HttpServer::Loop()
                        result,
                        NPT_ResultText(result));
 
-        // release the stream references to that the socket can be closed
-        input = NULL;
+        // release the stream references so that the socket can be closed
+        input  = NULL;
         output = NULL;
     } while (NPT_SUCCEEDED(result));
     
@@ -1682,6 +1682,7 @@ NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
     {"mp4",  "video/mp4"},
     {"m4v",  "video/mp4"},
     {"m4a",  "audio/mp4"},
+    {"ts",   "video/MP2T"}, // RFC 3555
     {"aif",  "audio/x-aiff"},
     {"aifc", "audio/x-aiff"},
     {"aiff", "audio/x-aiff"},
@@ -1699,7 +1700,8 @@ NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
     {"tiff", "image/tiff"},
     {"txt",  "text/plain"},
     {"wav",  "audio/x-wav"},
-    {"zip",  "application/zip"}
+    {"zip",  "application/zip"},
+    {"m3u8", "application/x-mpegURL"}
 };
 
 /*----------------------------------------------------------------------

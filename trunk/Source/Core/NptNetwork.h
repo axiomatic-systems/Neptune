@@ -183,6 +183,8 @@ public:
     NPT_NetworkInterface(const char*           name,
                          const NPT_MacAddress& mac,
                          NPT_Flags             flags);
+    NPT_NetworkInterface(const char*           name,
+                         NPT_Flags             flags);
    ~NPT_NetworkInterface() {}
 
     // methods
@@ -192,6 +194,11 @@ public:
     }
     const NPT_MacAddress& GetMacAddress() const {
         return m_MacAddress;
+    }
+    void SetMacAddress(NPT_MacAddress::Type type,
+                       const unsigned char* addr, 
+                       unsigned int         length) {
+        m_MacAddress.SetAddress(type, addr, length);
     }
     NPT_Flags GetFlags() const { return m_Flags; }
     const NPT_List<NPT_NetworkInterfaceAddress>& GetAddresses() const {

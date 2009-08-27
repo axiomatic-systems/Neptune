@@ -61,7 +61,7 @@ public:
     virtual void OnMessage(NPT_Message*) {}
 
     // this method is a central point of handling for received messages.
-    // it can be overloaded by subclasses who wish to process all 
+    // it can be overloaded by subclasses that wish to process all 
     // incoming messages
     virtual NPT_Result HandleMessage(NPT_Message* message);
 };

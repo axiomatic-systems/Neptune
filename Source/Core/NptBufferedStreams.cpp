@@ -150,13 +150,17 @@ NPT_BufferedInputStream::ReadLine(char*     buffer,
 {
     NPT_Result result = NPT_SUCCESS;
     char*      buffer_start = buffer;
+    char*      buffer_end   = buffer_start+size-1;
     bool       skip_newline = false;
 
     // check parameters
-    if (buffer == NULL || size < 1) return NPT_ERROR_INVALID_PARAMETERS;
+    if (buffer == NULL || size < 1) {
+        if (chars_read) *chars_read = 0;
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
 
     // read until EOF or newline
-    while (buffer-buffer_start < (long)(size-1)) {
+    for (;;) {
         while (m_Buffer.offset != m_Buffer.valid) {
             // there is some data left in the buffer
             NPT_Byte c = m_Buffer.data[m_Buffer.offset++];
@@ -171,6 +175,10 @@ NPT_BufferedInputStream::ReadLine(char*     buffer,
                 }
                 goto done;
             } else {
+                if (buffer == buffer_end) {
+                    result = NPT_ERROR_NOT_ENOUGH_SPACE;
+                    goto done;
+                }
                 *buffer++ = c;
             }
         }
@@ -187,6 +195,10 @@ NPT_BufferedInputStream::ReadLine(char*     buffer,
                 } else if (*buffer == '\n') {
                     goto done;
                 } else {
+                    if (buffer == buffer_end) {
+                        result = NPT_ERROR_NOT_ENOUGH_SPACE;
+                        goto done;
+                    }
                     ++buffer;
                 }
             }

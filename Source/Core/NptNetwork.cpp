@@ -236,6 +236,16 @@ NPT_NetworkInterface::NPT_NetworkInterface(const char*           name,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_NetworkInterface::NPT_NetworkInterface
++---------------------------------------------------------------------*/ 
+NPT_NetworkInterface::NPT_NetworkInterface(const char* name,
+                                           NPT_Flags   flags) :
+    m_Name(name),
+    m_Flags(flags)
+{
+}
+
+/*----------------------------------------------------------------------
 |   NPT_NetworkInterface::AddAddress
 +---------------------------------------------------------------------*/ 
 NPT_Result

@@ -37,8 +37,8 @@
 
 -(void) dealloc
 {
-    [super dealloc];
     delete message;
+    [super dealloc];
 }
 
 -(void) handle 

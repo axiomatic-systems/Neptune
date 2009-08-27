@@ -31,6 +31,13 @@
 #include "NptUtils.h"
 #include "NptConstants.h"
 
+#if defined(NPT_CONFIG_HAVE_NET_IF_DL_H)
+#include <net/if_dl.h>
+#endif
+#if defined(NPT_CONFIG_HAVE_NET_IF_TYPES_H)
+#include <net/if_types.h>
+#endif
+
 /*----------------------------------------------------------------------
 |       platform adaptation
 +---------------------------------------------------------------------*/
@@ -61,7 +68,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
     unsigned int last_size = 0;
     struct ifconf config;
     unsigned char* buffer;
-    for (;buffer_size < 16384;) {
+    for (;buffer_size < 65536;) {
         buffer = new unsigned char[buffer_size];
         config.ifc_len = buffer_size;
         config.ifc_buf = (char*)buffer;
@@ -78,11 +85,12 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
             last_size = config.ifc_len;
         } 
         
-        // supply 256 more bytes more next time around
-        buffer_size += 256;
+        // supply 4096 more bytes more next time around
+        buffer_size += 4096;
         delete[] buffer;
     }
     
+    // iterate over all objects
     unsigned char *entries;
     for (entries = buffer; entries < buffer+config.ifc_len;) {
         struct ifreq* entry = (struct ifreq*)entries;
@@ -108,8 +116,12 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         // point to the next entry
         entries += address_length + sizeof(entry->ifr_name);
         
-        // ignore anything except AF_INET addresses
-        if (entry->ifr_addr.sa_family != AF_INET) {
+        // ignore anything except AF_INET and AF_LINK addresses
+        if (entry->ifr_addr.sa_family != AF_INET
+#if defined(AF_LINK)
+            && entry->ifr_addr.sa_family != AF_LINK 
+#endif
+        ) {
             continue;
         }
         
@@ -143,93 +155,128 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         }
 #endif // defined(SIOCGIFFLAGS)
   
-        // get the mac address        
-        NPT_MacAddress mac;
+        // get a pointer to an interface we've looped over before
+        // or create a new one
+        NPT_NetworkInterface* interface = NULL;
+        for (NPT_List<NPT_NetworkInterface*>::Iterator iface_iter = interfaces.GetFirstItem();
+                                                       iface_iter;
+                                                     ++iface_iter) {
+            if ((*iface_iter)->GetName() == (const char*)entry->ifr_name) {
+                interface = *iface_iter;
+                break;
+            }
+        }
+        if (interface == NULL) {
+            // create a new interface object
+            interface = new NPT_NetworkInterface(entry->ifr_name, flags);
+
+            // add the interface to the list
+            interfaces.Add(interface);   
+
+            // get the mac address        
 #if defined(SIOCGIFHWADDR)
-        if (ioctl(net, SIOCGIFHWADDR, &query) == 0) {
-            NPT_MacAddress::Type mac_addr_type;
-            unsigned int         mac_addr_length = IFHWADDRLEN;
-            switch (query.ifr_addr.sa_family) {
+            if (ioctl(net, SIOCGIFHWADDR, &query) == 0) {
+                NPT_MacAddress::Type mac_addr_type;
+                unsigned int         mac_addr_length = IFHWADDRLEN;
+                switch (query.ifr_addr.sa_family) {
 #if defined(ARPHRD_ETHER)
-                case ARPHRD_ETHER:
-                    mac_addr_type = NPT_MacAddress::TYPE_ETHERNET;
-                    break;
+                    case ARPHRD_ETHER:
+                        mac_addr_type = NPT_MacAddress::TYPE_ETHERNET;
+                        break;
 #endif
 
 #if defined(ARPHRD_LOOPBACK)
-                case ARPHRD_LOOPBACK:
-                    mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK;
-                    length = 0;
-                    break;
+                    case ARPHRD_LOOPBACK:
+                        mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK;
+                        length = 0;
+                        break;
 #endif
                           
 #if defined(ARPHRD_PPP)
-                case ARPHRD_PPP:
-                    mac_addr_type = NPT_MacAddress::TYPE_PPP;
-                    mac_addr_length = 0;
-                    break;
+                    case ARPHRD_PPP:
+                        mac_addr_type = NPT_MacAddress::TYPE_PPP;
+                        mac_addr_length = 0;
+                        break;
 #endif
                     
 #if defined(ARPHRD_IEEE80211)
-                case ARPHRD_IEEE80211:
-                    mac_addr_type = NPT_MacAddress::TYPE_IEEE_802_11;
-                    break;
+                    case ARPHRD_IEEE80211:
+                        mac_addr_type = NPT_MacAddress::TYPE_IEEE_802_11;
+                        break;
 #endif
                                    
-                default:
-                    mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
-                    mac_addr_length = sizeof(query.ifr_addr.sa_data);
-                    break;
-            }
+                    default:
+                        mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
+                        mac_addr_length = sizeof(query.ifr_addr.sa_data);
+                        break;
+                }
                 
-            mac.SetAddress(mac_addr_type, (const unsigned char*)query.ifr_addr.sa_data, mac_addr_length);
-        }
+                interface->SetMacAddress(mac_addr_type, (const unsigned char*)query.ifr_addr.sa_data, mac_addr_length);
+            }
 #endif
+        }
+          
+        switch (entry->ifr_addr.sa_family) {
+            case AF_INET: {
+                // primary address
+                NPT_IpAddress primary_address(ntohl(((struct sockaddr_in*)&entry->ifr_addr)->sin_addr.s_addr));
 
-        // create an interface object
-        NPT_NetworkInterface* interface = new NPT_NetworkInterface(entry->ifr_name, mac, flags);
-
-        // primary address
-        NPT_IpAddress primary_address(ntohl(((struct sockaddr_in*)&entry->ifr_addr)->sin_addr.s_addr));
-
-        // broadcast address
-        NPT_IpAddress broadcast_address;
+                // broadcast address
+                NPT_IpAddress broadcast_address;
 #if defined(SIOCGIFBRDADDR)
-        if (flags & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
-            if (ioctl(net, SIOCGIFBRDADDR, &query) == 0) {
-                broadcast_address.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
-            }
-        }
+                if (flags & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
+                    if (ioctl(net, SIOCGIFBRDADDR, &query) == 0) {
+                        broadcast_address.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
+                    }
+                }
 #endif
 
-        // point to point address
-        NPT_IpAddress destination_address;
+                // point to point address
+                NPT_IpAddress destination_address;
 #if defined(SIOCGIFDSTADDR)
-        if (flags & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
-            if (ioctl(net, SIOCGIFDSTADDR, &query) == 0) {
-                destination_address.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
-            }
-        }
+                if (flags & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
+                    if (ioctl(net, SIOCGIFDSTADDR, &query) == 0) {
+                        destination_address.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
+                    }
+                }
 #endif
 
-        // netmask
-        NPT_IpAddress netmask(0xFFFFFFFF);
+                // netmask
+                NPT_IpAddress netmask(0xFFFFFFFF);
 #if defined(SIOCGIFNETMASK)
-        if (ioctl(net, SIOCGIFNETMASK, &query) == 0) {
-            netmask.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
-        }
+                if (ioctl(net, SIOCGIFNETMASK, &query) == 0) {
+                    netmask.Set(ntohl(((struct sockaddr_in*)&query.ifr_addr)->sin_addr.s_addr));
+                }
 #endif
 
-        // create the interface object
-        NPT_NetworkInterfaceAddress iface_address(
-            primary_address,
-            broadcast_address,
-            destination_address,
-            netmask);
-        interface->AddAddress(iface_address);  
-         
-        // add the interface to the list
-        interfaces.Add(interface);   
+                // add the address to the interface
+                NPT_NetworkInterfaceAddress iface_address(
+                    primary_address,
+                    broadcast_address,
+                    destination_address,
+                    netmask);
+                interface->AddAddress(iface_address);  
+                
+                break;
+            }
+
+#if defined(AF_LINK) && defined(NPT_CONFIG_HAVE_SOCKADDR_DL)
+            case AF_LINK: {
+                struct sockaddr_dl* mac_addr = (struct sockaddr_dl*)&entry->ifr_addr;
+                NPT_MacAddress::Type mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
+                switch (mac_addr->sdl_type) {
+                    case IFT_LOOP:  mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK; break;
+                    case IFT_ETHER: mac_addr_type = NPT_MacAddress::TYPE_ETHERNET; break;
+                    case IFT_PPP:   mac_addr_type = NPT_MacAddress::TYPE_PPP;      break;
+                    
+                }
+                interface->SetMacAddress(mac_addr_type, 
+                                         (const unsigned char*)(&mac_addr->sdl_data[mac_addr->sdl_nlen]),
+                                         mac_addr->sdl_alen);
+                break;
+            }
+#endif
+        }
     }
 
     // free resources

@@ -225,6 +225,13 @@ typedef long NPT_PointerLong;
 #define NPT_CONFIG_NO_RTTI
 #endif
 
+/* OSX */
+#if defined(__APPLE__)
+#define NPT_CONFIG_HAVE_NET_IF_DL_H
+#define NPT_CONFIG_HAVE_NET_IF_TYPES_H
+#define NPT_CONFIG_HAVE_SOCKADDR_DL
+#endif
+
 /*----------------------------------------------------------------------
 |   defaults
 +---------------------------------------------------------------------*/

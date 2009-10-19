@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CA9958A81046FFF60073F34A /* PBXTargetDependency */,
 				CA197D270E1AE4540018E87C /* PBXTargetDependency */,
 				CAE417710E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417730E0DC10600A530D1 /* PBXTargetDependency */,
@@ -150,6 +151,8 @@
 		CA926A500F8BEB50003CB74E /* NptDynamicCast.h in Headers */ = {isa = PBXBuildFile; fileRef = CA926A4F0F8BEB50003CB74E /* NptDynamicCast.h */; };
 		CA97E0250E2FDFDD0090CC9B /* StreamsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA97E01C0E2FDFA10090CC9B /* StreamsTest1.cpp */; };
 		CA97E0320E2FEA540090CC9B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA9958A61046FFD20073F34A /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA9958AB1047001B0073F34A /* HttpClientTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA9958AA1047001B0073F34A /* HttpClientTest2.cpp */; };
 		CAA97A070CF164E000C01909 /* XmlTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F80CF1648300C01909 /* XmlTest1.cpp */; };
 		CAA97A080CF164E300C01909 /* XmlTest1Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F90CF1648300C01909 /* XmlTest1Data.cpp */; };
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
@@ -351,6 +354,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
+		};
+		CA9958A41046FFCD0073F34A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA9958A71046FFF60073F34A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA99589F1046FFC70073F34A;
+			remoteInfo = HttpClientTest2;
 		};
 		CAA97A050CF164B500C01909 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -753,6 +770,8 @@
 		CA926A4F0F8BEB50003CB74E /* NptDynamicCast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptDynamicCast.h; sourceTree = "<group>"; };
 		CA97E01C0E2FDFA10090CC9B /* StreamsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StreamsTest1.cpp; sourceTree = "<group>"; };
 		CA97E0200E2FDFB30090CC9B /* StreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StreamsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9958A01046FFC70073F34A /* HttpClientTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpClientTest2; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9958AA1047001B0073F34A /* HttpClientTest2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpClientTest2.cpp; sourceTree = "<group>"; };
 		CAA979D70CF1648300C01909 /* ArraysTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArraysTest1.cpp; sourceTree = "<group>"; };
 		CAA979D90CF1648300C01909 /* BufferedStreamsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferedStreamsTest1.cpp; sourceTree = "<group>"; };
 		CAA979DB0CF1648300C01909 /* HttpClientTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpClientTest1.cpp; sourceTree = "<group>"; };
@@ -937,6 +956,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA97E0320E2FEA540090CC9B /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA99589E1046FFC70073F34A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA9958A61046FFD20073F34A /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1277,9 +1304,18 @@
 			path = Streams1;
 			sourceTree = "<group>";
 		};
+		CA9958A91047001B0073F34A /* HttpClient2 */ = {
+			isa = PBXGroup;
+			children = (
+				CA9958AA1047001B0073F34A /* HttpClientTest2.cpp */,
+			);
+			path = HttpClient2;
+			sourceTree = "<group>";
+		};
 		CAA979D50CF1648300C01909 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CA9958A91047001B0073F34A /* HttpClient2 */,
 				CA2F54320EC1165700AEBC12 /* Tls1 */,
 				CAF2EFD20E64A25700948C04 /* FileTest1 */,
 				CA197D190E1AE4200018E87C /* Queue1 */,
@@ -1543,6 +1579,7 @@
 				CA2F54240EC115E600AEBC12 /* TlsTest1 */,
 				CA30B76B0F0DCE990085B46E /* LoggingTest2 */,
 				CA78483D0F3B6E69009E84AD /* minihttpserver */,
+				CA9958A01046FFC70073F34A /* HttpClientTest2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1892,6 +1929,23 @@
 			name = StreamsTest1;
 			productName = StreamsTest1;
 			productReference = CA97E0200E2FDFB30090CC9B /* StreamsTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA99589F1046FFC70073F34A /* HttpClientTest2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA9958AC1047001B0073F34A /* Build configuration list for PBXNativeTarget "HttpClientTest2" */;
+			buildPhases = (
+				CA99589D1046FFC70073F34A /* Sources */,
+				CA99589E1046FFC70073F34A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA9958A51046FFCD0073F34A /* PBXTargetDependency */,
+			);
+			name = HttpClientTest2;
+			productName = HttpClientTest2;
+			productReference = CA9958A01046FFC70073F34A /* HttpClientTest2 */;
 			productType = "com.apple.product-type.tool";
 		};
 		CAA97A000CF164A700C01909 /* XmlTest1 */ = {
@@ -2313,6 +2367,7 @@
 				CAF2EFD60E64A27200948C04 /* FileTest1 */,
 				CA2F54230EC115E600AEBC12 /* TlsTest1 */,
 				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
+				CA99589F1046FFC70073F34A /* HttpClientTest2 */,
 			);
 		};
 /* End PBXProject section */
@@ -2394,6 +2449,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA97E0250E2FDFDD0090CC9B /* StreamsTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA99589D1046FFC70073F34A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA9958AB1047001B0073F34A /* HttpClientTest2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2685,6 +2748,16 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CA97E0480E2FEB6F0090CC9B /* PBXContainerItemProxy */;
+		};
+		CA9958A51046FFCD0073F34A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA9958A41046FFCD0073F34A /* PBXContainerItemProxy */;
+		};
+		CA9958A81046FFF60073F34A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA99589F1046FFC70073F34A /* HttpClientTest2 */;
+			targetProxy = CA9958A71046FFF60073F34A /* PBXContainerItemProxy */;
 		};
 		CAA97A060CF164B500C01909 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3145,6 +3218,36 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = StreamsTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CA9958A21046FFC80073F34A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = HttpClientTest2;
+			};
+			name = Debug;
+		};
+		CA9958A31046FFC80073F34A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = HttpClientTest2;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3855,6 +3958,7 @@
 				);
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -3901,6 +4005,7 @@
 				);
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -4040,6 +4145,15 @@
 			buildConfigurations = (
 				CA97E0220E2FDFB30090CC9B /* Debug */,
 				CA97E0240E2FDFB30090CC9B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA9958AC1047001B0073F34A /* Build configuration list for PBXNativeTarget "HttpClientTest2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA9958A21046FFC80073F34A /* Debug */,
+				CA9958A31046FFC80073F34A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -37,18 +37,18 @@
 /*----------------------------------------------------------------------
 |   NPT_TimeStamp::NPT_TimeStamp
 +---------------------------------------------------------------------*/
-NPT_TimeStamp::NPT_TimeStamp(float seconds)
+NPT_TimeStamp::NPT_TimeStamp(double seconds)
 {
     m_Seconds     = (long)seconds;
-    m_NanoSeconds = (long)(1E9f*(seconds - (float)m_Seconds));
+    m_NanoSeconds = (long)(1E9f*(seconds - (double)m_Seconds));
 }
 
 /*----------------------------------------------------------------------
-|   NPT_TimeStamp::operator float
+|   NPT_TimeStamp::operator double
 +---------------------------------------------------------------------*/
-NPT_TimeStamp::operator float() const
+NPT_TimeStamp::operator double() const
 {       
-    return ((float)m_Seconds) + ((float)m_NanoSeconds)/1E9f;
+    return ((double)m_Seconds) + ((double)m_NanoSeconds)/1E9f;
 }
 
 /*----------------------------------------------------------------------

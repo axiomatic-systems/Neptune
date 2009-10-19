@@ -46,8 +46,8 @@ class NPT_TimeStamp
     // methods
     NPT_TimeStamp(unsigned long seconds = 0, unsigned long nano_seconds = 0) :
         m_Seconds(seconds), m_NanoSeconds(nano_seconds) {}
-    NPT_TimeStamp(float seconds);
-    operator float() const;
+    NPT_TimeStamp(double seconds);
+    operator double() const;
     NPT_TimeStamp& operator+=(const NPT_TimeStamp& time_stamp);
     NPT_TimeStamp& operator-=(const NPT_TimeStamp& time_stamp);
     bool operator==(const NPT_TimeStamp& time_stamp) const;

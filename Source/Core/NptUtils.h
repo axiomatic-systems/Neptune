@@ -39,6 +39,7 @@
 #include "NptTypes.h"
 #include "NptStrings.h"
 #include "NptMap.h"
+#include "NptDataBuffer.h"
 
 #if defined (NPT_CONFIG_HAVE_STDIO_H)
 #include <stdio.h>
@@ -119,6 +120,7 @@ NPT_FormatOutput(void        (*function)(void* parameter, const char* message),
 
 void NPT_ByteToHex(NPT_Byte b, char* buffer, bool uppercase=false);
 NPT_Result NPT_HexToByte(const char* buffer, NPT_Byte& b);
+NPT_Result NPT_HexToBytes(const char* hex, NPT_DataBuffer& bytes);
 NPT_String NPT_HexString(const unsigned char* data, 
                          NPT_Size             data_size,
                          const char*          separator = NULL,

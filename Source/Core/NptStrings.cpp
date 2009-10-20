@@ -735,6 +735,21 @@ NPT_String::Replace(char a, const char* str)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::Replace
++---------------------------------------------------------------------*/
+void
+NPT_String::Replace(const char* before, const char* after)
+{
+    int      index = Find(before);
+    NPT_Size size  = NPT_StringLength(before);
+    while (index != NPT_STRING_SEARCH_FAILED) {
+        Erase(index, size);
+        Insert(after, index);
+        index = Find(before, index+size);
+    }
+}
+
+/*----------------------------------------------------------------------
 |   NPT_String::Insert
 +---------------------------------------------------------------------*/
 void

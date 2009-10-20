@@ -224,6 +224,28 @@ NPT_HexToByte(const char* buffer, NPT_Byte& b)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HexToBytes
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HexToBytes(const char*    hex,
+              NPT_DataBuffer& bytes)
+{
+    // check the size
+    NPT_Size len = NPT_StringLength(hex);
+    if ((len%2) != 0) return NPT_ERROR_INVALID_PARAMETERS;
+    NPT_Size bytes_size = len / 2;
+    NPT_Result result = bytes.SetDataSize(bytes_size);
+    if (NPT_FAILED(result)) return result;
+    
+    // decode
+    for (NPT_Ordinal i=0; i<bytes_size; i++) {
+        result = NPT_HexToByte(hex+(i*2), *(bytes.UseData()+i));
+        if (NPT_FAILED(result)) return result;
+    }
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HexString
 +---------------------------------------------------------------------*/
 NPT_String 

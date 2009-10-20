@@ -542,15 +542,15 @@ public:
      * Add a request handler. The ownership of the handler is NOT transfered to this object,
      * so the caller is responsible for the lifetime management of the handler object.
      */
-    NPT_Result AddRequestHandler(NPT_HttpRequestHandler* handler, const char* path, bool include_children = false);
-    NPT_HttpRequestHandler* FindRequestHandler(NPT_HttpRequest& request);
+    virtual NPT_Result AddRequestHandler(NPT_HttpRequestHandler* handler, const char* path, bool include_children = false);
+    virtual NPT_HttpRequestHandler* FindRequestHandler(NPT_HttpRequest& request);
 
     /**
      * Parse the request from a new client, form a response, and send it back. 
      */
-    NPT_Result RespondToClient(NPT_InputStreamReference&     input,
-                               NPT_OutputStreamReference&    output,
-                               const NPT_HttpRequestContext& context);
+    virtual NPT_Result RespondToClient(NPT_InputStreamReference&     input,
+                                       NPT_OutputStreamReference&    output,
+                                       const NPT_HttpRequestContext& context);
 
 protected:
     // types

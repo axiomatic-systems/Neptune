@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 45;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -2328,7 +2328,7 @@
 		F912B6870B8EB12700C1E90D /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 0;
 			mainGroup = F912B6850B8EB12700C1E90D;
 			productRefGroup = F912B6A00B8EB1C700C1E90D /* Products */;
@@ -3946,10 +3946,6 @@
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_DEBUG,
@@ -3958,9 +3954,9 @@
 				);
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
@@ -3981,7 +3977,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -3994,10 +3989,6 @@
 		F912B68A0B8EB12700C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				COPY_PHASE_STRIP = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_CONFIG_ENABLE_LOGGING,
@@ -4005,9 +3996,9 @@
 				);
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
-				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
@@ -4028,7 +4019,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				USER_HEADER_SEARCH_PATHS = "";
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -4052,7 +4042,6 @@
 					NPT_DEBUG,
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
-					NPT_CONFIG_ENABLE_TLS,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INSTALL_PATH = /usr/local/lib;
@@ -4073,7 +4062,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
-					NPT_CONFIG_ENABLE_TLS,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				INSTALL_PATH = /usr/local/lib;

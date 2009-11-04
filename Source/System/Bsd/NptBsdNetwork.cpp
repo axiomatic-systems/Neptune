@@ -265,10 +265,15 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
                 struct sockaddr_dl* mac_addr = (struct sockaddr_dl*)&entry->ifr_addr;
                 NPT_MacAddress::Type mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
                 switch (mac_addr->sdl_type) {
+#if defined(IFT_LOOP)
                     case IFT_LOOP:  mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK; break;
+#endif
+#if defined(IFT_ETHER)
                     case IFT_ETHER: mac_addr_type = NPT_MacAddress::TYPE_ETHERNET; break;
+#endif
+#if defined(IFT_PPP)
                     case IFT_PPP:   mac_addr_type = NPT_MacAddress::TYPE_PPP;      break;
-                    
+#endif                    
                 }
                 interface->SetMacAddress(mac_addr_type, 
                                          (const unsigned char*)(&mac_addr->sdl_data[mac_addr->sdl_nlen]),

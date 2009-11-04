@@ -213,11 +213,11 @@ main(int /*argc*/, char** /*argv*/)
     d2 = *d1;
     delete d1;
     d1 = NULL;
-    printf(d2);
+    printf("%s", d2.GetChars());
     d3 = d2;
     d3 = "d3";
-    printf(d2);
-    printf(d3);
+    printf("%s", d2.GetChars());
+    printf("%s", d3.GetChars());
 
     printf("::testing Append\n");
     NPT_String l = "blabla";

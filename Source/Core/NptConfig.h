@@ -227,9 +227,12 @@ typedef long NPT_PointerLong;
 
 /* OSX */
 #if defined(__APPLE__)
+#include <TargetConditionals.h>
 #define NPT_CONFIG_HAVE_NET_IF_DL_H
-#define NPT_CONFIG_HAVE_NET_IF_TYPES_H
 #define NPT_CONFIG_HAVE_SOCKADDR_DL
+#if !TARGET_OS_IPHONE
+#define NPT_CONFIG_HAVE_NET_IF_TYPES_H
+#endif
 #endif
 
 /*----------------------------------------------------------------------

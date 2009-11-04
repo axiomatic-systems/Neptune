@@ -167,7 +167,7 @@ TestNamespaces()
     writer.Serialize(*root, output);
     NPT_LargeSize size;
     output.GetSize(size);
-    printf(NPT_String((const char*)output.GetData(), (NPT_Size)size).GetChars());
+    printf("%s", NPT_String((const char*)output.GetData(), (NPT_Size)size).GetChars());
 
     delete top;
     delete root;

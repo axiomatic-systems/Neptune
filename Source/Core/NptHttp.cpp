@@ -1377,8 +1377,9 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
                                 const NPT_HttpRequestContext& context)
 {
     NPT_HttpRequest*  request;
-    NPT_HttpResponse* response = NULL;
-    NPT_Result        result   = NPT_ERROR_NO_SUCH_ITEM;
+    NPT_HttpResponse* response         = NULL;
+    NPT_Result        result           = NPT_ERROR_NO_SUCH_ITEM;
+    bool              terminate_server = false;
 
     NPT_HttpResponder responder(input, output);
     NPT_CHECK_WARNING(responder.ParseRequest(request, &context.GetLocalAddress()));
@@ -1411,6 +1412,9 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
         body->SetContentType("text/html");
         response->SetStatus(403, "Forbidden");
         handler = NULL;
+    } else if (result == NPT_ERROR_TERMINATED) {
+        // mark that we want to exit
+        terminate_server = true;
     } else if (NPT_FAILED(result)) {
         body->SetInputStream(NPT_HTTP_DEFAULT_500_HTML);
         body->SetContentType("text/html");
@@ -1442,6 +1446,9 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
 
     // flush
     output->Flush();
+
+    // if we need to die, we return an error code
+    if (NPT_SUCCEEDED(result) && terminate_server) result = NPT_ERROR_TERMINATED;
 
 end:
     // cleanup

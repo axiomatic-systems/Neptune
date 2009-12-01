@@ -13,6 +13,8 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CA9DDC5110AE2820008B871E /* PBXTargetDependency */,
+				CA9DDC6E10AE3DFD008B871E /* PBXTargetDependency */,
 				CA9958A81046FFF60073F34A /* PBXTargetDependency */,
 				CA197D270E1AE4540018E87C /* PBXTargetDependency */,
 				CAE417710E0DC10600A530D1 /* PBXTargetDependency */,
@@ -121,6 +123,9 @@
 		CA2F54390EC1203A00AEBC12 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA2F543A0EC1203A00AEBC12 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
 		CA30B7720F0DCEA70085B46E /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA40905C10AA10A800ED81C5 /* NptPosixTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA40905B10AA10A800ED81C5 /* NptPosixTime.cpp */; };
+		CA4090CA10AA259600ED81C5 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA4090CE10AA25BE00ED81C5 /* TimeTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA4090CD10AA25BE00ED81C5 /* TimeTest1.cpp */; };
 		CA5041AF0C5AE2180060E6FE /* NptNullSerialPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */; };
 		CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979DD0CF1648300C01909 /* HttpServerTest1.cpp */; };
@@ -153,6 +158,8 @@
 		CA97E0320E2FEA540090CC9B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA9958A61046FFD20073F34A /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA9958AB1047001B0073F34A /* HttpClientTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA9958AA1047001B0073F34A /* HttpClientTest2.cpp */; };
+		CA9DDC6C10AE3DE8008B871E /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA9DDC7210AE3E52008B871E /* FileTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA9DDC7110AE3E52008B871E /* FileTest2.cpp */; };
 		CAA97A070CF164E000C01909 /* XmlTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F80CF1648300C01909 /* XmlTest1.cpp */; };
 		CAA97A080CF164E300C01909 /* XmlTest1Data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979F90CF1648300C01909 /* XmlTest1Data.cpp */; };
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
@@ -327,6 +334,13 @@
 			remoteGlobalIDString = CA30B76A0F0DCE990085B46E;
 			remoteInfo = LoggingTest2;
 		};
+		CA4090C810AA259200ED81C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
 		CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
@@ -368,6 +382,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = CA99589F1046FFC70073F34A;
 			remoteInfo = HttpClientTest2;
+		};
+		CA9DDC5010AE2820008B871E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAF2EFD60E64A27200948C04;
+			remoteInfo = FileTest1;
+		};
+		CA9DDC6A10AE3DE3008B871E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA9DDC6D10AE3DFD008B871E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA9DDC6510AE3DD6008B871E;
+			remoteInfo = FileTest2;
 		};
 		CAA97A050CF164B500C01909 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -741,6 +776,9 @@
 		CA2F54240EC115E600AEBC12 /* TlsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TlsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TlsTest1.cpp; sourceTree = "<group>"; };
 		CA30B76B0F0DCE990085B46E /* LoggingTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest2; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA40905B10AA10A800ED81C5 /* NptPosixTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptPosixTime.cpp; sourceTree = "<group>"; };
+		CA4090C410AA257B00ED81C5 /* TimeTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TimeTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA4090CD10AA25BE00ED81C5 /* TimeTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeTest1.cpp; sourceTree = "<group>"; };
 		CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NptNullSerialPort.cpp; sourceTree = "<group>"; };
 		CA550D550D20A37E00B22D72 /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServerTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA78483D0F3B6E69009E84AD /* minihttpserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = minihttpserver; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -772,6 +810,8 @@
 		CA97E0200E2FDFB30090CC9B /* StreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StreamsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA9958A01046FFC70073F34A /* HttpClientTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpClientTest2; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA9958AA1047001B0073F34A /* HttpClientTest2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpClientTest2.cpp; sourceTree = "<group>"; };
+		CA9DDC6610AE3DD6008B871E /* FileTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FileTest2; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA9DDC7110AE3E52008B871E /* FileTest2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileTest2.cpp; sourceTree = "<group>"; };
 		CAA979D70CF1648300C01909 /* ArraysTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ArraysTest1.cpp; sourceTree = "<group>"; };
 		CAA979D90CF1648300C01909 /* BufferedStreamsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferedStreamsTest1.cpp; sourceTree = "<group>"; };
 		CAA979DB0CF1648300C01909 /* HttpClientTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HttpClientTest1.cpp; sourceTree = "<group>"; };
@@ -935,6 +975,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA4090C210AA257B00ED81C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA4090CA10AA259600ED81C5 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CA550D4F0D20A37E00B22D72 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -964,6 +1012,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA9958A61046FFD20073F34A /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA9DDC6410AE3DD6008B871E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA9DDC6C10AE3DE8008B871E /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1244,6 +1300,14 @@
 			path = Tls1;
 			sourceTree = "<group>";
 		};
+		CA4090CC10AA25BE00ED81C5 /* Time1 */ = {
+			isa = PBXGroup;
+			children = (
+				CA4090CD10AA25BE00ED81C5 /* TimeTest1.cpp */,
+			);
+			path = Time1;
+			sourceTree = "<group>";
+		};
 		CA5041A70C5AE2180060E6FE /* Null */ = {
 			isa = PBXGroup;
 			children = (
@@ -1312,9 +1376,19 @@
 			path = HttpClient2;
 			sourceTree = "<group>";
 		};
+		CA9DDC7010AE3E52008B871E /* FileTest2 */ = {
+			isa = PBXGroup;
+			children = (
+				CA9DDC7110AE3E52008B871E /* FileTest2.cpp */,
+			);
+			path = FileTest2;
+			sourceTree = "<group>";
+		};
 		CAA979D50CF1648300C01909 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				CA9DDC7010AE3E52008B871E /* FileTest2 */,
+				CA4090CC10AA25BE00ED81C5 /* Time1 */,
 				CA9958A91047001B0073F34A /* HttpClient2 */,
 				CA2F54320EC1165700AEBC12 /* Tls1 */,
 				CAF2EFD20E64A25700948C04 /* FileTest1 */,
@@ -1580,6 +1654,8 @@
 				CA30B76B0F0DCE990085B46E /* LoggingTest2 */,
 				CA78483D0F3B6E69009E84AD /* minihttpserver */,
 				CA9958A01046FFC70073F34A /* HttpClientTest2 */,
+				CA4090C410AA257B00ED81C5 /* TimeTest1 */,
+				CA9DDC6610AE3DD6008B871E /* FileTest2 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1698,6 +1774,7 @@
 		F912B6F70B8EB27400C1E90D /* Posix */ = {
 			isa = PBXGroup;
 			children = (
+				CA40905B10AA10A800ED81C5 /* NptPosixTime.cpp */,
 				CA1D05720E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp */,
 				CAF2EFB70E64882900948C04 /* NptPosixNetwork.cpp */,
 				CAF2EFB50E64881E00948C04 /* NptPosixFile.cpp */,
@@ -1880,6 +1957,23 @@
 			productReference = CA30B76B0F0DCE990085B46E /* LoggingTest2 */;
 			productType = "com.apple.product-type.tool";
 		};
+		CA4090C310AA257B00ED81C5 /* TimeTest1 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA4090CB10AA25BE00ED81C5 /* Build configuration list for PBXNativeTarget "TimeTest1" */;
+			buildPhases = (
+				CA4090C110AA257B00ED81C5 /* Sources */,
+				CA4090C210AA257B00ED81C5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA4090C910AA259200ED81C5 /* PBXTargetDependency */,
+			);
+			name = TimeTest1;
+			productName = TimeTest1;
+			productReference = CA4090C410AA257B00ED81C5 /* TimeTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
 		CA550D4A0D20A37E00B22D72 /* HttpServerTest1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CA550D510D20A37E00B22D72 /* Build configuration list for PBXNativeTarget "HttpServerTest1" */;
@@ -1946,6 +2040,23 @@
 			name = HttpClientTest2;
 			productName = HttpClientTest2;
 			productReference = CA9958A01046FFC70073F34A /* HttpClientTest2 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA9DDC6510AE3DD6008B871E /* FileTest2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA9DDC6F10AE3E29008B871E /* Build configuration list for PBXNativeTarget "FileTest2" */;
+			buildPhases = (
+				CA9DDC6310AE3DD6008B871E /* Sources */,
+				CA9DDC6410AE3DD6008B871E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA9DDC6B10AE3DE3008B871E /* PBXTargetDependency */,
+			);
+			name = FileTest2;
+			productName = FileTest2;
+			productReference = CA9DDC6610AE3DD6008B871E /* FileTest2 */;
 			productType = "com.apple.product-type.tool";
 		};
 		CAA97A000CF164A700C01909 /* XmlTest1 */ = {
@@ -2368,6 +2479,8 @@
 				CA2F54230EC115E600AEBC12 /* TlsTest1 */,
 				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
 				CA99589F1046FFC70073F34A /* HttpClientTest2 */,
+				CA4090C310AA257B00ED81C5 /* TimeTest1 */,
+				CA9DDC6510AE3DD6008B871E /* FileTest2 */,
 			);
 		};
 /* End PBXProject section */
@@ -2428,6 +2541,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CA4090C110AA257B00ED81C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA4090CE10AA25BE00ED81C5 /* TimeTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CA550D4D0D20A37E00B22D72 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2457,6 +2578,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA9958AB1047001B0073F34A /* HttpClientTest2.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA9DDC6310AE3DD6008B871E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA9DDC7210AE3E52008B871E /* FileTest2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2688,6 +2817,7 @@
 				CA8961860E7689AF00FD1BE1 /* NptCocoaMessageQueue.mm in Sources */,
 				CAFB23700EC760FE009C3459 /* NptTls.cpp in Sources */,
 				CA2B1E210FC22DBA00B9E79F /* NptResults.cpp in Sources */,
+				CA40905C10AA10A800ED81C5 /* NptPosixTime.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2729,6 +2859,11 @@
 			target = CA30B76A0F0DCE990085B46E /* LoggingTest2 */;
 			targetProxy = CA30B7790F0DCEFE0085B46E /* PBXContainerItemProxy */;
 		};
+		CA4090C910AA259200ED81C5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA4090C810AA259200ED81C5 /* PBXContainerItemProxy */;
+		};
 		CA550D4B0D20A37E00B22D72 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
@@ -2758,6 +2893,21 @@
 			isa = PBXTargetDependency;
 			target = CA99589F1046FFC70073F34A /* HttpClientTest2 */;
 			targetProxy = CA9958A71046FFF60073F34A /* PBXContainerItemProxy */;
+		};
+		CA9DDC5110AE2820008B871E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAF2EFD60E64A27200948C04 /* FileTest1 */;
+			targetProxy = CA9DDC5010AE2820008B871E /* PBXContainerItemProxy */;
+		};
+		CA9DDC6B10AE3DE3008B871E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA9DDC6A10AE3DE3008B871E /* PBXContainerItemProxy */;
+		};
+		CA9DDC6E10AE3DFD008B871E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA9DDC6510AE3DD6008B871E /* FileTest2 */;
+			targetProxy = CA9DDC6D10AE3DFD008B871E /* PBXContainerItemProxy */;
 		};
 		CAA97A060CF164B500C01909 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3117,6 +3267,36 @@
 			};
 			name = Release;
 		};
+		CA4090C610AA257C00ED81C5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = TimeTest1;
+			};
+			name = Debug;
+		};
+		CA4090C710AA257C00ED81C5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = TimeTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		CA550D520D20A37E00B22D72 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3232,6 +3412,36 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = HttpClientTest2;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CA9DDC6810AE3DD7008B871E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = FileTest2;
+			};
+			name = Debug;
+		};
+		CA9DDC6910AE3DD7008B871E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = FileTest2;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3914,6 +4124,8 @@
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -3946,6 +4158,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.5;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -3957,6 +4170,7 @@
 		F912B68A0B8EB12700C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_CONFIG_ENABLE_LOGGING,
@@ -3987,6 +4201,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx10.5;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -4002,7 +4217,9 @@
 					NPT_DEBUG,
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
+					NPT_CONFIG_ENABLE_TLS,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PRODUCT_NAME = Neptune;
 			};
 			name = Debug;
@@ -4013,7 +4230,9 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
+					NPT_CONFIG_ENABLE_TLS,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PRODUCT_NAME = Neptune;
 			};
 			name = Release;
@@ -4057,6 +4276,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CA4090CB10AA25BE00ED81C5 /* Build configuration list for PBXNativeTarget "TimeTest1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA4090C610AA257C00ED81C5 /* Debug */,
+				CA4090C710AA257C00ED81C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		CA550D510D20A37E00B22D72 /* Build configuration list for PBXNativeTarget "HttpServerTest1" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -4089,6 +4317,15 @@
 			buildConfigurations = (
 				CA9958A21046FFC80073F34A /* Debug */,
 				CA9958A31046FFC80073F34A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA9DDC6F10AE3E29008B871E /* Build configuration list for PBXNativeTarget "FileTest2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA9DDC6810AE3DD7008B871E /* Debug */,
+				CA9DDC6910AE3DD7008B871E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

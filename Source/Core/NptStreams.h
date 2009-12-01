@@ -219,7 +219,7 @@ public:
     NPT_Size        GetBufferSize() const { return m_Buffer.GetBufferSize();}
 
     // methods
-    NPT_Result SetSize(NPT_Size size);
+    NPT_Result SetDataSize(NPT_Size size);
 
 private:
     // NPT_DelegatingInputStream methods
@@ -298,5 +298,24 @@ private:
     NPT_Position             m_Start;
     NPT_LargeSize            m_Size;
 };
+
+/*----------------------------------------------------------------------
+|   NPT_NullOutputStream
++---------------------------------------------------------------------*/
+class NPT_NullOutputStream : public NPT_OutputStream
+{
+public:
+    // methods
+    NPT_NullOutputStream() {}
+    virtual ~NPT_NullOutputStream() {}
+
+    // NPT_OutputStream methods
+    NPT_Result Write(const void* buffer, NPT_Size bytes_to_write, NPT_Size* bytes_written = NULL);
+
+    NPT_Result Seek(NPT_Position /*offset*/)  { return NPT_ERROR_NOT_SUPPORTED;   }
+    NPT_Result Tell(NPT_Position& /*offset*/)  { return NPT_ERROR_NOT_SUPPORTED;   }
+};
+
+typedef NPT_Reference<NPT_NullOutputStream> NPT_NullOutputStreamReference;
 
 #endif // _NPT_STREAMS_H_

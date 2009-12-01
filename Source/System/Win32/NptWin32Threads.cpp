@@ -446,7 +446,7 @@ NPT_Win32Thread::EntryPoint(void* argument)
 {
     NPT_Win32Thread* thread = reinterpret_cast<NPT_Win32Thread*>(argument);
 
-    NPT_LOG_FINE("thread in =======================");
+    NPT_LOG_FINER("thread in =======================");
 
     // set random seed per thread
     NPT_TimeStamp now;
@@ -477,7 +477,7 @@ NPT_Win32Thread::Start()
         return NPT_ERROR_INVALID_STATE;
     }
 
-    NPT_LOG_FINE("creating thread");
+    NPT_LOG_FINER("creating thread");
 
     // create the native thread
 #if defined(_WIN32_WCE)

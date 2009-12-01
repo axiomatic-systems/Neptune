@@ -50,7 +50,7 @@
 /*----------------------------------------------------------------------
 |   logging
 +---------------------------------------------------------------------*/
-NPT_SET_LOCAL_LOGGER("neptune.logging")
+//NPT_SET_LOCAL_LOGGER("neptune.logging")
 
 /*----------------------------------------------------------------------
 |   types
@@ -85,8 +85,15 @@ public:
     void Log(const NPT_LogRecord& record);
 
 private:
+    NPT_Result Open(bool append = true);
+    
+private:
     // members
-    bool                      m_Flush;
+	bool                      m_Flush;
+    bool					  m_Append;
+    NPT_String                m_Filename;
+    NPT_Flags                 m_FormatFilter;
+    NPT_LargeSize             m_MaxFilesize;
     NPT_OutputStreamReference m_Stream;
 };
 
@@ -166,14 +173,44 @@ public:
 #define NPT_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE true
 #endif
 
-#define NPT_LOG_FORMAT_FILTER_NO_SOURCE        1
-#define NPT_LOG_FORMAT_FILTER_NO_TIMESTAMP     2
-#define NPT_LOG_FORMAT_FILTER_NO_FUNCTION_NAME 4
+#define NPT_LOG_FILE_HANDLER_MIN_RECYCLE_SIZE   1000000
+
+#define NPT_LOG_FORMAT_FILTER_NO_SOURCE         1
+#define NPT_LOG_FORMAT_FILTER_NO_TIMESTAMP      2
+#define NPT_LOG_FORMAT_FILTER_NO_FUNCTION_NAME  4
+#define NPT_LOG_FORMAT_FILTER_NO_LOGGER_NAME    8
+#define NPT_LOG_FORMAT_FILTER_NO_SOURCEPATH    16
 
 /*----------------------------------------------------------------------
 |   globals
 +---------------------------------------------------------------------*/
 static NPT_LogManager LogManager;
+
+/*----------------------------------------------------------------------
+|   NPT_LogManagerAutoDisabler
++---------------------------------------------------------------------*/
+class NPT_LogManagerAutoDisabler
+{
+public:
+    NPT_LogManagerAutoDisabler() : m_WasEnabled(LogManager.IsEnabled()) {
+        LogManager.SetEnabled(false);
+    }
+    ~NPT_LogManagerAutoDisabler() {
+        LogManager.SetEnabled(m_WasEnabled);
+    }
+private:
+    bool m_WasEnabled;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_GetSystemLogConfig
++---------------------------------------------------------------------*/
+#if !defined(NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG)
+NPT_Result NPT_GetSystemLogConfig(NPT_String& /*config*/)
+{
+    return NPT_ERROR_NOT_SUPPORTED;
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_LogHandler::Create
@@ -284,18 +321,33 @@ NPT_Log::FormatRecordToStream(const NPT_LogRecord& record,
         level_name = level_string;
     }
     if ((format_filter & NPT_LOG_FORMAT_FILTER_NO_SOURCE) == 0) {
-        stream.WriteString(record.m_SourceFile);
+        unsigned int start = 0;
+        /* remove source file path if requested */
+        if (format_filter & NPT_LOG_FORMAT_FILTER_NO_SOURCEPATH) {
+            for (start = NPT_StringLength(record.m_SourceFile);
+                 start;
+                 --start) {
+                if (record.m_SourceFile[start-1] == '\\' ||
+                    record.m_SourceFile[start-1] == '/') {
+                    break;
+                }
+            }
+        }
+        stream.WriteString(record.m_SourceFile + start);
         stream.Write("(", 1, NULL);
         stream.WriteString(NPT_String::FromIntegerU(record.m_SourceLine));
         stream.Write("): ", 3, NULL);
     }
-    stream.Write("[", 1, NULL);
-    stream.WriteString(record.m_LoggerName);
-    stream.Write("] ", 2, NULL);
+    if ((format_filter & NPT_LOG_FORMAT_FILTER_NO_LOGGER_NAME) == 0) {
+        stream.Write("[", 1, NULL);
+        stream.WriteString(record.m_LoggerName);
+        stream.Write("] ", 2, NULL);
+    }
     if ((format_filter & NPT_LOG_FORMAT_FILTER_NO_TIMESTAMP) == 0) {
-        stream.WriteString(NPT_String::FromIntegerU(record.m_TimeStamp.m_Seconds));
-        stream.WriteString(":");
-        stream.WriteString(NPT_String::FromIntegerU(record.m_TimeStamp.m_NanoSeconds/1000000L));
+        NPT_String ts = NPT_DateTime(record.m_TimeStamp, true).ToString(NPT_DateTime::FORMAT_W3C, 
+                                                                        NPT_DateTime::FLAG_EMIT_FRACTION | 
+                                                                        NPT_DateTime::FLAG_EXTENDED_PRECISION);
+        stream.WriteString(ts.GetChars());
         stream.Write(" ", 1);
     }
     if ((format_filter & NPT_LOG_FORMAT_FILTER_NO_FUNCTION_NAME) == 0) {
@@ -327,6 +379,7 @@ NPT_Log::FormatRecordToStream(const NPT_LogRecord& record,
 |   NPT_LogManager::NPT_LogManager
 +---------------------------------------------------------------------*/
 NPT_LogManager::NPT_LogManager() :
+    m_Enabled(true),
     m_Configured(false),
     m_Root(NULL)
 {
@@ -367,14 +420,21 @@ NPT_LogManager::Configure(const char* config_sources)
     // exit if we're already initialized
     if (m_Configured) return NPT_SUCCESS;
 
-    /* set some default config values */
+    // we need to be disabled while we configure ourselves
+    NPT_LogManagerAutoDisabler autodisabler;
+    
+    // set some default config values
     SetConfigValue(".handlers", NPT_LOG_ROOT_DEFAULT_HANDLER);
 
-    /* see if the config sources have been set to non-default values */
-    NPT_String config_sources_env;
+    // see if the config sources have been set to non-default values
     if (config_sources == NULL) {
         config_sources = NPT_CONFIG_DEFAULT_LOG_CONFIG_SOURCE;
     }
+    NPT_String config_sources_system;
+    if (NPT_SUCCEEDED(NPT_GetSystemLogConfig(config_sources_system))) {
+		config_sources = config_sources_system;
+	}
+    NPT_String config_sources_env;
     if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_CONFIG_LOG_CONFIG_ENV, config_sources_env))) {
         config_sources = config_sources_env;
     }
@@ -498,7 +558,7 @@ NPT_LogManager::ParseConfig(const char* config,
             /* newline or end of buffer */
             if (separator && line[0] != '#') {
                 /* we have a property */
-                key.Assign(line,                    (NPT_Size)(separator-line));
+                key.Assign(line, (NPT_Size)(separator-line));
                 value.Assign(line+(separator+1-line), (NPT_Size)(cursor-(separator+1)));
                 key.Trim(" \t");
                 value.Trim(" \t");
@@ -548,7 +608,8 @@ NPT_LogManager::ParseConfigSource(NPT_String& source)
     } else if (source.StartsWith("http:port=")) {
         /* http configurator */
         unsigned int port = 0;
-        NPT_CHECK_WARNING(NPT_ParseInteger(source.GetChars()+10, port, true));
+        NPT_Result result = NPT_ParseInteger(source.GetChars()+10, port, true);
+        if (NPT_FAILED(result)) return result;
         new NPT_HttpLoggerConfigurator(port);
     } else {
         return NPT_ERROR_INVALID_SYNTAX;
@@ -580,7 +641,6 @@ NPT_LogManager::HaveLoggerConfig(const char* name)
 
     /* no config found */
     return false;
-
 }
 
 /*----------------------------------------------------------------------
@@ -671,6 +731,10 @@ NPT_LogManager::FindLogger(const char* name)
 NPT_Logger*
 NPT_LogManager::GetLogger(const char* name)
 {
+    // exit now if the log manager is disabled
+    if (!LogManager.m_Enabled) return NULL;
+
+    // auto lock until we return from this method
     NPT_AutoLock lock(LogManager.m_Lock);
 
     /* check that the manager is initialized */
@@ -775,15 +839,20 @@ NPT_Logger::Log(int          level,
                 const char*  msg, 
                              ...)
 {
+    // this is a no-op if the log manager is disabled
+    if (!LogManager.IsEnabled()) return;
+    
+    /* check the log level (in case filtering has not already been done) */
+    if (level < m_Level) return;
+
+    // we need to disable the log manager while someone is logging
+    NPT_LogManagerAutoDisabler autodisabler;
+    
+    /* format the message */
     char     buffer[NPT_LOG_STACK_BUFFER_MAX_SIZE];
     NPT_Size buffer_size = sizeof(buffer);
     char*    message = buffer;
-    int      result;
-
-    /* check the log level (in case filtering has not already been done) */
-    if (level < m_Level) return;
-        
-    /* format the message */
+    int      result;        
     va_list  args;
     va_start(args, msg);
     for(;;) {
@@ -957,8 +1026,64 @@ NPT_LogConsoleHandler::Log(const NPT_LogRecord& record)
 void
 NPT_LogFileHandler::Log(const NPT_LogRecord& record)
 {
-    NPT_Log::FormatRecordToStream(record, *m_Stream, false, 0);
-    if (m_Flush) m_Stream->Flush();
+    if (m_MaxFilesize > 0) {
+        /* get current file size */
+        NPT_LargeSize size;
+		NPT_File::GetSize(m_Filename, size);
+
+        /* time to recycle ? */
+        if (size > m_MaxFilesize) {
+            /* release stream to force a reopen later 
+			   and to be able to rename file */
+            m_Stream = NULL;
+
+            /* rename file using current time */
+            NPT_TimeStamp now;
+            NPT_System::GetCurrentTimeStamp(now);
+            NPT_String suffix = NPT_DateTime(now, true).ToString(NPT_DateTime::FORMAT_W3C);
+            suffix.Replace(':', '_');
+            NPT_String new_name = NPT_FilePath::Create(
+                NPT_FilePath::DirName(m_Filename),
+                NPT_FilePath::BaseName(m_Filename, false) + 
+					"-" + 
+					suffix + 
+					NPT_FilePath::FileExtension(m_Filename));
+
+            NPT_File::Rename(m_Filename, new_name);
+        }
+    }
+    
+    /* try to reopen the file if it failed to open 
+	   previously or if we rotated it */
+    if (m_Stream.IsNull()) {
+        Open(m_Append);
+    }
+    
+    if (m_Stream.AsPointer()) {
+        NPT_Log::FormatRecordToStream(record, *m_Stream, false, m_FormatFilter);
+        if (m_Flush) m_Stream->Flush();
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogFileHandler::Open
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_LogFileHandler::Open(bool append /* = true */)
+{
+    /* reset stream just in case */
+    m_Stream = NULL;
+            
+    /* open the log file */
+    NPT_File file(m_Filename);
+    NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_CREATE |
+                                  NPT_FILE_OPEN_MODE_READ   |
+                                  NPT_FILE_OPEN_MODE_WRITE  |
+                                  (append?NPT_FILE_OPEN_MODE_APPEND:NPT_FILE_OPEN_MODE_TRUNCATE));
+    if (NPT_FAILED(result)) return result;
+
+    NPT_CHECK(file.GetOutputStream(m_Stream));
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -977,44 +1102,54 @@ NPT_LogFileHandler::Create(const char*      logger_name,
     handler = instance;
 
     /* filename */
-    const char* filename;
     NPT_String* filename_conf = LogManager.GetConfigValue(logger_prefix, ".filename");
     if (filename_conf) {
-        filename = *filename_conf;
+        instance->m_Filename = *filename_conf;
     } else if (logger_name[0]) {
         NPT_String filename_synth = logger_name;
         filename_synth += ".log";
-        filename = filename_synth;
+        instance->m_Filename = filename_synth;
     } else {
         /* default name for the root logger */
-        filename = NPT_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME;
+        instance->m_Filename = NPT_CONFIG_DEFAULT_LOG_FILE_HANDLER_FILENAME;
     }
 
     /* always flush flag */
     NPT_String* flush = LogManager.GetConfigValue(logger_prefix, ".flush");
-    if (flush && NPT_LogManager::ConfigValueIsBooleanFalse(*flush)) {
+    if (flush && NPT_LogManager::ConfigValueIsBooleanTrue(*flush)) {
         instance->m_Flush = true;
     } else {
         instance->m_Flush = false;
     }
 
     /* append mode */
-    bool append = true;
+    instance->m_Append = true;
     NPT_String* append_mode = LogManager.GetConfigValue(logger_prefix, ".append");
-    if (append_mode && !NPT_LogManager::ConfigValueIsBooleanFalse(*append_mode)) {
-        append = false;
+    if (append_mode && NPT_LogManager::ConfigValueIsBooleanFalse(*append_mode)) {
+        instance->m_Append = false;
+    }
+
+    /* filter */
+    NPT_String* filter;
+    instance->m_FormatFilter = 0;
+    filter = LogManager.GetConfigValue(logger_prefix,".filter");
+    if (filter) {
+        filter->ToInteger(instance->m_FormatFilter, true);
+    }
+
+    /* recycle */
+    NPT_String* recycle;
+    instance->m_MaxFilesize = 0;
+    recycle = LogManager.GetConfigValue(logger_prefix,".recycle");
+    if (recycle) {
+        NPT_ParseInteger64(*recycle, instance->m_MaxFilesize, true);
+        if (instance->m_MaxFilesize < NPT_LOG_FILE_HANDLER_MIN_RECYCLE_SIZE) {
+            instance->m_MaxFilesize = NPT_LOG_FILE_HANDLER_MIN_RECYCLE_SIZE;
+        }
     }
 
     /* open the log file */
-    NPT_File file(filename);
-    NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_CREATE |
-                                  NPT_FILE_OPEN_MODE_WRITE  |
-                                  (append?NPT_FILE_OPEN_MODE_APPEND:0));
-    if (NPT_FAILED(result)) {
-        return result;
-    }
-
-    return file.GetOutputStream(instance->m_Stream);
+    return instance->Open(instance->m_Append);
 }
 
 /*----------------------------------------------------------------------
@@ -1104,9 +1239,9 @@ NPT_LogTcpHandler::FormatRecord(const NPT_LogRecord& record, NPT_String& msg)
     msg += "\r\nSource-Line: ";
     msg += NPT_String::FromIntegerU(record.m_SourceLine);
     msg += "\r\nTimeStamp: ";
-    msg += NPT_String::FromIntegerU(record.m_TimeStamp.m_Seconds);
-    msg += ":";
-    msg += NPT_String::FromIntegerU(record.m_TimeStamp.m_NanoSeconds/1000000L);
+    msg += NPT_DateTime(record.m_TimeStamp, true).ToString(NPT_DateTime::FORMAT_W3C, 
+                                                           NPT_DateTime::FLAG_EMIT_FRACTION | 
+                                                           NPT_DateTime::FLAG_EXTENDED_PRECISION);
     msg += "\r\nContent-Length: ";
     msg += NPT_String::FromIntegerU(NPT_StringLength(record.m_Message));
     msg += "\r\n\r\n";
@@ -1276,7 +1411,6 @@ NPT_HttpLoggerConfigurator::Run()
         NPT_Result result;
         result = m_Server->Loop();
         if (NPT_FAILED(result)) {
-            NPT_LOG_FINE_1("server exits with status %d", result);
             break;
         }
     }

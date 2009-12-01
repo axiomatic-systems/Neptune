@@ -91,6 +91,9 @@ public:
     unsigned long    AsLong() const;
     NPT_String       ToString() const;
     
+    // operators
+    bool             operator==(const NPT_IpAddress& other) const;
+    
 private:
     // members
     unsigned char m_Address[4];
@@ -162,6 +165,12 @@ public:
         return m_NetMask;
     }
     
+    bool IsAddressInNetwork(const NPT_IpAddress& address) {
+        if (m_PrimaryAddress.AsLong() == address.AsLong()) return true;
+        if (m_NetMask.AsLong() == 0) return false;
+        return (m_PrimaryAddress.AsLong() & m_NetMask.AsLong()) == (address.AsLong() & m_NetMask.AsLong());
+    }
+
 private:
     // members
     NPT_IpAddress m_PrimaryAddress;
@@ -204,6 +213,15 @@ public:
     const NPT_List<NPT_NetworkInterfaceAddress>& GetAddresses() const {
         return m_Addresses;
     }    
+    
+    bool IsAddressInNetwork(const NPT_IpAddress& address) {
+        NPT_List<NPT_NetworkInterfaceAddress>::Iterator iter = m_Addresses.GetFirstItem();
+        while (iter) {
+            if ((*iter).IsAddressInNetwork(address)) return true;
+           ++iter;
+        }
+        return false;
+    }
     
 private:
     // members

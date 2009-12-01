@@ -280,6 +280,7 @@ main(int argc, char** argv)
     
     NPT_File                  file1(filename);
     NPT_OutputStreamReference output;
+    NPT_LargeSize             size;
 
     NPT_ASSERT(NPT_SUCCEEDED(file1.Open(NPT_FILE_OPEN_MODE_CREATE | NPT_FILE_OPEN_MODE_WRITE | NPT_FILE_OPEN_MODE_READ | NPT_FILE_OPEN_MODE_TRUNCATE)));
     NPT_ASSERT(NPT_SUCCEEDED(file1.GetSize(size)));

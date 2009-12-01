@@ -37,6 +37,7 @@
 +---------------------------------------------------------------------*/
 #include "NptTypes.h"
 #include "NptStreams.h"
+#include "NptTime.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -89,10 +90,12 @@ struct NPT_FileInfo
     NPT_FileInfo() : m_Type(FILE_TYPE_NONE), m_Size(0), m_AttributesMask(0), m_Attributes(0) {}
     
     // members
-    FileType   m_Type;
-    NPT_UInt64 m_Size;
-    NPT_Flags  m_AttributesMask;
-    NPT_Flags  m_Attributes;
+    FileType      m_Type;
+    NPT_UInt64    m_Size;
+    NPT_Flags     m_AttributesMask;
+    NPT_Flags     m_Attributes;
+    NPT_TimeStamp m_CreationTime;
+    NPT_TimeStamp m_ModificationTime;
 };
 
 /*----------------------------------------------------------------------
@@ -141,6 +144,7 @@ class NPT_File : public NPT_FileInterface
 public:
     // class methods
     static NPT_Result GetRoots(NPT_List<NPT_String>& roots);
+    static NPT_Result GetSize(const char* path, NPT_LargeSize &size);
     static NPT_Result GetInfo(const char* path, NPT_FileInfo* info = NULL);
     static bool       Exists(const char* path) { return NPT_SUCCEEDED(GetInfo(path)); }
     static NPT_Result Remove(const char* path);

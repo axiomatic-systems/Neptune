@@ -95,6 +95,7 @@ public:
                SubString(GetLength()-length, length);
     }
     NPT_List<NPT_String> Split(const char* separator) const;
+    static NPT_String Join(NPT_List<NPT_String>& args, const char* separator);
     
     // buffer management
     void       Reserve(NPT_Size length);

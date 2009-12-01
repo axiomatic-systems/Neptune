@@ -303,7 +303,7 @@ NPT_ParseFloat(const char* str, float& result, bool relaxed)
     }
 
     // check for sign
-    bool  negative = false;
+    bool negative = false;
     if (*str == '-') {
         // negative number
         negative = true; 

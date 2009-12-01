@@ -95,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
     CHECK(result == NPT_SUCCESS);
     CHECK(session_id.GetDataSize() > 0);
     printf("[5] Session ID: ");
-    printf(NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
+    printf("%s", NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
     printf("\n");
     
     NPT_TlsCertificateInfo cert_info;

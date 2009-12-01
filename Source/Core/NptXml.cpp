@@ -1923,7 +1923,9 @@ class NPT_XmlNodeWriter
 {
 public:
     NPT_XmlNodeWriter(NPT_XmlSerializer& serializer) : 
-      m_Serializer(serializer), m_AttributeWriter(serializer) {}
+        m_Serializer(serializer), m_AttributeWriter(serializer) {
+        m_Serializer.StartDocument();
+    }
     void operator()(NPT_XmlNode*& node) const {
         if (NPT_XmlElementNode* element = node->AsElementNode()) {
             const NPT_String& prefix = element->GetPrefix();
@@ -1977,7 +1979,9 @@ public:
     NPT_XmlNodeCanonicalWriter(NPT_XmlSerializer& serializer, 
                                MapChainLink*      map_chain = NULL) : 
         m_MapChain(map_chain),
-        m_Serializer(serializer) {}
+        m_Serializer(serializer) {
+        m_Serializer.StartDocument();
+    }
     void operator()(NPT_XmlNode*& node) const;
 
 private:
@@ -2239,13 +2243,15 @@ NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
 +---------------------------------------------------------------------*/
 NPT_XmlSerializer::NPT_XmlSerializer(NPT_OutputStream* output,
                                      NPT_Cardinal      indentation,
-                                     bool              shrink_empty_elements) :
+                                     bool              shrink_empty_elements,
+									 bool			   add_xml_decl) :
     m_Output(output),
     m_ElementPending(false),
     m_Depth(0),
     m_Indentation(indentation),
     m_ElementHasText(false),
-    m_ShrinkEmptyElements(shrink_empty_elements)
+    m_ShrinkEmptyElements(shrink_empty_elements),
+	m_AddXmlDecl(add_xml_decl)
 {
 }
 
@@ -2262,6 +2268,8 @@ NPT_XmlSerializer::~NPT_XmlSerializer()
 NPT_Result 
 NPT_XmlSerializer::StartDocument()
 {
+	if (!m_AddXmlDecl) return NPT_SUCCESS;
+
     return m_Output->WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 }
 
@@ -2477,9 +2485,11 @@ NPT_XmlSerializer::Comment(const char* comment)
 |   NPT_XmlWriter::Serialize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
+NPT_XmlWriter::Serialize(NPT_XmlNode&	   node, 
+						 NPT_OutputStream& output, 
+						 bool			   add_xml_decl)
 {
-    NPT_XmlSerializer serializer(&output, m_Indentation);
+    NPT_XmlSerializer serializer(&output, m_Indentation, true, add_xml_decl);
     NPT_XmlNodeWriter node_writer(serializer);
     NPT_XmlNode* node_pointer = &node;
     node_writer(node_pointer);
@@ -2491,10 +2501,12 @@ NPT_XmlWriter::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
 |   NPT_XmlCanonicalizer::Serialize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlCanonicalizer::Serialize(NPT_XmlNode& node, NPT_OutputStream& output)
+NPT_XmlCanonicalizer::Serialize(NPT_XmlNode&      node, 
+								NPT_OutputStream& output, 
+								bool			  add_xml_decl)
 {
     // create a serializer with no indentation and no shrinking of empty elements
-    NPT_XmlSerializer serializer(&output, 0, false);
+    NPT_XmlSerializer serializer(&output, 0, false, add_xml_decl);
 
     // serialize the node
     NPT_XmlNodeCanonicalWriter node_writer(serializer);

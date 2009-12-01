@@ -27,6 +27,7 @@
 #include <dirent.h>
 #endif
 
+#include "NptConfig.h"
 #include "NptLogging.h"
 #include "NptFile.h"
 #include "NptUtils.h"
@@ -252,6 +253,14 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
         if ((stat_buffer.st_mode & S_IWUSR) == 0) {
             info->m_Attributes &= NPT_FILE_ATTRIBUTE_READ_ONLY;
         }
+#if defined(NPT_CONFIG_HAVE_STAT_ST_BIRTHTIME)
+        info->m_CreationTime.SetSeconds(stat_buffer.st_birthtime);
+#elif defined(NPT_CONFIG_STAT_ST_CTIME_IS_ST_BIRTHTIME)
+        info->m_CreationTime.SetSeconds(stat_buffer.st_ctime);
+#else
+        info->m_CreationTime.SetSeconds(0);
+#endif
+        info->m_ModificationTime.SetSeconds(stat_buffer.st_mtime);
     }
     
     return NPT_SUCCESS;

@@ -403,7 +403,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 #endif
 
         // test the result of the open
-        if (open_result != 0) return MapErrno(errno);
+        if (open_result != 0) return MapErrno(open_result);
     }
 
     // unbuffer the file if needed 
@@ -452,8 +452,6 @@ NPT_StdcFile::GetInputStream(NPT_InputStreamReference& stream)
     }
 
     // create a stream
-    NPT_LargeSize size = 0;
-    m_Delegator.GetSize(size);
     stream = new NPT_StdcFileInputStream(m_FileReference);
 
     return NPT_SUCCESS;

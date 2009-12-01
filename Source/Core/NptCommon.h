@@ -82,6 +82,19 @@ NPT_Result NPT_ContainerFind(T&                   container,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_ContainerFind
++---------------------------------------------------------------------*/
+template <typename T, typename P>
+NPT_Result NPT_ContainerFind(T&                    container, 
+							 const P&              predicate, 
+							 typename T::Iterator& iter, 
+							 NPT_Ordinal           n=0) 
+{
+	iter = container.Find(predicate, n);
+	return iter?NPT_SUCCESS:NPT_ERROR_NO_SUCH_ITEM;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_UntilResultEquals
 +---------------------------------------------------------------------*/
 class NPT_UntilResultEquals

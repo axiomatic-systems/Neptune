@@ -439,7 +439,7 @@ NPT_PosixThread::EntryPoint(void* argument)
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed((unsigned int)(now.m_NanoSeconds + (long)thread->m_ThreadId));
+    NPT_System::SetRandomSeed((unsigned int)(now.ToNanos() + (long)thread->m_ThreadId));
 
     // run the thread 
     thread->Run();
@@ -523,8 +523,6 @@ NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
     void* return_value;
     int   result;
 
-    NPT_LOG_FINE_1("NPT_PosixThread::Wait - waiting for id %d", m_ThreadId);
-
     // check that we're not detached
     if (m_ThreadId == 0 || m_Detached) {
         return NPT_FAILURE;
@@ -533,10 +531,8 @@ NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
     // wait for the thread to finish
     m_JoinLock.Lock();
     if (m_Joined) {
-        NPT_LOG_FINE_1("NPT_PosixThread::Wait - %d already joined", m_ThreadId);
         result = 0;
     } else {
-        NPT_LOG_FINE_1("NPT_PosixThread::Wait - joining thread id %d", m_ThreadId);
         if (timeout != NPT_TIMEOUT_INFINITE) {
             result = m_Done.WaitUntilEquals(1, timeout);
             if (NPT_FAILED(result)) {

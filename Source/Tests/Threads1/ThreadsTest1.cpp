@@ -215,7 +215,7 @@ Test2()
     NPT_Debug("...done\n");
 
     // sleep a while
-    NPT_TimeInterval duration(15UL);
+    NPT_TimeInterval duration(15.0);
     NPT_System::Sleep(duration);
 
     NPT_Debug("--- Test2 End ---\n");

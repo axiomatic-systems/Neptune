@@ -111,9 +111,10 @@ NPT_String
 NPT_FilePath::Create(const char* directory, const char* basename)
 {
     if (!directory || NPT_StringLength(directory) == 0) return basename;
+    if (!basename || NPT_StringLength(basename) == 0) return directory;
 
     NPT_String result = directory;
-    if (result.GetLength() != 0 && !result.EndsWith(Separator)) {
+    if (!result.EndsWith(Separator) && basename[0] != Separator[0]) {
         result += Separator;
     }
     result += basename;
@@ -263,6 +264,16 @@ NPT_File::GetSize(NPT_LargeSize& size)
     size = info.m_Size;
     
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_File::GetSize
++---------------------------------------------------------------------*/
+NPT_Result        
+NPT_File::GetSize(const char* path, NPT_LargeSize& size)
+{
+	NPT_File file(path);
+	return file.GetSize(size);
 }
 
 /*----------------------------------------------------------------------

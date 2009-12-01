@@ -39,6 +39,7 @@
 #include "NptVersion.h"
 #include "NptUtils.h"
 #include "NptFile.h"
+#include "NptSystem.h"
 #include "NptLogging.h"
 
 /*----------------------------------------------------------------------
@@ -58,8 +59,11 @@ const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal E
 |   NPT_HttpUrl::NPT_HttpUrl
 +---------------------------------------------------------------------*/
 NPT_HttpUrl::NPT_HttpUrl(const char* url, bool ignore_scheme) :
-    NPT_Url(url, ignore_scheme?SCHEME_ID_UNKNOWN:SCHEME_ID_HTTP, NPT_HTTP_DEFAULT_PORT)
+    NPT_Url(url, NPT_HTTP_DEFAULT_PORT)
 {
+    if (!ignore_scheme && GetSchemeId() != NPT_Uri::SCHEME_ID_HTTP) {
+        Reset();
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -599,7 +603,7 @@ NPT_HttpRequest::Parse(NPT_BufferedInputStream& stream,
     // update the URL
     if (!proxy_style_request) {
         request->m_Url.SetScheme("http");
-        request->m_Url.SetPathPlus(uri);
+        request->m_Url.ParsePathPlus(uri);
         request->m_Url.SetPort(NPT_HTTP_DEFAULT_PORT);
 
         // check for a Host: header
@@ -1297,18 +1301,26 @@ NPT_HttpServer::Loop()
         NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)", 
                        result,
                        NPT_ResultText(result));
-        if (NPT_FAILED(result)) break;
 
-        // send a response
-        result = RespondToClient(input, output, context);
-        NPT_LOG_FINE_2("ResponToClient returned %d", 
-                       result,
-                       NPT_ResultText(result));
+        // respond to the client
+        if (NPT_SUCCEEDED(result)) {
+            // send a response
+            result = RespondToClient(input, output, context);
+            NPT_LOG_FINE_2("ResponToClient returned %d", 
+                           result,
+                           NPT_ResultText(result));
 
-        // release the stream references so that the socket can be closed
-        input  = NULL;
-        output = NULL;
-    } while (NPT_SUCCEEDED(result));
+            // release the stream references so that the socket can be closed
+            input  = NULL;
+            output = NULL;
+        }
+        
+        // if there was an error, wait a short time to avoid spinning
+        if (NPT_FAILED(result) && result != NPT_ERROR_TERMINATED) {
+            NPT_LOG_FINE("sleeping before restarting the loop");
+            NPT_System::Sleep(1.0);
+        }
+    } while (result != NPT_ERROR_TERMINATED);
     
     return result;
 }
@@ -2110,7 +2122,7 @@ NPT_HttpChunkedInputStream::Read(void*     buffer,
 
         // decode size (in hex)
         m_CurrentChunkSize = 0;
-        if (size_line < 1) {
+        if (size_line.GetLength() < 1) {
             NPT_LOG_WARNING("empty chunk size line");
             return NPT_ERROR_INVALID_FORMAT;
         }

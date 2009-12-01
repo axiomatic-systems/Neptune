@@ -490,12 +490,12 @@ NPT_MemoryStream::OutputSeek(NPT_Position offset)
 }
 
 /*----------------------------------------------------------------------
-|   NPT_MemoryStream::SetSize
+|   NPT_MemoryStream::SetDataSize
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_MemoryStream::SetSize(NPT_Size size)
+NPT_MemoryStream::SetDataSize(NPT_Size size)
 {
-    // try to resize the data buffer
+    // update data amount in buffer
     NPT_CHECK(m_Buffer.SetDataSize(size));
 
     // adjust the read and write offsets
@@ -508,7 +508,7 @@ NPT_MemoryStream::SetSize(NPT_Size size)
 /*----------------------------------------------------------------------
 |   NPT_StreamToStreamCopy
 +---------------------------------------------------------------------*/
-const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 4096; // copy 4k at a time
+const unsigned int NPT_STREAM_COPY_BUFFER_SIZE = 65536; // copy 64k at a time
 NPT_Result 
 NPT_StreamToStreamCopy(NPT_InputStream&  from, 
                        NPT_OutputStream& to,
@@ -709,3 +709,16 @@ NPT_SubInputStream::GetAvailable(NPT_LargeSize& available)
     available = m_Size-m_Position;
     return NPT_SUCCESS;
 }
+
+/*----------------------------------------------------------------------
+|   NPT_NullOutputStream::Write
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_NullOutputStream::Write(const void* /*buffer*/, 
+                            NPT_Size  bytes_to_write, 
+                            NPT_Size* bytes_written /* = NULL */)
+{
+    if (bytes_written) *bytes_written = bytes_to_write;
+    return NPT_SUCCESS;
+}
+

@@ -60,7 +60,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol);
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
 { SSL_RC4_128_SHA };
 #else
-static void session_free(SSL_SESS *ssl_sessions[], int sess_index);
+static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
 
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
 #ifdef CONFIG_SSL_PROT_LOW                  /* low security, fast speed */
@@ -182,8 +182,8 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 #ifndef CONFIG_SSL_SKELETON_MODE
     if (num_sessions)
     {
-        ssl_ctx->ssl_sessions = (SSL_SESS **)
-                        calloc(1, num_sessions*sizeof(SSL_SESS *));
+        ssl_ctx->ssl_sessions = (SSL_SESSION **)
+                        calloc(1, num_sessions*sizeof(SSL_SESSION *));
     }
 #endif
 
@@ -389,7 +389,6 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     int ret = SSL_ERROR_NO_CERT_DEFINED;
     int i = 0;
     int offset;
-    X509_CTX *cert = NULL;
     CA_CERT_CTX *ca_cert_ctx;
 
     if (ssl_ctx->ca_cert_ctx == NULL)
@@ -412,22 +411,6 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     if ((ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i])))
         goto error;
 
-    /* make sure the cert is valid */
-    cert = ca_cert_ctx->cert[i];
-    SSL_CTX_LOCK(ssl_ctx->mutex);
-
-    if ((ret = x509_verify(ca_cert_ctx, cert)) != X509_VFY_ERROR_SELF_SIGNED)
-    {
-        SSL_CTX_UNLOCK(ssl_ctx->mutex);
-        x509_free(cert);        /* get rid of it */
-        ca_cert_ctx->cert[i] = NULL;
-#ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: %s\n", x509_display_error(ret)); TTY_FLUSH();
-#endif
-        goto error;
-    }
-
-    SSL_CTX_UNLOCK(ssl_ctx->mutex);
     len -= offset;
     ret = SSL_OK;           /* ok so far */
 
@@ -1538,12 +1521,12 @@ void disposable_free(SSL *ssl)
  * Find if an existing session has the same session id. If so, use the
  * master secret from this session for session resumption.
  */
-SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[], 
+SSL_SESSION *ssl_session_update(int max_sessions, SSL_SESSION *ssl_sessions[], 
         SSL *ssl, const uint8_t *session_id)
 {
     time_t tm = time(NULL);
     time_t oldest_sess_time = tm;
-    SSL_SESS *oldest_sess = NULL;
+    SSL_SESSION *oldest_sess = NULL;
     int i;
 
     /* no sessions? Then bail */
@@ -1586,7 +1569,7 @@ SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[],
         if (ssl_sessions[i] == NULL)
         {
             /* perfect, this will do */
-            ssl_sessions[i] = (SSL_SESS *)calloc(1, sizeof(SSL_SESS));
+            ssl_sessions[i] = (SSL_SESSION *)calloc(1, sizeof(SSL_SESSION));
             ssl_sessions[i]->conn_time = tm;
             ssl->session_index = i;
             SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
@@ -1612,7 +1595,7 @@ SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[],
 /**
  * Free an existing session.
  */
-static void session_free(SSL_SESS *ssl_sessions[], int sess_index)
+static void session_free(SSL_SESSION *ssl_sessions[], int sess_index)
 {
     if (ssl_sessions[sess_index])
     {
@@ -1624,7 +1607,7 @@ static void session_free(SSL_SESS *ssl_sessions[], int sess_index)
 /**
  * This ssl object doesn't want this session anymore.
  */
-void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl)
+void kill_ssl_session(SSL_SESSION **ssl_sessions, SSL *ssl)
 {
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
 
@@ -1754,6 +1737,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
             goto error;
         }
 
+        /* DISPLAY_CERT(ssl, *chain); */
         chain = &((*chain)->next);
         offset += cert_size;
     }
@@ -1766,7 +1750,6 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
         ret = ssl_verify_cert(ssl);
     }
 
-    DISPLAY_CERT(ssl, *x509_ctx);
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
     ssl->dc->bm_proc_index += offset;
 error:

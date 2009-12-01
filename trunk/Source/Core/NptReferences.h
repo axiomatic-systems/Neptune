@@ -87,10 +87,10 @@ public:
     T& operator*() const { return *m_Object; }
     T* operator->() const { return m_Object; }
 
-    bool operator==(const NPT_Reference<T>& ref) {
+    bool operator==(const NPT_Reference<T>& ref) const {
         return m_Object == ref.m_Object;
     } 
-    bool operator!=(const NPT_Reference<T>& ref) {
+    bool operator!=(const NPT_Reference<T>& ref) const {
         return m_Object != ref.m_Object;
     }
 

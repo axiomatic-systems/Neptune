@@ -81,14 +81,13 @@ NPT_System::GetCurrentTimeStamp(NPT_TimeStamp& now)
 
     // get current time from system
     if (gettimeofday(&now_tv, NULL)) {
-        now.m_Seconds     = 0;
-        now.m_NanoSeconds = 0;
+        now.SetNanos(0);
         return NPT_FAILURE;
     }
     
     // convert format
-    now.m_Seconds     = now_tv.tv_sec;
-    now.m_NanoSeconds = now_tv.tv_usec * 1000;
+    now.SetNanos((NPT_UInt64)now_tv.tv_sec  * 1000000000 + 
+                 (NPT_UInt64)now_tv.tv_usec * 1000);
 
     return NPT_SUCCESS;
 }
@@ -104,8 +103,8 @@ NPT_System::Sleep(const NPT_TimeInterval& duration)
     int             result;
 
     // setup the time value
-    time_req.tv_sec  = duration.m_Seconds;
-    time_req.tv_nsec = duration.m_NanoSeconds;
+    time_req.tv_sec  = duration.ToNanos()/1000000000;
+    time_req.tv_nsec = duration.ToNanos()%1000000000;
 
     // sleep
     do {
@@ -132,13 +131,11 @@ NPT_System::SleepUntil(const NPT_TimeStamp& when)
     }
 
     // setup timeout
-    timeout.tv_sec  = now.tv_sec + when.m_Seconds;
-    timeout.tv_nsec = now.tv_usec * 1000 + when.m_NanoSeconds;
-
-    if (timeout.tv_nsec >= 1000000000) {
-        timeout.tv_sec  += timeout.tv_nsec / 1000000000;
-        timeout.tv_nsec %= 1000000000;
-    }
+    NPT_UInt64 limit = (NPT_UInt64)now.tv_sec*1000000000 +
+                       (NPT_UInt64)now.tv_usec*1000 +
+                       when.ToNanos();
+    timeout.tv_sec  = limit/1000000000;
+    timeout.tv_nsec = limit%1000000000;
 
     // sleep
     do {
@@ -173,7 +170,7 @@ NPT_System::GetRandomInteger()
     if (seeded == false) {
         NPT_TimeStamp now;
         GetCurrentTimeStamp(now);
-        SetRandomSeed(now.m_NanoSeconds);
+        SetRandomSeed((NPT_UInt32)now.ToNanos());
         seeded = true;
     }
 

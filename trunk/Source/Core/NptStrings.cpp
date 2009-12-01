@@ -449,6 +449,22 @@ NPT_String::Split(const char* separator) const
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::Join
++---------------------------------------------------------------------*/
+NPT_String
+NPT_String::Join(NPT_List<NPT_String>& args, const char* separator)
+{
+    NPT_String output;
+    NPT_List<NPT_String>::Iterator arg = args.GetFirstItem();
+    while (arg) {
+        output += *arg;
+        if (++arg) output += separator;
+    }
+    
+    return output;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_String::SubString
 +---------------------------------------------------------------------*/
 NPT_String

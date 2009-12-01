@@ -200,7 +200,8 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         NPT_IpAddress netmask;           // not supported yet
 
         // convert the interface name to UTF-8
-        unsigned int iface_name_length = (unsigned int)wcslen(iface->FriendlyName);
+        // BUG in Wine: FriendlyName is NULL
+        unsigned int iface_name_length = (unsigned int)iface->FriendlyName?wcslen(iface->FriendlyName):0;
         char* iface_name = new char[4*iface_name_length+1];
         int result = WideCharToMultiByte(
             CP_UTF8, 0, iface->FriendlyName, iface_name_length,

@@ -811,6 +811,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\Win32\NptWin32Time.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\System\WinCE\NptWinceConsole.cpp"
 				>
 				<FileConfiguration

@@ -123,6 +123,79 @@ NPT_FilePath::Create(const char* directory, const char* basename)
 }
 
 /*----------------------------------------------------------------------
+|   NPT_File::CreateDir
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_File::CreateDir(const char* path, bool create_intermediate_dirs)
+{
+    NPT_String full_path = path;
+
+    // normalize path separators
+    full_path.Replace((NPT_FilePath::Separator[0] == '/')?'\\':'/', NPT_FilePath::Separator);
+
+    // remove superfluous delimiters at the end
+    full_path.TrimRight(NPT_FilePath::Separator);
+
+    // create intermediate directories if needed
+    if (create_intermediate_dirs) {
+        NPT_String dir_path;
+
+        // look for the next path separator
+        int separator = full_path.Find(NPT_FilePath::Separator, 1);
+        while (separator > 0) {
+            // copy the path up to the separator
+            dir_path = full_path.SubString(0, separator);
+
+            // create the directory non recursively
+            NPT_CHECK_WARNING(NPT_File::CreateDir(dir_path, false));
+
+            // look for the next delimiter
+            separator = full_path.Find(NPT_FilePath::Separator, separator + 1);
+        }
+    }
+
+    // create the final directory
+    NPT_Result result = NPT_File::CreateDir(full_path);
+
+    // return error only if file didn't exist
+    if (NPT_FAILED(result) && result != NPT_ERROR_FILE_ALREADY_EXISTS) {
+        return result;
+    }
+    
+    return NPT_SUCCESS;
+}
+
+
+/*----------------------------------------------------------------------
+|   NPT_File::RemoveDir
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_File::RemoveDir(const char* path, bool force_if_not_empty)
+{
+    NPT_String root_path = path;
+
+    // normalize path separators
+    root_path.Replace((NPT_FilePath::Separator[0] == '/')?'\\':'/', NPT_FilePath::Separator);
+    
+    // remove superfluous delimiters at the end
+    root_path.TrimRight(NPT_FilePath::Separator);
+
+    // remove all entries in the directory if required
+    if (force_if_not_empty) {
+        // enumerate all entries
+        NPT_File dir(root_path);
+        NPT_List<NPT_String> entries;
+        NPT_CHECK_WARNING(dir.ListDir(entries));
+        for (NPT_List<NPT_String>::Iterator it = entries.GetFirstItem(); it; ++it) {
+            NPT_File::Remove(NPT_FilePath::Create(root_path, *it), true);
+        }
+    }
+
+    // remove the (now empty) directory
+    return NPT_File::RemoveDir(root_path);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_File::Load
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -257,11 +330,26 @@ NPT_File::GetSize(NPT_LargeSize& size)
     // default value
     size = 0;
     
-    // get the size from the info (call GetInfo() in case it has not
-    // yet been called)
+    // get the file info
     NPT_FileInfo info;
     GetInfo(info);
-    size = info.m_Size;
+    
+    switch (info.m_Type) {
+        case NPT_FileInfo::FILE_TYPE_DIRECTORY: {
+            NPT_List<NPT_String> entries;
+            NPT_CHECK_WARNING(ListDir(entries));
+            size = entries.GetItemCount();
+            break;
+        }
+        
+        case NPT_FileInfo::FILE_TYPE_REGULAR:
+        case NPT_FileInfo::FILE_TYPE_OTHER:
+            size = info.m_Size;
+            return NPT_SUCCESS;
+            
+        default:
+            break;
+    } 
     
     return NPT_SUCCESS;
 }
@@ -280,15 +368,15 @@ NPT_File::GetSize(const char* path, NPT_LargeSize& size)
 |   NPT_File::Remove
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_File::Remove(const char* path)
+NPT_File::Remove(const char* path, bool recurse /* = false */)
 {
     NPT_FileInfo info;
 
     // make sure the path exists
-    NPT_CHECK(GetInfo(path, &info));
+    NPT_CHECK_WARNING(GetInfo(path, &info));
 
     if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
-        return RemoveDir(path);
+        return RemoveDir(path, recurse);
     } else {
         return RemoveFile(path);
     }

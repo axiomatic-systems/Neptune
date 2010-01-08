@@ -118,8 +118,8 @@ public:
     enum Format {
         FORMAT_ANSI,
         FORMAT_W3C,
-        FORMAT_RFC_1123,
-        FORMAT_RFC_850
+        FORMAT_RFC_1123,  // RFC 822 updated by RFC 1123
+        FORMAT_RFC_1036   // RFC 850 updated by RFC 1036
     };
     
     enum FormatFlags {

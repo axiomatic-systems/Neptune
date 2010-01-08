@@ -451,7 +451,7 @@ NPT_Win32Thread::EntryPoint(void* argument)
     // set random seed per thread
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_System::SetRandomSeed(now.m_NanoSeconds + ::GetCurrentThreadId());
+    NPT_System::SetRandomSeed((NPT_UInt32)(now.ToNanos()) + ::GetCurrentThreadId());
 
     // run the thread 
     thread->Run();

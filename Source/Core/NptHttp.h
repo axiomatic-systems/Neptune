@@ -482,7 +482,8 @@ public:
     // constructors
     NPT_HttpFileRequestHandler(const char* url_root,
                                const char* file_root,
-                               bool        auto_dir = false);
+                               bool        auto_dir = false,
+                               const char* auto_index = NULL);
 
     // NPT_HttpRequetsHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
@@ -509,6 +510,7 @@ private:
     NPT_String                      m_DefaultMimeType;
     bool                            m_UseDefaultFileTypeMap;
     bool                            m_AutoDir;
+    NPT_String                      m_AutoIndex;
 };
 
 /*----------------------------------------------------------------------

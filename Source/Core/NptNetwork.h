@@ -80,6 +80,7 @@ public:
     // constructors and destructor
     NPT_IpAddress();
     NPT_IpAddress(unsigned long address);
+    NPT_IpAddress(unsigned char a, unsigned char b, unsigned char c, unsigned char d);
 
     // methods
     NPT_Result       ResolveName(const char* name, 

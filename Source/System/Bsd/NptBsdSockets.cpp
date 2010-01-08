@@ -145,6 +145,9 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK 
 #endif
+#if !defined(SHUT_RDWR)
+#define SHUT_RDWR SD_BOTH 
+#endif
 
 #if !defined(__MINGW32__)
 typedef int         ssize_t;
@@ -513,7 +516,8 @@ public:
       m_SocketFd(fd), 
       m_Blocking(true),
       m_ReadTimeout(NPT_TIMEOUT_INFINITE), 
-      m_WriteTimeout(NPT_TIMEOUT_INFINITE) {}
+      m_WriteTimeout(NPT_TIMEOUT_INFINITE),
+      m_Cancelled(false) {}
     ~NPT_BsdSocketFd() {
         closesocket(m_SocketFd);
     }
@@ -524,11 +528,12 @@ public:
     NPT_Result WaitUntilWriteable();
 
     // members
-    SocketFd     m_SocketFd;
-    bool         m_Blocking;
-    NPT_Timeout  m_ReadTimeout;
-    NPT_Timeout  m_WriteTimeout;
-    NPT_Position m_Position;
+    volatile SocketFd m_SocketFd;
+    bool              m_Blocking;
+    NPT_Timeout       m_ReadTimeout;
+    NPT_Timeout       m_WriteTimeout;
+    NPT_Position      m_Position;
+    volatile bool     m_Cancelled;
 
 private:
     // methods
@@ -651,14 +656,19 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     } else if (NPT_BSD_SOCKET_SELECT_FAILED(io_result)) {
         int err = GetSocketError();
         NPT_LOG_FINE_1("select socket error is %d", err);
-        result = MapErrorCode(err);
+        result = m_Cancelled?NPT_ERROR_INTERRUPTED:MapErrorCode(err);
     } else if ((wait_for_readable  && FD_ISSET(m_SocketFd, &read_set)) ||
                (wait_for_writeable && FD_ISSET(m_SocketFd, &write_set))) {
         result = NPT_SUCCESS;
     } else if (FD_ISSET(m_SocketFd, &except_set)) {
-        result = MapErrorCode(GetSocketError());
+        NPT_LOG_FINE("select socket exception is set");
+        result = m_Cancelled?NPT_ERROR_INTERRUPTED:MapErrorCode(GetSocketError());
+    } else if (m_Cancelled) {
+        NPT_LOG_FINE("select cancelled");
+        return NPT_ERROR_INTERRUPTED;
     } else {
         // should not happen
+        NPT_LOG_FINE("unexected select state");
         result = NPT_ERROR_INTERNAL;
     }
 
@@ -742,9 +752,9 @@ NPT_BsdSocketInputStream::Read(void*     buffer,
     } else {
         if (bytes_read) *bytes_read = 0;
         if (nb_read == 0) {
-            return NPT_ERROR_EOS;
+            return m_SocketFdReference->m_Cancelled?NPT_ERROR_INTERRUPTED:NPT_ERROR_EOS;
         } else {
-            return MapErrorCode(GetSocketError());
+            return m_SocketFdReference->m_Cancelled?NPT_ERROR_INTERRUPTED:MapErrorCode(GetSocketError());
         }
     }
 
@@ -850,9 +860,9 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
     } else {
         if (bytes_written) *bytes_written = 0;
         if (nb_written == 0) {
-            return NPT_ERROR_CONNECTION_RESET;
+            return m_SocketFdReference->m_Cancelled?NPT_ERROR_INTERRUPTED:NPT_ERROR_CONNECTION_RESET;
         } else {
-            return MapErrorCode(GetSocketError());
+            return m_SocketFdReference->m_Cancelled?NPT_ERROR_INTERRUPTED:MapErrorCode(GetSocketError());
         }
     }
 
@@ -922,7 +932,6 @@ class NPT_BsdSocket : public NPT_SocketInterface
 {
  public:
     // constructors and destructor
-             NPT_BsdSocket() {}
              NPT_BsdSocket(SocketFd fd, bool force_blocking=false);
     virtual ~NPT_BsdSocket();
 
@@ -939,6 +948,7 @@ class NPT_BsdSocket : public NPT_SocketInterface
     NPT_Result SetBlockingMode(bool blocking);
     NPT_Result SetReadTimeout(NPT_Timeout timeout);
     NPT_Result SetWriteTimeout(NPT_Timeout timeout);
+    NPT_Result Cancel();
 
  protected:
     // members
@@ -1148,12 +1158,46 @@ NPT_BsdSocket::SetReadTimeout(NPT_Timeout timeout)
 NPT_Result
 NPT_BsdSocket::SetWriteTimeout(NPT_Timeout timeout)
 {
+    if (timeout == NPT_TIMEOUT_INFINITE && m_SocketFdReference->m_WriteTimeout == timeout) {
+        // already infinite, do nothing
+        return NPT_SUCCESS;
+    }
     m_SocketFdReference->m_WriteTimeout = timeout;
+#if defined(_WIN32) || defined(_XBOX)
+    int timeout_opt = (timeout == NPT_TIMEOUT_INFINITE?0:timeout);
+#else
+    struct timeval timeout_opt;
+    if (timeout == NPT_TIMEOUT_INFINITE) {
+    } else {
+        timeout_opt.tv_sec  = timeout/1000;
+        timeout_opt.tv_usec = (timeout%1000)*1000;
+    }
+#endif
     setsockopt(m_SocketFdReference->m_SocketFd,
                SOL_SOCKET,
                SO_SNDTIMEO,
-               (SocketOption)&timeout,
+               (SocketOption)&timeout_opt,
                sizeof(timeout));
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdSocket::Cancel
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocket::Cancel()
+{
+    m_SocketFdReference->m_Cancelled = true;
+    int result = shutdown(m_SocketFdReference->m_SocketFd, SHUT_RDWR);
+    if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+        NPT_LOG_FINE_1("shutdown failed (%d)", result);
+    }
+    
+#if defined(__WIN32__) || defined(_XBOX)
+    SocketFd fd = m_SocketFdReference->m_SocketFd;
+    m_SocketFdReference->m_SocketFd = INVALID_SOCKET;
+    closesocket(fd);
+#endif
     return NPT_SUCCESS;
 }
 
@@ -1935,7 +1979,7 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client,
     socklen_t          namelen = sizeof(inet_address);
     SocketFd socket_fd = accept(m_SocketFdReference->m_SocketFd, (struct sockaddr*)&inet_address, &namelen); 
     if (NPT_BSD_SOCKET_IS_INVALID(socket_fd)) {
-        result = MapErrorCode(GetSocketError());
+        result = m_SocketFdReference->m_Cancelled?NPT_ERROR_INTERRUPTED:MapErrorCode(GetSocketError());
     } else {
         client = new NPT_Socket(new NPT_BsdSocket(socket_fd, m_Blocking));
     }

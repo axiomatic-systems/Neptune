@@ -136,6 +136,11 @@
 #define NPT_CONFIG_THREAD_STACK_SIZE   0x14000
 #endif
 
+/* android */
+#if defined(ANDROID)
+#undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
+#endif
+
 /*----------------------------------------------------------------------
 |   compiler specifics
 +---------------------------------------------------------------------*/
@@ -195,7 +200,7 @@ typedef long NPT_PointerLong;
 #define NPT_POINTER_TO_LONG(_p) ((NPT_PointerLong) (_p) )
 #if _MSC_VER >= 1400 && !defined(_WIN32_WCE)
 #define gmtime_r(a,b) gmtime_s(a,b)
-#define localtime_r(a,b) localtime_s(a,b)
+#define localtime_r(a,b) localtime_s(b,a)
 #define NPT_CONFIG_HAVE_FOPEN_S
 #define NPT_CONFIG_HAVE_FSOPEN
 #define NPT_CONFIG_HAVE_SHARE_H

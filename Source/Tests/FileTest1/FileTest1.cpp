@@ -99,6 +99,7 @@ main(int argc, char** argv)
     
     {
         NPT_File f1("foobar.file1");
+        NPT_File::Remove("foobar.file1-r");
         result = f1.Rename("foobar.file1-r");
         NPT_ASSERT(NPT_SUCCEEDED(result));
         NPT_ASSERT(f1.GetPath() == "foobar.file1-r");
@@ -110,6 +111,7 @@ main(int argc, char** argv)
     NPT_ASSERT(info.m_Size == 9);
 
     // dirs
+    NPT_File::RemoveDir("foobar.dir", true);
     NPT_ASSERT(!NPT_File::Exists("foobar.dir"));
     result = NPT_File::CreateDir("foobar.dir");
     NPT_ASSERT(NPT_SUCCEEDED(result));
@@ -145,6 +147,10 @@ main(int argc, char** argv)
     result = NPT_File::ListDir("foobar.dir", entries);
     NPT_ASSERT(NPT_SUCCEEDED(result));
     NPT_ASSERT(entries.GetItemCount() == 3);
+    NPT_LargeSize dir_size;
+    result = NPT_File::GetSize("foobar.dir", dir_size);
+    NPT_ASSERT(NPT_SUCCEEDED(result));
+    NPT_ASSERT(dir_size == 3);
     
     result = NPT_File::RemoveFile("foobar.dir");
     NPT_ASSERT(NPT_FAILED(result));
@@ -175,6 +181,20 @@ main(int argc, char** argv)
     NPT_ASSERT(NPT_SUCCEEDED(result));
     NPT_ASSERT(!NPT_File::Exists("foobar.dir-r"));
 
+    // dir creation with intermediates
+    result = NPT_File::CreateDir("foobar.dir/a/b/c/d", false);
+    NPT_ASSERT(NPT_FAILED(result));
+    result = NPT_File::CreateDir("foobar.dir/a/b/c/d", true);
+    NPT_ASSERT(NPT_SUCCEEDED(result));
+    CreateNewFile("foobar.dir/a/a.bin", 1, 1);
+    CreateNewFile("foobar.dir/a/b.bin", 1, 1);
+    CreateNewFile("foobar.dir/a/b/a.bin", 1, 1);
+    CreateNewFile("foobar.dir/a/b/c/d/foo.bin", 1, 1);
+    result = NPT_File::RemoveDir("foobar.dir", false);
+    NPT_ASSERT(NPT_FAILED(result));
+    result = NPT_File::RemoveDir("foobar.dir", true);
+    NPT_ASSERT(NPT_SUCCEEDED(result));
+    
     // paths
     NPT_String test;
     test = NPT_FilePath::BaseName("");
@@ -231,6 +251,7 @@ main(int argc, char** argv)
     for (unsigned int i=0; i<0x107; i++) {
         NPT_ASSERT(buffer[i] == (unsigned char)i);
     }        
+    delete[] buffer;
     file.Close();
     NPT_File::RemoveFile(file.GetPath());
 
@@ -265,6 +286,7 @@ main(int argc, char** argv)
         for (unsigned int i=0; i<0x10007; i++) {
             NPT_ASSERT(buffer[i] == (unsigned char)i);
         }        
+        delete[] buffer;
         file.Close();
         NPT_File::RemoveFile(new_name);
     }

@@ -130,6 +130,7 @@ class NPT_SocketInterface
     virtual NPT_Result SetBlockingMode(bool blocking) = 0;
     virtual NPT_Result SetReadTimeout(NPT_Timeout timeout) = 0;
     virtual NPT_Result SetWriteTimeout(NPT_Timeout timeout) = 0;
+    virtual NPT_Result Cancel() = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -185,8 +186,7 @@ class NPT_Socket : public NPT_SocketInterface
 {
 public:
     // constructor and destructor
-    NPT_Socket(NPT_SocketInterface* delegate) :
-        m_SocketDelegate(delegate) {}
+    NPT_Socket(NPT_SocketInterface* delegate) : m_SocketDelegate(delegate) {}
     virtual ~NPT_Socket();
 
     // delegate NPT_SocketInterface methods
@@ -217,6 +217,9 @@ public:
     }                                                          
     NPT_Result SetWriteTimeout(NPT_Timeout timeout) {                      
         return m_SocketDelegate->SetWriteTimeout(timeout);                            
+    }                                                          
+    NPT_Result Cancel() {                      
+        return m_SocketDelegate->Cancel();                            
     }                                                          
 
 protected:

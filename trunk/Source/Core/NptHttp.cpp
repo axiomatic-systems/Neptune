@@ -1728,12 +1728,14 @@ NPT_HttpFileRequestHandler_DefaultFileTypeMap[] = {
 +---------------------------------------------------------------------*/
 NPT_HttpFileRequestHandler::NPT_HttpFileRequestHandler(const char* url_root,
                                                        const char* file_root,
-                                                       bool        auto_dir) :
+                                                       bool        auto_dir,
+                                                       const char* auto_index) :
     m_UrlRoot(url_root),
     m_FileRoot(file_root),
     m_DefaultMimeType("text/html"),
     m_UseDefaultFileTypeMap(true),
-    m_AutoDir(auto_dir)
+    m_AutoDir(auto_dir),
+    m_AutoIndex(auto_index)
 {
 }
 
@@ -1870,8 +1872,8 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
     // compute the filename
     NPT_String filename = m_FileRoot;
     NPT_String relative_path = NPT_Url::PercentDecode(request.GetUrl().GetPath().GetChars()+m_UrlRoot.GetLength());
-    filename += "/";
     filename += relative_path;
+    NPT_LOG_FINE_1("filename = %s", filename.GetChars());
     
     // get info about the file
     NPT_FileInfo info;
@@ -1879,47 +1881,63 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
 
     // check if this is a directory 
     if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) {
+        NPT_LOG_FINE("file is a DIRECTORY");
         if (m_AutoDir) {
-            // get the dir entries
-            NPT_List<NPT_String> entries;
-            NPT_File::ListDir(filename, entries);
-
-            NPT_String html;
-            html.Reserve(1024+128*entries.GetItemCount());
-
-            NPT_String html_dirname = NPT_HtmlEncode(relative_path, "<>&");
-            html += "<hmtl><head><title>Directory Listing for /";
-            html += html_dirname;
-            html += "</title></head><body>";
-            html += "<h2>Directory Listing for /";
-            html += html_dirname;
-            html += "</h2><hr><ul>\r\n";
-            NPT_String url_base_path = NPT_HtmlEncode(request.GetUrl().GetPath(), "<>&\"");
-            
-            for (NPT_List<NPT_String>::Iterator i = entries.GetFirstItem();
-                 i;
-                 ++i) {
-                 NPT_String url_filename = NPT_HtmlEncode(*i, "<>&");
-                 html += "<li><a href=\"";
-                 html += url_base_path;
-                 if (!url_base_path.EndsWith("/")) html += "/";
-                 html += url_filename;
-                 html += "\">";
-                 html +=url_filename;
+            if (m_AutoIndex.GetLength()) {
+                NPT_LOG_FINE("redirecting to auto-index");
+                filename += NPT_FilePath::Separator;
+                filename += m_AutoIndex;
+                if (NPT_File::Exists(filename)) {
+                    NPT_String location = m_UrlRoot+"/"+m_AutoIndex;
+                    response.SetStatus(302, "Found");
+                    response.GetHeaders().SetHeader(NPT_HTTP_HEADER_LOCATION, location);
+                } else {
+                    return NPT_ERROR_PERMISSION_DENIED;
+                }
+            } else {
+                NPT_LOG_FINE("doing auto-dir");
                 
-                 NPT_String full_path = filename;
-                 full_path += "/";
-                 full_path += *i;
-                 NPT_File::GetInfo(full_path, &info);
-                 if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) html += "/";
-                 
-                 html += "</a><br>\r\n";
-            }
-            html += "</ul></body></html>";
+                // get the dir entries
+                NPT_List<NPT_String> entries;
+                NPT_File::ListDir(filename, entries);
 
-            entity->SetContentType("text/html");
-            entity->SetInputStream(html);
-            return NPT_SUCCESS;
+                NPT_String html;
+                html.Reserve(1024+128*entries.GetItemCount());
+
+                NPT_String html_dirname = NPT_HtmlEncode(relative_path, "<>&");
+                html += "<hmtl><head><title>Directory Listing for /";
+                html += html_dirname;
+                html += "</title></head><body>";
+                html += "<h2>Directory Listing for /";
+                html += html_dirname;
+                html += "</h2><hr><ul>\r\n";
+                NPT_String url_base_path = NPT_HtmlEncode(request.GetUrl().GetPath(), "<>&\"");
+                
+                for (NPT_List<NPT_String>::Iterator i = entries.GetFirstItem();
+                     i;
+                     ++i) {
+                     NPT_String url_filename = NPT_HtmlEncode(*i, "<>&");
+                     html += "<li><a href=\"";
+                     html += url_base_path;
+                     if (!url_base_path.EndsWith("/")) html += "/";
+                     html += url_filename;
+                     html += "\">";
+                     html +=url_filename;
+                    
+                     NPT_String full_path = filename;
+                     full_path += "/";
+                     full_path += *i;
+                     NPT_File::GetInfo(full_path, &info);
+                     if (info.m_Type == NPT_FileInfo::FILE_TYPE_DIRECTORY) html += "/";
+                     
+                     html += "</a><br>\r\n";
+                }
+                html += "</ul></body></html>";
+
+                entity->SetContentType("text/html");
+                entity->SetInputStream(html);
+                return NPT_SUCCESS;
+            }
         } else {
             return NPT_ERROR_PERMISSION_DENIED;
         }
@@ -1929,6 +1947,7 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
     NPT_File file(filename);
     NPT_Result result = file.Open(NPT_FILE_OPEN_MODE_READ);
     if (NPT_FAILED(result)) {
+        NPT_LOG_FINE("file not found");
         return NPT_ERROR_NO_SUCH_ITEM;
     }
     NPT_InputStreamReference stream;

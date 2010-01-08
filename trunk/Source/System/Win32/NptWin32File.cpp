@@ -237,7 +237,7 @@ FILE*
 NPT_fsopen_utf8(const char* path, const char* mode, int sh_flags)
 {
     NPT_WIN32_USE_CHAR_CONVERSION;
-    return _wfsopen(NPT_WIN32_A2W(path), NPT_WIN32_A2W(mode + NPT_String(", ccs=UNICODE")), sh_flags);
+    return _wfsopen(NPT_WIN32_A2W(path), NPT_WIN32_A2W(mode), sh_flags);
 }
 #endif
 

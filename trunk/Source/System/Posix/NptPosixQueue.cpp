@@ -136,7 +136,7 @@ NPT_PosixQueue::Push(NPT_QueueItem* item, NPT_Timeout timeout)
 
         // wake up any thread that may be waiting to pop
         if (m_PoppersWaitingCount) { 
-            pthread_cond_signal(&m_CanPopCondition);
+            pthread_cond_broadcast(&m_CanPopCondition);
         }
     }
 
@@ -201,12 +201,76 @@ NPT_PosixQueue::Pop(NPT_QueueItem*& item, NPT_Timeout timeout)
     
     // wake up any thread that my be waiting to push
     if (m_MaxItems && (result == NPT_SUCCESS) && m_PushersWaitingCount) {
-        pthread_cond_signal(&m_CanPushCondition);
+        pthread_cond_broadcast(&m_CanPushCondition);
     }
 
     // unlock the mutex
     pthread_mutex_unlock(&m_Mutex);
  
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|       NPT_PosixQueue::Peek
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_PosixQueue::Peek(NPT_QueueItem*& item, NPT_Timeout timeout)
+{
+    struct timespec timed;
+    if (timeout != NPT_TIMEOUT_INFINITE) {
+        // get current time from system
+        struct timeval now;
+        if (gettimeofday(&now, NULL)) {
+            return NPT_FAILURE;
+        }
+
+        now.tv_usec += timeout * 1000;
+        if (now.tv_usec >= 1000000) {
+            now.tv_sec += now.tv_usec / 1000000;
+            now.tv_usec = now.tv_usec % 1000000;
+        }
+
+        // setup timeout
+        timed.tv_sec  = now.tv_sec;
+        timed.tv_nsec = now.tv_usec * 1000;
+    }
+
+    // lock the mutex that protects the list
+    if (pthread_mutex_lock(&m_Mutex)) {
+        return NPT_FAILURE;
+    }
+
+    NPT_Result result = NPT_SUCCESS;
+    NPT_List<NPT_QueueItem*>::Iterator head = m_Items.GetFirstItem();
+    if (timeout) {
+        while (!head) {
+            // no item in the list, wait for one
+            ++m_PoppersWaitingCount;
+            if (timeout == NPT_TIMEOUT_INFINITE) {
+                pthread_cond_wait(&m_CanPopCondition, &m_Mutex);
+                --m_PoppersWaitingCount;
+            } else {
+                int wait_res = pthread_cond_timedwait(&m_CanPopCondition, 
+                                                      &m_Mutex, 
+                                                      &timed);
+                --m_PoppersWaitingCount;
+                if (wait_res == ETIMEDOUT) {
+                    result = NPT_ERROR_TIMEOUT;
+                    break;
+                }
+            }
+
+            head = m_Items.GetFirstItem();
+        }
+    } else {
+        if (!head) result = NPT_ERROR_LIST_EMPTY;
+    }
+
+    item = head?*head:NULL;
+
+    // unlock the mutex
+    pthread_mutex_unlock(&m_Mutex);
+
     return result;
 }
 

@@ -88,6 +88,16 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         address = (SOCKADDR_IN*)&query[i].iiBroadcastAddress;
         NPT_IpAddress broadcast_address(ntohl(address->sin_addr.s_addr));
 
+        {
+            // broadcast address is incorrect
+            unsigned char addr[4];
+            for(int i=0; i<4; i++) {
+                addr[i] = (primary_address.AsBytes()[i] & netmask.AsBytes()[i]) | 
+                    ~netmask.AsBytes()[i];
+            }
+            broadcast_address.Set(addr);
+        }
+
         // ignore interfaces that are not up
         if (!(query[i].iiFlags & IFF_UP)) {
             continue;

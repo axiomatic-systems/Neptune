@@ -136,7 +136,7 @@ def Application(name, dir):
     cpp_path = GetIncludeDirs('Neptune')
     
     prog = env.Program(name, 
-                       GlobSources(dir, ['*.c', '*.cpp']), 
+                       GlobSources(dir, ['*.c', '*.cpp']) + env['NPT_EXTRA_EXECUTABLE_OBJECTS'],
                        LIBS=libs, CPPPATH=cpp_path)
     #env.Alias(name, prog)
     if env.has_key('NPT_EXECUTABLE_POST_PROCESSOR'):
@@ -149,6 +149,7 @@ Import("env")
 
 ### defaults
 env['NPT_EXTRA_LIBS'] = []
+env['NPT_EXTRA_EXECUTABLE_OBJECTS'] = []
 
 if (env['build_config'] == 'Debug'):
     env.AppendUnique(CPPDEFINES=['NPT_DEBUG', 'NPT_CONFIG_ENABLE_LOGGING'])
@@ -181,6 +182,6 @@ LibraryModule(name                  = 'Neptune',
 for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'MiniHttpServer']:
     Application(app, 'Source/Apps/'+app)
     
-for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1']:
+for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1', 'Time1', 'Sockets1', 'FileTest1', 'FileTest2']:
     Application(test+'Test', 'Source/Tests/'+test)
 

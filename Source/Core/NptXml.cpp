@@ -2345,7 +2345,7 @@ NPT_XmlSerializer::OutputEscapedString(const char* text, bool attribute)
         }
         if (insert) {
             // output pending chars
-            if (start != text) m_Output->Write(start, (NPT_Size)(text-start));
+            if (start != text) m_Output->WriteFully(start, (NPT_Size)(text-start));
             m_Output->WriteString(insert);
             start = ++text;
         } else {
@@ -2353,7 +2353,7 @@ NPT_XmlSerializer::OutputEscapedString(const char* text, bool attribute)
         }
     }
     if (start != text) {
-        m_Output->Write(start, (NPT_Size)(text-start));
+        m_Output->WriteFully(start, (NPT_Size)(text-start));
     }
 
     return NPT_SUCCESS;
@@ -2377,7 +2377,7 @@ NPT_XmlSerializer::OutputIndentation(bool start)
     }
 
     // print the indentation prefix
-    m_Output->Write(m_IndentationPrefix.GetChars(), prefix_length);
+    m_Output->WriteFully(m_IndentationPrefix.GetChars(), prefix_length);
 }
 
 /*----------------------------------------------------------------------
@@ -2411,7 +2411,7 @@ NPT_XmlSerializer::EndElement(const char* prefix, const char* name)
         // this element has no children
         m_ElementPending = false;
         if (m_ShrinkEmptyElements) {
-            return m_Output->Write("/>", 2);
+            return m_Output->WriteFully("/>", 2);
         } else {
             m_Output->Write(">",1);
         }
@@ -2419,7 +2419,7 @@ NPT_XmlSerializer::EndElement(const char* prefix, const char* name)
 
     if (m_Indentation && !m_ElementHasText) OutputIndentation(false);
     m_ElementHasText = false;
-    m_Output->Write("</", 2);
+    m_Output->WriteFully("</", 2);
     if (prefix && prefix[0]) {
         m_Output->WriteString(prefix);
         m_Output->Write(":", 1);
@@ -2440,7 +2440,7 @@ NPT_XmlSerializer::Attribute(const char* prefix, const char* name, const char* v
         m_Output->Write(":", 1);
     }
     m_Output->WriteString(name);
-    m_Output->Write("=\"", 2);
+    m_Output->WriteFully("=\"", 2);
     OutputEscapedString(value, true);
     return m_Output->Write("\"", 1);
 }
@@ -2464,9 +2464,9 @@ NPT_XmlSerializer::CdataSection(const char* data)
 {
     ProcessPending();
     m_ElementHasText = true;
-    m_Output->Write("<![CDATA[", 9);
+    m_Output->WriteFully("<![CDATA[", 9);
     m_Output->WriteString(data);
-    return m_Output->Write("]]>", 3);
+    return m_Output->WriteFully("]]>", 3);
 }
 
 /*----------------------------------------------------------------------
@@ -2476,9 +2476,9 @@ NPT_Result
 NPT_XmlSerializer::Comment(const char* comment)
 {
     ProcessPending();
-    m_Output->Write("<!--", 4);
+    m_Output->WriteFully("<!--", 4);
     m_Output->WriteString(comment);
-    return m_Output->Write("-->", 3);
+    return m_Output->WriteFully("-->", 3);
 }
 
 /*----------------------------------------------------------------------

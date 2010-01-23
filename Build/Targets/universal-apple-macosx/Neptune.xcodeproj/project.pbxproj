@@ -4224,6 +4224,7 @@
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
@@ -4257,8 +4258,9 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -4270,6 +4272,7 @@
 		F912B68A0B8EB12700C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4302,6 +4305,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx10.5;
+				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -4319,7 +4323,6 @@
 					NPT_CONFIG_ENABLE_ZIP,
 					NPT_CONFIG_ENABLE_TLS,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PRODUCT_NAME = Neptune;
 			};
 			name = Debug;
@@ -4332,7 +4335,6 @@
 					NPT_CONFIG_ENABLE_ZIP,
 					NPT_CONFIG_ENABLE_TLS,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				PRODUCT_NAME = Neptune;
 			};
 			name = Release;

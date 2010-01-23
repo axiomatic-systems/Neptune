@@ -1197,7 +1197,7 @@ NPT_Result
 NPT_LogTcpHandler::Connect()
 {
     /* create a socket */
-    NPT_Socket tcp_socket = new NPT_TcpClientSocket();
+    NPT_TcpClientSocket tcp_socket;
 
     /* connect to the host */
     NPT_IpAddress ip_address;

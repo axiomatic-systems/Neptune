@@ -34,6 +34,12 @@
 +---------------------------------------------------------------------*/
 #include "NptSimpleMessageQueue.h"
 #include "NptDebug.h"
+#include "NptLogging.h"
+
+/*----------------------------------------------------------------------
+|   logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.message-queue")
 
 /*----------------------------------------------------------------------
 |   NPT_SimpleMessageCapsule
@@ -81,6 +87,8 @@ NPT_Result
 NPT_SimpleMessageQueue::PumpMessage(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
 {
     NPT_SimpleMessageCapsule* capsule;
+    
+    NPT_LOG_FINEST_1("popping message from queue, timeout=%d", timeout);
     NPT_Result result = m_Queue.Pop(capsule, timeout);
     if (NPT_SUCCEEDED(result) && capsule) {
         if (capsule->m_Handler && capsule->m_Message) {
@@ -88,7 +96,9 @@ NPT_SimpleMessageQueue::PumpMessage(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINIT
         }
         delete capsule->m_Message;
         delete capsule;
-    } 
+    } else {
+        NPT_LOG_FINEST_1("m_Queue.Pop() returned %d", result);
+    }
 
     return result;
 }

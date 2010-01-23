@@ -146,6 +146,7 @@ const int NPT_ERROR_OUT_OF_RANGE        = NPT_ERROR_BASE_GENERAL - 17;
 const int NPT_ERROR_OUT_OF_RESOURCES    = NPT_ERROR_BASE_GENERAL - 18;
 const int NPT_ERROR_NOT_ENOUGH_SPACE    = NPT_ERROR_BASE_GENERAL - 19;
 const int NPT_ERROR_INTERRUPTED         = NPT_ERROR_BASE_GENERAL - 20;
+const int NPT_ERROR_CANCELLED           = NPT_ERROR_BASE_GENERAL - 21;
 
 /* standard error codes                                  */
 /* these are special codes to convey an errno            */

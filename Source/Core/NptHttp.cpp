@@ -1306,19 +1306,22 @@ NPT_HttpServer::Loop()
         if (NPT_SUCCEEDED(result)) {
             // send a response
             result = RespondToClient(input, output, context);
-            NPT_LOG_FINE_2("ResponToClient returned %d", 
+            NPT_LOG_FINE_2("ResponToClient returned %d (%s)", 
                            result,
                            NPT_ResultText(result));
 
             // release the stream references so that the socket can be closed
             input  = NULL;
             output = NULL;
-        }
-        
-        // if there was an error, wait a short time to avoid spinning
-        if (NPT_FAILED(result) && result != NPT_ERROR_TERMINATED) {
-            NPT_LOG_FINE("sleeping before restarting the loop");
-            NPT_System::Sleep(1.0);
+        } else {
+            NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)",
+                          result,
+                          NPT_ResultText(result));
+            // if there was an error, wait a short time to avoid spinning
+            if (result != NPT_ERROR_TERMINATED) {
+                NPT_LOG_FINE("sleeping before restarting the loop");
+                NPT_System::Sleep(1.0);
+            }
         }
     } while (result != NPT_ERROR_TERMINATED);
     

@@ -227,7 +227,7 @@ NPT_File::GetInfo(const char* path, NPT_FileInfo* info)
     NPT_String _path = path;
     _path.TrimRight("\\/");
     // keep a separator at the end for drive names such as C:<backslash>
-    if (NPT_StringLength(_path) ==  2 && path[1] == ':') {
+    if (NPT_StringLength(_path) ==  2 && _path[1] == ':') {
         _path += NPT_FilePath::Separator;
     }
 #else

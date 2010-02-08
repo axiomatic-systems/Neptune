@@ -52,7 +52,7 @@ NPT_DynamicLibrary::Load(const char* name, NPT_Flags flags, NPT_DynamicLibrary*&
     library = NULL;
     
     // compute the mode
-    int mode = 0;
+    int mode = RTLD_LOCAL;
     if (flags & NPT_DYANMIC_LIBRARY_LOAD_FLAG_NOW) {
         mode |= RTLD_NOW;
     } else {

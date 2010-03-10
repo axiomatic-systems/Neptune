@@ -388,6 +388,7 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component);
 
 /* GBG added */
 EXP_FUNC void ssl_get_cert_fingerprints(const SSL* ssl, unsigned char* md5, unsigned char* sha1);
+EXP_FUNC void ssl_get_cert_validity_dates(const SSL* ssl, SSL_DateTime* not_before, SSL_DateTime* not_after);
 
 /**
  * @brief Force the client to perform its handshake again.

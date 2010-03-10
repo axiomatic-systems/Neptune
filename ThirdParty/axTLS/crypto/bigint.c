@@ -508,8 +508,8 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
 static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
 {
     int i = biR->size - 1;
-    (void)ctx; /* unused */
     long_comp r = 0;
+    (void)ctx; /* unused */
 
     check(biR);
 

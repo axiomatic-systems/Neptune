@@ -99,7 +99,8 @@ public:
                       const unsigned char* key_data,
                       NPT_Size             key_data_size,
                       const char*          password);
-                   
+   NPT_Result AddTrustAnchor(const unsigned char* ta_data,
+                             NPT_Size             ta_data_size);
       
 protected:
     NPT_TlsContextImpl* m_Impl;

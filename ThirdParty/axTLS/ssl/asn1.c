@@ -197,27 +197,37 @@ int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx)
 /**
  * Get the time of a certificate. Ignore hours/minutes/seconds.
  */
-static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
+static int asn1_get_utc_time(const uint8_t *buf, int *offset, SSL_DateTime *t)
 {
     int ret = X509_NOT_OK, len, t_offset;
-    struct tm tm;
-
-    if (buf[(*offset)++] != ASN1_UTC_TIME)
+    uint8_t time_encoding;
+    
+    memset(t, 0, sizeof(*t));
+    time_encoding = buf[(*offset)++];
+    if (time_encoding != ASN1_UTC_TIME && time_encoding != ASN1_GENERALIZED_TIME) /* GBG */
         goto end_utc_time;
     len = get_asn1_length(buf, offset);
     t_offset = *offset;
 
-    memset(&tm, 0, sizeof(struct tm));
-    tm.tm_year = (buf[t_offset] - '0')*10 + (buf[t_offset+1] - '0');
+    if (time_encoding == ASN1_UTC_TIME) {
+        t->year = (buf[t_offset] - '0')*10 + (buf[t_offset+1] - '0');
 
-    if (tm.tm_year <= 50)    /* 1951-2050 thing */
-    {
-        tm.tm_year += 100;
+        if (t->year <= 50)    /* 1951-2050 thing */
+        {
+            t->year += 100;
+        }
+        t->year += 1900;
+        t_offset += 2;
+    } else {
+        t->year = (buf[t_offset  ] - '0')*1000 +
+                  (buf[t_offset+1] - '0')*100  + 
+                  (buf[t_offset+2] - '0')*10   + 
+                  (buf[t_offset+3] - '0');
+        t_offset += 4;
     }
 
-    tm.tm_mon = (buf[t_offset+2] - '0')*10 + (buf[t_offset+3] - '0') - 1;
-    tm.tm_mday = (buf[t_offset+4] - '0')*10 + (buf[t_offset+5] - '0');
-    *t = mktime(&tm);
+    t->month = (buf[t_offset  ] - '0')*10 + (buf[t_offset+1] - '0');
+    t->day   = (buf[t_offset+2] - '0')*10 + (buf[t_offset+3] - '0');
     *offset += len;
     ret = X509_OK;
 
@@ -264,12 +274,10 @@ static int asn1_get_oid_x520(const uint8_t *buf, int *offset)
 
     /* expect a sequence of 2.5.4.[x] where x is a one of distinguished name 
        components we are interested in. */
-    if (len == 3 && buf[(*offset)++] == 0x55 && buf[(*offset)++] == 0x04)
-        dn_type = buf[(*offset)++];
-    else
-    {
-        *offset += len;     /* skip over it */
-    }
+    if (len == 3 && buf[*offset] == 0x55 && buf[*offset+1] == 0x04) { /* GBG */
+        dn_type = buf[*offset+2];
+    } 
+    *offset += len;     /* skip over it */
 
 end_oid:
     return dn_type;
@@ -284,9 +292,11 @@ static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
 
     /* some certs have this awful crud in them for some reason */
     if (buf[*offset] != ASN1_PRINTABLE_STR &&  
-            buf[*offset] != ASN1_TELETEX_STR &&  
-            buf[*offset] != ASN1_IA5_STR &&  
-            buf[*offset] != ASN1_UNICODE_STR)
+        buf[*offset] != ASN1_TELETEX_STR   &&  
+        buf[*offset] != ASN1_IA5_STR       &&  
+        buf[*offset] != ASN1_UNICODE_STR   &&
+        buf[*offset] != ASN1_UTF8_STR      &&
+        buf[*offset] != ASN1_UNIVERSAL_STR)
         goto end_pnt_str;
 
         (*offset)++;

@@ -88,7 +88,7 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
             { 
                 int cert_res;
                 cert_res = x509_verify(
-                        ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
+                        ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx, NULL);
                 ret = (cert_res == 0) ? SSL_OK : SSL_X509_ERROR(cert_res);
             }
             break;

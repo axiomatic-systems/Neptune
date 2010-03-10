@@ -59,12 +59,12 @@ TestPrivateKeys()
 }
 
 int 
-main(int /*argc*/, char** /*argv*/)
+main(int argc, char** argv)
 {
     TestPrivateKeys();
     
     /* test a connection */
-    const char* hostname = "koala.bok.net";
+    const char* hostname = argc==2?argv[1]:"koala.bok.net";
     printf("[1] Connecting to %s...\n", hostname);
     NPT_Socket* client_socket = new NPT_TcpClientSocket();
     NPT_IpAddress server_ip;
@@ -90,6 +90,7 @@ main(int /*argc*/, char** /*argv*/)
         printf("!ERROR\n");
         return 1;
     }
+
     NPT_DataBuffer session_id;
     result = session.GetSessionId(session_id);
     CHECK(result == NPT_SUCCESS);
@@ -112,9 +113,28 @@ main(int /*argc*/, char** /*argv*/)
     printf("  Common Name         = %s\n", cert_info.issuer.common_name.GetChars());
     printf("  Organization        = %s\n", cert_info.issuer.organization.GetChars());
     printf("  Organizational Name = %s\n", cert_info.issuer.organizational_name.GetChars());
+    printf("Issue Date:      %d/%d/%d %02d:%02d:%02d\n", cert_info.issue_date.m_Year,
+                                                    cert_info.issue_date.m_Month,
+                                                    cert_info.issue_date.m_Day,
+                                                    cert_info.issue_date.m_Hours,
+                                                    cert_info.issue_date.m_Minutes,
+                                                    cert_info.issue_date.m_Seconds);
+    printf("Expiration Date: %d/%d/%d %02d:%02d:%02d\n", cert_info.expiration_date.m_Year,
+                                                    cert_info.expiration_date.m_Month,
+                                                    cert_info.expiration_date.m_Day,
+                                                    cert_info.expiration_date.m_Hours,
+                                                    cert_info.expiration_date.m_Minutes,
+                                                    cert_info.expiration_date.m_Seconds);
     printf("\n");
     printf("[7] Cipher Type = %d (%s)\n", session.GetCipherSuiteId(), GetCipherSuiteName(session.GetCipherSuiteId()));
-    
+
+    result = session.VerifyPeerCertificate();
+    printf("[4] Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
+    if (NPT_FAILED(result)) {
+        printf("!ERROR\n");
+        return 1;
+    }
+
     NPT_InputStreamReference  ssl_input;
     NPT_OutputStreamReference ssl_output;
     session.GetInputStream(ssl_input);

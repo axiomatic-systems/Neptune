@@ -37,19 +37,29 @@
 +---------------------------------------------------------------------*/
 #include "NptConfig.h"
 #include "NptStreams.h"
+#include "NptTime.h"
 
 /*----------------------------------------------------------------------
 |   error codes
 +---------------------------------------------------------------------*/
-const NPT_Result NPT_ERROR_INVALID_PASSWORD             = (NPT_ERROR_BASE_TLS-1);
-const NPT_Result NPT_ERROR_TLS_INVALID_HANDSHAKE        = (NPT_ERROR_BASE_TLS-2);
-const NPT_Result NPT_ERROR_TLS_INVALID_PROTOCOL_MESSAGE = (NPT_ERROR_BASE_TLS-3);
-const NPT_Result NPT_ERROR_TLS_INVALID_HMAC             = (NPT_ERROR_BASE_TLS-4);
-const NPT_Result NPT_ERROR_TLS_INVALID_VERSION          = (NPT_ERROR_BASE_TLS-5);
-const NPT_Result NPT_ERROR_TLS_INVALID_SESSION          = (NPT_ERROR_BASE_TLS-6);
-const NPT_Result NPT_ERROR_TLS_NO_CIPHER                = (NPT_ERROR_BASE_TLS-7);
-const NPT_Result NPT_ERROR_TLS_BAD_CERTIFICATE          = (NPT_ERROR_BASE_TLS-8);
-const NPT_Result NPT_ERROR_INVALID_KEY                  = (NPT_ERROR_BASE_TLS-9);
+const NPT_Result NPT_ERROR_INVALID_PASSWORD                     = (NPT_ERROR_BASE_TLS-1);
+const NPT_Result NPT_ERROR_TLS_INVALID_HANDSHAKE                = (NPT_ERROR_BASE_TLS-2);
+const NPT_Result NPT_ERROR_TLS_INVALID_PROTOCOL_MESSAGE         = (NPT_ERROR_BASE_TLS-3);
+const NPT_Result NPT_ERROR_TLS_INVALID_HMAC                     = (NPT_ERROR_BASE_TLS-4);
+const NPT_Result NPT_ERROR_TLS_INVALID_VERSION                  = (NPT_ERROR_BASE_TLS-5);
+const NPT_Result NPT_ERROR_TLS_INVALID_SESSION                  = (NPT_ERROR_BASE_TLS-6);
+const NPT_Result NPT_ERROR_TLS_NO_CIPHER                        = (NPT_ERROR_BASE_TLS-7);
+const NPT_Result NPT_ERROR_TLS_BAD_CERTIFICATE                  = (NPT_ERROR_BASE_TLS-8);
+const NPT_Result NPT_ERROR_INVALID_KEY                          = (NPT_ERROR_BASE_TLS-9);
+const NPT_Result NPT_ERROR_CERTIFICATE_FAILURE                  = (NPT_ERROR_BASE_TLS-10);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NO_TRUST_ANCHOR      = (NPT_ERROR_BASE_TLS-11);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_BAD_SIGNATURE        = (NPT_ERROR_BASE_TLS-12);      
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NOT_YET_VALID        = (NPT_ERROR_BASE_TLS-13);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_EXPIRED              = (NPT_ERROR_BASE_TLS-14);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED          = (NPT_ERROR_BASE_TLS-15);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_CHAIN        = (NPT_ERROR_BASE_TLS-16);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_UNSUPPORTED_DIGEST   = (NPT_ERROR_BASE_TLS-17);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_PRIVATE_KEY  = (NPT_ERROR_BASE_TLS-18);
 
 /*----------------------------------------------------------------------
 |   constants
@@ -106,20 +116,22 @@ typedef NPT_Reference<NPT_TlsContext> NPT_TlsContextReference;
 +---------------------------------------------------------------------*/
 struct NPT_TlsCertificateInfo
 {
-    struct {
+    struct _subject {
         NPT_String common_name;
         NPT_String organization;
         NPT_String organizational_name;
     } subject;
-    struct {
+    struct _issuer {
         NPT_String common_name;
         NPT_String organization;
         NPT_String organizational_name;
     } issuer;
-    struct {
+    struct _fingerprint {
         unsigned char sha1[20];
         unsigned char md5[16];
     } fingerprint;
+    NPT_DateTime issue_date;
+    NPT_DateTime expiration_date;
 };
 
 /*----------------------------------------------------------------------
@@ -133,9 +145,10 @@ public:
                          NPT_OutputStreamReference& output);
    ~NPT_TlsClientSession();
     NPT_Result Handshake();
+    NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& info);
+    NPT_Result VerifyPeerCertificate();
     NPT_Result GetSessionId(NPT_DataBuffer& session_id);
     NPT_UInt32 GetCipherSuiteId();
-    NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& info);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
     

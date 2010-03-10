@@ -167,11 +167,13 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
     SSL_CTX *ssl_ctx = (SSL_CTX *)calloc(1, sizeof (SSL_CTX));
     ssl_ctx->options = options;
 
+#if 0 /* GBG: no automatic cert loading */
     if (load_key_certs(ssl_ctx) < 0)
     {
         free(ssl_ctx);  /* can't load our key/certificate pair, so die */
         return NULL;
     }
+#endif
 
 #ifndef CONFIG_SSL_SKELETON_MODE
     ssl_ctx->num_sessions = num_sessions;
@@ -467,6 +469,16 @@ EXP_FUNC void ssl_get_cert_fingerprints(const SSL* ssl, unsigned char* md5, unsi
     memcpy(sha1, ssl->x509_ctx->fingerprint.sha1, SHA1_SIZE);
 }
 
+EXP_FUNC void ssl_get_cert_validity_dates(const SSL* ssl, SSL_DateTime* not_before, SSL_DateTime* not_after)
+{
+    if (ssl->x509_ctx == NULL) {
+        memset(not_before, 0, sizeof(SSL_DateTime));
+        memset(not_after, 0, sizeof(SSL_DateTime));
+        return;
+    }
+    *not_before = ssl->x509_ctx->not_before;
+    *not_after  = ssl->x509_ctx->not_after;
+}
 /* /GBG added */
 
 #endif
@@ -802,7 +814,7 @@ static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
     uint8_t buf[128];   /* needs to be > 13+32+32 in size */
-    strcpy((char *)buf, "master secret");
+    memcpy(buf, "master secret", 13);
     memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], ssl->dc->server_random, SSL_RANDOM_SIZE);
     prf(premaster_secret, SSL_SECRET_SIZE, buf, 77, ssl->dc->master_secret,
@@ -816,7 +828,7 @@ static void generate_key_block(uint8_t *client_random, uint8_t *server_random,
         uint8_t *master_secret, uint8_t *key_block, int key_block_size)
 {
     uint8_t buf[128];
-    strcpy((char *)buf, "key expansion");
+    memcpy(buf, "key expansion", 13);
     memcpy(&buf[13], server_random, SSL_RANDOM_SIZE);
     memcpy(&buf[45], client_random, SSL_RANDOM_SIZE);
     prf(master_secret, SSL_SECRET_SIZE, buf, 77, key_block, key_block_size);
@@ -835,7 +847,7 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 
     if (label)
     {
-        strcpy((char *)q, label);
+        memcpy(q, label, (int)strlen(label));
         q += strlen(label);
     }
 
@@ -1698,7 +1710,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
     int ret;
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
+    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx, NULL);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (ret)        /* modify into an SSL error type */

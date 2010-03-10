@@ -54,6 +54,7 @@ static uint64_t rng_num;
 static int rng_ref_count;
 const char * const unsupported_str = "Error: Feature not supported\n";
 
+#if 0 /* GBG */
 #ifndef CONFIG_SSL_SKELETON_MODE
 /** 
  * Retrieve a file and put it into memory
@@ -90,6 +91,7 @@ int get_file(const char *filename, uint8_t **buf)
     return filesize;
 }
 #endif
+#endif 
 
 /**
  * Initialise the Random Number Generator engine.
@@ -114,8 +116,8 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
                            PROV_RSA_FULL, 
                            CRYPT_NEWKEYSET))
             {
-                printf("CryptoLib: %x\n", unsupported_str, GetLastError());
-                exit(1);
+                /*printf("CryptoLib: %x\n", unsupported_str, GetLastError());
+                exit(1);*/
             }
         }
 #else   

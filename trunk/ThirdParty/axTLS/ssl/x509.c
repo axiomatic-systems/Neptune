@@ -273,7 +273,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
  * - The certificate chain is valid.
  * - The signature of the certificate is valid.
  */
-int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert) 
+int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, const SSL_DateTime* now) 
 {
     int ret = X509_OK, i = 0;
     bigint *cert_sig;
@@ -281,8 +281,8 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     BI_CTX *ctx = NULL;
     bigint *mod = NULL, *expn = NULL;
     int match_ca_cert = 0;
-    struct timeval tv;
     uint8_t is_self_signed = 0;
+    SSL_DateTime now_dt;
 
     if (cert == NULL)
     {
@@ -300,17 +300,21 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         expn = cert->rsa_ctx->e;
     }
 
-    gettimeofday(&tv, NULL);
+    /* if the time was not passed in, get it now */
+    if (now == NULL) {
+        SSL_DateTime_Now(&now_dt);
+        now = &now_dt;
+    }
 
     /* check the not before date */
-    if (tv.tv_sec < cert->not_before)
+    if (SSL_DateTime_Before(now, &cert->not_before))
     {
         ret = X509_VFY_ERROR_NOT_YET_VALID;
         goto end_verify;
     }
 
     /* check the not after date */
-    if (tv.tv_sec > cert->not_after)
+    if (SSL_DateTime_Before(&cert->not_after, now))
     {
         ret = X509_VFY_ERROR_EXPIRED;
         goto end_verify;
@@ -391,7 +395,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     /* go down the certificate chain using recursion. */
     if (next_cert != NULL)
     {
-        ret = x509_verify(ca_cert_ctx, next_cert);
+        ret = x509_verify(ca_cert_ctx, next_cert, now);
     }
 
 end_verify:

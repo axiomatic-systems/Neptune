@@ -39,6 +39,7 @@
 #include "NptLogging.h"
 #include "NptUtils.h"
 #include "NptSockets.h"
+#include "NptSystem.h"
 
 #include "ssl.h"
 
@@ -56,6 +57,46 @@ const unsigned int NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE = 16;
 |   types
 +---------------------------------------------------------------------*/
 typedef NPT_Reference<NPT_TlsSessionImpl> NPT_TlsSessionImplReference;
+
+/*----------------------------------------------------------------------
+|   SSL_DateTime_Before
++---------------------------------------------------------------------*/
+int
+SSL_DateTime_Before(const SSL_DateTime* t1, const SSL_DateTime* t2)
+{
+    if (t1->year == t2->year) {
+        if (t1->month == t2->month) {
+            if (t1->day == t2->day) {
+                return t1->hours*3600+t1->minutes*60+t1->seconds < 
+                       t2->hours*3600+t2->minutes*60+t2->seconds ? 1 : 0;
+            } else {
+                return t1->day < t2->day ? 1 : 0;
+            }
+        } else {
+            return t1->month < t2->month ? 1 : 0;
+        }
+    } else {
+        return t1->year < t2->year ? 1 : 0;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   SSL_DateTime_Now
++---------------------------------------------------------------------*/
+void
+SSL_DateTime_Now(SSL_DateTime* now)
+{
+    NPT_TimeStamp ts;
+    NPT_System::GetCurrentTimeStamp(ts);
+    NPT_DateTime dt;
+    dt.FromTimeStamp(ts);
+    now->year    = dt.m_Year;
+    now->month   = dt.m_Month;
+    now->day     = dt.m_Day;
+    now->hours   = dt.m_Hours;
+    now->minutes = dt.m_Minutes;
+    now->seconds = dt.m_Seconds;
+}
 
 /*----------------------------------------------------------------------
 |   NPT_Tls_MapResult
@@ -76,6 +117,16 @@ NPT_Tls_MapResult(int err)
         case SSL_ERROR_NO_CIPHER:         return NPT_ERROR_TLS_NO_CIPHER;
         case SSL_ERROR_BAD_CERTIFICATE:   return NPT_ERROR_TLS_BAD_CERTIFICATE;
         case SSL_ERROR_INVALID_KEY:       return NPT_ERROR_INVALID_KEY;
+        case SSL_X509_ERROR(X509_OK):                           return NPT_SUCCESS;
+        case SSL_X509_ERROR(X509_NOT_OK):                       return NPT_ERROR_CERTIFICATE_FAILURE;
+        case SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT):    return NPT_ERROR_TLS_CERTIFICATE_NO_TRUST_ANCHOR;
+        case SSL_X509_ERROR(X509_VFY_ERROR_BAD_SIGNATURE):      return NPT_ERROR_TLS_CERTIFICATE_BAD_SIGNATURE;      
+        case SSL_X509_ERROR(X509_VFY_ERROR_NOT_YET_VALID):      return NPT_ERROR_TLS_CERTIFICATE_NOT_YET_VALID;
+        case SSL_X509_ERROR(X509_VFY_ERROR_EXPIRED):            return NPT_ERROR_TLS_CERTIFICATE_EXPIRED;
+        case SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED):        return NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED;
+        case SSL_X509_ERROR(X509_VFY_ERROR_INVALID_CHAIN):      return NPT_ERROR_TLS_CERTIFICATE_INVALID_CHAIN;
+        case SSL_X509_ERROR(X509_VFY_ERROR_UNSUPPORTED_DIGEST): return NPT_ERROR_TLS_CERTIFICATE_UNSUPPORTED_DIGEST;
+        case SSL_X509_ERROR(X509_INVALID_PRIV_KEY):             return NPT_ERROR_TLS_CERTIFICATE_INVALID_PRIVATE_KEY;
         case 0:                           return NPT_SUCCESS;
         default:                          return NPT_FAILURE;
     }
@@ -180,6 +231,7 @@ public:
     
     // methods
     NPT_Result Handshake();
+    NPT_Result VerifyPeerCertificate();
     NPT_Result GetSessionId(NPT_DataBuffer& session_id);
     NPT_UInt32 GetCipherSuiteId();
     NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info);
@@ -202,6 +254,22 @@ NPT_TlsSessionImpl::Handshake()
     }
     
     int result = ssl_handshake_status(m_SSL);
+    return NPT_Tls_MapResult(result);
+}
+
+
+/*----------------------------------------------------------------------
+|   NPT_TlsSessionImpl::VerifyPeerCertificate
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_TlsSessionImpl::VerifyPeerCertificate()
+{
+    if (m_SSL == NULL) {
+        // no handshake done
+        return 0;
+    }
+
+    int result = ssl_verify_cert(m_SSL);
     return NPT_Tls_MapResult(result);
 }
 
@@ -243,6 +311,12 @@ NPT_TlsSessionImpl::GetCipherSuiteId()
 NPT_Result
 NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
 {
+    if (m_SSL == NULL) {
+        // no handshake done
+        NPT_SetMemory(&cert_info, 0, sizeof(cert_info));
+        return NPT_ERROR_INVALID_STATE;
+    }
+
     cert_info.subject.common_name         = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_COMMON_NAME);
     cert_info.subject.organization        = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_ORGANIZATION);
     cert_info.subject.organizational_name = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_ORGANIZATIONAL_NAME);
@@ -251,7 +325,25 @@ NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
     cert_info.issuer.organizational_name  = ssl_get_cert_dn(m_SSL, SSL_X509_CA_CERT_ORGANIZATIONAL_NAME);
     
     ssl_get_cert_fingerprints(m_SSL, cert_info.fingerprint.md5, cert_info.fingerprint.sha1);
-    
+    SSL_DateTime not_before, not_after;
+    ssl_get_cert_validity_dates(m_SSL, &not_before, &not_after);
+    cert_info.issue_date.m_Year        = not_before.year;
+    cert_info.issue_date.m_Month       = not_before.month;
+    cert_info.issue_date.m_Day         = not_before.day;
+    cert_info.issue_date.m_Hours       = not_before.hours;
+    cert_info.issue_date.m_Minutes     = not_before.minutes;
+    cert_info.issue_date.m_Seconds     = not_before.seconds;
+    cert_info.issue_date.m_NanoSeconds = 0;
+    cert_info.issue_date.m_TimeZone    = 0;
+    cert_info.expiration_date.m_Year        = not_after.year;
+    cert_info.expiration_date.m_Month       = not_after.month;
+    cert_info.expiration_date.m_Day         = not_after.day;
+    cert_info.expiration_date.m_Hours       = not_after.hours;
+    cert_info.expiration_date.m_Minutes     = not_after.minutes;
+    cert_info.expiration_date.m_Seconds     = not_after.seconds;
+    cert_info.expiration_date.m_NanoSeconds = 0;
+    cert_info.expiration_date.m_TimeZone    = 0;
+
     return NPT_SUCCESS;
 }
 
@@ -440,6 +532,15 @@ NPT_Result
 NPT_TlsClientSession::Handshake()
 {
     return m_Impl->Handshake();
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TlsClientSession::VerifyPeerCertificate
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_TlsClientSession::VerifyPeerCertificate()
+{
+    return m_Impl->VerifyPeerCertificate();
 }
 
 /*----------------------------------------------------------------------

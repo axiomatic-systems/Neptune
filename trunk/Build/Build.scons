@@ -153,6 +153,8 @@ env['NPT_EXTRA_EXECUTABLE_OBJECTS'] = []
 
 if (env['build_config'] == 'Debug'):
     env.AppendUnique(CPPDEFINES=['NPT_DEBUG', 'NPT_CONFIG_ENABLE_LOGGING'])
+else:
+    env.AppendUnique(CPPDEFINES=['NDEBUG', 'NPT_CONFIG_ENABLE_LOGGING'])
 
 ### try to read in any target specific configuration
 target_config_file = env.GetBuildPath('#/Build/Targets/'+env['target']+'/Config.scons')
@@ -168,20 +170,27 @@ LibraryModule(name                  = 'Zlib',
               source_root           = '.',
               build_source_dirs     = ['ThirdParty/zlib-1.2.3'])
 
+LibraryModule(name                  = 'axTLS',
+              source_root           = '.',
+              build_source_dirs     = ['ThirdParty/axTLS/crypto', 'ThirdParty/axTLS/ssl', 'ThirdParty/axTLS/config/Generic'],
+              excluded_files				= ['gen_cert.c'])
 
 extra_cpp_flags = []
 if not env.has_key('NPT_CONFIG_NO_ZIP'):
     extra_cpp_flags = ['NPT_CONFIG_ENABLE_ZIP']
     
+if not env.has_key('NPT_CONFIG_NO_SSL'):
+    extra_cpp_flags += ['NPT_CONFIG_ENABLE_TLS']
+    
 LibraryModule(name                  = 'Neptune',
               build_source_dirs     = ['Core'],
               build_source_files    = env['NPT_SYSTEM_SOURCES'],
               extra_cpp_defines     = extra_cpp_flags,
-              linked_modules        = env['NPT_EXTRA_LIBS']+['Zlib'])
+              linked_modules        = env['NPT_EXTRA_LIBS']+['Zlib']+['axTLS'])
            
 for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'MiniHttpServer']:
     Application(app, 'Source/Apps/'+app)
     
-for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1', 'Time1', 'Sockets1', 'FileTest1', 'FileTest2']:
+for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1', 'Time1', 'Tls1', 'Sockets1', 'FileTest1', 'FileTest2']:
     Application(test+'Test', 'Source/Tests/'+test)
 

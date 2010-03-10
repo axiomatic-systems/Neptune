@@ -141,10 +141,12 @@ public:
         m_SSL_CTX(ssl_ctx_new(SSL_SERVER_VERIFY_LATER, NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE)) {};
     ~NPT_TlsContextImpl() { ssl_ctx_free(m_SSL_CTX); }
     
-   NPT_Result LoadKey(NPT_TlsKeyFormat     key_format, 
-                      const unsigned char* key_data,
-                      NPT_Size             key_data_size,
-                      const char*          password);
+    NPT_Result LoadKey(NPT_TlsKeyFormat     key_format, 
+                       const unsigned char* key_data,
+                       NPT_Size             key_data_size,
+                       const char*          password);
+    NPT_Result AddTrustAnchor(const unsigned char* ta_data,
+                              NPT_Size             ta_data_size);
     
     SSL_CTX* m_SSL_CTX;
 };
@@ -167,6 +169,17 @@ NPT_TlsContextImpl::LoadKey(NPT_TlsKeyFormat     key_format,
     }
     
     int result = ssl_obj_memory_load(m_SSL_CTX, object_type, key_data, key_data_size, password);
+    return NPT_Tls_MapResult(result);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TlsContextImpl::AddTrustAnchor
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_TlsContextImpl::AddTrustAnchor(const unsigned char* ta_data,
+                                   NPT_Size             ta_data_size)
+{
+    int result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CACERT, ta_data, ta_data_size, NULL);
     return NPT_Tls_MapResult(result);
 }
 
@@ -266,7 +279,7 @@ NPT_TlsSessionImpl::VerifyPeerCertificate()
 {
     if (m_SSL == NULL) {
         // no handshake done
-        return 0;
+        return NPT_ERROR_INVALID_STATE;
     }
 
     int result = ssl_verify_cert(m_SSL);
@@ -505,6 +518,16 @@ NPT_TlsContext::LoadKey(NPT_TlsKeyFormat     key_format,
                         const char*          password)
 {
     return m_Impl->LoadKey(key_format, key_data, key_data_size, password);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TlsContext::AddTrustAnchor
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_TlsContext::AddTrustAnchor(const unsigned char* ta_data,
+                               NPT_Size             ta_data_size)
+{
+    return m_Impl->AddTrustAnchor(ta_data, ta_data_size);
 }
 
 /*----------------------------------------------------------------------

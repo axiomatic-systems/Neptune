@@ -37,6 +37,9 @@
 #include <string.h>
 #include "crypto.h"
 
+/* GBG: don't depend on ntoh */
+#define aes_ntohl(x) ( ((x)>>24) | (((x)>>8)&0x0000FF00) | (((x)<<8)&0x00FF0000) | ((x)<<24) ) 
+
 /* all commented out in skeleton mode */
 #ifndef CONFIG_SSL_SKELETON_MODE
 
@@ -275,7 +278,7 @@ void AES_cbc_encrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 
     memcpy(iv, ctx->iv, AES_IV_SIZE);
     for (i = 0; i < 4; i++)
-        tout[i] = ntohl(iv[i]);
+        tout[i] = aes_ntohl(iv[i]);
 
     for (length -= AES_BLOCKSIZE; length >= 0; length -= AES_BLOCKSIZE)
     {
@@ -285,7 +288,7 @@ void AES_cbc_encrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
         msg += AES_BLOCKSIZE;
 
         for (i = 0; i < 4; i++)
-            tin[i] = ntohl(msg_32[i])^tout[i];
+            tin[i] = aes_ntohl(msg_32[i])^tout[i];
 
         AES_encrypt(ctx, tin);
 
@@ -314,7 +317,7 @@ void AES_cbc_decrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 
     memcpy(iv, ctx->iv, AES_IV_SIZE);
     for (i = 0; i < 4; i++)
-        xor[i] = ntohl(iv[i]);
+        xor[i] = aes_ntohl(iv[i]);
 
     for (length -= 16; length >= 0; length -= 16)
     {
@@ -325,7 +328,7 @@ void AES_cbc_decrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 
         for (i = 0; i < 4; i++)
         {
-            tin[i] = ntohl(msg_32[i]);
+            tin[i] = aes_ntohl(msg_32[i]);
             data[i] = tin[i];
         }
 

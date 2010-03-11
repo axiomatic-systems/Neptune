@@ -42,7 +42,7 @@
 #include "wincrypt.h"
 #endif
 
-#ifndef WIN32
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
 static int rng_fd = -1;
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
 static HCRYPTPROV gCryptProv;

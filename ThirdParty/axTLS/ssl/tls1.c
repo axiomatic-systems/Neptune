@@ -156,7 +156,12 @@ static void add_hmac_digest(SSL *ssl, int snd, uint8_t *hmac_header,
 /*#if defined(WIN32) && !defined(CONFIG_SSL_FULL_MODE)*/
 #if 1
 void DISPLAY_BYTES(SSL *ssl, const char *format, 
-        const uint8_t *data, int size, ...) {}
+        const uint8_t *data, int size, ...) {
+    (void)ssl;
+    (void)format;
+    (void)data;
+    (void)size;
+}
 #endif
 
 /**
@@ -1471,7 +1476,8 @@ int process_finished(SSL *ssl, int hs_len)
     int ret = SSL_OK;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     int resume = IS_SET_SSL_FLAG(SSL_SESSION_RESUME);
-
+    (void)hs_len;
+    
     PARANOIA_CHECK(ssl->bm_index, SSL_FINISHED_HASH_SIZE+4);
 
     /* check that we all work before we continue */
@@ -2072,7 +2078,7 @@ EXP_FUNC const char  * STDCALL ssl_version()
  * configuration - they just return an error statement and a bad return code.
  */
 #if !defined(CONFIG_SSL_FULL_MODE)
-EXP_FUNC void STDCALL ssl_display_error(int error_code) {}
+EXP_FUNC void STDCALL ssl_display_error(int error_code) { (void)error_code; }
 #endif
 
 #ifdef CONFIG_BINDINGS

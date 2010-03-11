@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <sys/time.h>
 #include "crypto_misc.h"
 #ifdef CONFIG_WIN32_USE_CRYPTO_LIB
 #include "wincrypt.h"
@@ -143,7 +144,7 @@ EXP_FUNC void STDCALL RNG_terminate(void)
 {
     if (--rng_ref_count == 0)
     {
-#ifndef WIN32
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
         close(rng_fd);
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
         CryptReleaseContext(gCryptProv, 0);

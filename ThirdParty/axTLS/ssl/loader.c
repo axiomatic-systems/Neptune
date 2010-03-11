@@ -47,8 +47,10 @@
 static int do_obj(SSL_CTX *ssl_ctx, int obj_type, 
                     SSLObjLoader *ssl_obj, const char *password);
 #ifdef CONFIG_SSL_HAS_PEM
+#if 0 /* GBG */
 static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
                         SSLObjLoader *ssl_obj, const char *password);
+#endif /* GBG */
 #endif
 
 #if 0 /* GBG */
@@ -373,6 +375,7 @@ error:
 /*
  * Load a file into memory that is in ASCII PEM format.
  */
+#if 0 /* GBG */
 static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
                         SSLObjLoader *ssl_obj, const char *password)
 {
@@ -386,6 +389,7 @@ static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type,
     return new_pem_obj(ssl_ctx, obj_type == SSL_OBJ_X509_CACERT,
                                 start, ssl_obj->len, password);
 }
+#endif /* GBG */
 #endif /* CONFIG_SSL_HAS_PEM */
 
 #if 0 /* GBG */

@@ -39,9 +39,12 @@
 #include "os_port.h"
 #include "crypto.h"
 #include "crypto_misc.h"
+#include "ssl.h"
+#include "tls1.h"
 
 #define SIG_OID_PREFIX_SIZE 8
 #define SIG_IIS6_OID_SIZE   5
+#define SIG_SUBJECT_ALT_NAME_SIZE 3
 
 /* Must be an RSA algorithm with either SHA1 or MD5 for verifying to work */
 static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] = 
@@ -52,6 +55,11 @@ static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] =
 static const uint8_t sig_iis6_oid[SIG_IIS6_OID_SIZE] =
 {
     0x2b, 0x0e, 0x03, 0x02, 0x1d
+};
+
+static const uint8_t sig_subject_alt_name[SIG_SUBJECT_ALT_NAME_SIZE] =
+{
+    0x55, 0x1d, 0x11
 };
 
 /* CN, O, OU */
@@ -481,7 +489,52 @@ int asn1_compare_dn(char * const dn1[], char * const dn2[])
     return 0;       /* all good */
 }
 
-#endif
+int asn1_find_oid(const uint8_t* cert, int* offset, 
+                    const uint8_t* oid, int oid_length)
+{
+    int seqlen;
+    if ((seqlen = asn1_next_obj(cert, offset, ASN1_SEQUENCE))> 0)
+    {
+        int end = *offset + seqlen;
+
+        while (*offset < end)
+        {
+            int type = cert[(*offset)++];
+            int length = get_asn1_length(cert, offset);
+            int noffset = *offset + length;
+
+            if (type == ASN1_SEQUENCE)
+            {
+                type = cert[(*offset)++];
+                length = get_asn1_length(cert, offset);
+
+                if (type == ASN1_OID && length == oid_length && 
+                              memcmp(cert + *offset, oid, oid_length) == 0)
+                {
+                    *offset += oid_length;
+                    return 1;
+                }
+            }
+
+            *offset = noffset;
+        }
+    }
+
+    return 0;
+}
+
+int asn1_find_subjectaltname(const uint8_t* cert, int offset)
+{
+    if (asn1_find_oid(cert, &offset, sig_subject_alt_name, 
+                                SIG_SUBJECT_ALT_NAME_SIZE))
+    {
+        return offset;
+    }
+
+    return 0;
+}
+
+#endif /* CONFIG_SSL_CERT_VERIFICATION */
 
 /**
  * Read the signature type of the certificate. We only support RSA-MD5 and

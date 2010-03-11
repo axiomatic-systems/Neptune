@@ -424,6 +424,7 @@ error:
     return ret;
 }
 
+
 /*
  * Retrieve an X.509 distinguished name component
  */
@@ -457,6 +458,26 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
     }
 }
 
+/*
+ * Retrieve a "Subject Alternative Name" from a v3 certificate
+ */
+EXP_FUNC const char * STDCALL ssl_get_cert_subject_alt_dnsname(const SSL *ssl,
+        int dnsindex)
+{
+    int i;
+
+    if (ssl->x509_ctx == NULL || ssl->x509_ctx->subject_alt_dnsnames == NULL)
+        return NULL;
+
+    for (i = 0; i < dnsindex; ++i)
+    {
+        if (ssl->x509_ctx->subject_alt_dnsnames[i] == NULL)
+            return NULL;
+    }
+
+    return ssl->x509_ctx->subject_alt_dnsnames[dnsindex];
+}
+
 /* GBG added */
 EXP_FUNC void ssl_get_cert_fingerprints(const SSL* ssl, unsigned char* md5, unsigned char* sha1)
 {
@@ -481,7 +502,7 @@ EXP_FUNC void ssl_get_cert_validity_dates(const SSL* ssl, SSL_DateTime* not_befo
 }
 /* /GBG added */
 
-#endif
+#endif /* CONFIG_SSL_CERT_VERIFICATION */
 
 /*
  * Find an ssl object based on the client's file descriptor.
@@ -908,7 +929,6 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
 
                 return (void *)aes_ctx;
             }
-            break;
 
         case SSL_RC4_128_MD5:
 #endif
@@ -918,7 +938,6 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
                 RC4_setup(rc4_ctx, key, 16);
                 return (void *)rc4_ctx;
             }
-            break;
     }
 
     return NULL;    /* its all gone wrong */
@@ -1226,8 +1245,16 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     switch (ssl->record_type)
     {
         case PT_HANDSHAKE_PROTOCOL:
-            ssl->dc->bm_proc_index = 0;
-            ret = do_handshake(ssl, buf, read_len);
+            if (ssl->dc != NULL)
+            {
+                ssl->dc->bm_proc_index = 0;
+                ret = do_handshake(ssl, buf, read_len);
+            }
+            else /* no client renogiation allowed */
+            {
+                ret = SSL_ERROR_NO_CLIENT_RENOG;              
+                goto error;
+            }
             break;
 
         case PT_CHANGE_CIPHER_SPEC:
@@ -1398,6 +1425,7 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_INVALID_HANDSHAKE:
         case SSL_ERROR_INVALID_PROT_MSG:
+        case SSL_ERROR_NO_CLIENT_RENOG:
             alert_num = SSL_ALERT_HANDSHAKE_FAILURE;
             break;
 
@@ -1520,7 +1548,7 @@ void disposable_free(SSL *ssl)
 {
     if (ssl->dc)
     {
-	    free(ssl->dc->key_block);
+        free(ssl->dc->key_block);
         memset(ssl->dc, 0, sizeof(DISPOSABLE_CTX));
         free(ssl->dc);
         ssl->dc = NULL;
@@ -1954,6 +1982,10 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
             printf("no certificate defined");
             break;
 
+        case SSL_ERROR_NO_CLIENT_RENOG:
+            printf("client renegotiation not supported");
+            break;
+            
         case SSL_ERROR_NOT_SUPPORTED:
             printf("Option not supported");
             break;
@@ -2060,7 +2092,14 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
     return -1;
 }
 
+
 EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
+{
+    printf(unsupported_str);
+    return NULL;
+}
+
+EXP_FUNC const char * STDCALL ssl_get_cert_subject_alt_dnsname(const SSL *ssl, int index)
 {
     printf(unsupported_str);
     return NULL;

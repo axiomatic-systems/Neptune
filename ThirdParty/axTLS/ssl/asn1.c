@@ -249,7 +249,8 @@ end_utc_time:
 int asn1_version(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     int ret = X509_NOT_OK;
-
+    (void)x509_ctx; /* unused */
+    
     (*offset) += 2;        /* get past explicit tag */
     if (asn1_skip_obj(cert, offset, ASN1_INTEGER))
         goto end_version;
@@ -489,7 +490,7 @@ int asn1_compare_dn(char * const dn1[], char * const dn2[])
     return 0;       /* all good */
 }
 
-int asn1_find_oid(const uint8_t* cert, int* offset, 
+static int asn1_find_oid(const uint8_t* cert, int* offset, 
                     const uint8_t* oid, int oid_length)
 {
     int seqlen;

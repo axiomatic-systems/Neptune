@@ -205,6 +205,7 @@ static const char * const aes_str[2] =
     "DEK-Info: AES-256-CBC," 
 };
 
+#if 0 /* GBG */
 /**
  * Take a base64 blob of data and decrypt it (using AES) into its 
  * proper ASN.1 form.
@@ -375,7 +376,6 @@ error:
 /*
  * Load a file into memory that is in ASCII PEM format.
  */
-#if 0 /* GBG */
 static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
                         SSLObjLoader *ssl_obj, const char *password)
 {

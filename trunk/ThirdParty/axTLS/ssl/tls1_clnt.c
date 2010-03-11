@@ -80,7 +80,8 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, SSL_SOCKET* client_fd, c
 int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 {
     int ret = SSL_OK;
-
+    (void)buf;
+    
     /* To get here the state must be valid */
     switch (handshake_type)
     {
@@ -276,7 +277,7 @@ static int process_server_hello(SSL *ssl)
     ssl->next_state = IS_SET_SSL_FLAG(SSL_SESSION_RESUME) ? 
                                         HS_FINISHED : HS_CERTIFICATE;
 
-    offset++;   // skip the compr
+    offset++;   /* skip the compr */
     PARANOIA_CHECK(pkt_size, offset);
     ssl->dc->bm_proc_index = offset+1; 
 

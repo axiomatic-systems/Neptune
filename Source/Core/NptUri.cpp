@@ -44,6 +44,8 @@ NPT_Uri::ParseScheme(const NPT_String& scheme)
 {
     if (scheme == "http") {
         return SCHEME_ID_HTTP;
+    } else if (scheme == "https") {
+        return SCHEME_ID_HTTPS;
     } else {
         return SCHEME_ID_UNKNOWN;
     }
@@ -654,7 +656,7 @@ NPT_Url::SetPath(const char* path, bool encoded)
     if (encoded) {
         m_Path = path;
     } else {
-        PercentEncode(path, PathCharsToEncode);    
+        m_Path = PercentEncode(path, PathCharsToEncode);    
     }
     
     return NPT_SUCCESS;

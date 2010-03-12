@@ -24,8 +24,9 @@
 +---------------------------------------------------------------------*/
 @interface NPT_CocoaMessageCapsule : NSObject
 {
-    NPT_Message*        message;
-    NPT_MessageHandler* handler;
+    NPT_Message*             message;
+    NPT_MessageHandler*      handler;
+    NPT_MessageHandlerProxy* proxy;
 }
 -(id)   initWithMessage: (NPT_Message*) message andHandler: (NPT_MessageHandler*) handler;
 -(void) handle;
@@ -37,6 +38,8 @@
     if ((self = [super init])) {
         message = aMessage;
         handler = aHandler;
+        proxy   = NPT_DYNAMIC_CAST(NPT_MessageHandlerProxy, aHandler);
+        if (proxy) proxy->AddReference();
     }
     return self;
 }
@@ -44,6 +47,7 @@
 -(void) dealloc
 {
     delete message;
+    if (proxy) proxy->Release();
     [super dealloc];
 }
 

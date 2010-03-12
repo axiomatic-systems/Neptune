@@ -154,9 +154,14 @@ main(int argc, char** argv)
                                                     cert_info.expiration_date.m_Seconds);
     printf("\n");
     printf("[7] Cipher Type = %d (%s)\n", session.GetCipherSuiteId(), GetCipherSuiteName(session.GetCipherSuiteId()));
-
+    for (NPT_List<NPT_String>::Iterator i=cert_info.alternate_names.GetFirstItem();
+         i;
+         ++i) {
+         NPT_String& name = *i;
+         printf("[8] Alternate Name = %s\n", name.GetChars());
+    }
     result = session.VerifyPeerCertificate();
-    printf("[4] Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
+    printf("[9] Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
     if (NPT_FAILED(result)) {
         printf("!ERROR\n");
         return 1;
@@ -167,7 +172,7 @@ main(int argc, char** argv)
     session.GetInputStream(ssl_input);
     session.GetOutputStream(ssl_output);
     
-    printf("[8] Getting / Document\n");
+    printf("[10] Getting / Document\n");
     ssl_output->WriteString("GET / HTTP/1.0\n\n");
     for (;;) {
         unsigned char buffer[1];

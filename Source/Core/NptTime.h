@@ -70,7 +70,7 @@ class NPT_TimeStamp
     void SetSeconds(NPT_Int64 seconds)   { m_NanoSeconds = seconds * 1000000000; }
         
     // conversion
-    operator double() const                { return (double)m_NanoSeconds/1E9; }
+    operator double() const               { return (double)m_NanoSeconds/1E9; }
     void FromNanos(NPT_Int64 nanoseconds) { m_NanoSeconds = nanoseconds;      }
     NPT_Int64 ToNanos() const             { return m_NanoSeconds;             }
     NPT_Int64 ToMicros() const            { return m_NanoSeconds/1000;        }
@@ -137,9 +137,9 @@ public:
     // methods
     NPT_Result ChangeTimeZone(NPT_Int32 timezone);
     NPT_Result FromTimeStamp(const NPT_TimeStamp& timestamp, bool local=false);
-    NPT_Result ToTimeStamp(NPT_TimeStamp& timestamp);
+    NPT_Result ToTimeStamp(NPT_TimeStamp& timestamp) const;
     NPT_Result FromString(const char* date, Format format = FORMAT_ANSI);
-    NPT_String ToString(Format format = FORMAT_ANSI, NPT_Flags flags=0);
+    NPT_String ToString(Format format = FORMAT_ANSI, NPT_Flags flags=0) const;
     
     // members
     NPT_Int32 m_Year;        // year

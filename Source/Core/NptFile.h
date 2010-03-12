@@ -198,4 +198,21 @@ protected:
     bool               m_IsSpecial;
 };
 
+/*----------------------------------------------------------------------
+|   NPT_FileDateComparator
++---------------------------------------------------------------------*/
+class NPT_FileDateComparator {
+public: 
+    NPT_FileDateComparator(const char* directory) : m_Directory(directory) {}
+    NPT_Int32 operator()(const NPT_String& file1, const NPT_String& file2) const {
+        NPT_FileInfo info1, info2;
+        if (NPT_FAILED(NPT_File::GetInfo(NPT_FilePath::Create(m_Directory, file1), &info1))) return -1;
+        if (NPT_FAILED(NPT_File::GetInfo(NPT_FilePath::Create(m_Directory, file2), &info2))) return -1;
+        return (info1.m_ModificationTime == info2.m_ModificationTime) ? 0 : (info1.m_ModificationTime < info2.m_ModificationTime ? -1 : 1);
+    }
+    
+private:
+    NPT_String m_Directory;
+};
+
 #endif // _NPT_FILE_H_ 

@@ -170,7 +170,10 @@ NPT_DateTime::ChangeTimeZone(NPT_Int32 timezone)
     NPT_Result result = ToTimeStamp(ts);
     if (NPT_FAILED(result)) return result;
     ts.SetNanos(ts.ToNanos()+(NPT_Int64)timezone*(NPT_Int64)60*(NPT_Int64)1000000000);
-    return FromTimeStamp(ts);
+
+    result = FromTimeStamp(ts);
+    m_TimeZone = timezone;
+    return result;
 }
 
 /*----------------------------------------------------------------------
@@ -259,7 +262,7 @@ NPT_DateTime::FromTimeStamp(const NPT_TimeStamp& ts, bool local)
 /*----------------------------------------------------------------------
 |   CheckDate
 +---------------------------------------------------------------------*/
-NPT_Result
+static NPT_Result
 CheckDate(const NPT_DateTime& date)
 {
     NPT_TIME_CHECK_BOUNDS(date.m_Year, NPT_DATETIME_YEAR_MIN, NPT_DATETIME_YEAR_MAX);
@@ -278,7 +281,7 @@ CheckDate(const NPT_DateTime& date)
 |   NPT_DateTime::ToTimeStamp
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_DateTime::ToTimeStamp(NPT_TimeStamp& timestamp)
+NPT_DateTime::ToTimeStamp(NPT_TimeStamp& timestamp) const
 {
     // default value
     timestamp.SetNanos(0);
@@ -296,6 +299,11 @@ NPT_DateTime::ToTimeStamp(NPT_TimeStamp& timestamp)
                         (NPT_Int64)m_Minutes * (60) + 
                         (NPT_Int64)m_Seconds;
     seconds -= (NPT_Int64)m_TimeZone*60;
+
+    // adjust to the number of seconds since 1900
+    seconds -= (NPT_Int64)NPT_SECONDS_PER_YEAR*70 + 
+        (NPT_Int64)(17*NPT_SECONDS_PER_DAY); // 17 leap year between 1900 and 1970
+
     timestamp.FromNanos(seconds * 1000000000 + m_NanoSeconds);
 
     return NPT_SUCCESS;
@@ -320,7 +328,7 @@ AppendNumber(NPT_String& output, NPT_UInt32 number, unsigned int digit_count)
 |   NPT_DateTime::ToString
 +---------------------------------------------------------------------*/
 NPT_String
-NPT_DateTime::ToString(Format format, NPT_Flags flags)
+NPT_DateTime::ToString(Format format, NPT_Flags flags) const
 {
     NPT_String result;
     
@@ -390,7 +398,7 @@ NPT_DateTime::ToString(Format format, NPT_Flags flags)
             NPT_UInt32 days = ElapsedDaysSince1900(*this);
 
             if (format == FORMAT_RFC_1036) {
-                result += NPT_TIME_DAYS_SHORT[days%7];
+                result += NPT_TIME_DAYS_LONG[days%7];
                 result += ", ";
                 AppendNumber(result, m_Day, 2);
                 result += '-';
@@ -398,7 +406,7 @@ NPT_DateTime::ToString(Format format, NPT_Flags flags)
                 result += '-';
                 AppendNumber(result, m_Year%100, 2);
             } else {
-                result += NPT_TIME_DAYS_LONG[days%7];
+                result += NPT_TIME_DAYS_SHORT[days%7];
                 result += ", ";
                 AppendNumber(result, m_Day, 2);
                 result += ' ';
@@ -544,10 +552,10 @@ NPT_DateTime::FromString(const char* date, Format format)
         int wday_index;
         if (format == FORMAT_RFC_1036) {
             sep = '-';
-            wday_index = MatchString(wday, NPT_TIME_DAYS_SHORT, 7);
+            wday_index = MatchString(wday, NPT_TIME_DAYS_LONG, 7);
         } else {
             sep = ' ';
-            wday_index = MatchString(wday, NPT_TIME_DAYS_LONG, 7);
+            wday_index = MatchString(wday, NPT_TIME_DAYS_SHORT, 7);
         }
         if (input[0]     != ' ' || 
             input[3]     != sep || 

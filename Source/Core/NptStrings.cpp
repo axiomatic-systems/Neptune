@@ -754,14 +754,15 @@ NPT_String::Replace(char a, const char* str)
 |   NPT_String::Replace
 +---------------------------------------------------------------------*/
 void
-NPT_String::Replace(const char* before, const char* after)
+NPT_String::Replace(const char* before, const char* after, bool ignore_case)
 {
-    int      index = Find(before);
-    NPT_Size size  = NPT_StringLength(before);
+    int      index          = Find(before, 0, ignore_case);
+    NPT_Size before_length  = NPT_StringLength(before);
+    NPT_Size after_length   = NPT_StringLength(after);
     while (index != NPT_STRING_SEARCH_FAILED) {
-        Erase(index, size);
+        Erase(index, before_length);
         Insert(after, index);
-        index = Find(before, index+size);
+        index = Find(before, index + after_length);
     }
 }
 

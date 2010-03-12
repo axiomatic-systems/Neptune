@@ -2270,7 +2270,7 @@ NPT_XmlSerializer::StartDocument()
 {
 	if (!m_AddXmlDecl) return NPT_SUCCESS;
 
-    return m_Output->WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+    return m_Output->WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
 }
 
 /*----------------------------------------------------------------------
@@ -2365,7 +2365,7 @@ NPT_XmlSerializer::OutputEscapedString(const char* text, bool attribute)
 void
 NPT_XmlSerializer::OutputIndentation(bool start)
 {
-    if (m_Depth || !start) m_Output->Write("\n", 1);
+    if (m_Depth || !start) m_Output->Write("\r\n", 2);
 
     // ensure we have enough chars in the prefix string
     unsigned int prefix_length = m_Indentation*m_Depth;

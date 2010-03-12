@@ -659,12 +659,16 @@ main(int argc, char** argv)
                 offset += bytes_written;
                 total  += bytes_written;
             } else {
-                printf("[%d] *******************\n", result);
-                exit(1);
+                break;
             }
         } while (NPT_SUCCEEDED(result));
     }
 
+    if (NPT_FAILED(result)) {
+        printf("[%d] *******************\n", result);
+        exit(1);
+    }
+    
     delete buffer;
     return 0;
 }

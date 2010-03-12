@@ -39,6 +39,7 @@
 #include "NptTypes.h"
 #include "NptResults.h"
 #include "NptList.h"
+#include "NptThreads.h"
 #include "NptDynamicCast.h"
 
 /*----------------------------------------------------------------------
@@ -64,6 +65,59 @@ public:
     // it can be overloaded by subclasses that wish to process all 
     // incoming messages
     virtual NPT_Result HandleMessage(NPT_Message* message);
+};
+
+/*----------------------------------------------------------------------
+|   NPT_MessageHandlerProxy
++---------------------------------------------------------------------*/
+class NPT_MessageHandlerProxy : public NPT_MessageHandler
+{
+public:
+    NPT_IMPLEMENT_DYNAMIC_CAST_D(NPT_MessageHandlerProxy, NPT_MessageHandler)
+
+    /**
+     * Create a proxy for a message handler.
+     * All calls to HandleMessage() and OnMessage() on the proxy
+     * are automatically forwarded to the handler.
+     * This class is useful in cases where a handler is passed
+     * asynchronously (for example in a message queue) and one wishes
+     * to guarantee right away that no more calls to the handler will be 
+     * made (because, for example, the handler needs to be deleted).
+     *
+     * The proxy object keeps a pointer to the handler, but does not own it.
+     */
+    NPT_MessageHandlerProxy(NPT_MessageHandler* handler);
+    
+    // destructor
+    virtual ~NPT_MessageHandlerProxy();
+
+    // NPT_MessageHandler methods
+    virtual void OnMessage(NPT_Message*);
+    virtual NPT_Result HandleMessage(NPT_Message* message);
+    
+    /**
+     * Detach the proxy from the handler implementation.
+     * After this call returns, calls will no longer be
+     * forwarded to the handler object. It is then safe, for example,
+     * to delete the handler.
+     */
+    void DetachHandler();
+    
+    /**
+     * Increment the reference count
+     */
+    void AddReference();
+
+    /**
+     * Decrement the reference count and delete if 0
+     */
+    void Release();
+    
+private:
+    // members
+    NPT_MessageHandler* m_Handler;
+    NPT_Cardinal        m_ReferenceCount;
+    NPT_Mutex           m_Lock;
 };
 
 /*----------------------------------------------------------------------

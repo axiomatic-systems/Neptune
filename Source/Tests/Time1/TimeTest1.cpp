@@ -107,9 +107,9 @@ TestMisc()
     s = date.ToString(NPT_DateTime::FORMAT_ANSI);
     SHOULD_EQUAL_S(s.GetChars(), "Wed Jan  1 00:00:00 1970");
     s = date.ToString(NPT_DateTime::FORMAT_RFC_1036);
-    SHOULD_EQUAL_S(s.GetChars(), "Wed, 01-Jan-70 00:00:00 GMT");
+    SHOULD_EQUAL_S(s.GetChars(), "Wednesday, 01-Jan-70 00:00:00 GMT");
     s = date.ToString(NPT_DateTime::FORMAT_RFC_1123);
-    SHOULD_EQUAL_S(s.GetChars(), "Wednesday, 01 Jan 1970 00:00:00 GMT");
+    SHOULD_EQUAL_S(s.GetChars(), "Wed, 01 Jan 1970 00:00:00 GMT");
     
     ts.SetSeconds(0xFFFFFFFF);
     SHOULD_SUCCEED(date.FromTimeStamp(ts, false));
@@ -371,7 +371,7 @@ TestDateFromTimeStringRFC_1036()
     NPT_DateTime date;
 
     /* Valid date */
-    SHOULD_SUCCEED(date.FromString("Fri, 14-Apr-2006 12:01:10 UT", NPT_DateTime::FORMAT_RFC_1036));
+    SHOULD_SUCCEED(date.FromString("Friday, 14-Apr-2006 12:01:10 UT", NPT_DateTime::FORMAT_RFC_1036));
     SHOULD_EQUAL_I(date.m_Year         , 2006);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -382,7 +382,7 @@ TestDateFromTimeStringRFC_1036()
     SHOULD_EQUAL_I(date.m_TimeZone     , 0);
 
     /* Valid date with timezone */
-    SHOULD_SUCCEED(date.FromString("Fri, 14-Apr-95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
+    SHOULD_SUCCEED(date.FromString("Friday, 14-Apr-95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
     SHOULD_EQUAL_I(date.m_Year         , 1995);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -393,7 +393,7 @@ TestDateFromTimeStringRFC_1036()
     SHOULD_EQUAL_I(date.m_TimeZone     , 0);
 
     /* Valid date with timezone */
-    SHOULD_SUCCEED(date.FromString("Fri, 14-Apr-95 12:01:10 -0800", NPT_DateTime::FORMAT_RFC_1036));
+    SHOULD_SUCCEED(date.FromString("Friday, 14-Apr-95 12:01:10 -0800", NPT_DateTime::FORMAT_RFC_1036));
     SHOULD_EQUAL_I(date.m_Year         , 1995);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -403,11 +403,14 @@ TestDateFromTimeStringRFC_1036()
     SHOULD_EQUAL_I(date.m_NanoSeconds  , 0);
     SHOULD_EQUAL_I(date.m_TimeZone     , -8*60);
 
+    /* Wrong day name */
+    SHOULD_FAIL(date.FromString("Fri, 14-Apr-95 12:01:10 -0800", NPT_DateTime::FORMAT_RFC_1036));
+
     /* Wrong weekday */
-    SHOULD_FAIL(date.FromString("Wed, 14-Apr-95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
+    SHOULD_FAIL(date.FromString("Wednesday, 14-Apr-95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
 
     /* Wrong year length */
-    SHOULD_FAIL(date.FromString("Mon, 14-Apr-1995 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
+    SHOULD_FAIL(date.FromString("Monday, 14-Apr-1995 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1036));
 }
 
 /*----------------------------------------------------------------------
@@ -419,7 +422,7 @@ TestDateFromTimeStringRFC_1123()
     NPT_DateTime date;
 
     /* Valid date */
-    SHOULD_SUCCEED(date.FromString("Friday, 14 Apr 2006 12:01:10 UT", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_SUCCEED(date.FromString("Fri, 14 Apr 2006 12:01:10 UT", NPT_DateTime::FORMAT_RFC_1123));
     SHOULD_EQUAL_I(date.m_Year         , 2006);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -430,7 +433,7 @@ TestDateFromTimeStringRFC_1123()
     SHOULD_EQUAL_I(date.m_TimeZone     , 0);
 
     /* Valid date with timezone*/
-    SHOULD_SUCCEED(date.FromString("Friday, 14 Apr 2006 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_SUCCEED(date.FromString("Fri, 14 Apr 2006 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
     SHOULD_EQUAL_I(date.m_Year         , 2006);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -441,7 +444,7 @@ TestDateFromTimeStringRFC_1123()
     SHOULD_EQUAL_I(date.m_TimeZone     , 0);
 
     /* Valid date with timezone*/
-    SHOULD_SUCCEED(date.FromString("Friday, 14 Apr 2006 12:01:10 +0800", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_SUCCEED(date.FromString("Fri, 14 Apr 2006 12:01:10 +0800", NPT_DateTime::FORMAT_RFC_1123));
     SHOULD_EQUAL_I(date.m_Year         , 2006);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -452,7 +455,7 @@ TestDateFromTimeStringRFC_1123()
     SHOULD_EQUAL_I(date.m_TimeZone     , 8*60);
 
     /* Valid date, short year */
-    SHOULD_SUCCEED(date.FromString("Friday, 14 Apr 95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_SUCCEED(date.FromString("Fri, 14 Apr 95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
     SHOULD_EQUAL_I(date.m_Year         , 1995);
     SHOULD_EQUAL_I(date.m_Month        , 4);
     SHOULD_EQUAL_I(date.m_Day          , 14);
@@ -462,11 +465,14 @@ TestDateFromTimeStringRFC_1123()
     SHOULD_EQUAL_I(date.m_NanoSeconds  , 0);
     SHOULD_EQUAL_I(date.m_TimeZone     , 0);
 
+    /* Wrong day name */
+    SHOULD_FAIL(date.FromString("Friday, 14 Apr 95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
+
     /* Wrong weekday */
-    SHOULD_FAIL(date.FromString("Wednesday, 14 Apr 2006 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_FAIL(date.FromString("Wed, 14 Apr 2006 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
 
     /* Wrong year length */
-    SHOULD_FAIL(date.FromString("Monday, 14 Apr 95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
+    SHOULD_FAIL(date.FromString("Mon, 14 Apr 95 12:01:10 GMT", NPT_DateTime::FORMAT_RFC_1123));
 }
 
 /*----------------------------------------------------------------------

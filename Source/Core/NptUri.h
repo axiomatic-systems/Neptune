@@ -51,7 +51,8 @@ public:
     // types
     typedef enum {
         SCHEME_ID_UNKNOWN,
-        SCHEME_ID_HTTP
+        SCHEME_ID_HTTP,
+        SCHEME_ID_HTTPS
     } SchemeId;
 
     // constants. use as a parameter to Encode()
@@ -177,12 +178,12 @@ public:
     /**
      * Returns the host part of the URL, in its encoded form
      */
-    const NPT_String& GetHost() const { return m_Host; }
+    const NPT_String& GetHost() const { return m_Host;     }
     
     /**
      * Returns the port number of the URL.
      */
-    NPT_UInt16 GetPort() const { return m_Port; }
+    NPT_UInt16 GetPort() const { return m_Port;     }
 
     /**
      * Returns the path part of the URL, in its encoded form

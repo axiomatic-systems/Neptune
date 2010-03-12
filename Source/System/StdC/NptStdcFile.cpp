@@ -221,7 +221,7 @@ NPT_StdcFileInputStream::Read(void*     buffer,
         return NPT_ERROR_EOS;
     } else {
         if (bytes_read) *bytes_read = 0;
-        return NPT_ERROR_READ_FAILED;
+        return MapErrno(errno);
     }
 }
 

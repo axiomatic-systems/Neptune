@@ -130,8 +130,7 @@ public:
     // editing
     void Insert(const char* s, NPT_Ordinal where = 0);
     void Erase(NPT_Ordinal start, NPT_Cardinal count = 1);
-    void Replace(const char* before, const char* after);
-    // void Replace(NPT_Ordinal start, NPT_Cardinal count, const char* s);
+    void Replace(const char* before, const char* after, bool ignore_case = false);
     void TrimLeft();
     void TrimLeft(char c);
     void TrimLeft(const char* chars);

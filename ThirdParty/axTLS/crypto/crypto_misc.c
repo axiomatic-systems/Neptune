@@ -36,7 +36,6 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <sys/time.h>
 #include "crypto_misc.h"
 #ifdef CONFIG_WIN32_USE_CRYPTO_LIB
 #include "wincrypt.h"
@@ -167,14 +166,11 @@ EXP_FUNC void STDCALL get_random(unsigned int num_rand_bytes, uint8_t *rand_data
     /* The method we use when we've got nothing better. Use RC4, time 
        and a couple of random seeds to generate a random sequence */
     RC4_CTX rng_ctx;
-    struct timeval tv;
     uint64_t big_num1, big_num2;
-
-    gettimeofday(&tv, NULL);    /* yes I know we shouldn't do this */
 
     /* all numbers by themselves are pretty simple, but combined should 
      * be a challenge */
-    big_num1 = (uint64_t)tv.tv_sec*(tv.tv_usec+1); 
+    big_num1 = SSL_GetRandomSeed(); 
     big_num2 = (uint64_t)rand()*big_num1;
     big_num1 ^= rng_num;
 

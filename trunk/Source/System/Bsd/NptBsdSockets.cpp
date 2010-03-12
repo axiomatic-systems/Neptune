@@ -400,7 +400,7 @@ MapErrorCode(int error)
 #endif
 
         default:
-            return NPT_FAILURE;
+            return NPT_ERROR_ERRNO(error);
     }
 }
 
@@ -728,7 +728,7 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     }
 
     if (NPT_FAILED(result)) {
-        NPT_LOG_FINE_1("select result = %d", result);
+        NPT_LOG_FINER_1("select result = %d", result);
     }
     return result;
 }
@@ -942,7 +942,7 @@ NPT_BsdSocketOutputStream::Flush()
     int       args = 0;
     socklen_t size = sizeof(args);
 
-    NPT_LOG_FINER("flushing socket");
+    NPT_LOG_FINEST("flushing socket");
     
     // get the value of the nagle algorithm
     if (getsockopt(m_SocketFdReference->m_SocketFd, 
@@ -1542,12 +1542,12 @@ NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket(NPT_Flags flags) :
     NPT_BsdUdpSocket(flags)
 {
 #if !defined(_XBOX)
-    int option = 1;
-    setsockopt(m_SocketFdReference->m_SocketFd, 
-               IPPROTO_IP, 
-               IP_MULTICAST_LOOP,
-               (SocketOption)&option,
-               sizeof(option));
+        int option = 1;
+        setsockopt(m_SocketFdReference->m_SocketFd, 
+                   IPPROTO_IP, 
+                   IP_MULTICAST_LOOP,
+                   (SocketOption)&option,
+                   sizeof(option));
 #endif
 }
 
@@ -1932,11 +1932,11 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client,
     }
 
     // wait until the socket is readable or writeable
-    NPT_LOG_FINE("waiting until socket is readable or writeable");
+    NPT_LOG_FINER("waiting until socket is readable or writeable");
     NPT_Result result = m_SocketFdReference->WaitForCondition(true, true, false, timeout);
     if (result != NPT_SUCCESS) return result;
 
-    NPT_LOG_FINE("accepting connection");
+    NPT_LOG_FINER("accepting connection");
     struct sockaddr_in inet_address;
     socklen_t          namelen = sizeof(inet_address);
     SocketFd socket_fd = accept(m_SocketFdReference->m_SocketFd, (struct sockaddr*)&inet_address, &namelen); 

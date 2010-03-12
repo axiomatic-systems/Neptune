@@ -180,6 +180,7 @@ public:
 #define NPT_LOG_FORMAT_FILTER_NO_FUNCTION_NAME  4
 #define NPT_LOG_FORMAT_FILTER_NO_LOGGER_NAME    8
 #define NPT_LOG_FORMAT_FILTER_NO_SOURCEPATH    16
+#define NPT_LOG_FORMAT_FILTER_NO_THREAD_ID     32
 
 /*----------------------------------------------------------------------
 |   globals
@@ -356,6 +357,11 @@ NPT_Log::FormatRecordToStream(const NPT_LogRecord& record,
             stream.WriteString(record.m_SourceFunction);
         }
         stream.WriteFully("] ",2);
+    }
+    if ((format_filter & NPT_LOG_FORMAT_FILTER_NO_THREAD_ID) == 0) {
+        stream.Write("(", 1, NULL);
+        stream.WriteString(NPT_String::FromIntegerU(record.m_ThreadId));
+        stream.Write(") ", 2, NULL);
     }
     const char* ansi_color = NULL;
     if (use_colors) {
@@ -882,6 +888,7 @@ NPT_Logger::Log(int          level,
     record.m_SourceLine     = source_line;
     record.m_SourceFunction = source_function;
     NPT_System::GetCurrentTimeStamp(record.m_TimeStamp);
+    record.m_ThreadId       = NPT_Thread::GetCurrentThreadId();
 
     /* call all handlers for this logger and parents */
     m_Manager.Lock();
@@ -1238,6 +1245,8 @@ NPT_LogTcpHandler::FormatRecord(const NPT_LogRecord& record, NPT_String& msg)
     msg += record.m_SourceFunction;
     msg += "\r\nSource-Line: ";
     msg += NPT_String::FromIntegerU(record.m_SourceLine);
+    msg += "\r\nThread-Id: ";
+    msg += NPT_String::FromIntegerU(record.m_ThreadId);
     msg += "\r\nTimeStamp: ";
     msg += NPT_DateTime(record.m_TimeStamp, true).ToString(NPT_DateTime::FORMAT_W3C, 
                                                            NPT_DateTime::FLAG_EMIT_FRACTION | 

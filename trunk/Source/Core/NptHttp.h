@@ -77,6 +77,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 #define NPT_HTTP_HEADER_COOKIE              "Cookie"
 #define NPT_HTTP_HEADER_ACCEPT_RANGES       "Accept-Ranges"
+#define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
 #define NPT_HTTP_HEADER_AUTHORIZATION		"Authorization"
 
 #define NPT_HTTP_TRANSFER_ENCODING_CHUNKED  "chunked"
@@ -158,7 +159,7 @@ public:
     // methods
     NPT_Result Parse(NPT_BufferedInputStream& stream);
     NPT_Result Emit(NPT_OutputStream& stream) const;
-    NPT_List<NPT_HttpHeader*>& GetHeaders() { return m_Headers; }
+    const NPT_List<NPT_HttpHeader*>& GetHeaders() const { return m_Headers; }
     NPT_HttpHeader*   GetHeader(const char* name) const;
     const NPT_String* GetHeaderValue(const char* name) const;
     NPT_Result        SetHeader(const char* name, const char* value, bool replace=true);
@@ -227,8 +228,14 @@ public:
     NPT_HttpHeaders& GetHeaders() { 
         return m_Headers;  
     }
+    const NPT_HttpHeaders& GetHeaders() const { 
+        return m_Headers;  
+    }
     NPT_Result SetEntity(NPT_HttpEntity* entity);
     NPT_HttpEntity* GetEntity() {
+        return m_Entity;
+    }
+    NPT_HttpEntity* GetEntity() const {
         return m_Entity;
     }
     virtual NPT_Result ParseHeaders(NPT_BufferedInputStream& stream);
@@ -293,10 +300,11 @@ public:
 
     // methods
     NPT_Result         SetStatus(NPT_HttpStatusCode status_code,
-                                 const char*        reason_phrase);
+                                 const char*        reason_phrase,
+                                 const char*        protocol = NPT_HTTP_PROTOCOL_1_0);
     NPT_Result         SetProtocol(const char* protocol);
-    NPT_HttpStatusCode GetStatusCode()   { return m_StatusCode;   }
-    NPT_String&        GetReasonPhrase() { return m_ReasonPhrase; }
+    NPT_HttpStatusCode GetStatusCode() const { return m_StatusCode;   }
+    const NPT_String&  GetReasonPhrase() const { return m_ReasonPhrase; }
     virtual NPT_Result Emit(NPT_OutputStream& stream) const;
 
 protected:
@@ -363,7 +371,7 @@ public:
                                    NPT_Timeout                name_resolver_timeout,
                                    NPT_InputStreamReference&  input_stream,
                                    NPT_OutputStreamReference& output_stream) = 0;
-
+        virtual NPT_Result Abort() { return NPT_SUCCESS; }
     };
 
     /**
@@ -377,6 +385,7 @@ public:
     // methods
     NPT_Result SendRequest(NPT_HttpRequest&   request,
                            NPT_HttpResponse*& response);
+    NPT_Result Abort();
     NPT_Result SetConfig(const Config& config);
     NPT_Result SetProxy(const char* hostname, NPT_UInt16 port);
     NPT_Result SetProxySelector(NPT_HttpProxySelector* selector);
@@ -384,6 +393,7 @@ public:
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout,
                            NPT_Timeout io_timeout,
                            NPT_Timeout name_resolver_timeout);
+    NPT_Result SetUserAgent(const char* user_agent);
 
 protected:
     // methods
@@ -395,6 +405,7 @@ protected:
     NPT_HttpProxySelector* m_ProxySelector;
     bool                   m_ProxySelectorIsOwned;
     Connector*             m_Connector;
+    NPT_String             m_UserAgent;
 };
 
 /*----------------------------------------------------------------------
@@ -463,7 +474,7 @@ public:
                                  const char* mime_type = "text/html",
                                  bool        copy = true);
 
-    // NPT_HttpRequetsHandler methods
+    // NPT_HttpRequestHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
                                      const NPT_HttpRequestContext& context,
                                      NPT_HttpResponse&             response);
@@ -485,7 +496,7 @@ public:
                                bool        auto_dir = false,
                                const char* auto_index = NULL);
 
-    // NPT_HttpRequetsHandler methods
+    // NPT_HttpRequestHandler methods
     virtual NPT_Result SetupResponse(NPT_HttpRequest&              request, 
                                      const NPT_HttpRequestContext& context,
                                      NPT_HttpResponse&             response);
@@ -534,8 +545,10 @@ public:
 
     // methods
     NPT_Result SetConfig(const Config& config);
+    const Config& GetConfig() const { return m_Config; }
     NPT_Result SetListenPort(NPT_UInt16 port);
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout, NPT_Timeout io_timeout);
+    NPT_Result SetServerHeader(const char* server_header);
     NPT_Result Abort();
     NPT_Result WaitForNewClient(NPT_InputStreamReference&  input,
                                 NPT_OutputStreamReference& output,
@@ -581,6 +594,7 @@ protected:
     NPT_UInt16               m_BoundPort;
     Config                   m_Config;
     NPT_List<HandlerConfig*> m_RequestHandlers;
+    NPT_String               m_ServerHeader;
 };
 
 /*----------------------------------------------------------------------

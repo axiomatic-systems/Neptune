@@ -50,16 +50,17 @@ const NPT_Result NPT_ERROR_TLS_INVALID_VERSION                  = (NPT_ERROR_BAS
 const NPT_Result NPT_ERROR_TLS_INVALID_SESSION                  = (NPT_ERROR_BASE_TLS-6);
 const NPT_Result NPT_ERROR_TLS_NO_CIPHER                        = (NPT_ERROR_BASE_TLS-7);
 const NPT_Result NPT_ERROR_TLS_BAD_CERTIFICATE                  = (NPT_ERROR_BASE_TLS-8);
-const NPT_Result NPT_ERROR_INVALID_KEY                          = (NPT_ERROR_BASE_TLS-9);
-const NPT_Result NPT_ERROR_CERTIFICATE_FAILURE                  = (NPT_ERROR_BASE_TLS-10);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NO_TRUST_ANCHOR      = (NPT_ERROR_BASE_TLS-11);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_BAD_SIGNATURE        = (NPT_ERROR_BASE_TLS-12);      
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NOT_YET_VALID        = (NPT_ERROR_BASE_TLS-13);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_EXPIRED              = (NPT_ERROR_BASE_TLS-14);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED          = (NPT_ERROR_BASE_TLS-15);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_CHAIN        = (NPT_ERROR_BASE_TLS-16);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_UNSUPPORTED_DIGEST   = (NPT_ERROR_BASE_TLS-17);
-const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_PRIVATE_KEY  = (NPT_ERROR_BASE_TLS-18);
+const NPT_Result NPT_ERROR_TLS_INVALID_KEY                      = (NPT_ERROR_BASE_TLS-9);
+const NPT_Result NPT_ERROR_TLS_NO_CLIENT_RENEGOTIATION          = (NPT_ERROR_BASE_TLS-10);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_FAILURE              = (NPT_ERROR_BASE_TLS-11);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NO_TRUST_ANCHOR      = (NPT_ERROR_BASE_TLS-12);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_BAD_SIGNATURE        = (NPT_ERROR_BASE_TLS-13);      
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_NOT_YET_VALID        = (NPT_ERROR_BASE_TLS-14);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_EXPIRED              = (NPT_ERROR_BASE_TLS-15);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED          = (NPT_ERROR_BASE_TLS-16);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_CHAIN        = (NPT_ERROR_BASE_TLS-17);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_UNSUPPORTED_DIGEST   = (NPT_ERROR_BASE_TLS-18);
+const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_PRIVATE_KEY  = (NPT_ERROR_BASE_TLS-19);
 
 /*----------------------------------------------------------------------
 |   constants
@@ -133,6 +134,7 @@ struct NPT_TlsCertificateInfo
     } fingerprint;
     NPT_DateTime issue_date;
     NPT_DateTime expiration_date;
+    NPT_List<NPT_String> alternate_names;
 };
 
 /*----------------------------------------------------------------------

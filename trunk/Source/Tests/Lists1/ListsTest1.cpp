@@ -93,7 +93,7 @@ SortTest()
         CHECK(NPT_SUCCEEDED(list.Sort(compare)));
         NPT_UInt32 value = 0;
         for (unsigned int j=0; j<list_size; j++) {
-            NPT_UInt32 cursor;
+            NPT_UInt32 cursor = 0;
             list.Get(j, cursor);
             CHECK(cursor >= value);
             value = cursor;

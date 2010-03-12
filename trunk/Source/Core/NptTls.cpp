@@ -99,6 +99,17 @@ SSL_DateTime_Now(SSL_DateTime* now)
 }
 
 /*----------------------------------------------------------------------
+|   SSL_GetRandomSeed
++---------------------------------------------------------------------*/
+uint64_t
+SSL_GetRandomSeed()
+{
+    NPT_TimeStamp ts;
+    NPT_System::GetCurrentTimeStamp(ts);
+    return ts.ToNanos();
+}
+
+/*----------------------------------------------------------------------
 |   NPT_Tls_MapResult
 +---------------------------------------------------------------------*/
 static NPT_Result
@@ -116,9 +127,9 @@ NPT_Tls_MapResult(int err)
         case SSL_ERROR_INVALID_SESSION:   return NPT_ERROR_TLS_INVALID_SESSION;
         case SSL_ERROR_NO_CIPHER:         return NPT_ERROR_TLS_NO_CIPHER;
         case SSL_ERROR_BAD_CERTIFICATE:   return NPT_ERROR_TLS_BAD_CERTIFICATE;
-        case SSL_ERROR_INVALID_KEY:       return NPT_ERROR_INVALID_KEY;
+        case SSL_ERROR_INVALID_KEY:       return NPT_ERROR_TLS_INVALID_KEY;
         case SSL_X509_ERROR(X509_OK):                           return NPT_SUCCESS;
-        case SSL_X509_ERROR(X509_NOT_OK):                       return NPT_ERROR_CERTIFICATE_FAILURE;
+        case SSL_X509_ERROR(X509_NOT_OK):                       return NPT_ERROR_TLS_CERTIFICATE_FAILURE;
         case SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT):    return NPT_ERROR_TLS_CERTIFICATE_NO_TRUST_ANCHOR;
         case SSL_X509_ERROR(X509_VFY_ERROR_BAD_SIGNATURE):      return NPT_ERROR_TLS_CERTIFICATE_BAD_SIGNATURE;      
         case SSL_X509_ERROR(X509_VFY_ERROR_NOT_YET_VALID):      return NPT_ERROR_TLS_CERTIFICATE_NOT_YET_VALID;
@@ -357,6 +368,13 @@ NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
     cert_info.expiration_date.m_NanoSeconds = 0;
     cert_info.expiration_date.m_TimeZone    = 0;
 
+    // alternate names
+    cert_info.alternate_names.Clear();
+    const char* alt_name = NULL;
+    for (unsigned int i=0; (alt_name=ssl_get_cert_subject_alt_dnsname(m_SSL, i)); i++) {
+        cert_info.alternate_names.Add(NPT_String(alt_name));
+    }
+    
     return NPT_SUCCESS;
 }
 

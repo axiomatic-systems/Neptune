@@ -244,7 +244,7 @@ NPT_fsopen_utf8(const char* path, const char* mode, int sh_flags)
 /*----------------------------------------------------------------------
 |   NPT_FilePath::Separator
 +---------------------------------------------------------------------*/
-const NPT_String NPT_FilePath::Separator("\\");
+const char* const NPT_FilePath::Separator = "\\";
 
 /*----------------------------------------------------------------------
 |   NPT_File::GetRoots

@@ -138,6 +138,7 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
     NPT_OutputStreamReference output;
     client_socket->GetInputStream(input);
     client_socket->GetOutputStream(output);
+    delete client_socket;
     NPT_TlsContextReference context(new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_VERIFY_LATER));
     
     /* self-signed cert */

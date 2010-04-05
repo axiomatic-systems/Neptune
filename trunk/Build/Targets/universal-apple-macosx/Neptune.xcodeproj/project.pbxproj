@@ -188,6 +188,157 @@
 		CAE417D00E0DC1C600A530D1 /* NetConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE417A70E0DC16300A530D1 /* NetConfig.cpp */; };
 		CAE417DC0E0DC1DF00A530D1 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAE417DD0E0DC1EA00A530D1 /* NetPing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE417AB0E0DC16300A530D1 /* NetPing.cpp */; };
+		CAE4F8031157C3A000DD82F9 /* NptTlsDefaultTrustAnchors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7681157C3A000DD82F9 /* NptTlsDefaultTrustAnchors.cpp */; };
+		CAE4F8041157C3A000DD82F9 /* NptTlsTrustAnchor_0000.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7691157C3A000DD82F9 /* NptTlsTrustAnchor_0000.cpp */; };
+		CAE4F8051157C3A000DD82F9 /* NptTlsTrustAnchor_0001.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76A1157C3A000DD82F9 /* NptTlsTrustAnchor_0001.cpp */; };
+		CAE4F8061157C3A000DD82F9 /* NptTlsTrustAnchor_0002.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76B1157C3A000DD82F9 /* NptTlsTrustAnchor_0002.cpp */; };
+		CAE4F8071157C3A000DD82F9 /* NptTlsTrustAnchor_0003.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76C1157C3A000DD82F9 /* NptTlsTrustAnchor_0003.cpp */; };
+		CAE4F8081157C3A000DD82F9 /* NptTlsTrustAnchor_0004.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76D1157C3A000DD82F9 /* NptTlsTrustAnchor_0004.cpp */; };
+		CAE4F8091157C3A000DD82F9 /* NptTlsTrustAnchor_0005.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76E1157C3A000DD82F9 /* NptTlsTrustAnchor_0005.cpp */; };
+		CAE4F80A1157C3A000DD82F9 /* NptTlsTrustAnchor_0006.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F76F1157C3A000DD82F9 /* NptTlsTrustAnchor_0006.cpp */; };
+		CAE4F80B1157C3A000DD82F9 /* NptTlsTrustAnchor_0007.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7701157C3A000DD82F9 /* NptTlsTrustAnchor_0007.cpp */; };
+		CAE4F80C1157C3A000DD82F9 /* NptTlsTrustAnchor_0008.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7711157C3A000DD82F9 /* NptTlsTrustAnchor_0008.cpp */; };
+		CAE4F80D1157C3A000DD82F9 /* NptTlsTrustAnchor_0009.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7721157C3A000DD82F9 /* NptTlsTrustAnchor_0009.cpp */; };
+		CAE4F80E1157C3A000DD82F9 /* NptTlsTrustAnchor_0010.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7731157C3A000DD82F9 /* NptTlsTrustAnchor_0010.cpp */; };
+		CAE4F80F1157C3A000DD82F9 /* NptTlsTrustAnchor_0011.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7741157C3A000DD82F9 /* NptTlsTrustAnchor_0011.cpp */; };
+		CAE4F8101157C3A000DD82F9 /* NptTlsTrustAnchor_0012.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7751157C3A000DD82F9 /* NptTlsTrustAnchor_0012.cpp */; };
+		CAE4F8111157C3A000DD82F9 /* NptTlsTrustAnchor_0013.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7761157C3A000DD82F9 /* NptTlsTrustAnchor_0013.cpp */; };
+		CAE4F8121157C3A000DD82F9 /* NptTlsTrustAnchor_0014.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7771157C3A000DD82F9 /* NptTlsTrustAnchor_0014.cpp */; };
+		CAE4F8131157C3A000DD82F9 /* NptTlsTrustAnchor_0015.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7781157C3A000DD82F9 /* NptTlsTrustAnchor_0015.cpp */; };
+		CAE4F8141157C3A000DD82F9 /* NptTlsTrustAnchor_0016.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7791157C3A000DD82F9 /* NptTlsTrustAnchor_0016.cpp */; };
+		CAE4F8151157C3A000DD82F9 /* NptTlsTrustAnchor_0017.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77A1157C3A000DD82F9 /* NptTlsTrustAnchor_0017.cpp */; };
+		CAE4F8161157C3A000DD82F9 /* NptTlsTrustAnchor_0018.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77B1157C3A000DD82F9 /* NptTlsTrustAnchor_0018.cpp */; };
+		CAE4F8171157C3A000DD82F9 /* NptTlsTrustAnchor_0019.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77C1157C3A000DD82F9 /* NptTlsTrustAnchor_0019.cpp */; };
+		CAE4F8181157C3A000DD82F9 /* NptTlsTrustAnchor_0020.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77D1157C3A000DD82F9 /* NptTlsTrustAnchor_0020.cpp */; };
+		CAE4F8191157C3A000DD82F9 /* NptTlsTrustAnchor_0021.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77E1157C3A000DD82F9 /* NptTlsTrustAnchor_0021.cpp */; };
+		CAE4F81A1157C3A000DD82F9 /* NptTlsTrustAnchor_0022.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F77F1157C3A000DD82F9 /* NptTlsTrustAnchor_0022.cpp */; };
+		CAE4F81B1157C3A000DD82F9 /* NptTlsTrustAnchor_0023.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7801157C3A000DD82F9 /* NptTlsTrustAnchor_0023.cpp */; };
+		CAE4F81C1157C3A000DD82F9 /* NptTlsTrustAnchor_0024.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7811157C3A000DD82F9 /* NptTlsTrustAnchor_0024.cpp */; };
+		CAE4F81D1157C3A000DD82F9 /* NptTlsTrustAnchor_0025.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7821157C3A000DD82F9 /* NptTlsTrustAnchor_0025.cpp */; };
+		CAE4F81E1157C3A000DD82F9 /* NptTlsTrustAnchor_0026.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7831157C3A000DD82F9 /* NptTlsTrustAnchor_0026.cpp */; };
+		CAE4F81F1157C3A000DD82F9 /* NptTlsTrustAnchor_0027.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7841157C3A000DD82F9 /* NptTlsTrustAnchor_0027.cpp */; };
+		CAE4F8201157C3A000DD82F9 /* NptTlsTrustAnchor_0028.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7851157C3A000DD82F9 /* NptTlsTrustAnchor_0028.cpp */; };
+		CAE4F8211157C3A000DD82F9 /* NptTlsTrustAnchor_0029.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7861157C3A000DD82F9 /* NptTlsTrustAnchor_0029.cpp */; };
+		CAE4F8221157C3A000DD82F9 /* NptTlsTrustAnchor_0030.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7871157C3A000DD82F9 /* NptTlsTrustAnchor_0030.cpp */; };
+		CAE4F8231157C3A000DD82F9 /* NptTlsTrustAnchor_0031.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7881157C3A000DD82F9 /* NptTlsTrustAnchor_0031.cpp */; };
+		CAE4F8241157C3A000DD82F9 /* NptTlsTrustAnchor_0032.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7891157C3A000DD82F9 /* NptTlsTrustAnchor_0032.cpp */; };
+		CAE4F8251157C3A000DD82F9 /* NptTlsTrustAnchor_0033.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78A1157C3A000DD82F9 /* NptTlsTrustAnchor_0033.cpp */; };
+		CAE4F8261157C3A000DD82F9 /* NptTlsTrustAnchor_0034.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78B1157C3A000DD82F9 /* NptTlsTrustAnchor_0034.cpp */; };
+		CAE4F8271157C3A000DD82F9 /* NptTlsTrustAnchor_0035.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78C1157C3A000DD82F9 /* NptTlsTrustAnchor_0035.cpp */; };
+		CAE4F8281157C3A000DD82F9 /* NptTlsTrustAnchor_0036.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78D1157C3A000DD82F9 /* NptTlsTrustAnchor_0036.cpp */; };
+		CAE4F8291157C3A000DD82F9 /* NptTlsTrustAnchor_0037.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78E1157C3A000DD82F9 /* NptTlsTrustAnchor_0037.cpp */; };
+		CAE4F82A1157C3A000DD82F9 /* NptTlsTrustAnchor_0038.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F78F1157C3A000DD82F9 /* NptTlsTrustAnchor_0038.cpp */; };
+		CAE4F82B1157C3A000DD82F9 /* NptTlsTrustAnchor_0039.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7901157C3A000DD82F9 /* NptTlsTrustAnchor_0039.cpp */; };
+		CAE4F82C1157C3A000DD82F9 /* NptTlsTrustAnchor_0040.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7911157C3A000DD82F9 /* NptTlsTrustAnchor_0040.cpp */; };
+		CAE4F82D1157C3A000DD82F9 /* NptTlsTrustAnchor_0041.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7921157C3A000DD82F9 /* NptTlsTrustAnchor_0041.cpp */; };
+		CAE4F82E1157C3A000DD82F9 /* NptTlsTrustAnchor_0042.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7931157C3A000DD82F9 /* NptTlsTrustAnchor_0042.cpp */; };
+		CAE4F82F1157C3A000DD82F9 /* NptTlsTrustAnchor_0043.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7941157C3A000DD82F9 /* NptTlsTrustAnchor_0043.cpp */; };
+		CAE4F8301157C3A000DD82F9 /* NptTlsTrustAnchor_0044.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7951157C3A000DD82F9 /* NptTlsTrustAnchor_0044.cpp */; };
+		CAE4F8311157C3A000DD82F9 /* NptTlsTrustAnchor_0045.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7961157C3A000DD82F9 /* NptTlsTrustAnchor_0045.cpp */; };
+		CAE4F8321157C3A000DD82F9 /* NptTlsTrustAnchor_0046.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7971157C3A000DD82F9 /* NptTlsTrustAnchor_0046.cpp */; };
+		CAE4F8331157C3A000DD82F9 /* NptTlsTrustAnchor_0047.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7981157C3A000DD82F9 /* NptTlsTrustAnchor_0047.cpp */; };
+		CAE4F8341157C3A000DD82F9 /* NptTlsTrustAnchor_0048.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7991157C3A000DD82F9 /* NptTlsTrustAnchor_0048.cpp */; };
+		CAE4F8351157C3A000DD82F9 /* NptTlsTrustAnchor_0049.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79A1157C3A000DD82F9 /* NptTlsTrustAnchor_0049.cpp */; };
+		CAE4F8361157C3A000DD82F9 /* NptTlsTrustAnchor_0050.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79B1157C3A000DD82F9 /* NptTlsTrustAnchor_0050.cpp */; };
+		CAE4F8371157C3A000DD82F9 /* NptTlsTrustAnchor_0051.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79C1157C3A000DD82F9 /* NptTlsTrustAnchor_0051.cpp */; };
+		CAE4F8381157C3A000DD82F9 /* NptTlsTrustAnchor_0052.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79D1157C3A000DD82F9 /* NptTlsTrustAnchor_0052.cpp */; };
+		CAE4F8391157C3A000DD82F9 /* NptTlsTrustAnchor_0053.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79E1157C3A000DD82F9 /* NptTlsTrustAnchor_0053.cpp */; };
+		CAE4F83A1157C3A000DD82F9 /* NptTlsTrustAnchor_0054.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F79F1157C3A000DD82F9 /* NptTlsTrustAnchor_0054.cpp */; };
+		CAE4F83B1157C3A000DD82F9 /* NptTlsTrustAnchor_0055.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A01157C3A000DD82F9 /* NptTlsTrustAnchor_0055.cpp */; };
+		CAE4F83C1157C3A000DD82F9 /* NptTlsTrustAnchor_0056.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A11157C3A000DD82F9 /* NptTlsTrustAnchor_0056.cpp */; };
+		CAE4F83D1157C3A000DD82F9 /* NptTlsTrustAnchor_0057.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A21157C3A000DD82F9 /* NptTlsTrustAnchor_0057.cpp */; };
+		CAE4F83E1157C3A000DD82F9 /* NptTlsTrustAnchor_0058.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A31157C3A000DD82F9 /* NptTlsTrustAnchor_0058.cpp */; };
+		CAE4F83F1157C3A000DD82F9 /* NptTlsTrustAnchor_0059.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A41157C3A000DD82F9 /* NptTlsTrustAnchor_0059.cpp */; };
+		CAE4F8401157C3A000DD82F9 /* NptTlsTrustAnchor_0060.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A51157C3A000DD82F9 /* NptTlsTrustAnchor_0060.cpp */; };
+		CAE4F8411157C3A000DD82F9 /* NptTlsTrustAnchor_0061.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A61157C3A000DD82F9 /* NptTlsTrustAnchor_0061.cpp */; };
+		CAE4F8421157C3A000DD82F9 /* NptTlsTrustAnchor_0062.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A71157C3A000DD82F9 /* NptTlsTrustAnchor_0062.cpp */; };
+		CAE4F8431157C3A000DD82F9 /* NptTlsTrustAnchor_0063.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A81157C3A000DD82F9 /* NptTlsTrustAnchor_0063.cpp */; };
+		CAE4F8441157C3A000DD82F9 /* NptTlsTrustAnchor_0064.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7A91157C3A000DD82F9 /* NptTlsTrustAnchor_0064.cpp */; };
+		CAE4F8451157C3A000DD82F9 /* NptTlsTrustAnchor_0065.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AA1157C3A000DD82F9 /* NptTlsTrustAnchor_0065.cpp */; };
+		CAE4F8461157C3A000DD82F9 /* NptTlsTrustAnchor_0066.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AB1157C3A000DD82F9 /* NptTlsTrustAnchor_0066.cpp */; };
+		CAE4F8471157C3A000DD82F9 /* NptTlsTrustAnchor_0067.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AC1157C3A000DD82F9 /* NptTlsTrustAnchor_0067.cpp */; };
+		CAE4F8481157C3A000DD82F9 /* NptTlsTrustAnchor_0068.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AD1157C3A000DD82F9 /* NptTlsTrustAnchor_0068.cpp */; };
+		CAE4F8491157C3A000DD82F9 /* NptTlsTrustAnchor_0069.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AE1157C3A000DD82F9 /* NptTlsTrustAnchor_0069.cpp */; };
+		CAE4F84A1157C3A000DD82F9 /* NptTlsTrustAnchor_0070.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7AF1157C3A000DD82F9 /* NptTlsTrustAnchor_0070.cpp */; };
+		CAE4F84B1157C3A000DD82F9 /* NptTlsTrustAnchor_0071.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B01157C3A000DD82F9 /* NptTlsTrustAnchor_0071.cpp */; };
+		CAE4F84C1157C3A000DD82F9 /* NptTlsTrustAnchor_0072.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B11157C3A000DD82F9 /* NptTlsTrustAnchor_0072.cpp */; };
+		CAE4F84D1157C3A000DD82F9 /* NptTlsTrustAnchor_0073.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B21157C3A000DD82F9 /* NptTlsTrustAnchor_0073.cpp */; };
+		CAE4F84E1157C3A000DD82F9 /* NptTlsTrustAnchor_0074.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B31157C3A000DD82F9 /* NptTlsTrustAnchor_0074.cpp */; };
+		CAE4F84F1157C3A000DD82F9 /* NptTlsTrustAnchor_0075.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B41157C3A000DD82F9 /* NptTlsTrustAnchor_0075.cpp */; };
+		CAE4F8501157C3A000DD82F9 /* NptTlsTrustAnchor_0076.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B51157C3A000DD82F9 /* NptTlsTrustAnchor_0076.cpp */; };
+		CAE4F8511157C3A000DD82F9 /* NptTlsTrustAnchor_0077.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B61157C3A000DD82F9 /* NptTlsTrustAnchor_0077.cpp */; };
+		CAE4F8521157C3A000DD82F9 /* NptTlsTrustAnchor_0078.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B71157C3A000DD82F9 /* NptTlsTrustAnchor_0078.cpp */; };
+		CAE4F8531157C3A000DD82F9 /* NptTlsTrustAnchor_0079.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B81157C3A000DD82F9 /* NptTlsTrustAnchor_0079.cpp */; };
+		CAE4F8541157C3A000DD82F9 /* NptTlsTrustAnchor_0080.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7B91157C3A000DD82F9 /* NptTlsTrustAnchor_0080.cpp */; };
+		CAE4F8551157C3A000DD82F9 /* NptTlsTrustAnchor_0081.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BA1157C3A000DD82F9 /* NptTlsTrustAnchor_0081.cpp */; };
+		CAE4F8561157C3A000DD82F9 /* NptTlsTrustAnchor_0082.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BB1157C3A000DD82F9 /* NptTlsTrustAnchor_0082.cpp */; };
+		CAE4F8571157C3A000DD82F9 /* NptTlsTrustAnchor_0083.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BC1157C3A000DD82F9 /* NptTlsTrustAnchor_0083.cpp */; };
+		CAE4F8581157C3A000DD82F9 /* NptTlsTrustAnchor_0084.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BD1157C3A000DD82F9 /* NptTlsTrustAnchor_0084.cpp */; };
+		CAE4F8591157C3A100DD82F9 /* NptTlsTrustAnchor_0085.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BE1157C3A000DD82F9 /* NptTlsTrustAnchor_0085.cpp */; };
+		CAE4F85A1157C3A100DD82F9 /* NptTlsTrustAnchor_0086.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7BF1157C3A000DD82F9 /* NptTlsTrustAnchor_0086.cpp */; };
+		CAE4F85B1157C3A100DD82F9 /* NptTlsTrustAnchor_0087.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C01157C3A000DD82F9 /* NptTlsTrustAnchor_0087.cpp */; };
+		CAE4F85C1157C3A100DD82F9 /* NptTlsTrustAnchor_0088.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C11157C3A000DD82F9 /* NptTlsTrustAnchor_0088.cpp */; };
+		CAE4F85D1157C3A100DD82F9 /* NptTlsTrustAnchor_0089.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C21157C3A000DD82F9 /* NptTlsTrustAnchor_0089.cpp */; };
+		CAE4F85E1157C3A100DD82F9 /* NptTlsTrustAnchor_0090.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C31157C3A000DD82F9 /* NptTlsTrustAnchor_0090.cpp */; };
+		CAE4F85F1157C3A100DD82F9 /* NptTlsTrustAnchor_0091.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C41157C3A000DD82F9 /* NptTlsTrustAnchor_0091.cpp */; };
+		CAE4F8601157C3A100DD82F9 /* NptTlsTrustAnchor_0092.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C51157C3A000DD82F9 /* NptTlsTrustAnchor_0092.cpp */; };
+		CAE4F8611157C3A100DD82F9 /* NptTlsTrustAnchor_0093.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C61157C3A000DD82F9 /* NptTlsTrustAnchor_0093.cpp */; };
+		CAE4F8621157C3A100DD82F9 /* NptTlsTrustAnchor_0094.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C71157C3A000DD82F9 /* NptTlsTrustAnchor_0094.cpp */; };
+		CAE4F8631157C3A100DD82F9 /* NptTlsTrustAnchor_0095.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C81157C3A000DD82F9 /* NptTlsTrustAnchor_0095.cpp */; };
+		CAE4F8641157C3A100DD82F9 /* NptTlsTrustAnchor_0096.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7C91157C3A000DD82F9 /* NptTlsTrustAnchor_0096.cpp */; };
+		CAE4F8651157C3A100DD82F9 /* NptTlsTrustAnchor_0097.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CA1157C3A000DD82F9 /* NptTlsTrustAnchor_0097.cpp */; };
+		CAE4F8661157C3A100DD82F9 /* NptTlsTrustAnchor_0098.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CB1157C3A000DD82F9 /* NptTlsTrustAnchor_0098.cpp */; };
+		CAE4F8671157C3A100DD82F9 /* NptTlsTrustAnchor_0099.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CC1157C3A000DD82F9 /* NptTlsTrustAnchor_0099.cpp */; };
+		CAE4F8681157C3A100DD82F9 /* NptTlsTrustAnchor_0100.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CD1157C3A000DD82F9 /* NptTlsTrustAnchor_0100.cpp */; };
+		CAE4F8691157C3A100DD82F9 /* NptTlsTrustAnchor_0101.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CE1157C3A000DD82F9 /* NptTlsTrustAnchor_0101.cpp */; };
+		CAE4F86A1157C3A100DD82F9 /* NptTlsTrustAnchor_0102.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7CF1157C3A000DD82F9 /* NptTlsTrustAnchor_0102.cpp */; };
+		CAE4F86B1157C3A100DD82F9 /* NptTlsTrustAnchor_0103.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D01157C3A000DD82F9 /* NptTlsTrustAnchor_0103.cpp */; };
+		CAE4F86C1157C3A100DD82F9 /* NptTlsTrustAnchor_0104.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D11157C3A000DD82F9 /* NptTlsTrustAnchor_0104.cpp */; };
+		CAE4F86D1157C3A100DD82F9 /* NptTlsTrustAnchor_0105.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D21157C3A000DD82F9 /* NptTlsTrustAnchor_0105.cpp */; };
+		CAE4F86E1157C3A100DD82F9 /* NptTlsTrustAnchor_0106.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D31157C3A000DD82F9 /* NptTlsTrustAnchor_0106.cpp */; };
+		CAE4F86F1157C3A100DD82F9 /* NptTlsTrustAnchor_0107.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D41157C3A000DD82F9 /* NptTlsTrustAnchor_0107.cpp */; };
+		CAE4F8701157C3A100DD82F9 /* NptTlsTrustAnchor_0108.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D51157C3A000DD82F9 /* NptTlsTrustAnchor_0108.cpp */; };
+		CAE4F8711157C3A100DD82F9 /* NptTlsTrustAnchor_0109.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D61157C3A000DD82F9 /* NptTlsTrustAnchor_0109.cpp */; };
+		CAE4F8721157C3A100DD82F9 /* NptTlsTrustAnchor_0110.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D71157C3A000DD82F9 /* NptTlsTrustAnchor_0110.cpp */; };
+		CAE4F8731157C3A100DD82F9 /* NptTlsTrustAnchor_0111.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D81157C3A000DD82F9 /* NptTlsTrustAnchor_0111.cpp */; };
+		CAE4F8741157C3A100DD82F9 /* NptTlsTrustAnchor_0112.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7D91157C3A000DD82F9 /* NptTlsTrustAnchor_0112.cpp */; };
+		CAE4F8751157C3A100DD82F9 /* NptTlsTrustAnchor_0113.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DA1157C3A000DD82F9 /* NptTlsTrustAnchor_0113.cpp */; };
+		CAE4F8761157C3A100DD82F9 /* NptTlsTrustAnchor_0114.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DB1157C3A000DD82F9 /* NptTlsTrustAnchor_0114.cpp */; };
+		CAE4F8771157C3A100DD82F9 /* NptTlsTrustAnchor_0115.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DC1157C3A000DD82F9 /* NptTlsTrustAnchor_0115.cpp */; };
+		CAE4F8781157C3A100DD82F9 /* NptTlsTrustAnchor_0116.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DD1157C3A000DD82F9 /* NptTlsTrustAnchor_0116.cpp */; };
+		CAE4F8791157C3A100DD82F9 /* NptTlsTrustAnchor_0117.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DE1157C3A000DD82F9 /* NptTlsTrustAnchor_0117.cpp */; };
+		CAE4F87A1157C3A100DD82F9 /* NptTlsTrustAnchor_0118.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7DF1157C3A000DD82F9 /* NptTlsTrustAnchor_0118.cpp */; };
+		CAE4F87B1157C3A100DD82F9 /* NptTlsTrustAnchor_0119.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E01157C3A000DD82F9 /* NptTlsTrustAnchor_0119.cpp */; };
+		CAE4F87C1157C3A100DD82F9 /* NptTlsTrustAnchor_0120.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E11157C3A000DD82F9 /* NptTlsTrustAnchor_0120.cpp */; };
+		CAE4F87D1157C3A100DD82F9 /* NptTlsTrustAnchor_0121.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E21157C3A000DD82F9 /* NptTlsTrustAnchor_0121.cpp */; };
+		CAE4F87E1157C3A100DD82F9 /* NptTlsTrustAnchor_0122.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E31157C3A000DD82F9 /* NptTlsTrustAnchor_0122.cpp */; };
+		CAE4F87F1157C3A100DD82F9 /* NptTlsTrustAnchor_0123.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E41157C3A000DD82F9 /* NptTlsTrustAnchor_0123.cpp */; };
+		CAE4F8801157C3A100DD82F9 /* NptTlsTrustAnchor_0124.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E51157C3A000DD82F9 /* NptTlsTrustAnchor_0124.cpp */; };
+		CAE4F8811157C3A100DD82F9 /* NptTlsTrustAnchor_0125.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E61157C3A000DD82F9 /* NptTlsTrustAnchor_0125.cpp */; };
+		CAE4F8821157C3A100DD82F9 /* NptTlsTrustAnchor_0126.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E71157C3A000DD82F9 /* NptTlsTrustAnchor_0126.cpp */; };
+		CAE4F8831157C3A100DD82F9 /* NptTlsTrustAnchor_0127.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E81157C3A000DD82F9 /* NptTlsTrustAnchor_0127.cpp */; };
+		CAE4F8841157C3A100DD82F9 /* NptTlsTrustAnchor_0128.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7E91157C3A000DD82F9 /* NptTlsTrustAnchor_0128.cpp */; };
+		CAE4F8851157C3A100DD82F9 /* NptTlsTrustAnchor_0129.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7EA1157C3A000DD82F9 /* NptTlsTrustAnchor_0129.cpp */; };
+		CAE4F8861157C3A100DD82F9 /* NptTlsTrustAnchor_0130.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7EB1157C3A000DD82F9 /* NptTlsTrustAnchor_0130.cpp */; };
+		CAE4F8871157C3A100DD82F9 /* NptTlsTrustAnchor_0131.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7EC1157C3A000DD82F9 /* NptTlsTrustAnchor_0131.cpp */; };
+		CAE4F8881157C3A100DD82F9 /* NptTlsTrustAnchor_0132.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7ED1157C3A000DD82F9 /* NptTlsTrustAnchor_0132.cpp */; };
+		CAE4F8891157C3A100DD82F9 /* NptTlsTrustAnchor_0133.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7EE1157C3A000DD82F9 /* NptTlsTrustAnchor_0133.cpp */; };
+		CAE4F88A1157C3A100DD82F9 /* NptTlsTrustAnchor_0134.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7EF1157C3A000DD82F9 /* NptTlsTrustAnchor_0134.cpp */; };
+		CAE4F88B1157C3A100DD82F9 /* NptTlsTrustAnchor_0135.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F01157C3A000DD82F9 /* NptTlsTrustAnchor_0135.cpp */; };
+		CAE4F88C1157C3A100DD82F9 /* NptTlsTrustAnchor_0136.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F11157C3A000DD82F9 /* NptTlsTrustAnchor_0136.cpp */; };
+		CAE4F88D1157C3A100DD82F9 /* NptTlsTrustAnchor_0137.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F21157C3A000DD82F9 /* NptTlsTrustAnchor_0137.cpp */; };
+		CAE4F88E1157C3A100DD82F9 /* NptTlsTrustAnchor_0138.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F31157C3A000DD82F9 /* NptTlsTrustAnchor_0138.cpp */; };
+		CAE4F88F1157C3A100DD82F9 /* NptTlsTrustAnchor_0139.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F41157C3A000DD82F9 /* NptTlsTrustAnchor_0139.cpp */; };
+		CAE4F8901157C3A100DD82F9 /* NptTlsTrustAnchor_0140.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F51157C3A000DD82F9 /* NptTlsTrustAnchor_0140.cpp */; };
+		CAE4F8911157C3A100DD82F9 /* NptTlsTrustAnchor_0141.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F61157C3A000DD82F9 /* NptTlsTrustAnchor_0141.cpp */; };
+		CAE4F8921157C3A100DD82F9 /* NptTlsTrustAnchor_0142.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F71157C3A000DD82F9 /* NptTlsTrustAnchor_0142.cpp */; };
+		CAE4F8931157C3A100DD82F9 /* NptTlsTrustAnchor_0143.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F81157C3A000DD82F9 /* NptTlsTrustAnchor_0143.cpp */; };
+		CAE4F8941157C3A100DD82F9 /* NptTlsTrustAnchor_0144.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7F91157C3A000DD82F9 /* NptTlsTrustAnchor_0144.cpp */; };
+		CAE4F8951157C3A100DD82F9 /* NptTlsTrustAnchor_0145.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7FA1157C3A000DD82F9 /* NptTlsTrustAnchor_0145.cpp */; };
+		CAE4F8961157C3A100DD82F9 /* NptTlsTrustAnchor_0146.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7FB1157C3A000DD82F9 /* NptTlsTrustAnchor_0146.cpp */; };
+		CAE4F8971157C3A100DD82F9 /* NptTlsTrustAnchor_0147.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7FC1157C3A000DD82F9 /* NptTlsTrustAnchor_0147.cpp */; };
+		CAE4F8981157C3A100DD82F9 /* NptTlsTrustAnchor_0148.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7FD1157C3A000DD82F9 /* NptTlsTrustAnchor_0148.cpp */; };
+		CAE4F8991157C3A100DD82F9 /* NptTlsTrustAnchor_0149.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAE4F7FE1157C3A000DD82F9 /* NptTlsTrustAnchor_0149.cpp */; };
 		CAF03CB60C7E7F15002C470F /* NptZip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF03CB50C7E7F15002C470F /* NptZip.cpp */; };
 		CAF03DB40C7F9243002C470F /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = CAF03DB30C7F9243002C470F /* compress.c */; };
 		CAF2EFB60E64881E00948C04 /* NptPosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFB50E64881E00948C04 /* NptPosixFile.cpp */; };
@@ -839,6 +990,157 @@
 		CAE417BB0E0DC19400A530D1 /* NetEcho */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetEcho; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE417C80E0DC1B400A530D1 /* NetConfig */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetConfig; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE417D50E0DC1D600A530D1 /* NetPing */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetPing; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAE4F7681157C3A000DD82F9 /* NptTlsDefaultTrustAnchors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchors.cpp; sourceTree = "<group>"; };
+		CAE4F7691157C3A000DD82F9 /* NptTlsTrustAnchor_0000.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0000.cpp; sourceTree = "<group>"; };
+		CAE4F76A1157C3A000DD82F9 /* NptTlsTrustAnchor_0001.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0001.cpp; sourceTree = "<group>"; };
+		CAE4F76B1157C3A000DD82F9 /* NptTlsTrustAnchor_0002.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0002.cpp; sourceTree = "<group>"; };
+		CAE4F76C1157C3A000DD82F9 /* NptTlsTrustAnchor_0003.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0003.cpp; sourceTree = "<group>"; };
+		CAE4F76D1157C3A000DD82F9 /* NptTlsTrustAnchor_0004.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0004.cpp; sourceTree = "<group>"; };
+		CAE4F76E1157C3A000DD82F9 /* NptTlsTrustAnchor_0005.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0005.cpp; sourceTree = "<group>"; };
+		CAE4F76F1157C3A000DD82F9 /* NptTlsTrustAnchor_0006.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0006.cpp; sourceTree = "<group>"; };
+		CAE4F7701157C3A000DD82F9 /* NptTlsTrustAnchor_0007.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0007.cpp; sourceTree = "<group>"; };
+		CAE4F7711157C3A000DD82F9 /* NptTlsTrustAnchor_0008.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0008.cpp; sourceTree = "<group>"; };
+		CAE4F7721157C3A000DD82F9 /* NptTlsTrustAnchor_0009.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0009.cpp; sourceTree = "<group>"; };
+		CAE4F7731157C3A000DD82F9 /* NptTlsTrustAnchor_0010.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0010.cpp; sourceTree = "<group>"; };
+		CAE4F7741157C3A000DD82F9 /* NptTlsTrustAnchor_0011.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0011.cpp; sourceTree = "<group>"; };
+		CAE4F7751157C3A000DD82F9 /* NptTlsTrustAnchor_0012.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0012.cpp; sourceTree = "<group>"; };
+		CAE4F7761157C3A000DD82F9 /* NptTlsTrustAnchor_0013.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0013.cpp; sourceTree = "<group>"; };
+		CAE4F7771157C3A000DD82F9 /* NptTlsTrustAnchor_0014.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0014.cpp; sourceTree = "<group>"; };
+		CAE4F7781157C3A000DD82F9 /* NptTlsTrustAnchor_0015.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0015.cpp; sourceTree = "<group>"; };
+		CAE4F7791157C3A000DD82F9 /* NptTlsTrustAnchor_0016.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0016.cpp; sourceTree = "<group>"; };
+		CAE4F77A1157C3A000DD82F9 /* NptTlsTrustAnchor_0017.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0017.cpp; sourceTree = "<group>"; };
+		CAE4F77B1157C3A000DD82F9 /* NptTlsTrustAnchor_0018.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0018.cpp; sourceTree = "<group>"; };
+		CAE4F77C1157C3A000DD82F9 /* NptTlsTrustAnchor_0019.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0019.cpp; sourceTree = "<group>"; };
+		CAE4F77D1157C3A000DD82F9 /* NptTlsTrustAnchor_0020.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0020.cpp; sourceTree = "<group>"; };
+		CAE4F77E1157C3A000DD82F9 /* NptTlsTrustAnchor_0021.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0021.cpp; sourceTree = "<group>"; };
+		CAE4F77F1157C3A000DD82F9 /* NptTlsTrustAnchor_0022.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0022.cpp; sourceTree = "<group>"; };
+		CAE4F7801157C3A000DD82F9 /* NptTlsTrustAnchor_0023.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0023.cpp; sourceTree = "<group>"; };
+		CAE4F7811157C3A000DD82F9 /* NptTlsTrustAnchor_0024.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0024.cpp; sourceTree = "<group>"; };
+		CAE4F7821157C3A000DD82F9 /* NptTlsTrustAnchor_0025.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0025.cpp; sourceTree = "<group>"; };
+		CAE4F7831157C3A000DD82F9 /* NptTlsTrustAnchor_0026.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0026.cpp; sourceTree = "<group>"; };
+		CAE4F7841157C3A000DD82F9 /* NptTlsTrustAnchor_0027.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0027.cpp; sourceTree = "<group>"; };
+		CAE4F7851157C3A000DD82F9 /* NptTlsTrustAnchor_0028.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0028.cpp; sourceTree = "<group>"; };
+		CAE4F7861157C3A000DD82F9 /* NptTlsTrustAnchor_0029.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0029.cpp; sourceTree = "<group>"; };
+		CAE4F7871157C3A000DD82F9 /* NptTlsTrustAnchor_0030.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0030.cpp; sourceTree = "<group>"; };
+		CAE4F7881157C3A000DD82F9 /* NptTlsTrustAnchor_0031.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0031.cpp; sourceTree = "<group>"; };
+		CAE4F7891157C3A000DD82F9 /* NptTlsTrustAnchor_0032.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0032.cpp; sourceTree = "<group>"; };
+		CAE4F78A1157C3A000DD82F9 /* NptTlsTrustAnchor_0033.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0033.cpp; sourceTree = "<group>"; };
+		CAE4F78B1157C3A000DD82F9 /* NptTlsTrustAnchor_0034.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0034.cpp; sourceTree = "<group>"; };
+		CAE4F78C1157C3A000DD82F9 /* NptTlsTrustAnchor_0035.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0035.cpp; sourceTree = "<group>"; };
+		CAE4F78D1157C3A000DD82F9 /* NptTlsTrustAnchor_0036.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0036.cpp; sourceTree = "<group>"; };
+		CAE4F78E1157C3A000DD82F9 /* NptTlsTrustAnchor_0037.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0037.cpp; sourceTree = "<group>"; };
+		CAE4F78F1157C3A000DD82F9 /* NptTlsTrustAnchor_0038.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0038.cpp; sourceTree = "<group>"; };
+		CAE4F7901157C3A000DD82F9 /* NptTlsTrustAnchor_0039.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0039.cpp; sourceTree = "<group>"; };
+		CAE4F7911157C3A000DD82F9 /* NptTlsTrustAnchor_0040.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0040.cpp; sourceTree = "<group>"; };
+		CAE4F7921157C3A000DD82F9 /* NptTlsTrustAnchor_0041.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0041.cpp; sourceTree = "<group>"; };
+		CAE4F7931157C3A000DD82F9 /* NptTlsTrustAnchor_0042.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0042.cpp; sourceTree = "<group>"; };
+		CAE4F7941157C3A000DD82F9 /* NptTlsTrustAnchor_0043.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0043.cpp; sourceTree = "<group>"; };
+		CAE4F7951157C3A000DD82F9 /* NptTlsTrustAnchor_0044.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0044.cpp; sourceTree = "<group>"; };
+		CAE4F7961157C3A000DD82F9 /* NptTlsTrustAnchor_0045.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0045.cpp; sourceTree = "<group>"; };
+		CAE4F7971157C3A000DD82F9 /* NptTlsTrustAnchor_0046.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0046.cpp; sourceTree = "<group>"; };
+		CAE4F7981157C3A000DD82F9 /* NptTlsTrustAnchor_0047.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0047.cpp; sourceTree = "<group>"; };
+		CAE4F7991157C3A000DD82F9 /* NptTlsTrustAnchor_0048.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0048.cpp; sourceTree = "<group>"; };
+		CAE4F79A1157C3A000DD82F9 /* NptTlsTrustAnchor_0049.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0049.cpp; sourceTree = "<group>"; };
+		CAE4F79B1157C3A000DD82F9 /* NptTlsTrustAnchor_0050.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0050.cpp; sourceTree = "<group>"; };
+		CAE4F79C1157C3A000DD82F9 /* NptTlsTrustAnchor_0051.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0051.cpp; sourceTree = "<group>"; };
+		CAE4F79D1157C3A000DD82F9 /* NptTlsTrustAnchor_0052.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0052.cpp; sourceTree = "<group>"; };
+		CAE4F79E1157C3A000DD82F9 /* NptTlsTrustAnchor_0053.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0053.cpp; sourceTree = "<group>"; };
+		CAE4F79F1157C3A000DD82F9 /* NptTlsTrustAnchor_0054.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0054.cpp; sourceTree = "<group>"; };
+		CAE4F7A01157C3A000DD82F9 /* NptTlsTrustAnchor_0055.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0055.cpp; sourceTree = "<group>"; };
+		CAE4F7A11157C3A000DD82F9 /* NptTlsTrustAnchor_0056.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0056.cpp; sourceTree = "<group>"; };
+		CAE4F7A21157C3A000DD82F9 /* NptTlsTrustAnchor_0057.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0057.cpp; sourceTree = "<group>"; };
+		CAE4F7A31157C3A000DD82F9 /* NptTlsTrustAnchor_0058.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0058.cpp; sourceTree = "<group>"; };
+		CAE4F7A41157C3A000DD82F9 /* NptTlsTrustAnchor_0059.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0059.cpp; sourceTree = "<group>"; };
+		CAE4F7A51157C3A000DD82F9 /* NptTlsTrustAnchor_0060.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0060.cpp; sourceTree = "<group>"; };
+		CAE4F7A61157C3A000DD82F9 /* NptTlsTrustAnchor_0061.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0061.cpp; sourceTree = "<group>"; };
+		CAE4F7A71157C3A000DD82F9 /* NptTlsTrustAnchor_0062.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0062.cpp; sourceTree = "<group>"; };
+		CAE4F7A81157C3A000DD82F9 /* NptTlsTrustAnchor_0063.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0063.cpp; sourceTree = "<group>"; };
+		CAE4F7A91157C3A000DD82F9 /* NptTlsTrustAnchor_0064.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0064.cpp; sourceTree = "<group>"; };
+		CAE4F7AA1157C3A000DD82F9 /* NptTlsTrustAnchor_0065.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0065.cpp; sourceTree = "<group>"; };
+		CAE4F7AB1157C3A000DD82F9 /* NptTlsTrustAnchor_0066.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0066.cpp; sourceTree = "<group>"; };
+		CAE4F7AC1157C3A000DD82F9 /* NptTlsTrustAnchor_0067.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0067.cpp; sourceTree = "<group>"; };
+		CAE4F7AD1157C3A000DD82F9 /* NptTlsTrustAnchor_0068.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0068.cpp; sourceTree = "<group>"; };
+		CAE4F7AE1157C3A000DD82F9 /* NptTlsTrustAnchor_0069.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0069.cpp; sourceTree = "<group>"; };
+		CAE4F7AF1157C3A000DD82F9 /* NptTlsTrustAnchor_0070.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0070.cpp; sourceTree = "<group>"; };
+		CAE4F7B01157C3A000DD82F9 /* NptTlsTrustAnchor_0071.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0071.cpp; sourceTree = "<group>"; };
+		CAE4F7B11157C3A000DD82F9 /* NptTlsTrustAnchor_0072.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0072.cpp; sourceTree = "<group>"; };
+		CAE4F7B21157C3A000DD82F9 /* NptTlsTrustAnchor_0073.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0073.cpp; sourceTree = "<group>"; };
+		CAE4F7B31157C3A000DD82F9 /* NptTlsTrustAnchor_0074.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0074.cpp; sourceTree = "<group>"; };
+		CAE4F7B41157C3A000DD82F9 /* NptTlsTrustAnchor_0075.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0075.cpp; sourceTree = "<group>"; };
+		CAE4F7B51157C3A000DD82F9 /* NptTlsTrustAnchor_0076.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0076.cpp; sourceTree = "<group>"; };
+		CAE4F7B61157C3A000DD82F9 /* NptTlsTrustAnchor_0077.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0077.cpp; sourceTree = "<group>"; };
+		CAE4F7B71157C3A000DD82F9 /* NptTlsTrustAnchor_0078.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0078.cpp; sourceTree = "<group>"; };
+		CAE4F7B81157C3A000DD82F9 /* NptTlsTrustAnchor_0079.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0079.cpp; sourceTree = "<group>"; };
+		CAE4F7B91157C3A000DD82F9 /* NptTlsTrustAnchor_0080.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0080.cpp; sourceTree = "<group>"; };
+		CAE4F7BA1157C3A000DD82F9 /* NptTlsTrustAnchor_0081.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0081.cpp; sourceTree = "<group>"; };
+		CAE4F7BB1157C3A000DD82F9 /* NptTlsTrustAnchor_0082.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0082.cpp; sourceTree = "<group>"; };
+		CAE4F7BC1157C3A000DD82F9 /* NptTlsTrustAnchor_0083.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0083.cpp; sourceTree = "<group>"; };
+		CAE4F7BD1157C3A000DD82F9 /* NptTlsTrustAnchor_0084.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0084.cpp; sourceTree = "<group>"; };
+		CAE4F7BE1157C3A000DD82F9 /* NptTlsTrustAnchor_0085.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0085.cpp; sourceTree = "<group>"; };
+		CAE4F7BF1157C3A000DD82F9 /* NptTlsTrustAnchor_0086.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0086.cpp; sourceTree = "<group>"; };
+		CAE4F7C01157C3A000DD82F9 /* NptTlsTrustAnchor_0087.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0087.cpp; sourceTree = "<group>"; };
+		CAE4F7C11157C3A000DD82F9 /* NptTlsTrustAnchor_0088.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0088.cpp; sourceTree = "<group>"; };
+		CAE4F7C21157C3A000DD82F9 /* NptTlsTrustAnchor_0089.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0089.cpp; sourceTree = "<group>"; };
+		CAE4F7C31157C3A000DD82F9 /* NptTlsTrustAnchor_0090.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0090.cpp; sourceTree = "<group>"; };
+		CAE4F7C41157C3A000DD82F9 /* NptTlsTrustAnchor_0091.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0091.cpp; sourceTree = "<group>"; };
+		CAE4F7C51157C3A000DD82F9 /* NptTlsTrustAnchor_0092.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0092.cpp; sourceTree = "<group>"; };
+		CAE4F7C61157C3A000DD82F9 /* NptTlsTrustAnchor_0093.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0093.cpp; sourceTree = "<group>"; };
+		CAE4F7C71157C3A000DD82F9 /* NptTlsTrustAnchor_0094.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0094.cpp; sourceTree = "<group>"; };
+		CAE4F7C81157C3A000DD82F9 /* NptTlsTrustAnchor_0095.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0095.cpp; sourceTree = "<group>"; };
+		CAE4F7C91157C3A000DD82F9 /* NptTlsTrustAnchor_0096.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0096.cpp; sourceTree = "<group>"; };
+		CAE4F7CA1157C3A000DD82F9 /* NptTlsTrustAnchor_0097.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0097.cpp; sourceTree = "<group>"; };
+		CAE4F7CB1157C3A000DD82F9 /* NptTlsTrustAnchor_0098.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0098.cpp; sourceTree = "<group>"; };
+		CAE4F7CC1157C3A000DD82F9 /* NptTlsTrustAnchor_0099.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0099.cpp; sourceTree = "<group>"; };
+		CAE4F7CD1157C3A000DD82F9 /* NptTlsTrustAnchor_0100.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0100.cpp; sourceTree = "<group>"; };
+		CAE4F7CE1157C3A000DD82F9 /* NptTlsTrustAnchor_0101.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0101.cpp; sourceTree = "<group>"; };
+		CAE4F7CF1157C3A000DD82F9 /* NptTlsTrustAnchor_0102.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0102.cpp; sourceTree = "<group>"; };
+		CAE4F7D01157C3A000DD82F9 /* NptTlsTrustAnchor_0103.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0103.cpp; sourceTree = "<group>"; };
+		CAE4F7D11157C3A000DD82F9 /* NptTlsTrustAnchor_0104.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0104.cpp; sourceTree = "<group>"; };
+		CAE4F7D21157C3A000DD82F9 /* NptTlsTrustAnchor_0105.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0105.cpp; sourceTree = "<group>"; };
+		CAE4F7D31157C3A000DD82F9 /* NptTlsTrustAnchor_0106.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0106.cpp; sourceTree = "<group>"; };
+		CAE4F7D41157C3A000DD82F9 /* NptTlsTrustAnchor_0107.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0107.cpp; sourceTree = "<group>"; };
+		CAE4F7D51157C3A000DD82F9 /* NptTlsTrustAnchor_0108.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0108.cpp; sourceTree = "<group>"; };
+		CAE4F7D61157C3A000DD82F9 /* NptTlsTrustAnchor_0109.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0109.cpp; sourceTree = "<group>"; };
+		CAE4F7D71157C3A000DD82F9 /* NptTlsTrustAnchor_0110.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0110.cpp; sourceTree = "<group>"; };
+		CAE4F7D81157C3A000DD82F9 /* NptTlsTrustAnchor_0111.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0111.cpp; sourceTree = "<group>"; };
+		CAE4F7D91157C3A000DD82F9 /* NptTlsTrustAnchor_0112.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0112.cpp; sourceTree = "<group>"; };
+		CAE4F7DA1157C3A000DD82F9 /* NptTlsTrustAnchor_0113.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0113.cpp; sourceTree = "<group>"; };
+		CAE4F7DB1157C3A000DD82F9 /* NptTlsTrustAnchor_0114.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0114.cpp; sourceTree = "<group>"; };
+		CAE4F7DC1157C3A000DD82F9 /* NptTlsTrustAnchor_0115.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0115.cpp; sourceTree = "<group>"; };
+		CAE4F7DD1157C3A000DD82F9 /* NptTlsTrustAnchor_0116.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0116.cpp; sourceTree = "<group>"; };
+		CAE4F7DE1157C3A000DD82F9 /* NptTlsTrustAnchor_0117.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0117.cpp; sourceTree = "<group>"; };
+		CAE4F7DF1157C3A000DD82F9 /* NptTlsTrustAnchor_0118.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0118.cpp; sourceTree = "<group>"; };
+		CAE4F7E01157C3A000DD82F9 /* NptTlsTrustAnchor_0119.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0119.cpp; sourceTree = "<group>"; };
+		CAE4F7E11157C3A000DD82F9 /* NptTlsTrustAnchor_0120.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0120.cpp; sourceTree = "<group>"; };
+		CAE4F7E21157C3A000DD82F9 /* NptTlsTrustAnchor_0121.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0121.cpp; sourceTree = "<group>"; };
+		CAE4F7E31157C3A000DD82F9 /* NptTlsTrustAnchor_0122.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0122.cpp; sourceTree = "<group>"; };
+		CAE4F7E41157C3A000DD82F9 /* NptTlsTrustAnchor_0123.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0123.cpp; sourceTree = "<group>"; };
+		CAE4F7E51157C3A000DD82F9 /* NptTlsTrustAnchor_0124.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0124.cpp; sourceTree = "<group>"; };
+		CAE4F7E61157C3A000DD82F9 /* NptTlsTrustAnchor_0125.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0125.cpp; sourceTree = "<group>"; };
+		CAE4F7E71157C3A000DD82F9 /* NptTlsTrustAnchor_0126.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0126.cpp; sourceTree = "<group>"; };
+		CAE4F7E81157C3A000DD82F9 /* NptTlsTrustAnchor_0127.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0127.cpp; sourceTree = "<group>"; };
+		CAE4F7E91157C3A000DD82F9 /* NptTlsTrustAnchor_0128.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0128.cpp; sourceTree = "<group>"; };
+		CAE4F7EA1157C3A000DD82F9 /* NptTlsTrustAnchor_0129.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0129.cpp; sourceTree = "<group>"; };
+		CAE4F7EB1157C3A000DD82F9 /* NptTlsTrustAnchor_0130.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0130.cpp; sourceTree = "<group>"; };
+		CAE4F7EC1157C3A000DD82F9 /* NptTlsTrustAnchor_0131.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0131.cpp; sourceTree = "<group>"; };
+		CAE4F7ED1157C3A000DD82F9 /* NptTlsTrustAnchor_0132.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0132.cpp; sourceTree = "<group>"; };
+		CAE4F7EE1157C3A000DD82F9 /* NptTlsTrustAnchor_0133.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0133.cpp; sourceTree = "<group>"; };
+		CAE4F7EF1157C3A000DD82F9 /* NptTlsTrustAnchor_0134.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0134.cpp; sourceTree = "<group>"; };
+		CAE4F7F01157C3A000DD82F9 /* NptTlsTrustAnchor_0135.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0135.cpp; sourceTree = "<group>"; };
+		CAE4F7F11157C3A000DD82F9 /* NptTlsTrustAnchor_0136.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0136.cpp; sourceTree = "<group>"; };
+		CAE4F7F21157C3A000DD82F9 /* NptTlsTrustAnchor_0137.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0137.cpp; sourceTree = "<group>"; };
+		CAE4F7F31157C3A000DD82F9 /* NptTlsTrustAnchor_0138.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0138.cpp; sourceTree = "<group>"; };
+		CAE4F7F41157C3A000DD82F9 /* NptTlsTrustAnchor_0139.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0139.cpp; sourceTree = "<group>"; };
+		CAE4F7F51157C3A000DD82F9 /* NptTlsTrustAnchor_0140.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0140.cpp; sourceTree = "<group>"; };
+		CAE4F7F61157C3A000DD82F9 /* NptTlsTrustAnchor_0141.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0141.cpp; sourceTree = "<group>"; };
+		CAE4F7F71157C3A000DD82F9 /* NptTlsTrustAnchor_0142.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0142.cpp; sourceTree = "<group>"; };
+		CAE4F7F81157C3A000DD82F9 /* NptTlsTrustAnchor_0143.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0143.cpp; sourceTree = "<group>"; };
+		CAE4F7F91157C3A000DD82F9 /* NptTlsTrustAnchor_0144.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0144.cpp; sourceTree = "<group>"; };
+		CAE4F7FA1157C3A000DD82F9 /* NptTlsTrustAnchor_0145.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0145.cpp; sourceTree = "<group>"; };
+		CAE4F7FB1157C3A000DD82F9 /* NptTlsTrustAnchor_0146.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0146.cpp; sourceTree = "<group>"; };
+		CAE4F7FC1157C3A000DD82F9 /* NptTlsTrustAnchor_0147.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0147.cpp; sourceTree = "<group>"; };
+		CAE4F7FD1157C3A000DD82F9 /* NptTlsTrustAnchor_0148.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0148.cpp; sourceTree = "<group>"; };
+		CAE4F7FE1157C3A000DD82F9 /* NptTlsTrustAnchor_0149.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsTrustAnchor_0149.cpp; sourceTree = "<group>"; };
 		CAF03CB50C7E7F15002C470F /* NptZip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptZip.cpp; sourceTree = "<group>"; };
 		CAF03DB30C7F9243002C470F /* compress.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = compress.c; path = "../../../ThirdParty/zlib-1.2.3/compress.c"; sourceTree = SOURCE_ROOT; };
 		CAF2EFB50E64881E00948C04 /* NptPosixFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptPosixFile.cpp; sourceTree = "<group>"; };
@@ -1594,6 +1896,172 @@
 			path = NetPump;
 			sourceTree = "<group>";
 		};
+		CAE4F7661157C3A000DD82F9 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				CAE4F7671157C3A000DD82F9 /* TLS */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		CAE4F7671157C3A000DD82F9 /* TLS */ = {
+			isa = PBXGroup;
+			children = (
+				CAE4F7681157C3A000DD82F9 /* NptTlsDefaultTrustAnchors.cpp */,
+				CAE4F7691157C3A000DD82F9 /* NptTlsTrustAnchor_0000.cpp */,
+				CAE4F76A1157C3A000DD82F9 /* NptTlsTrustAnchor_0001.cpp */,
+				CAE4F76B1157C3A000DD82F9 /* NptTlsTrustAnchor_0002.cpp */,
+				CAE4F76C1157C3A000DD82F9 /* NptTlsTrustAnchor_0003.cpp */,
+				CAE4F76D1157C3A000DD82F9 /* NptTlsTrustAnchor_0004.cpp */,
+				CAE4F76E1157C3A000DD82F9 /* NptTlsTrustAnchor_0005.cpp */,
+				CAE4F76F1157C3A000DD82F9 /* NptTlsTrustAnchor_0006.cpp */,
+				CAE4F7701157C3A000DD82F9 /* NptTlsTrustAnchor_0007.cpp */,
+				CAE4F7711157C3A000DD82F9 /* NptTlsTrustAnchor_0008.cpp */,
+				CAE4F7721157C3A000DD82F9 /* NptTlsTrustAnchor_0009.cpp */,
+				CAE4F7731157C3A000DD82F9 /* NptTlsTrustAnchor_0010.cpp */,
+				CAE4F7741157C3A000DD82F9 /* NptTlsTrustAnchor_0011.cpp */,
+				CAE4F7751157C3A000DD82F9 /* NptTlsTrustAnchor_0012.cpp */,
+				CAE4F7761157C3A000DD82F9 /* NptTlsTrustAnchor_0013.cpp */,
+				CAE4F7771157C3A000DD82F9 /* NptTlsTrustAnchor_0014.cpp */,
+				CAE4F7781157C3A000DD82F9 /* NptTlsTrustAnchor_0015.cpp */,
+				CAE4F7791157C3A000DD82F9 /* NptTlsTrustAnchor_0016.cpp */,
+				CAE4F77A1157C3A000DD82F9 /* NptTlsTrustAnchor_0017.cpp */,
+				CAE4F77B1157C3A000DD82F9 /* NptTlsTrustAnchor_0018.cpp */,
+				CAE4F77C1157C3A000DD82F9 /* NptTlsTrustAnchor_0019.cpp */,
+				CAE4F77D1157C3A000DD82F9 /* NptTlsTrustAnchor_0020.cpp */,
+				CAE4F77E1157C3A000DD82F9 /* NptTlsTrustAnchor_0021.cpp */,
+				CAE4F77F1157C3A000DD82F9 /* NptTlsTrustAnchor_0022.cpp */,
+				CAE4F7801157C3A000DD82F9 /* NptTlsTrustAnchor_0023.cpp */,
+				CAE4F7811157C3A000DD82F9 /* NptTlsTrustAnchor_0024.cpp */,
+				CAE4F7821157C3A000DD82F9 /* NptTlsTrustAnchor_0025.cpp */,
+				CAE4F7831157C3A000DD82F9 /* NptTlsTrustAnchor_0026.cpp */,
+				CAE4F7841157C3A000DD82F9 /* NptTlsTrustAnchor_0027.cpp */,
+				CAE4F7851157C3A000DD82F9 /* NptTlsTrustAnchor_0028.cpp */,
+				CAE4F7861157C3A000DD82F9 /* NptTlsTrustAnchor_0029.cpp */,
+				CAE4F7871157C3A000DD82F9 /* NptTlsTrustAnchor_0030.cpp */,
+				CAE4F7881157C3A000DD82F9 /* NptTlsTrustAnchor_0031.cpp */,
+				CAE4F7891157C3A000DD82F9 /* NptTlsTrustAnchor_0032.cpp */,
+				CAE4F78A1157C3A000DD82F9 /* NptTlsTrustAnchor_0033.cpp */,
+				CAE4F78B1157C3A000DD82F9 /* NptTlsTrustAnchor_0034.cpp */,
+				CAE4F78C1157C3A000DD82F9 /* NptTlsTrustAnchor_0035.cpp */,
+				CAE4F78D1157C3A000DD82F9 /* NptTlsTrustAnchor_0036.cpp */,
+				CAE4F78E1157C3A000DD82F9 /* NptTlsTrustAnchor_0037.cpp */,
+				CAE4F78F1157C3A000DD82F9 /* NptTlsTrustAnchor_0038.cpp */,
+				CAE4F7901157C3A000DD82F9 /* NptTlsTrustAnchor_0039.cpp */,
+				CAE4F7911157C3A000DD82F9 /* NptTlsTrustAnchor_0040.cpp */,
+				CAE4F7921157C3A000DD82F9 /* NptTlsTrustAnchor_0041.cpp */,
+				CAE4F7931157C3A000DD82F9 /* NptTlsTrustAnchor_0042.cpp */,
+				CAE4F7941157C3A000DD82F9 /* NptTlsTrustAnchor_0043.cpp */,
+				CAE4F7951157C3A000DD82F9 /* NptTlsTrustAnchor_0044.cpp */,
+				CAE4F7961157C3A000DD82F9 /* NptTlsTrustAnchor_0045.cpp */,
+				CAE4F7971157C3A000DD82F9 /* NptTlsTrustAnchor_0046.cpp */,
+				CAE4F7981157C3A000DD82F9 /* NptTlsTrustAnchor_0047.cpp */,
+				CAE4F7991157C3A000DD82F9 /* NptTlsTrustAnchor_0048.cpp */,
+				CAE4F79A1157C3A000DD82F9 /* NptTlsTrustAnchor_0049.cpp */,
+				CAE4F79B1157C3A000DD82F9 /* NptTlsTrustAnchor_0050.cpp */,
+				CAE4F79C1157C3A000DD82F9 /* NptTlsTrustAnchor_0051.cpp */,
+				CAE4F79D1157C3A000DD82F9 /* NptTlsTrustAnchor_0052.cpp */,
+				CAE4F79E1157C3A000DD82F9 /* NptTlsTrustAnchor_0053.cpp */,
+				CAE4F79F1157C3A000DD82F9 /* NptTlsTrustAnchor_0054.cpp */,
+				CAE4F7A01157C3A000DD82F9 /* NptTlsTrustAnchor_0055.cpp */,
+				CAE4F7A11157C3A000DD82F9 /* NptTlsTrustAnchor_0056.cpp */,
+				CAE4F7A21157C3A000DD82F9 /* NptTlsTrustAnchor_0057.cpp */,
+				CAE4F7A31157C3A000DD82F9 /* NptTlsTrustAnchor_0058.cpp */,
+				CAE4F7A41157C3A000DD82F9 /* NptTlsTrustAnchor_0059.cpp */,
+				CAE4F7A51157C3A000DD82F9 /* NptTlsTrustAnchor_0060.cpp */,
+				CAE4F7A61157C3A000DD82F9 /* NptTlsTrustAnchor_0061.cpp */,
+				CAE4F7A71157C3A000DD82F9 /* NptTlsTrustAnchor_0062.cpp */,
+				CAE4F7A81157C3A000DD82F9 /* NptTlsTrustAnchor_0063.cpp */,
+				CAE4F7A91157C3A000DD82F9 /* NptTlsTrustAnchor_0064.cpp */,
+				CAE4F7AA1157C3A000DD82F9 /* NptTlsTrustAnchor_0065.cpp */,
+				CAE4F7AB1157C3A000DD82F9 /* NptTlsTrustAnchor_0066.cpp */,
+				CAE4F7AC1157C3A000DD82F9 /* NptTlsTrustAnchor_0067.cpp */,
+				CAE4F7AD1157C3A000DD82F9 /* NptTlsTrustAnchor_0068.cpp */,
+				CAE4F7AE1157C3A000DD82F9 /* NptTlsTrustAnchor_0069.cpp */,
+				CAE4F7AF1157C3A000DD82F9 /* NptTlsTrustAnchor_0070.cpp */,
+				CAE4F7B01157C3A000DD82F9 /* NptTlsTrustAnchor_0071.cpp */,
+				CAE4F7B11157C3A000DD82F9 /* NptTlsTrustAnchor_0072.cpp */,
+				CAE4F7B21157C3A000DD82F9 /* NptTlsTrustAnchor_0073.cpp */,
+				CAE4F7B31157C3A000DD82F9 /* NptTlsTrustAnchor_0074.cpp */,
+				CAE4F7B41157C3A000DD82F9 /* NptTlsTrustAnchor_0075.cpp */,
+				CAE4F7B51157C3A000DD82F9 /* NptTlsTrustAnchor_0076.cpp */,
+				CAE4F7B61157C3A000DD82F9 /* NptTlsTrustAnchor_0077.cpp */,
+				CAE4F7B71157C3A000DD82F9 /* NptTlsTrustAnchor_0078.cpp */,
+				CAE4F7B81157C3A000DD82F9 /* NptTlsTrustAnchor_0079.cpp */,
+				CAE4F7B91157C3A000DD82F9 /* NptTlsTrustAnchor_0080.cpp */,
+				CAE4F7BA1157C3A000DD82F9 /* NptTlsTrustAnchor_0081.cpp */,
+				CAE4F7BB1157C3A000DD82F9 /* NptTlsTrustAnchor_0082.cpp */,
+				CAE4F7BC1157C3A000DD82F9 /* NptTlsTrustAnchor_0083.cpp */,
+				CAE4F7BD1157C3A000DD82F9 /* NptTlsTrustAnchor_0084.cpp */,
+				CAE4F7BE1157C3A000DD82F9 /* NptTlsTrustAnchor_0085.cpp */,
+				CAE4F7BF1157C3A000DD82F9 /* NptTlsTrustAnchor_0086.cpp */,
+				CAE4F7C01157C3A000DD82F9 /* NptTlsTrustAnchor_0087.cpp */,
+				CAE4F7C11157C3A000DD82F9 /* NptTlsTrustAnchor_0088.cpp */,
+				CAE4F7C21157C3A000DD82F9 /* NptTlsTrustAnchor_0089.cpp */,
+				CAE4F7C31157C3A000DD82F9 /* NptTlsTrustAnchor_0090.cpp */,
+				CAE4F7C41157C3A000DD82F9 /* NptTlsTrustAnchor_0091.cpp */,
+				CAE4F7C51157C3A000DD82F9 /* NptTlsTrustAnchor_0092.cpp */,
+				CAE4F7C61157C3A000DD82F9 /* NptTlsTrustAnchor_0093.cpp */,
+				CAE4F7C71157C3A000DD82F9 /* NptTlsTrustAnchor_0094.cpp */,
+				CAE4F7C81157C3A000DD82F9 /* NptTlsTrustAnchor_0095.cpp */,
+				CAE4F7C91157C3A000DD82F9 /* NptTlsTrustAnchor_0096.cpp */,
+				CAE4F7CA1157C3A000DD82F9 /* NptTlsTrustAnchor_0097.cpp */,
+				CAE4F7CB1157C3A000DD82F9 /* NptTlsTrustAnchor_0098.cpp */,
+				CAE4F7CC1157C3A000DD82F9 /* NptTlsTrustAnchor_0099.cpp */,
+				CAE4F7CD1157C3A000DD82F9 /* NptTlsTrustAnchor_0100.cpp */,
+				CAE4F7CE1157C3A000DD82F9 /* NptTlsTrustAnchor_0101.cpp */,
+				CAE4F7CF1157C3A000DD82F9 /* NptTlsTrustAnchor_0102.cpp */,
+				CAE4F7D01157C3A000DD82F9 /* NptTlsTrustAnchor_0103.cpp */,
+				CAE4F7D11157C3A000DD82F9 /* NptTlsTrustAnchor_0104.cpp */,
+				CAE4F7D21157C3A000DD82F9 /* NptTlsTrustAnchor_0105.cpp */,
+				CAE4F7D31157C3A000DD82F9 /* NptTlsTrustAnchor_0106.cpp */,
+				CAE4F7D41157C3A000DD82F9 /* NptTlsTrustAnchor_0107.cpp */,
+				CAE4F7D51157C3A000DD82F9 /* NptTlsTrustAnchor_0108.cpp */,
+				CAE4F7D61157C3A000DD82F9 /* NptTlsTrustAnchor_0109.cpp */,
+				CAE4F7D71157C3A000DD82F9 /* NptTlsTrustAnchor_0110.cpp */,
+				CAE4F7D81157C3A000DD82F9 /* NptTlsTrustAnchor_0111.cpp */,
+				CAE4F7D91157C3A000DD82F9 /* NptTlsTrustAnchor_0112.cpp */,
+				CAE4F7DA1157C3A000DD82F9 /* NptTlsTrustAnchor_0113.cpp */,
+				CAE4F7DB1157C3A000DD82F9 /* NptTlsTrustAnchor_0114.cpp */,
+				CAE4F7DC1157C3A000DD82F9 /* NptTlsTrustAnchor_0115.cpp */,
+				CAE4F7DD1157C3A000DD82F9 /* NptTlsTrustAnchor_0116.cpp */,
+				CAE4F7DE1157C3A000DD82F9 /* NptTlsTrustAnchor_0117.cpp */,
+				CAE4F7DF1157C3A000DD82F9 /* NptTlsTrustAnchor_0118.cpp */,
+				CAE4F7E01157C3A000DD82F9 /* NptTlsTrustAnchor_0119.cpp */,
+				CAE4F7E11157C3A000DD82F9 /* NptTlsTrustAnchor_0120.cpp */,
+				CAE4F7E21157C3A000DD82F9 /* NptTlsTrustAnchor_0121.cpp */,
+				CAE4F7E31157C3A000DD82F9 /* NptTlsTrustAnchor_0122.cpp */,
+				CAE4F7E41157C3A000DD82F9 /* NptTlsTrustAnchor_0123.cpp */,
+				CAE4F7E51157C3A000DD82F9 /* NptTlsTrustAnchor_0124.cpp */,
+				CAE4F7E61157C3A000DD82F9 /* NptTlsTrustAnchor_0125.cpp */,
+				CAE4F7E71157C3A000DD82F9 /* NptTlsTrustAnchor_0126.cpp */,
+				CAE4F7E81157C3A000DD82F9 /* NptTlsTrustAnchor_0127.cpp */,
+				CAE4F7E91157C3A000DD82F9 /* NptTlsTrustAnchor_0128.cpp */,
+				CAE4F7EA1157C3A000DD82F9 /* NptTlsTrustAnchor_0129.cpp */,
+				CAE4F7EB1157C3A000DD82F9 /* NptTlsTrustAnchor_0130.cpp */,
+				CAE4F7EC1157C3A000DD82F9 /* NptTlsTrustAnchor_0131.cpp */,
+				CAE4F7ED1157C3A000DD82F9 /* NptTlsTrustAnchor_0132.cpp */,
+				CAE4F7EE1157C3A000DD82F9 /* NptTlsTrustAnchor_0133.cpp */,
+				CAE4F7EF1157C3A000DD82F9 /* NptTlsTrustAnchor_0134.cpp */,
+				CAE4F7F01157C3A000DD82F9 /* NptTlsTrustAnchor_0135.cpp */,
+				CAE4F7F11157C3A000DD82F9 /* NptTlsTrustAnchor_0136.cpp */,
+				CAE4F7F21157C3A000DD82F9 /* NptTlsTrustAnchor_0137.cpp */,
+				CAE4F7F31157C3A000DD82F9 /* NptTlsTrustAnchor_0138.cpp */,
+				CAE4F7F41157C3A000DD82F9 /* NptTlsTrustAnchor_0139.cpp */,
+				CAE4F7F51157C3A000DD82F9 /* NptTlsTrustAnchor_0140.cpp */,
+				CAE4F7F61157C3A000DD82F9 /* NptTlsTrustAnchor_0141.cpp */,
+				CAE4F7F71157C3A000DD82F9 /* NptTlsTrustAnchor_0142.cpp */,
+				CAE4F7F81157C3A000DD82F9 /* NptTlsTrustAnchor_0143.cpp */,
+				CAE4F7F91157C3A000DD82F9 /* NptTlsTrustAnchor_0144.cpp */,
+				CAE4F7FA1157C3A000DD82F9 /* NptTlsTrustAnchor_0145.cpp */,
+				CAE4F7FB1157C3A000DD82F9 /* NptTlsTrustAnchor_0146.cpp */,
+				CAE4F7FC1157C3A000DD82F9 /* NptTlsTrustAnchor_0147.cpp */,
+				CAE4F7FD1157C3A000DD82F9 /* NptTlsTrustAnchor_0148.cpp */,
+				CAE4F7FE1157C3A000DD82F9 /* NptTlsTrustAnchor_0149.cpp */,
+			);
+			path = TLS;
+			sourceTree = "<group>";
+		};
 		CAF2EFD20E64A25700948C04 /* FileTest1 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1655,6 +2123,7 @@
 		F912B6A50B8EB27400C1E90D /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				CAE4F7661157C3A000DD82F9 /* Data */,
 				F912B6AF0B8EB27400C1E90D /* Core */,
 				F912B6EE0B8EB27400C1E90D /* System */,
 				CA84EC470C7E51A500CC9622 /* ThirdParty */,
@@ -2819,6 +3288,157 @@
 				CA2B1E210FC22DBA00B9E79F /* NptResults.cpp in Sources */,
 				CA40905C10AA10A800ED81C5 /* NptPosixTime.cpp in Sources */,
 				CA289B6C10E16150001BC817 /* NptCocoaMessageQueue.mm in Sources */,
+				CAE4F8031157C3A000DD82F9 /* NptTlsDefaultTrustAnchors.cpp in Sources */,
+				CAE4F8041157C3A000DD82F9 /* NptTlsTrustAnchor_0000.cpp in Sources */,
+				CAE4F8051157C3A000DD82F9 /* NptTlsTrustAnchor_0001.cpp in Sources */,
+				CAE4F8061157C3A000DD82F9 /* NptTlsTrustAnchor_0002.cpp in Sources */,
+				CAE4F8071157C3A000DD82F9 /* NptTlsTrustAnchor_0003.cpp in Sources */,
+				CAE4F8081157C3A000DD82F9 /* NptTlsTrustAnchor_0004.cpp in Sources */,
+				CAE4F8091157C3A000DD82F9 /* NptTlsTrustAnchor_0005.cpp in Sources */,
+				CAE4F80A1157C3A000DD82F9 /* NptTlsTrustAnchor_0006.cpp in Sources */,
+				CAE4F80B1157C3A000DD82F9 /* NptTlsTrustAnchor_0007.cpp in Sources */,
+				CAE4F80C1157C3A000DD82F9 /* NptTlsTrustAnchor_0008.cpp in Sources */,
+				CAE4F80D1157C3A000DD82F9 /* NptTlsTrustAnchor_0009.cpp in Sources */,
+				CAE4F80E1157C3A000DD82F9 /* NptTlsTrustAnchor_0010.cpp in Sources */,
+				CAE4F80F1157C3A000DD82F9 /* NptTlsTrustAnchor_0011.cpp in Sources */,
+				CAE4F8101157C3A000DD82F9 /* NptTlsTrustAnchor_0012.cpp in Sources */,
+				CAE4F8111157C3A000DD82F9 /* NptTlsTrustAnchor_0013.cpp in Sources */,
+				CAE4F8121157C3A000DD82F9 /* NptTlsTrustAnchor_0014.cpp in Sources */,
+				CAE4F8131157C3A000DD82F9 /* NptTlsTrustAnchor_0015.cpp in Sources */,
+				CAE4F8141157C3A000DD82F9 /* NptTlsTrustAnchor_0016.cpp in Sources */,
+				CAE4F8151157C3A000DD82F9 /* NptTlsTrustAnchor_0017.cpp in Sources */,
+				CAE4F8161157C3A000DD82F9 /* NptTlsTrustAnchor_0018.cpp in Sources */,
+				CAE4F8171157C3A000DD82F9 /* NptTlsTrustAnchor_0019.cpp in Sources */,
+				CAE4F8181157C3A000DD82F9 /* NptTlsTrustAnchor_0020.cpp in Sources */,
+				CAE4F8191157C3A000DD82F9 /* NptTlsTrustAnchor_0021.cpp in Sources */,
+				CAE4F81A1157C3A000DD82F9 /* NptTlsTrustAnchor_0022.cpp in Sources */,
+				CAE4F81B1157C3A000DD82F9 /* NptTlsTrustAnchor_0023.cpp in Sources */,
+				CAE4F81C1157C3A000DD82F9 /* NptTlsTrustAnchor_0024.cpp in Sources */,
+				CAE4F81D1157C3A000DD82F9 /* NptTlsTrustAnchor_0025.cpp in Sources */,
+				CAE4F81E1157C3A000DD82F9 /* NptTlsTrustAnchor_0026.cpp in Sources */,
+				CAE4F81F1157C3A000DD82F9 /* NptTlsTrustAnchor_0027.cpp in Sources */,
+				CAE4F8201157C3A000DD82F9 /* NptTlsTrustAnchor_0028.cpp in Sources */,
+				CAE4F8211157C3A000DD82F9 /* NptTlsTrustAnchor_0029.cpp in Sources */,
+				CAE4F8221157C3A000DD82F9 /* NptTlsTrustAnchor_0030.cpp in Sources */,
+				CAE4F8231157C3A000DD82F9 /* NptTlsTrustAnchor_0031.cpp in Sources */,
+				CAE4F8241157C3A000DD82F9 /* NptTlsTrustAnchor_0032.cpp in Sources */,
+				CAE4F8251157C3A000DD82F9 /* NptTlsTrustAnchor_0033.cpp in Sources */,
+				CAE4F8261157C3A000DD82F9 /* NptTlsTrustAnchor_0034.cpp in Sources */,
+				CAE4F8271157C3A000DD82F9 /* NptTlsTrustAnchor_0035.cpp in Sources */,
+				CAE4F8281157C3A000DD82F9 /* NptTlsTrustAnchor_0036.cpp in Sources */,
+				CAE4F8291157C3A000DD82F9 /* NptTlsTrustAnchor_0037.cpp in Sources */,
+				CAE4F82A1157C3A000DD82F9 /* NptTlsTrustAnchor_0038.cpp in Sources */,
+				CAE4F82B1157C3A000DD82F9 /* NptTlsTrustAnchor_0039.cpp in Sources */,
+				CAE4F82C1157C3A000DD82F9 /* NptTlsTrustAnchor_0040.cpp in Sources */,
+				CAE4F82D1157C3A000DD82F9 /* NptTlsTrustAnchor_0041.cpp in Sources */,
+				CAE4F82E1157C3A000DD82F9 /* NptTlsTrustAnchor_0042.cpp in Sources */,
+				CAE4F82F1157C3A000DD82F9 /* NptTlsTrustAnchor_0043.cpp in Sources */,
+				CAE4F8301157C3A000DD82F9 /* NptTlsTrustAnchor_0044.cpp in Sources */,
+				CAE4F8311157C3A000DD82F9 /* NptTlsTrustAnchor_0045.cpp in Sources */,
+				CAE4F8321157C3A000DD82F9 /* NptTlsTrustAnchor_0046.cpp in Sources */,
+				CAE4F8331157C3A000DD82F9 /* NptTlsTrustAnchor_0047.cpp in Sources */,
+				CAE4F8341157C3A000DD82F9 /* NptTlsTrustAnchor_0048.cpp in Sources */,
+				CAE4F8351157C3A000DD82F9 /* NptTlsTrustAnchor_0049.cpp in Sources */,
+				CAE4F8361157C3A000DD82F9 /* NptTlsTrustAnchor_0050.cpp in Sources */,
+				CAE4F8371157C3A000DD82F9 /* NptTlsTrustAnchor_0051.cpp in Sources */,
+				CAE4F8381157C3A000DD82F9 /* NptTlsTrustAnchor_0052.cpp in Sources */,
+				CAE4F8391157C3A000DD82F9 /* NptTlsTrustAnchor_0053.cpp in Sources */,
+				CAE4F83A1157C3A000DD82F9 /* NptTlsTrustAnchor_0054.cpp in Sources */,
+				CAE4F83B1157C3A000DD82F9 /* NptTlsTrustAnchor_0055.cpp in Sources */,
+				CAE4F83C1157C3A000DD82F9 /* NptTlsTrustAnchor_0056.cpp in Sources */,
+				CAE4F83D1157C3A000DD82F9 /* NptTlsTrustAnchor_0057.cpp in Sources */,
+				CAE4F83E1157C3A000DD82F9 /* NptTlsTrustAnchor_0058.cpp in Sources */,
+				CAE4F83F1157C3A000DD82F9 /* NptTlsTrustAnchor_0059.cpp in Sources */,
+				CAE4F8401157C3A000DD82F9 /* NptTlsTrustAnchor_0060.cpp in Sources */,
+				CAE4F8411157C3A000DD82F9 /* NptTlsTrustAnchor_0061.cpp in Sources */,
+				CAE4F8421157C3A000DD82F9 /* NptTlsTrustAnchor_0062.cpp in Sources */,
+				CAE4F8431157C3A000DD82F9 /* NptTlsTrustAnchor_0063.cpp in Sources */,
+				CAE4F8441157C3A000DD82F9 /* NptTlsTrustAnchor_0064.cpp in Sources */,
+				CAE4F8451157C3A000DD82F9 /* NptTlsTrustAnchor_0065.cpp in Sources */,
+				CAE4F8461157C3A000DD82F9 /* NptTlsTrustAnchor_0066.cpp in Sources */,
+				CAE4F8471157C3A000DD82F9 /* NptTlsTrustAnchor_0067.cpp in Sources */,
+				CAE4F8481157C3A000DD82F9 /* NptTlsTrustAnchor_0068.cpp in Sources */,
+				CAE4F8491157C3A000DD82F9 /* NptTlsTrustAnchor_0069.cpp in Sources */,
+				CAE4F84A1157C3A000DD82F9 /* NptTlsTrustAnchor_0070.cpp in Sources */,
+				CAE4F84B1157C3A000DD82F9 /* NptTlsTrustAnchor_0071.cpp in Sources */,
+				CAE4F84C1157C3A000DD82F9 /* NptTlsTrustAnchor_0072.cpp in Sources */,
+				CAE4F84D1157C3A000DD82F9 /* NptTlsTrustAnchor_0073.cpp in Sources */,
+				CAE4F84E1157C3A000DD82F9 /* NptTlsTrustAnchor_0074.cpp in Sources */,
+				CAE4F84F1157C3A000DD82F9 /* NptTlsTrustAnchor_0075.cpp in Sources */,
+				CAE4F8501157C3A000DD82F9 /* NptTlsTrustAnchor_0076.cpp in Sources */,
+				CAE4F8511157C3A000DD82F9 /* NptTlsTrustAnchor_0077.cpp in Sources */,
+				CAE4F8521157C3A000DD82F9 /* NptTlsTrustAnchor_0078.cpp in Sources */,
+				CAE4F8531157C3A000DD82F9 /* NptTlsTrustAnchor_0079.cpp in Sources */,
+				CAE4F8541157C3A000DD82F9 /* NptTlsTrustAnchor_0080.cpp in Sources */,
+				CAE4F8551157C3A000DD82F9 /* NptTlsTrustAnchor_0081.cpp in Sources */,
+				CAE4F8561157C3A000DD82F9 /* NptTlsTrustAnchor_0082.cpp in Sources */,
+				CAE4F8571157C3A000DD82F9 /* NptTlsTrustAnchor_0083.cpp in Sources */,
+				CAE4F8581157C3A000DD82F9 /* NptTlsTrustAnchor_0084.cpp in Sources */,
+				CAE4F8591157C3A100DD82F9 /* NptTlsTrustAnchor_0085.cpp in Sources */,
+				CAE4F85A1157C3A100DD82F9 /* NptTlsTrustAnchor_0086.cpp in Sources */,
+				CAE4F85B1157C3A100DD82F9 /* NptTlsTrustAnchor_0087.cpp in Sources */,
+				CAE4F85C1157C3A100DD82F9 /* NptTlsTrustAnchor_0088.cpp in Sources */,
+				CAE4F85D1157C3A100DD82F9 /* NptTlsTrustAnchor_0089.cpp in Sources */,
+				CAE4F85E1157C3A100DD82F9 /* NptTlsTrustAnchor_0090.cpp in Sources */,
+				CAE4F85F1157C3A100DD82F9 /* NptTlsTrustAnchor_0091.cpp in Sources */,
+				CAE4F8601157C3A100DD82F9 /* NptTlsTrustAnchor_0092.cpp in Sources */,
+				CAE4F8611157C3A100DD82F9 /* NptTlsTrustAnchor_0093.cpp in Sources */,
+				CAE4F8621157C3A100DD82F9 /* NptTlsTrustAnchor_0094.cpp in Sources */,
+				CAE4F8631157C3A100DD82F9 /* NptTlsTrustAnchor_0095.cpp in Sources */,
+				CAE4F8641157C3A100DD82F9 /* NptTlsTrustAnchor_0096.cpp in Sources */,
+				CAE4F8651157C3A100DD82F9 /* NptTlsTrustAnchor_0097.cpp in Sources */,
+				CAE4F8661157C3A100DD82F9 /* NptTlsTrustAnchor_0098.cpp in Sources */,
+				CAE4F8671157C3A100DD82F9 /* NptTlsTrustAnchor_0099.cpp in Sources */,
+				CAE4F8681157C3A100DD82F9 /* NptTlsTrustAnchor_0100.cpp in Sources */,
+				CAE4F8691157C3A100DD82F9 /* NptTlsTrustAnchor_0101.cpp in Sources */,
+				CAE4F86A1157C3A100DD82F9 /* NptTlsTrustAnchor_0102.cpp in Sources */,
+				CAE4F86B1157C3A100DD82F9 /* NptTlsTrustAnchor_0103.cpp in Sources */,
+				CAE4F86C1157C3A100DD82F9 /* NptTlsTrustAnchor_0104.cpp in Sources */,
+				CAE4F86D1157C3A100DD82F9 /* NptTlsTrustAnchor_0105.cpp in Sources */,
+				CAE4F86E1157C3A100DD82F9 /* NptTlsTrustAnchor_0106.cpp in Sources */,
+				CAE4F86F1157C3A100DD82F9 /* NptTlsTrustAnchor_0107.cpp in Sources */,
+				CAE4F8701157C3A100DD82F9 /* NptTlsTrustAnchor_0108.cpp in Sources */,
+				CAE4F8711157C3A100DD82F9 /* NptTlsTrustAnchor_0109.cpp in Sources */,
+				CAE4F8721157C3A100DD82F9 /* NptTlsTrustAnchor_0110.cpp in Sources */,
+				CAE4F8731157C3A100DD82F9 /* NptTlsTrustAnchor_0111.cpp in Sources */,
+				CAE4F8741157C3A100DD82F9 /* NptTlsTrustAnchor_0112.cpp in Sources */,
+				CAE4F8751157C3A100DD82F9 /* NptTlsTrustAnchor_0113.cpp in Sources */,
+				CAE4F8761157C3A100DD82F9 /* NptTlsTrustAnchor_0114.cpp in Sources */,
+				CAE4F8771157C3A100DD82F9 /* NptTlsTrustAnchor_0115.cpp in Sources */,
+				CAE4F8781157C3A100DD82F9 /* NptTlsTrustAnchor_0116.cpp in Sources */,
+				CAE4F8791157C3A100DD82F9 /* NptTlsTrustAnchor_0117.cpp in Sources */,
+				CAE4F87A1157C3A100DD82F9 /* NptTlsTrustAnchor_0118.cpp in Sources */,
+				CAE4F87B1157C3A100DD82F9 /* NptTlsTrustAnchor_0119.cpp in Sources */,
+				CAE4F87C1157C3A100DD82F9 /* NptTlsTrustAnchor_0120.cpp in Sources */,
+				CAE4F87D1157C3A100DD82F9 /* NptTlsTrustAnchor_0121.cpp in Sources */,
+				CAE4F87E1157C3A100DD82F9 /* NptTlsTrustAnchor_0122.cpp in Sources */,
+				CAE4F87F1157C3A100DD82F9 /* NptTlsTrustAnchor_0123.cpp in Sources */,
+				CAE4F8801157C3A100DD82F9 /* NptTlsTrustAnchor_0124.cpp in Sources */,
+				CAE4F8811157C3A100DD82F9 /* NptTlsTrustAnchor_0125.cpp in Sources */,
+				CAE4F8821157C3A100DD82F9 /* NptTlsTrustAnchor_0126.cpp in Sources */,
+				CAE4F8831157C3A100DD82F9 /* NptTlsTrustAnchor_0127.cpp in Sources */,
+				CAE4F8841157C3A100DD82F9 /* NptTlsTrustAnchor_0128.cpp in Sources */,
+				CAE4F8851157C3A100DD82F9 /* NptTlsTrustAnchor_0129.cpp in Sources */,
+				CAE4F8861157C3A100DD82F9 /* NptTlsTrustAnchor_0130.cpp in Sources */,
+				CAE4F8871157C3A100DD82F9 /* NptTlsTrustAnchor_0131.cpp in Sources */,
+				CAE4F8881157C3A100DD82F9 /* NptTlsTrustAnchor_0132.cpp in Sources */,
+				CAE4F8891157C3A100DD82F9 /* NptTlsTrustAnchor_0133.cpp in Sources */,
+				CAE4F88A1157C3A100DD82F9 /* NptTlsTrustAnchor_0134.cpp in Sources */,
+				CAE4F88B1157C3A100DD82F9 /* NptTlsTrustAnchor_0135.cpp in Sources */,
+				CAE4F88C1157C3A100DD82F9 /* NptTlsTrustAnchor_0136.cpp in Sources */,
+				CAE4F88D1157C3A100DD82F9 /* NptTlsTrustAnchor_0137.cpp in Sources */,
+				CAE4F88E1157C3A100DD82F9 /* NptTlsTrustAnchor_0138.cpp in Sources */,
+				CAE4F88F1157C3A100DD82F9 /* NptTlsTrustAnchor_0139.cpp in Sources */,
+				CAE4F8901157C3A100DD82F9 /* NptTlsTrustAnchor_0140.cpp in Sources */,
+				CAE4F8911157C3A100DD82F9 /* NptTlsTrustAnchor_0141.cpp in Sources */,
+				CAE4F8921157C3A100DD82F9 /* NptTlsTrustAnchor_0142.cpp in Sources */,
+				CAE4F8931157C3A100DD82F9 /* NptTlsTrustAnchor_0143.cpp in Sources */,
+				CAE4F8941157C3A100DD82F9 /* NptTlsTrustAnchor_0144.cpp in Sources */,
+				CAE4F8951157C3A100DD82F9 /* NptTlsTrustAnchor_0145.cpp in Sources */,
+				CAE4F8961157C3A100DD82F9 /* NptTlsTrustAnchor_0146.cpp in Sources */,
+				CAE4F8971157C3A100DD82F9 /* NptTlsTrustAnchor_0147.cpp in Sources */,
+				CAE4F8981157C3A100DD82F9 /* NptTlsTrustAnchor_0148.cpp in Sources */,
+				CAE4F8991157C3A100DD82F9 /* NptTlsTrustAnchor_0149.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4164,14 +4784,14 @@
 				"ARCHS[sdk=iphonesimulator*]" = i386;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_DEBUG,
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
@@ -4212,12 +4832,12 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				"ARCHS[sdk=iphonesimulator*]" = i386;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					NPT_CONFIG_ENABLE_LOGGING,
 					NPT_CONFIG_ENABLE_ZIP,
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_TREAT_NONCONFORMANT_CODE_ERRORS_AS_WARNINGS = YES;
 				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;

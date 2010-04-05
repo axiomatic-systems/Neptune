@@ -45,8 +45,9 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const unsigned int NPT_HTTP_DEFAULT_PORT = 80;
-const unsigned int NPT_HTTP_INVALID_PORT = 0;
+const unsigned int NPT_HTTP_DEFAULT_PORT  = 80;
+const unsigned int NPT_HTTPS_DEFAULT_PORT = 443;
+const unsigned int NPT_HTTP_INVALID_PORT  = 0;
 
 const NPT_Timeout NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT    = 30000;
 const NPT_Timeout NPT_HTTP_CLIENT_DEFAULT_IO_TIMEOUT            = 30000;

@@ -486,6 +486,8 @@ EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const c
  */
 EXP_FUNC const char * STDCALL ssl_version(void);
 
+EXP_FUNC void ssl_mem_free(void* mem); /* GBG */
+
 /** @} */
 
 #ifdef __cplusplus

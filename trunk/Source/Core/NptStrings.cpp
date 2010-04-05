@@ -127,13 +127,14 @@ NPT_String::Format(const char* format, ...)
     NPT_Size   buffer_size = NPT_STRING_FORMAT_BUFFER_DEFAULT_SIZE; // default value
     
     va_list  args;
-    va_start(args, format);
 
     for(;;) {
         /* try to format (it might not fit) */
         result.Reserve(buffer_size);
         char* buffer = result.UseChars();
+        va_start(args, format);
         int f_result = NPT_FormatStringVN(buffer, buffer_size, format, args);
+        va_end(args);
         if (f_result >= (int)(buffer_size)) f_result = -1;
         if (f_result >= 0) {
             result.SetLength(f_result);
@@ -147,7 +148,6 @@ NPT_String::Format(const char* format, ...)
         if (buffer_size > NPT_STRING_FORMAT_BUFFER_MAX_SIZE) break;
     }
 
-    va_end(args);
     
     return result;
 }

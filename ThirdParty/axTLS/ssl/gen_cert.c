@@ -154,6 +154,7 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
+#if 0 /* GBG */
     char fqdn[128]; 
 
     /* we need the common name, so if not configured, work out the fully
@@ -172,6 +173,7 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
 
         dn[X509_COMMON_NAME] = fqdn;
     }
+#endif /* GBG */
 
     if ((ret = gen_dn(dn[X509_COMMON_NAME], 3, buf, offset)))
         goto error;
@@ -340,6 +342,7 @@ error:
 EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const char * dn[], uint8_t **cert_data)
 {
     int ret = X509_OK, offset = 0, seq_offset;
+
     /* allocate enough space to load a new certificate */
     uint8_t *buf = (uint8_t *)alloca(ssl_ctx->rsa_ctx->num_octets*2 + 512);
     uint8_t sha_dgst[SHA1_SIZE];
@@ -349,6 +352,7 @@ EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const c
     if ((ret = gen_tbs_cert(dn, ssl_ctx->rsa_ctx, buf, &offset, sha_dgst)) < 0)
         goto error;
 
+    (void)options; /* GBG */
     gen_signature_alg(buf, &offset);
     gen_signature(ssl_ctx->rsa_ctx, sha_dgst, buf, &offset);
     adjust_with_size(seq_size, seq_offset, buf, &offset);

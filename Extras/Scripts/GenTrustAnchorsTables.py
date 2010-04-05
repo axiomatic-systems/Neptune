@@ -42,9 +42,7 @@ FILE_HEADER = """/**************************************************************
 | SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 |
  ****************************************************************/
- 
- #include "NptTls.h"
- 
+  
  """
 
 digest_oid_pattern = "\x2a\x86\x48\x86\xf7\x0d\x01\x01"

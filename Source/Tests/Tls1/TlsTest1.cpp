@@ -59,76 +59,9 @@ static const char* EquifaxCA =
 "7qj/WsjTVbJmcVfewCHrPSqnI0kBBIZCe/zuf6IWUrVnZ9NA2zsmWLIodz2uFHdh\n"
 "1voqZiegDfqnc1zqcPGUIWVEX/r87yloqaKHee9570+sB3c4\n";
 
-static void 
-TestPrivateKeys()
+static void
+PrintCertificateInfo(NPT_TlsCertificateInfo& cert_info)
 {
-    NPT_TlsContext context;
-    NPT_Result     result;
-
-    NPT_DataBuffer key_data;
-    NPT_Base64::Decode(TestClient_rsa_priv_base64_1, NPT_StringLength(TestClient_rsa_priv_base64_1), key_data);
-    
-    result = context.LoadKey(NPT_TLS_KEY_FORMAT_RSA_PRIVATE, key_data.GetData(), key_data.GetDataSize(), NULL);
-    CHECK(result == NPT_SUCCESS);
-
-    result = context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, NULL);
-    CHECK(result != NPT_SUCCESS);
-    result = context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
-    CHECK(result == NPT_SUCCESS);
-}
-
-int 
-main(int argc, char** argv)
-{
-    TestPrivateKeys();
-    
-    /* test a connection */
-    const char* hostname = argc==2?argv[1]:"koala.bok.net";
-    printf("[1] Connecting to %s...\n", hostname);
-    NPT_Socket* client_socket = new NPT_TcpClientSocket();
-    NPT_IpAddress server_ip;
-    server_ip.ResolveName(hostname);
-    NPT_SocketAddress server_addr(server_ip, 443);
-    NPT_Result result = client_socket->Connect(server_addr);
-    printf("[2] Connection result = %d (%s)\n", result, NPT_ResultText(result));
-    if (NPT_FAILED(result)) {
-        printf("!ERROR\n");
-        return 1;
-    }
-    
-    NPT_InputStreamReference input;
-    NPT_OutputStreamReference output;
-    client_socket->GetInputStream(input);
-    client_socket->GetOutputStream(output);
-    NPT_TlsContextReference context(new NPT_TlsContext());
-    
-    NPT_DataBuffer ta_data;
-    NPT_Base64::Decode(EquifaxCA, NPT_StringLength(EquifaxCA), ta_data);
-    result = context->AddTrustAnchor(ta_data.GetData(), ta_data.GetDataSize());
-    if (NPT_FAILED(result)) {
-        printf("!ERROR: context->AddTrustAnchor() \n");
-        return 1;
-    }
-    NPT_TlsClientSession session(context, input, output);
-    printf("[3] Performing Handshake\n");
-    result = session.Handshake();
-    printf("[4] Handshake Result = %d (%s)\n", result, NPT_ResultText(result));
-    if (NPT_FAILED(result)) {
-        printf("!ERROR\n");
-        return 1;
-    }
-
-    NPT_DataBuffer session_id;
-    result = session.GetSessionId(session_id);
-    CHECK(result == NPT_SUCCESS);
-    CHECK(session_id.GetDataSize() > 0);
-    printf("[5] Session ID: ");
-    printf("%s", NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
-    printf("\n");
-    
-    NPT_TlsCertificateInfo cert_info;
-    result = session.GetPeerCertificateInfo(cert_info);
-    CHECK(result == NPT_SUCCESS);
     printf("[6] Fingerprints:\n");
     printf("MD5: %s\n", NPT_HexString(cert_info.fingerprint.md5, sizeof(cert_info.fingerprint.md5), ":").GetChars());
     printf("SHA1: %s\n", NPT_HexString(cert_info.fingerprint.sha1, sizeof(cert_info.fingerprint.sha1), ":").GetChars());
@@ -153,6 +86,26 @@ main(int argc, char** argv)
                                                     cert_info.expiration_date.m_Minutes,
                                                     cert_info.expiration_date.m_Seconds);
     printf("\n");
+}
+
+static void
+PrintSessionInfo(NPT_TlsSession& session)
+{
+    NPT_Result result;
+    
+    NPT_DataBuffer session_id;
+    result = session.GetSessionId(session_id);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(session_id.GetDataSize() > 0);
+    printf("[5] Session ID: ");
+    printf("%s", NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
+    printf("\n");
+    
+    NPT_TlsCertificateInfo cert_info;
+    result = session.GetPeerCertificateInfo(cert_info);
+    CHECK(result == NPT_SUCCESS);
+    PrintCertificateInfo(cert_info);
+    
     printf("[7] Cipher Type = %d (%s)\n", session.GetCipherSuiteId(), GetCipherSuiteName(session.GetCipherSuiteId()));
     for (NPT_List<NPT_String>::Iterator i=cert_info.alternate_names.GetFirstItem();
          i;
@@ -160,13 +113,69 @@ main(int argc, char** argv)
          NPT_String& name = *i;
          printf("[8] Alternate Name = %s\n", name.GetChars());
     }
-    result = session.VerifyPeerCertificate();
-    printf("[9] Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
+}
+
+static int
+TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_Result expected_cert_verif_result)
+{
+    printf("[1] Connecting to %s...\n", hostname);
+    NPT_Socket* client_socket = new NPT_TcpClientSocket();
+    NPT_IpAddress server_ip;
+    NPT_Result result = server_ip.ResolveName(hostname);
+    if (NPT_FAILED(result)) {
+        printf("!ERROR cannot resolve hostname\n");
+        return 1;
+    }
+    NPT_SocketAddress server_addr(server_ip, port);
+    result = client_socket->Connect(server_addr);
+    printf("[2] Connection result = %d (%s)\n", result, NPT_ResultText(result));
+    if (NPT_FAILED(result)) {
+        printf("!ERROR\n");
+        return 1;
+    }
+    
+    NPT_InputStreamReference input;
+    NPT_OutputStreamReference output;
+    client_socket->GetInputStream(input);
+    client_socket->GetOutputStream(output);
+    NPT_TlsContextReference context(new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_VERIFY_LATER));
+    
+    /* self-signed cert */
+    result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+    CHECK(result == NPT_SUCCESS);
+    result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
+
+    NPT_DataBuffer ta_data;
+    NPT_Base64::Decode(EquifaxCA, NPT_StringLength(EquifaxCA), ta_data);
+    result = context->AddTrustAnchor(ta_data.GetData(), ta_data.GetDataSize());
+    if (NPT_FAILED(result)) {
+        printf("!ERROR: context->AddTrustAnchor() \n");
+        return 1;
+    }
+    result = context->AddTrustAnchors(NptTlsDefaultTrustAnchors);
+    if (NPT_FAILED(result)) {
+        printf("!ERROR: context->AddTrustAnchors() \n");
+        return 1;
+    }
+    NPT_TlsClientSession session(context, input, output);
+    printf("[3] Performing Handshake\n");
+    result = session.Handshake();
+    printf("[4] Handshake Result = %d (%s)\n", result, NPT_ResultText(result));
     if (NPT_FAILED(result)) {
         printf("!ERROR\n");
         return 1;
     }
 
+    PrintSessionInfo(session);
+    if (verify_cert) {
+        result = session.VerifyPeerCertificate();
+        printf("[9] Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
+        if (result != expected_cert_verif_result) {
+            printf("!ERROR, cert verification expected %d, got %d\n", expected_cert_verif_result, result);
+            return 1;
+        }
+    }
+    
     NPT_InputStreamReference  ssl_input;
     NPT_OutputStreamReference ssl_output;
     session.GetInputStream(ssl_input);
@@ -182,11 +191,150 @@ main(int argc, char** argv)
             CHECK(bytes_read == 1);
             printf("%c", buffer[0]);
         } else {
-            if (result != NPT_ERROR_EOS) {
+            if (result != NPT_ERROR_EOS && result != NPT_ERROR_CONNECTION_ABORTED) {
                 printf("!ERROR: Read() returned %d (%s)\n", result, NPT_ResultText(result)); 
             }
             break;
         }
     }
     printf("[9] SUCCESS\n");
+    
+    return 0;
+}
+
+class TlsTestServer : public NPT_Thread
+{
+    void Run();
+    
+public:
+    TlsTestServer(int mode) : m_Mode(mode) {}
+    
+    int                m_Mode;
+    NPT_SharedVariable m_Ready;
+    NPT_SocketInfo     m_SocketInfo;
+};
+
+void
+TlsTestServer::Run()
+{
+    printf("@@@ starting TLS server\n");
+    NPT_TcpServerSocket socket;
+    NPT_SocketAddress address(NPT_IpAddress::Any, 0);
+    NPT_Result result = socket.Bind(address);
+    if (NPT_FAILED(result)) {
+        fprintf(stderr, "@@@ Bind failed (%d)\n", result);
+        return;
+    }
+    result = socket.GetInfo(m_SocketInfo);
+    if (NPT_FAILED(result)) {
+        fprintf(stderr, "@@@ GetInfo failed (%d)\n", result);
+        return;
+    }
+    m_Ready.SetValue(1);
+    
+    printf("@@@ Waiting for connection\n");
+    NPT_Socket* client = NULL;
+    socket.WaitForNewClient(client);
+    printf("@@@ Client connected\n");
+    
+    NPT_TlsContextReference tls_context;
+    if (m_Mode == 0) {
+        tls_context = new NPT_TlsContext();
+    } else if (m_Mode == 1) {
+        /* require client authentication */
+        tls_context = new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_REQUIRE_CLIENT_CERTIFICATE | NPT_TLS_CONTEXT_OPTION_VERIFY_LATER);
+    }
+    /* self-signed cert */
+    result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+    CHECK(result == NPT_SUCCESS);
+    result = tls_context->SelfSignCertificate("MyServerCommonName", "MyServerOrganization", "MyServerOrganizationalName");
+    
+    NPT_InputStreamReference  socket_input;
+    NPT_OutputStreamReference socket_output;
+    client->GetInputStream(socket_input);
+    client->GetOutputStream(socket_output);
+    NPT_TlsServerSession session(tls_context, socket_input, socket_output);
+    delete client;
+    
+    result = session.Handshake();
+    if (m_Mode == 1) {
+        /* expect a self-signed client cert */
+        result = session.VerifyPeerCertificate();
+        printf("@@@ Certificate Verification Result = %d (%s)\n", result, NPT_ResultText(result));
+        if (result != NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED) {
+            printf("!ERROR, cert verification expected %d, got %d\n", NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED, result);
+            return;
+        }
+
+        NPT_TlsCertificateInfo cert_info;
+        result = session.GetPeerCertificateInfo(cert_info);
+        CHECK(result == NPT_SUCCESS);
+        PrintCertificateInfo(cert_info);
+    } else {
+        if (NPT_FAILED(result)) {
+            fprintf(stderr, "@@@ Handshake failed (%d : %s)\n", result, NPT_ResultText(result));
+            return;
+        }
+    }
+    
+    NPT_OutputStreamReference tls_output;
+    session.GetOutputStream(tls_output);
+    tls_output->WriteString("Hello, Client\n");
+    
+    printf("@@@ TLS server done\n");
+    //NPT_System::Sleep(1.0);
+}
+
+static void
+TestLocalServer()
+{
+    TlsTestServer* server = new TlsTestServer(0);
+    server->Start();
+    
+    server->m_Ready.WaitUntilEquals(1);
+    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED);
+    server->Wait();
+    delete server;
+
+    server = new TlsTestServer(1);
+    server->Start();
+    
+    server->m_Ready.WaitUntilEquals(1);
+    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED);
+    server->Wait();
+    delete server;
+}
+
+static void 
+TestPrivateKeys()
+{
+    NPT_TlsContext context;
+    NPT_Result     result;
+
+    NPT_DataBuffer key_data;
+    NPT_Base64::Decode(TestClient_rsa_priv_base64_1, NPT_StringLength(TestClient_rsa_priv_base64_1), key_data);
+    
+    result = context.LoadKey(NPT_TLS_KEY_FORMAT_RSA_PRIVATE, key_data.GetData(), key_data.GetDataSize(), NULL);
+    CHECK(result == NPT_SUCCESS);
+
+    result = context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, NULL);
+    CHECK(result != NPT_SUCCESS);
+    result = context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+    CHECK(result == NPT_SUCCESS);
+}
+
+
+int 
+main(int argc, char** argv)
+{
+    /* test private keys */
+    TestPrivateKeys();
+    
+    /* test a local connection */
+    TestLocalServer();
+    
+    /* test a connection */
+    const char* hostname = argc==2?argv[1]:"koala.bok.net";
+    TestRemoteServer(hostname, 443, true, NPT_SUCCESS);
+    
 }

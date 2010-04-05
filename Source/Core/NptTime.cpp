@@ -382,7 +382,7 @@ NPT_DateTime::ToString(Format format, NPT_Flags flags) const
             result.SetLength(24);
             NPT_FormatString(result.UseChars(), result.GetLength()+1, 
                              "%.3s %.3s%3d %.2d:%.2d:%.2d %d",
-                             NPT_TIME_DAYS_SHORT[days%7],
+                             NPT_TIME_DAYS_SHORT[(days+1)%7],
                              NPT_TIME_MONTHS[m_Month-1],
                              m_Day,
                              m_Hours,
@@ -398,7 +398,7 @@ NPT_DateTime::ToString(Format format, NPT_Flags flags) const
             NPT_UInt32 days = ElapsedDaysSince1900(*this);
 
             if (format == FORMAT_RFC_1036) {
-                result += NPT_TIME_DAYS_LONG[days%7];
+                result += NPT_TIME_DAYS_LONG[(days+1)%7];
                 result += ", ";
                 AppendNumber(result, m_Day, 2);
                 result += '-';
@@ -406,7 +406,7 @@ NPT_DateTime::ToString(Format format, NPT_Flags flags) const
                 result += '-';
                 AppendNumber(result, m_Year%100, 2);
             } else {
-                result += NPT_TIME_DAYS_SHORT[days%7];
+                result += NPT_TIME_DAYS_SHORT[(days+1)%7];
                 result += ", ";
                 AppendNumber(result, m_Day, 2);
                 result += ' ';

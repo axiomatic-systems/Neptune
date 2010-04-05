@@ -53,6 +53,17 @@ const int NPT_ERROR_FILE_ALREADY_EXISTS   = NPT_ERROR_BASE_FILE - 7;
 const int NPT_ERROR_FILE_NOT_ENOUGH_SPACE = NPT_ERROR_BASE_FILE - 8;
 const int NPT_ERROR_DIRECTORY_NOT_EMPTY   = NPT_ERROR_BASE_FILE - 9;
 
+/**
+ * File open modes.
+ * Use a combination of these flags to indicate how a file should be opened 
+ * Note all combinations of flags are valid or meaningful:
+ * If NPT_FILE_OPEN_MODE_WRITE is not set, then NPT_FILE_OPEN_MODE_CREATE, 
+ * NPT_FILE_OPEN_MODE_TRUNCATE and NPT_FILE_OPEN_MODE_APPEND are ignored.
+ * If NPT_FILE_OPEN_MODE_APPEND is set, then NPT_FILE_OPEN_MODE_CREATE is
+ * automatically implied whether it is set or not.
+ * NPT_FILE_OPEN_MODE_CREATE and NPT_FILE_OPEN_MODE_TRUNCATE imply each
+ * other (if one is set, the other one is automatically implied)
+ */
 const unsigned int NPT_FILE_OPEN_MODE_READ       = 0x01;
 const unsigned int NPT_FILE_OPEN_MODE_WRITE      = 0x02;
 const unsigned int NPT_FILE_OPEN_MODE_CREATE     = 0x04;
@@ -105,7 +116,7 @@ class NPT_FilePath
 {
 public:
     // class members
-    static const NPT_String Separator;
+    static const char* const Separator;
 
     // class methods
     static NPT_String BaseName(const char* path, bool with_extension = true);

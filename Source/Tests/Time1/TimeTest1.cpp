@@ -105,11 +105,11 @@ TestMisc()
     s = date.ToString(NPT_DateTime::FORMAT_W3C);
     SHOULD_EQUAL_S(s.GetChars(), "1970-01-01T00:00:00Z");
     s = date.ToString(NPT_DateTime::FORMAT_ANSI);
-    SHOULD_EQUAL_S(s.GetChars(), "Wed Jan  1 00:00:00 1970");
+    SHOULD_EQUAL_S(s.GetChars(), "Thu Jan  1 00:00:00 1970");
     s = date.ToString(NPT_DateTime::FORMAT_RFC_1036);
-    SHOULD_EQUAL_S(s.GetChars(), "Wednesday, 01-Jan-70 00:00:00 GMT");
+    SHOULD_EQUAL_S(s.GetChars(), "Thursday, 01-Jan-70 00:00:00 GMT");
     s = date.ToString(NPT_DateTime::FORMAT_RFC_1123);
-    SHOULD_EQUAL_S(s.GetChars(), "Wed, 01 Jan 1970 00:00:00 GMT");
+    SHOULD_EQUAL_S(s.GetChars(), "Thu, 01 Jan 1970 00:00:00 GMT");
     
     ts.SetSeconds(0xFFFFFFFF);
     SHOULD_SUCCEED(date.FromTimeStamp(ts, false));
@@ -476,6 +476,46 @@ TestDateFromTimeStringRFC_1123()
 }
 
 /*----------------------------------------------------------------------
+|   TestRandom
++---------------------------------------------------------------------*/
+static void
+TestRandom()
+{
+    for (unsigned int i=0; i<10000; i++) {
+        NPT_TimeStamp ts((double)NPT_System::GetRandomInteger());
+        NPT_TimeStamp ts2;
+        NPT_DateTime date;
+        SHOULD_SUCCEED(date.FromTimeStamp(ts, false));
+        SHOULD_SUCCEED(date.ToTimeStamp(ts2));
+        NPT_String ds;
+        NPT_DateTime ndate;
+        ds = date.ToString(NPT_DateTime::FORMAT_ANSI);
+        ndate.FromString(ds);
+        //SHOULD_EQUAL(date, ndate);
+        SHOULD_SUCCEED(ndate.ToTimeStamp(ts2));
+        SHOULD_EQUAL_F((double)ts2.ToSeconds(), (double)ts.ToSeconds());
+        
+        ds = date.ToString(NPT_DateTime::FORMAT_W3C);
+        ndate.FromString(ds);
+        //SHOULD_EQUAL(date, ndate);
+        SHOULD_SUCCEED(ndate.ToTimeStamp(ts2));
+        SHOULD_EQUAL_F((double)ts2.ToSeconds(), (double)ts.ToSeconds());
+
+        ds = date.ToString(NPT_DateTime::FORMAT_RFC_1123);
+        ndate.FromString(ds);
+        //SHOULD_EQUAL(date, ndate);
+        SHOULD_SUCCEED(ndate.ToTimeStamp(ts2));
+        SHOULD_EQUAL_F((double)ts2.ToSeconds(), (double)ts.ToSeconds());
+
+        ds = date.ToString(NPT_DateTime::FORMAT_RFC_1036);
+        ndate.FromString(ds);
+        //SHOULD_EQUAL(date, ndate);
+        SHOULD_SUCCEED(ndate.ToTimeStamp(ts2));
+        SHOULD_EQUAL_F((double)ts2.ToSeconds(), (double)ts.ToSeconds());
+    }
+}
+
+/*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
 int
@@ -486,5 +526,6 @@ main(int /*argc*/, char** /*argv*/)
     TestDateFromTimeStringANSI();
     TestDateFromTimeStringRFC_1036();
     TestDateFromTimeStringRFC_1123();
+    TestRandom();
     return 0;
 }

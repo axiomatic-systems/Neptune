@@ -130,7 +130,7 @@ public:
     typedef const char* Type;
 
     // static members
-    static Type MessageType;
+    static Type const MessageType;
 
     // methods
     virtual           ~NPT_Message() {}

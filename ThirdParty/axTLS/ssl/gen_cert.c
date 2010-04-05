@@ -141,7 +141,7 @@ static int gen_dn(const char *name, uint8_t dn_type,
     buf[(*offset)++] = dn_type;
     buf[(*offset)++] = ASN1_PRINTABLE_STR;
     buf[(*offset)++] = name_size;
-    strcpy(&buf[*offset], name);
+    strcpy((char*)&buf[*offset], name);
     *offset += name_size;
 
 error:
@@ -354,7 +354,7 @@ EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const c
     adjust_with_size(seq_size, seq_offset, buf, &offset);
     *cert_data = (uint8_t *)malloc(offset); /* create the exact memory for it */
     memcpy(*cert_data, buf, offset);
-
+    
 error:
     return ret < 0 ? ret : offset;
 }

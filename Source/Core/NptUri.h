@@ -41,7 +41,9 @@
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const NPT_UInt16 NPT_URL_INVALID_PORT = 0;
+const NPT_UInt16 NPT_URL_INVALID_PORT       = 0;
+const NPT_UInt16 NPT_URL_DEFAULT_HTTP_PORT  = 80;
+const NPT_UInt16 NPT_URL_DEFAULT_HTTPS_PORT = 443;
 
 /*----------------------------------------------------------------------
 |   NPT_Uri

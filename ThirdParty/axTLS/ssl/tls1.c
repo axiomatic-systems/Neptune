@@ -406,7 +406,7 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i]) 
         i++;
 
-    if (i > CONFIG_X509_MAX_CA_CERTS)
+    if (i >= CONFIG_X509_MAX_CA_CERTS)
     {
 #ifdef CONFIG_SSL_FULL_MODE
         printf("Error: maximum number of CA certs added - change of "
@@ -415,8 +415,10 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
         goto error;
     }
 
-    if ((ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i])))
+    if ((ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i]))) {
+        ret = SSL_X509_ERROR(ret); /* GBG */
         goto error;
+    }
 
     len -= offset;
     ret = SSL_OK;           /* ok so far */
@@ -1790,8 +1792,8 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 
     PARANOIA_CHECK(pkt_size, offset);
 
-    /* if we are client we can do the verify now or later */
-    if (is_client && !IS_SET_SSL_FLAG(SSL_SERVER_VERIFY_LATER))
+    /* GBG: modif: verify for server and client (was: if we are client we can do the verify now or later) */
+    if (!IS_SET_SSL_FLAG(SSL_SERVER_VERIFY_LATER))
     {
         ret = ssl_verify_cert(ssl);
     }
@@ -2071,6 +2073,11 @@ EXP_FUNC const char  * STDCALL ssl_version()
 {
     static const char * axtls_version = AXTLS_VERSION;
     return axtls_version;
+}
+
+EXP_FUNC void ssl_mem_free(void* mem) /* GBG */
+{
+    if (mem) free(mem);
 }
 
 /**

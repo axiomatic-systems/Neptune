@@ -84,13 +84,14 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
         case HS_CERTIFICATE:/* the client sends its cert */
             ret = process_certificate(ssl, &ssl->x509_ctx);
 
-            if (ret == SSL_OK)    /* verify the cert */
+            /* GBG: removed (modified process_certificate to do the cert verification for both client and server
+            if (ret == SSL_OK)    
             { 
                 int cert_res;
                 cert_res = x509_verify(
                         ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx, NULL);
                 ret = (cert_res == 0) ? SSL_OK : SSL_X509_ERROR(cert_res);
-            }
+            }*/
             break;
 
         case HS_CERT_VERIFY:    

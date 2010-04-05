@@ -60,10 +60,13 @@ const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal E
 |   NPT_HttpUrl::NPT_HttpUrl
 +---------------------------------------------------------------------*/
 NPT_HttpUrl::NPT_HttpUrl(const char* url, bool ignore_scheme) :
-    NPT_Url(url, NPT_HTTP_DEFAULT_PORT)
+    NPT_Url(url)
 {
-    if (!ignore_scheme && GetSchemeId() != NPT_Uri::SCHEME_ID_HTTP) {
-        Reset();
+    if (!ignore_scheme) {
+        if (GetSchemeId() != NPT_Uri::SCHEME_ID_HTTP &&
+            GetSchemeId() != NPT_Uri::SCHEME_ID_HTTPS) {
+            Reset();
+        }
     }
 }
 
@@ -85,7 +88,13 @@ NPT_HttpUrl::NPT_HttpUrl(const char* host,
 NPT_String
 NPT_HttpUrl::ToString(bool with_fragment) const
 {
-    return NPT_Url::ToStringWithDefaultPort(NPT_HTTP_DEFAULT_PORT, with_fragment);
+    NPT_UInt16 default_port;
+    switch (m_SchemeId) {
+        case SCHEME_ID_HTTP:  default_port = NPT_HTTP_DEFAULT_PORT;  break;
+        case SCHEME_ID_HTTPS: default_port = NPT_HTTPS_DEFAULT_PORT; break;
+        default:              default_port = 0;
+    }
+    return NPT_Url::ToStringWithDefaultPort(default_port, with_fragment);
 }
 
 /*----------------------------------------------------------------------

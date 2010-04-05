@@ -493,7 +493,18 @@ NPT_Url::Parse(const char* url, NPT_UInt16 default_port)
     // set the uri scheme
     NPT_Result result = SetSchemeFromUri(url);
     if (NPT_FAILED(result)) return result;
-
+    
+    // set the default port
+    if (default_port) {
+        m_Port = default_port;
+    } else {
+        switch (m_SchemeId) {
+            case SCHEME_ID_HTTP:  m_Port = NPT_URL_DEFAULT_HTTP_PORT;  break;
+            case SCHEME_ID_HTTPS: m_Port = NPT_URL_DEFAULT_HTTPS_PORT; break;
+            default:                                                   break;
+        }
+    }
+    
     // move to the scheme-specific part
     url += m_Scheme.GetLength()+1;
 
@@ -528,10 +539,10 @@ NPT_Url::Parse(const char* url, NPT_UInt16 default_port)
                 m_Host.Assign(mark, (NPT_Size)(url-1-mark));
                 if (c == ':') {
                     mark = url;
+                    m_Port = 0;
                     state = NPT_URL_PARSER_STATE_PORT;
                 } else {
                     mark = url-1;
-                    m_Port = default_port;
                     state = NPT_URL_PARSER_STATE_PATH;
                 }
             }
@@ -613,7 +624,15 @@ NPT_Url::Reset()
 bool
 NPT_Url::IsValid() const
 {
-    return m_Port != NPT_URL_INVALID_PORT && !m_Host.IsEmpty();
+    switch (m_SchemeId) {
+        case SCHEME_ID_HTTP:
+        case SCHEME_ID_HTTPS:
+            return m_Port != NPT_URL_INVALID_PORT && !m_Host.IsEmpty();
+            break;
+            
+        default:
+            return !m_Scheme.IsEmpty();
+    }
 }
 
 /*----------------------------------------------------------------------

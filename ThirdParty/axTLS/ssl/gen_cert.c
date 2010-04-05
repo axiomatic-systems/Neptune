@@ -122,7 +122,7 @@ static int gen_dn(const char *name, uint8_t dn_type,
                         uint8_t *buf, int *offset)
 {
     int ret = X509_OK;
-    int name_size = strlen(name);
+    int name_size = (int)strlen(name);
 
     if (name_size > 0x70)    /* just too big */
     {
@@ -141,7 +141,7 @@ static int gen_dn(const char *name, uint8_t dn_type,
     buf[(*offset)++] = dn_type;
     buf[(*offset)++] = ASN1_PRINTABLE_STR;
     buf[(*offset)++] = name_size;
-    strcpy((char*)&buf[*offset], name);
+    memcpy((char*)&buf[*offset], name, name_size);
     *offset += name_size;
 
 error:

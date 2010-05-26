@@ -125,7 +125,7 @@ void bi_terminate(BI_CTX *ctx)
         printf("bi_terminate: there were %d un-freed bigints\n",
                        ctx->active_count);
 #endif
-        abort();
+        /*abort();*/ /* GBG */
     }
 
     bi_clear_cache(ctx);

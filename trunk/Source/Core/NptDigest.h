@@ -1,8 +1,8 @@
 /*****************************************************************
 |
-|   Neptune - Toplevel Include
+|   Neptune - Message Digests
 |
-| Copyright (c) 2002-2008, Axiomatic Systems, LLC.
+| Copyright (c) 2002-2010, Axiomatic Systems, LLC.
 | All rights reserved.
 |
 | Redistribution and use in source and binary forms, with or without
@@ -29,58 +29,48 @@
 |
  ****************************************************************/
 
-#ifndef _NEPTUNE_H_
-#define _NEPTUNE_H_
-
-/*----------------------------------------------------------------------
-|   flags
-+---------------------------------------------------------------------*/
-#define NPT_EXTERNAL_USE /* do not expose internal definitions */
+#ifndef _NPT_DIGEST_H_
+#define _NPT_DIGEST_H_
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptConfig.h"
-#include "NptCommon.h"
-#include "NptResults.h"
 #include "NptTypes.h"
-#include "NptConstants.h"
-#include "NptReferences.h"
-#include "NptStreams.h"
-#include "NptBufferedStreams.h"
-#include "NptFile.h"
-#include "NptNetwork.h"
-#include "NptSockets.h"
-#include "NptTime.h"
-#include "NptThreads.h"
-#include "NptSystem.h"
-#include "NptMessaging.h"
-#include "NptQueue.h"
-#include "NptSimpleMessageQueue.h"
-#include "NptSelectableMessageQueue.h"
-#include "NptXml.h"
-#include "NptStrings.h"
-#include "NptArray.h"
-#include "NptList.h"
-#include "NptMap.h"
-#include "NptStack.h"
-#include "NptUri.h"
-#include "NptHttp.h"
 #include "NptDataBuffer.h"
-#include "NptUtils.h"
-#include "NptRingBuffer.h"
-#include "NptBase64.h"
-#include "NptConsole.h"
-#include "NptLogging.h"
-#include "NptSerialPort.h"
-#include "NptVersion.h"
-#include "NptDynamicLibraries.h"
-#include "NptDynamicCast.h"
-#include "NptDigest.h"
-#include "NptCrypto.h"
 
-// optional modules
-#include "NptZip.h"
-#include "NptTls.h"
+/*----------------------------------------------------------------------
+|   NPT_Digest
++---------------------------------------------------------------------*/
+class NPT_Digest {
+public:
+    // types
+    typedef enum {
+        SHA1,
+        MD5
+    } Algorithm;
+    
+    // factory
+    static NPT_Result Create(Algorithm algorithm, NPT_Digest*& digest);
+    
+    // methods
+    virtual           ~NPT_Digest() {}
+    virtual NPT_Result Update(const NPT_UInt8* data, NPT_Size data_size) = 0;
+    virtual NPT_Result GetDigest(NPT_DataBuffer& digest) = 0;
 
-#endif // _NEPTUNE_H_
+protected:
+    NPT_Digest() {} // don't instantiate directly
+};
+
+class NPT_Hmac {
+public:
+    static NPT_Result Create(NPT_Digest::Algorithm algorithm,
+                             const NPT_UInt8*      key,
+                             NPT_Size              key_size, 
+                             NPT_Digest*&          digest);
+
+private:
+    // methods
+    NPT_Hmac() {} // don't instantiate
+};
+
+#endif // _NPT_DIGEST_H_

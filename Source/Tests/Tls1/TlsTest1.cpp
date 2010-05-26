@@ -85,6 +85,11 @@ PrintCertificateInfo(NPT_TlsCertificateInfo& cert_info)
                                                     cert_info.expiration_date.m_Hours,
                                                     cert_info.expiration_date.m_Minutes,
                                                     cert_info.expiration_date.m_Seconds);
+    for (NPT_List<NPT_String>::Iterator i = cert_info.alternate_names.GetFirstItem();
+                                        i;
+                                      ++i) {
+        printf("DNS Name:        %s\n", (*i).GetChars()); 
+    }
     printf("\n");
 }
 
@@ -96,7 +101,7 @@ PrintSessionInfo(NPT_TlsSession& session)
     NPT_DataBuffer session_id;
     result = session.GetSessionId(session_id);
     CHECK(result == NPT_SUCCESS);
-    CHECK(session_id.GetDataSize() > 0);
+    //CHECK(session_id.GetDataSize() > 0);
     printf("[5] Session ID: ");
     printf("%s", NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
     printf("\n");
@@ -116,7 +121,7 @@ PrintSessionInfo(NPT_TlsSession& session)
 }
 
 static int
-TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_Result expected_cert_verif_result)
+TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_Result expected_cert_verif_result, bool client_key)
 {
     printf("[1] Connecting to %s...\n", hostname);
     NPT_Socket* client_socket = new NPT_TcpClientSocket();
@@ -141,11 +146,13 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
     delete client_socket;
     NPT_TlsContextReference context(new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_VERIFY_LATER));
     
-    /* self-signed cert */
-    result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
-    CHECK(result == NPT_SUCCESS);
-    result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
-
+    if (client_key) {
+        /* self-signed cert */
+        result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+        CHECK(result == NPT_SUCCESS);
+        result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
+    }
+    
     NPT_DataBuffer ta_data;
     NPT_Base64::Decode(EquifaxCA, NPT_StringLength(EquifaxCA), ta_data);
     result = context->AddTrustAnchor(ta_data.GetData(), ta_data.GetDataSize());
@@ -293,7 +300,7 @@ TestLocalServer()
     server->Start();
     
     server->m_Ready.WaitUntilEquals(1);
-    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED);
+    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED, true);
     server->Wait();
     delete server;
 
@@ -301,7 +308,7 @@ TestLocalServer()
     server->Start();
     
     server->m_Ready.WaitUntilEquals(1);
-    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED);
+    TestRemoteServer("127.0.0.1", server->m_SocketInfo.local_address.GetPort(), true, NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED, true);
     server->Wait();
     delete server;
 }
@@ -324,10 +331,37 @@ TestPrivateKeys()
     CHECK(result == NPT_SUCCESS);
 }
 
+static void
+TestDnsNameMatch()
+{
+    CHECK(!NPT_Tls::MatchDnsName(NULL, NULL));
+    CHECK(!NPT_Tls::MatchDnsName(NULL, ""));
+    CHECK(!NPT_Tls::MatchDnsName(NULL, "a"));
+    CHECK(!NPT_Tls::MatchDnsName(NULL, "a.com"));
+    CHECK(!NPT_Tls::MatchDnsName(NULL, "*"));
+    CHECK(!NPT_Tls::MatchDnsName("", NULL));
+    CHECK(!NPT_Tls::MatchDnsName("", ""));
+    CHECK(!NPT_Tls::MatchDnsName("", "a"));
+    CHECK(!NPT_Tls::MatchDnsName("", "a.com"));
+    CHECK(!NPT_Tls::MatchDnsName("", "*"));
+    CHECK(!NPT_Tls::MatchDnsName("*", "*"));
+    CHECK(!NPT_Tls::MatchDnsName("a", "*"));
+    CHECK(!NPT_Tls::MatchDnsName("a.com", "*"));
+    CHECK(!NPT_Tls::MatchDnsName("a.com", "b.com"));
+    CHECK(!NPT_Tls::MatchDnsName("a.com", "*.a.com"));
+
+    CHECK(NPT_Tls::MatchDnsName("a.com", "a.com"));
+    CHECK(NPT_Tls::MatchDnsName("b.a.com", "*.a.com"));
+    CHECK(NPT_Tls::MatchDnsName("a.com", "A.com"));
+    CHECK(NPT_Tls::MatchDnsName("a.com", "a.COM"));
+}
 
 int 
 main(int argc, char** argv)
 {
+    /* test dns name matching */
+    TestDnsNameMatch();
+    
     /* test private keys */
     TestPrivateKeys();
     
@@ -336,6 +370,6 @@ main(int argc, char** argv)
     
     /* test a connection */
     const char* hostname = argc==2?argv[1]:"koala.bok.net";
-    TestRemoteServer(hostname, 443, true, NPT_SUCCESS);
+    TestRemoteServer(hostname, 443, true, NPT_SUCCESS, false);
     
 }

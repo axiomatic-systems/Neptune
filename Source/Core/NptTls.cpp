@@ -110,6 +110,55 @@ SSL_GetRandomSeed()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_Tls::MatchDnsName
++---------------------------------------------------------------------*/
+bool 
+NPT_Tls::MatchDnsName(const char* hostname, const char* dns_name)
+{
+    // NULL or empty names don't match anything
+    if (hostname == NULL || *hostname == '\0') return false;
+    if (dns_name == NULL || *dns_name == '\0') return false;
+
+    // check for wildcards */
+    if (dns_name[0] == '*') {
+        // wildcard match, expect '*.' at the start, we don't match '*foo.com'
+        if (dns_name[1] != '.') return false;
+        
+        // skip the first component of the hostname
+        while (hostname[0] != '\0' && hostname[0] != '.') {
+            ++hostname;
+        }
+        
+        // compare the tails
+        return NPT_String::Compare(hostname, dns_name+2, true) == 0;
+    } else {
+        // full match
+        return NPT_String::Compare(hostname, dns_name, true) == 0;    
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Tls::MatchDnsNames
++---------------------------------------------------------------------*/
+bool 
+NPT_Tls::MatchDnsNames(const char*                 hostname,
+                       const NPT_List<NPT_String>& dns_names)
+{
+    // NULL or empty names don't match anything
+    if (hostname == NULL || *hostname == '\0') return false;
+    
+    // check the dns names
+    for (NPT_List<NPT_String>::Iterator i = dns_names.GetFirstItem();
+                                        i;
+                                      ++i) {
+        if (MatchDnsName(hostname, (*i).GetChars())) return true;
+    }
+    
+    // no match
+    return false;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_Tls_MapResult
 +---------------------------------------------------------------------*/
 static NPT_Result

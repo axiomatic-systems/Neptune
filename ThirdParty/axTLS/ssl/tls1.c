@@ -1211,6 +1211,16 @@ int basic_read(SSL *ssl, uint8_t **in_data)
             goto error; /* not an error - just get out of here */
         }
 
+        /* GBG: check the header values */
+        if ((buf[0] != PT_HANDSHAKE_PROTOCOL &&
+             buf[0] != PT_CHANGE_CIPHER_SPEC &&
+             buf[0] != PT_APP_PROTOCOL_DATA  &&
+             buf[0] != PT_ALERT_PROTOCOL) ||
+            (buf[1] != 3 /* version major */)) {
+            ret = SSL_ERROR_INVALID_PROT_MSG;
+            goto error;
+        }
+
         ssl->need_bytes = (buf[3] << 8) + buf[4];
 
         /* do we violate the spec with the message size?  */

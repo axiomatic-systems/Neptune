@@ -63,7 +63,7 @@ static const uint8_t sig_subject_alt_name[SIG_SUBJECT_ALT_NAME_SIZE] =
 };
 
 /* CN, O, OU */
-static const uint8_t g_dn_types[] = { 3, 10, 11 };
+static const uint8_t g_dn_types[] = { 3, 10, 11, 0 };
 
 int get_asn1_length(const uint8_t *buf, int *offset)
 {
@@ -270,6 +270,7 @@ int asn1_validity(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
               asn1_get_utc_time(cert, offset, &x509_ctx->not_after));
 }
 
+#if 0 /* GBG */
 /**
  * Get the components of a distinguished name 
  */
@@ -291,6 +292,7 @@ static int asn1_get_oid_x520(const uint8_t *buf, int *offset)
 end_oid:
     return dn_type;
 }
+#endif
 
 /**
  * Obtain an ASN.1 printable string type.
@@ -334,15 +336,85 @@ end_pnt_str:
     return len;
 }
 
+/** 
+ * Add an integer value at the end of a string
+ */
+static char*
+asn1_append_int_value(char* str, unsigned int value)
+{
+    char workspace[32];
+    char* c = &workspace[31];
+    int digit_count = 0;
+
+    /* process the digits */
+    do {
+        unsigned int digit = value%10;
+        *c-- = '0'+digit;
+        value /= 10;
+        ++digit_count;
+    } while(value);
+
+    /* copy the string */
+    memcpy(str, &workspace[32-digit_count], digit_count);
+        
+    return str+digit_count;
+}
+
+/**
+ * Convert an ASN.1 OID to a string. (GBG)
+ */
+static char*
+asn1_oid_to_string(const uint8_t *oid, int len)
+{
+    char* str = NULL;
+    char* result = NULL;
+    int i;
+    
+    /* sanity check */
+    if (len < 2) return NULL;
+    if (len >= 3 && (oid[len-1] & 0x80)) return NULL; /* last byte should not have the high bit set */
+    
+    /* allocate space with an upper bound size estimate */
+    str = malloc(len*4+len+3);
+    result = str;
+    
+    /* first two values */
+    {
+        int value1 = oid[0]/40;
+        int value2 = oid[0]-(40*value1);
+        str = asn1_append_int_value(str, value1);
+        *str++ = '.';
+        str = asn1_append_int_value(str, value2);
+    }
+    
+    /* other values */
+    {
+        unsigned long value = 0;
+        for (i=1; i<len; i++) {
+            value = (value<<7) + (oid[i]&0x7F);
+            if ((oid[i]&0x80) == 0) {
+                /* termination of value */
+                *str++ = '.';
+                str = asn1_append_int_value(str, value);
+                value = 0;
+            }
+        }
+    }
+    *str++ = '\0';
+    return result;
+}
+
+
 /**
  * Get the subject name (or the issuer) of a certificate.
  */
 int asn1_name(const uint8_t *cert, int *offset, char *dn[])
 {
     int ret = X509_NOT_OK;
-    int dn_type;
-    char *tmp = NULL;
-
+    int dn_type = 0;
+    char *name = NULL;
+    char* name_prefix = NULL; /* GBG */
+    
     if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0)
         goto end_name;
 
@@ -350,14 +422,41 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
     {
         int i, found = 0;
 
-        if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0 ||
-               (dn_type = asn1_get_oid_x520(cert, offset)) < 0)
+        if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0) {  /* GBG */
             goto end_name;
-
-        if (asn1_get_printable_str(cert, offset, &tmp) < 0)
+        }
+        /* get the oid */
         {
-            free(tmp);
+            int len = asn1_next_obj(cert, offset, ASN1_OID);
+            int oid_offset = *offset;
+            
+            if (len < 0) goto end_name;
+            if (len == 3 && cert[oid_offset] == 0x55 && cert[oid_offset+1] == 0x04) {
+                dn_type = cert[oid_offset+2];
+            } else {
+                /* convert the OID to a string */
+                name_prefix = asn1_oid_to_string(cert+oid_offset, len);
+                if (name_prefix == NULL) goto end_name;
+            }
+            *offset += len;
+        }
+        if (asn1_get_printable_str(cert, offset, &name) < 0) {
+            free(name);
+            if (name_prefix) free(name_prefix);
             goto end_name;
+        }
+        /* add the prefix if there is one */
+        if (name_prefix) {
+            int name_prefix_len = strlen(name_prefix);
+            int name_len        = strlen(name);
+            char* compound = malloc(name_prefix_len+name_len+2);
+            memcpy(compound, name_prefix, name_prefix_len);
+            compound[name_prefix_len] = '=';
+            memcpy(compound+name_prefix_len+1, name, name_len+1);
+            free(name);
+            free(name_prefix);
+            name = compound;
+            name_prefix = NULL;
         }
 
         /* find the distinguished named type */
@@ -367,7 +466,7 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
             {
                 if (dn[i] == NULL)
                 {
-                    dn[i] = tmp;
+                    dn[i] = name;
                     found = 1;
                     break;
                 }
@@ -376,7 +475,7 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
 
         if (found == 0) /* not found so get rid of it */
         {
-            free(tmp);
+            free(name);
         }
     }
 

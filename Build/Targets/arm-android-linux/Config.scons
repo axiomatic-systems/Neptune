@@ -13,7 +13,7 @@ if env.has_key('target_variant'):
 	ANDROID_PLATFORM=env['target_variant']
 else:
 	ANDROID_PLATFORM='android-3'
-print ANDROID_PLATFORM
+print 'Building for: ', ANDROID_PLATFORM, ANDROID_TOOLCHAIN
 
 ### parse the host config file
 try:
@@ -39,6 +39,15 @@ ANDROID_PLATFORM_ROOT   = ANDROID_NDK_ROOT+'/build/platforms/'+ANDROID_PLATFORM
 ANDROID_PLATFORM_ARM    = ANDROID_PLATFORM_ROOT+'/arch-arm'
 ANDROID_PLATFORM_COMMON = ANDROID_PLATFORM_ROOT+'/common'
 
+### add the tools to the path
+env.PrependENVPath('PATH', ANDROID_TOOLCHAIN_BIN)
+
+### figure out the path of libgcc.a for the selected toolchain
+subproc = os.popen(ANDROID_TOOLCHAIN_BIN+'/arm-eabi-gcc -mthumb-interwork -print-libgcc-file-name', 'r')
+libgcc_path = subproc.readlines()[0].rstrip()
+subproc.close()
+
+### setup compiler options
 android_includes = ['usr/include']
 
 android_extras = ['-march=armv5te',
@@ -82,17 +91,16 @@ android_link = ['-Bdynamic',
                 '-Wl,-rpath-link=' + ANDROID_PLATFORM_ARM+'/usr/lib',
                 '-L' + ANDROID_PLATFORM_ARM+'/usr/lib',
                 '-nostdlib',
-                ANDROID_TOOLCHAIN_ROOT+'/lib/gcc/arm-eabi/4.2.1/interwork/libgcc.a',
+                libgcc_path,
                 ANDROID_PLATFORM_ARM+'/usr/lib/libc.so',
                 ANDROID_PLATFORM_ARM+'/usr/lib/libstdc++.so',
                 ANDROID_PLATFORM_ARM+'/usr/lib/libm.so',
-                '-ldl']
+                '-ldl',
+                '-llog']
 
 env['NPT_EXTRA_EXECUTABLE_OBJECTS'] = [ANDROID_PLATFORM_ARM+'/usr/lib/crtbegin_static.o',
                                        ANDROID_PLATFORM_ARM+'/usr/lib/crtend_android.o']
 
-### add the tools to the path
-env.PrependENVPath('PATH', ANDROID_TOOLCHAIN_BIN)
 
 ### Load the tools
 LoadTool('gcc-generic', env, gcc_cross_prefix='arm-eabi', gcc_strict=False)

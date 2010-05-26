@@ -805,7 +805,7 @@ NPT_HttpTcpConnector::Connect(const char*                hostname,
 {
     // get the address and port to which we need to connect
     NPT_IpAddress address;
-    NPT_CHECK(address.ResolveName(hostname, name_resolver_timeout));
+    NPT_CHECK_FINE(address.ResolveName(hostname, name_resolver_timeout));
 
     // connect to the server
     NPT_LOG_FINE_2("TCP connector will connect to %s:%d", hostname, port);
@@ -813,11 +813,11 @@ NPT_HttpTcpConnector::Connect(const char*                hostname,
     connection.SetReadTimeout(io_timeout);
     connection.SetWriteTimeout(io_timeout);
     NPT_SocketAddress socket_address(address, port);
-    NPT_CHECK(connection.Connect(socket_address, connection_timeout));
+    NPT_CHECK_FINE(connection.Connect(socket_address, connection_timeout));
 
     // get the streams
-    NPT_CHECK(connection.GetInputStream(input_stream));
-    NPT_CHECK(connection.GetOutputStream(output_stream));
+    NPT_CHECK_FINE(connection.GetInputStream(input_stream));
+    NPT_CHECK_FINE(connection.GetOutputStream(output_stream));
 
     return NPT_SUCCESS;
 }
@@ -1293,7 +1293,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
                                  NPT_HttpRequestContext*    context)
 {
     // ensure that we're bound 
-    NPT_CHECK(Bind());
+    NPT_CHECK_FINE(Bind());
 
     // wait for a connection
     NPT_Socket* client;
@@ -2207,7 +2207,7 @@ NPT_HttpChunkedInputStream::Read(void*     buffer,
         m_Source->SetBufferSize(4096);
 
         NPT_String size_line;
-        NPT_CHECK(m_Source->ReadLine(size_line));
+        NPT_CHECK_FINE(m_Source->ReadLine(size_line));
 
         // decode size (in hex)
         m_CurrentChunkSize = 0;
@@ -2238,7 +2238,7 @@ NPT_HttpChunkedInputStream::Read(void*     buffer,
             // read footers until empty line
             NPT_String footer;
             do {
-                NPT_CHECK(m_Source->ReadLine(footer));
+                NPT_CHECK_FINE(m_Source->ReadLine(footer));
             } while (!footer.IsEmpty());
             m_Eos = true;
             
@@ -2253,7 +2253,7 @@ NPT_HttpChunkedInputStream::Read(void*     buffer,
     // read no more than what's left in chunk
     NPT_Size chunk_bytes_read;
     if (bytes_to_read > m_CurrentChunkSize) bytes_to_read = m_CurrentChunkSize;
-    NPT_CHECK(m_Source->Read(buffer, bytes_to_read, &chunk_bytes_read));
+    NPT_CHECK_FINE(m_Source->Read(buffer, bytes_to_read, &chunk_bytes_read));
 
     // ready to go to next chunk?
     m_CurrentChunkSize -= chunk_bytes_read;
@@ -2262,7 +2262,7 @@ NPT_HttpChunkedInputStream::Read(void*     buffer,
         
         // when a chunk is finished, a \r\n follows
         char newline[2];
-        NPT_CHECK(m_Source->ReadFully(newline, 2));
+        NPT_CHECK_FINE(m_Source->ReadFully(newline, 2));
         if (newline[0] != '\r' || newline[1] != '\n') {
             NPT_LOG_WARNING("invalid end of chunk (expected \\r\\n)");
             return NPT_ERROR_INVALID_FORMAT;

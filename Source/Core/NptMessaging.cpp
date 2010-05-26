@@ -53,6 +53,7 @@ NPT_MessageHandler::HandleMessage(NPT_Message* message)
 /*----------------------------------------------------------------------
 |   NPT_MessageHandlerProxy::NPT_MessageHandlerProxy
 +---------------------------------------------------------------------*/
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(NPT_MessageHandlerProxy)
 NPT_MessageHandlerProxy::NPT_MessageHandlerProxy(NPT_MessageHandler* handler) :
     m_Handler(handler),
     m_ReferenceCount(1)

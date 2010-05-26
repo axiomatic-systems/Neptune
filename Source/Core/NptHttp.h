@@ -189,7 +189,6 @@ public:
     NPT_Result SetInputStream(const char* string);
     NPT_Result GetInputStream(NPT_InputStreamReference& stream);
     NPT_Result Load(NPT_DataBuffer& buffer);
-    NPT_Result SetHeaders(const NPT_HttpHeaders& headers);
 
     // field access
     NPT_Result        SetContentLength(NPT_LargeSize length);

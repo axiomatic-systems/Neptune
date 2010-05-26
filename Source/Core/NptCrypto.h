@@ -1,8 +1,8 @@
 /*****************************************************************
 |
-|   Neptune - Toplevel Include
+|   Neptune - Crypto
 |
-| Copyright (c) 2002-2008, Axiomatic Systems, LLC.
+| Copyright (c) 2002-2010, Axiomatic Systems, LLC.
 | All rights reserved.
 |
 | Redistribution and use in source and binary forms, with or without
@@ -29,58 +29,44 @@
 |
  ****************************************************************/
 
-#ifndef _NEPTUNE_H_
-#define _NEPTUNE_H_
-
-/*----------------------------------------------------------------------
-|   flags
-+---------------------------------------------------------------------*/
-#define NPT_EXTERNAL_USE /* do not expose internal definitions */
+#ifndef _NPT_CRYPTO_H_
+#define _NPT_CRYPTO_H_
 
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
-#include "NptConfig.h"
-#include "NptCommon.h"
-#include "NptResults.h"
 #include "NptTypes.h"
-#include "NptConstants.h"
-#include "NptReferences.h"
-#include "NptStreams.h"
-#include "NptBufferedStreams.h"
-#include "NptFile.h"
-#include "NptNetwork.h"
-#include "NptSockets.h"
-#include "NptTime.h"
-#include "NptThreads.h"
-#include "NptSystem.h"
-#include "NptMessaging.h"
-#include "NptQueue.h"
-#include "NptSimpleMessageQueue.h"
-#include "NptSelectableMessageQueue.h"
-#include "NptXml.h"
-#include "NptStrings.h"
-#include "NptArray.h"
-#include "NptList.h"
-#include "NptMap.h"
-#include "NptStack.h"
-#include "NptUri.h"
-#include "NptHttp.h"
 #include "NptDataBuffer.h"
-#include "NptUtils.h"
-#include "NptRingBuffer.h"
-#include "NptBase64.h"
-#include "NptConsole.h"
-#include "NptLogging.h"
-#include "NptSerialPort.h"
-#include "NptVersion.h"
-#include "NptDynamicLibraries.h"
-#include "NptDynamicCast.h"
-#include "NptDigest.h"
-#include "NptCrypto.h"
 
-// optional modules
-#include "NptZip.h"
-#include "NptTls.h"
+/*----------------------------------------------------------------------
+|   NPT_BlockCipher
++---------------------------------------------------------------------*/
+class NPT_BlockCipher {
+public:
+    // types
+    typedef enum {
+        AES_128
+    } Algorithm;
+    
+    typedef enum {
+        ENCRYPT,
+        DECRYPT
+    } Direction;
+    
+    // factory
+    static NPT_Result Create(Algorithm         algorithm, 
+                             Direction         direction,
+                             const NPT_UInt8*  key,
+                             NPT_Size          key_size,
+                             NPT_BlockCipher*& cipher);
+    
+    // methods
+    virtual           ~NPT_BlockCipher() {}
+    virtual NPT_Size   GetBlockSize() = 0;
+    virtual NPT_Result ProcessBlock(const NPT_UInt8* block_in, NPT_UInt8* block_out) = 0;
 
-#endif // _NEPTUNE_H_
+protected:
+    NPT_BlockCipher() {} // don't instantiate directly
+};
+
+#endif // _NPT_CRYPTO_H_

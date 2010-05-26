@@ -108,6 +108,20 @@ const unsigned int NPT_TLS_CONTEXT_OPTION_VERIFY_LATER               = 1;
 const unsigned int NPT_TLS_CONTEXT_OPTION_REQUIRE_CLIENT_CERTIFICATE = 2;
 
 /*----------------------------------------------------------------------
+|   NPT_Tls
++---------------------------------------------------------------------*/
+class NPT_Tls
+{
+public:
+    static bool MatchDnsNames(const char*                 hostname,
+                              const NPT_List<NPT_String>& dns_names);
+    static bool MatchDnsName(const char* hostname, const char* dns_name);
+                              
+private:
+    NPT_Tls() {}; // don't instantiate 
+};
+
+/*----------------------------------------------------------------------
 |   NPT_TlsContext
 +---------------------------------------------------------------------*/
 class NPT_TlsContext

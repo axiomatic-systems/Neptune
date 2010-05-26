@@ -180,9 +180,14 @@ if not env.has_key('NPT_CONFIG_NO_ZIP'):
     
 if not env.has_key('NPT_CONFIG_NO_SSL'):
     extra_cpp_flags += ['NPT_CONFIG_ENABLE_TLS']
-    
+    tls_data_dirs  = ['Data/TLS']
+    tls_tests      = ['Tls1']
+else:
+    tls_data_dirs = []
+    tls_tests     = []
+	
 LibraryModule(name                  = 'Neptune',
-              build_source_dirs     = ['Core', 'Data/TLS'],
+              build_source_dirs     = ['Core']+tls_data_dirs,
               build_source_files    = env['NPT_SYSTEM_SOURCES'],
               extra_cpp_defines     = extra_cpp_flags,
               linked_modules        = env['NPT_EXTRA_LIBS']+['Zlib']+['axTLS'])
@@ -190,6 +195,28 @@ LibraryModule(name                  = 'Neptune',
 for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'MiniHttpServer']:
     Application(app, 'Source/Apps/'+app)
     
-for test in ['Arrays1', 'BufferedStreams1', 'HttpClient1', 'HttpServer1', 'Lists1', 'Maps1', 'Misc1', 'RingBuffer1', 'Strings1', 'Xml1', 'Udp1', 'Threads1', 'Queue1', 'Messages1', 'Messages2', 'Url1', 'Zip1', 'Time1', 'Tls1', 'Sockets1', 'FileTest1', 'FileTest2']:
+tests = ['Arrays1', 
+		 'BufferedStreams1', 
+		 'HttpClient1', 
+		 'HttpServer1', 
+		 'Lists1', 
+		 'Maps1', 
+		 'Misc1', 
+		 'RingBuffer1', 
+		 'Strings1', 
+		 'Xml1', 
+		 'Udp1', 
+		 'Threads1', 
+		 'Queue1', 
+		 'Messages1', 
+		 'Messages2', 
+		 'Url1', 
+		 'Zip1', 
+		 'Time1', 
+		 'Sockets1', 
+		 'FileTest1', 
+		 'FileTest2']+tls_tests
+	
+for test in tests:
     Application(test+'Test', 'Source/Tests/'+test)
 

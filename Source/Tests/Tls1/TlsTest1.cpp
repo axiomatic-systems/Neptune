@@ -160,7 +160,7 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
         printf("!ERROR: context->AddTrustAnchor() \n");
         return 1;
     }
-    result = context->AddTrustAnchors(NptTlsDefaultTrustAnchors);
+    result = context->AddTrustAnchors(NptTlsDefaultTrustAnchorsBase);
     if (NPT_FAILED(result)) {
         printf("!ERROR: context->AddTrustAnchors() \n");
         return 1;

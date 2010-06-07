@@ -473,7 +473,7 @@ NPT_HmacDigest::NPT_HmacDigest(NPT_Digest::Algorithm algorithm,
     // if the key is larger than the block size, use a digest of the key
     NPT_DataBuffer hk;
     if (key_size > NPT_BASIC_DIGEST_BLOCK_SIZE) {
-        NPT_Digest* key_digest;
+        NPT_Digest* key_digest = NULL;
         NPT_Digest::Create(algorithm, key_digest);
         key_digest->Update(key, key_size);
         key_digest->GetDigest(hk);

@@ -109,6 +109,7 @@ LoadTool('gcc-generic', env, gcc_cross_prefix='arm-eabi', gcc_strict=False)
 env.AppendUnique(CCFLAGS = ['-I'+ANDROID_PLATFORM_ARM+'/'+x for x in android_includes] + android_extras + android_defines + android_optimize )
 env.AppendUnique(CXXFLAGS = android_extras_cpp)
 env.AppendUnique(LINKFLAGS = android_link)
+env.AppendUnique(CPPDEFINES = ['NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG'])
 
 env['NPT_SYSTEM_SOURCES']={'System/StdC':'NptStdc[!D]*.cpp',
                            'System/Bsd':'*.cpp',

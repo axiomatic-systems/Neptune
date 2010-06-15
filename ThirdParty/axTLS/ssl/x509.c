@@ -330,7 +330,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
  */
 int x509_verify(X509_CTX* ca_certs /* GBG: changed */, const X509_CTX *cert, const SSL_DateTime* now) 
 {
-    int ret = X509_OK, i = 0;
+    int ret = X509_OK;
     bigint *cert_sig;
     X509_CTX *next_cert = NULL;
     BI_CTX *ctx = NULL;

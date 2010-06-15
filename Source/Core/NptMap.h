@@ -90,7 +90,7 @@ public:
 
     // methods
     NPT_Result   Put(const K& key, const V& value);
-    NPT_Result   Get(const K& key, V*& value) const;
+    NPT_Result   Get(const K& key, V*& value) const; // WARNING: the second parameter is a POINTER on the value type!!!
     bool         HasKey(const K& key) const { return GetEntry(key) != NULL; }
     bool         HasValue(const V& value) const;
     NPT_Result   Erase(const K& key);

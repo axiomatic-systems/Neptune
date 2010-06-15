@@ -94,6 +94,21 @@ PrintCertificateInfo(NPT_TlsCertificateInfo& cert_info)
 }
 
 static void
+PrintCertificateChain(NPT_TlsSession& session)
+{
+    NPT_Ordinal position = 0;
+    NPT_Result result;
+    
+    do {
+        NPT_TlsCertificateInfo info;
+        result = session.GetPeerCertificateInfo(info, position++);
+        if (NPT_SUCCEEDED(result)) {
+            PrintCertificateInfo(info);
+        }
+    } while (NPT_SUCCEEDED(result));
+}
+
+static void
 PrintSessionInfo(NPT_TlsSession& session)
 {
     NPT_Result result;
@@ -106,18 +121,9 @@ PrintSessionInfo(NPT_TlsSession& session)
     printf("%s", NPT_HexString(session_id.GetData(), session_id.GetDataSize()).GetChars());
     printf("\n");
     
-    NPT_TlsCertificateInfo cert_info;
-    result = session.GetPeerCertificateInfo(cert_info);
-    CHECK(result == NPT_SUCCESS);
-    PrintCertificateInfo(cert_info);
+    PrintCertificateChain(session);
     
     printf("[7] Cipher Type = %d (%s)\n", session.GetCipherSuiteId(), GetCipherSuiteName(session.GetCipherSuiteId()));
-    for (NPT_List<NPT_String>::Iterator i=cert_info.alternate_names.GetFirstItem();
-         i;
-         ++i) {
-         NPT_String& name = *i;
-         printf("[8] Alternate Name = %s\n", name.GetChars());
-    }
 }
 
 static int
@@ -135,7 +141,7 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
     result = client_socket->Connect(server_addr);
     printf("[2] Connection result = %d (%s)\n", result, NPT_ResultText(result));
     if (NPT_FAILED(result)) {
-        printf("!ERROR\n");
+        printf("!ERROR cannot connect\n");
         return 1;
     }
     
@@ -144,14 +150,7 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
     client_socket->GetInputStream(input);
     client_socket->GetOutputStream(output);
     delete client_socket;
-    NPT_TlsContextReference context(new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_VERIFY_LATER));
-    
-    if (client_key) {
-        /* self-signed cert */
-        result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
-        CHECK(result == NPT_SUCCESS);
-        result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
-    }
+    NPT_TlsContextReference context(new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER));
     
     NPT_DataBuffer ta_data;
     NPT_Base64::Decode(EquifaxCA, NPT_StringLength(EquifaxCA), ta_data);
@@ -160,17 +159,25 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
         printf("!ERROR: context->AddTrustAnchor() \n");
         return 1;
     }
-    result = context->AddTrustAnchors(NptTlsDefaultTrustAnchorsBase);
+    result = context->AddTrustAnchors(NPT_Tls::GetDefaultTrustAnchors(0));
     if (NPT_FAILED(result)) {
         printf("!ERROR: context->AddTrustAnchors() \n");
         return 1;
     }
+
+    if (client_key) {
+        /* self-signed cert */
+        result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+        CHECK(result == NPT_SUCCESS);
+        result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
+    }
+    
     NPT_TlsClientSession session(context, input, output);
     printf("[3] Performing Handshake\n");
     result = session.Handshake();
     printf("[4] Handshake Result = %d (%s)\n", result, NPT_ResultText(result));
     if (NPT_FAILED(result)) {
-        printf("!ERROR\n");
+        printf("!ERROR handshake failed\n");
         return 1;
     }
 
@@ -238,6 +245,7 @@ TlsTestServer::Run()
         fprintf(stderr, "@@@ GetInfo failed (%d)\n", result);
         return;
     }
+    socket.Listen(5);
     m_Ready.SetValue(1);
     
     printf("@@@ Waiting for connection\n");
@@ -250,7 +258,7 @@ TlsTestServer::Run()
         tls_context = new NPT_TlsContext();
     } else if (m_Mode == 1) {
         /* require client authentication */
-        tls_context = new NPT_TlsContext(NPT_TLS_CONTEXT_OPTION_REQUIRE_CLIENT_CERTIFICATE | NPT_TLS_CONTEXT_OPTION_VERIFY_LATER);
+        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_REQUIRE_CLIENT_CERTIFICATE | NPT_TlsContext::OPTION_VERIFY_LATER);
     }
     /* self-signed cert */
     result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
@@ -274,10 +282,7 @@ TlsTestServer::Run()
             return;
         }
 
-        NPT_TlsCertificateInfo cert_info;
-        result = session.GetPeerCertificateInfo(cert_info);
-        CHECK(result == NPT_SUCCESS);
-        PrintCertificateInfo(cert_info);
+        PrintCertificateChain(session);
     } else {
         if (NPT_FAILED(result)) {
             fprintf(stderr, "@@@ Handshake failed (%d : %s)\n", result, NPT_ResultText(result));
@@ -331,6 +336,45 @@ TestPrivateKeys()
     CHECK(result == NPT_SUCCESS);
 }
 
+class TestTlsConnector : public NPT_HttpTlsConnector
+{
+public:
+    virtual NPT_Result VerifyPeer(NPT_TlsClientSession& session,
+                                  const char*           hostname,
+                                  NPT_UInt16            port) {
+        printf("+++ Verifying Peer (hostname=%s, port=%d)\n", hostname, port);
+        PrintSessionInfo(session);
+        return NPT_HttpTlsConnector::VerifyPeer(session, hostname, port);
+    }
+};
+
+static void
+TestHttpConnector(const char* hostname)
+{
+    TestTlsConnector connector;
+    NPT_HttpClient client(&connector, false);
+    NPT_String url_string = "https://";
+    url_string += hostname;
+    url_string += "/index.html";
+    NPT_HttpUrl url(url_string);
+    NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
+    NPT_HttpResponse* response = NULL;
+    NPT_Result result = client.SendRequest(request, response);
+    CHECK(result == NPT_SUCCESS);
+    if (NPT_SUCCEEDED(result)) {
+        CHECK(response->GetEntity() != NULL);
+        if (response->GetEntity()) {
+            printf("+++ HTTP Response: code=%d, type=%s, len=%d\n", 
+                   response->GetStatusCode(), 
+                   response->GetEntity()->GetContentType().GetChars(),
+                   (int)response->GetEntity()->GetContentLength());
+        }
+    } else {
+        printf("!ERROR: SendRequest returns %d (%s)\n", result, NPT_ResultText(result));
+    }
+    delete response;
+}
+
 static void
 TestDnsNameMatch()
 {
@@ -369,7 +413,9 @@ main(int argc, char** argv)
     TestLocalServer();
     
     /* test a connection */
-    const char* hostname = argc==2?argv[1]:"koala.bok.net";
+    const char* hostname = argc==2?argv[1]:"zebulon.bok.net";
     TestRemoteServer(hostname, 443, true, NPT_SUCCESS, false);
-    
+
+    /* test using the http connector */
+    TestHttpConnector(hostname);
 }

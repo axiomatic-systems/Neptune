@@ -128,6 +128,7 @@ NPT_Tls::MatchDnsName(const char* hostname, const char* dns_name)
         while (hostname[0] != '\0' && hostname[0] != '.') {
             ++hostname;
         }
+        if (hostname[0] == '.') ++hostname;
         
         // compare the tails
         return NPT_String::Compare(hostname, dns_name+2, true) == 0;
@@ -208,22 +209,20 @@ NPT_Tls_MapResult(int err)
 class NPT_TlsContextImpl {
 public:
     NPT_TlsContextImpl(NPT_Flags options) :
-        m_SSL_CTX(ssl_ctx_new(((options & NPT_TLS_CONTEXT_OPTION_VERIFY_LATER)?SSL_SERVER_VERIFY_LATER:0) |
-                              ((options & NPT_TLS_CONTEXT_OPTION_REQUIRE_CLIENT_CERTIFICATE)?SSL_CLIENT_AUTHENTICATION:0),
-                              NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE)) {};
+        m_SSL_CTX(ssl_ctx_new(((options & NPT_TlsContext::OPTION_VERIFY_LATER)?SSL_SERVER_VERIFY_LATER:0) |
+                              ((options & NPT_TlsContext::OPTION_REQUIRE_CLIENT_CERTIFICATE)?SSL_CLIENT_AUTHENTICATION:0),
+                              NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE)) {}
     ~NPT_TlsContextImpl() { ssl_ctx_free(m_SSL_CTX); }
     
     NPT_Result LoadKey(NPT_TlsKeyFormat     key_format, 
                        const unsigned char* key_data,
                        NPT_Size             key_data_size,
                        const char*          password);
-    NPT_Result AddTrustAnchor(const unsigned char* ta_data,
-                              NPT_Size             ta_data_size);
-    NPT_Result AddTrustAnchors(const NPT_TlsTrustAnchorData* anchors,
-                               NPT_Cardinal                  anchor_count);
     NPT_Result SelfSignCertificate(const char* common_name,
                                    const char* organization,
                                    const char* organizational_name);                               
+    NPT_Result AddTrustAnchor(const unsigned char* ta_data,
+                              NPT_Size             ta_data_size);
     
     SSL_CTX* m_SSL_CTX;
 };
@@ -250,39 +249,6 @@ NPT_TlsContextImpl::LoadKey(NPT_TlsKeyFormat     key_format,
 }
 
 /*----------------------------------------------------------------------
-|   NPT_TlsContextImpl::AddTrustAnchor
-+---------------------------------------------------------------------*/
-NPT_Result 
-NPT_TlsContextImpl::AddTrustAnchor(const unsigned char* ta_data,
-                                   NPT_Size             ta_data_size)
-{
-    int result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CACERT, ta_data, ta_data_size, NULL);
-    return NPT_Tls_MapResult(result);
-}
-
-/*----------------------------------------------------------------------
-|   NPT_TlsContextImpl::AddTrustAnchors
-+---------------------------------------------------------------------*/
-NPT_Result 
-NPT_TlsContextImpl::AddTrustAnchors(const NPT_TlsTrustAnchorData* anchors,
-                                    NPT_Cardinal                  anchor_count)
-{
-    for (unsigned int i=0; 
-         anchor_count     ? 
-         (i<anchor_count) :
-         (anchors[i].cert_data && anchors[i].cert_size); 
-         i++) {
-        int result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CACERT, anchors[i].cert_data, anchors[i].cert_size, NULL);
-        if (result != SSL_OK) {
-            NPT_Result npt_result = NPT_Tls_MapResult(result);
-            NPT_LOG_WARNING_2("failed to load x.509 certificate (%d : %s)", npt_result, NPT_ResultText(npt_result));
-            return npt_result;
-        }
-    }
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |   NPT_TlsContextImpl::SelfSignCertificate
 +---------------------------------------------------------------------*/
 NPT_Result 
@@ -299,6 +265,17 @@ NPT_TlsContextImpl::SelfSignCertificate(const char* common_name,
     result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CERT, certificate, result, NULL);
     ssl_mem_free(certificate);
     
+    return NPT_Tls_MapResult(result);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TlsContextImpl::AddTrustAnchor
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_TlsContextImpl::AddTrustAnchor(const unsigned char* ta_data,
+                                   NPT_Size             ta_data_size)
+{
+    int result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CACERT, ta_data, ta_data_size, NULL);
     return NPT_Tls_MapResult(result);
 }
 
@@ -365,9 +342,11 @@ public:
     virtual NPT_Result Handshake() = 0;
     virtual NPT_Result GetHandshakeStatus();
     virtual NPT_Result VerifyPeerCertificate();
+    virtual NPT_Result VerifyDnsNameMatch(const char* hostname);
     virtual NPT_Result GetSessionId(NPT_DataBuffer& session_id);
     virtual NPT_UInt32 GetCipherSuiteId();
-    virtual NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info);
+    virtual NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info,
+                                              NPT_Ordinal             position);
     
     // members
     SSL_CTX*             m_SSL_CTX;
@@ -406,6 +385,35 @@ NPT_TlsSessionImpl::VerifyPeerCertificate()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_TlsSessionImpl::VerifyDnsNameMatch
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_TlsSessionImpl::VerifyDnsNameMatch(const char* hostname)
+{
+    if (hostname == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+    if (m_SSL == NULL || ssl_handshake_status(m_SSL) == SSL_NOT_OK) {
+        // no handshake done
+        return NPT_ERROR_INVALID_STATE;
+    }
+
+    // get the peer certificate
+    const SSL_X509_CERT* cert = ssl_get_peer_cert(m_SSL, 0);
+    if (cert == NULL) return NPT_ERROR_NO_SUCH_ITEM;
+    
+    // try the common name 
+    const char* common_name = ssl_cert_get_dn(cert, SSL_X509_CERT_COMMON_NAME);
+    if (common_name && NPT_Tls::MatchDnsName(hostname, common_name)) return NPT_SUCCESS;
+    
+    // try all the alt DNS names
+    const char* alt_name = NULL;
+    for (unsigned int i=0; (alt_name=ssl_cert_get_subject_alt_dnsname(cert, i)); i++) {
+        if (NPT_Tls::MatchDnsName(hostname, alt_name)) return NPT_SUCCESS;
+    }
+    
+    return NPT_FAILURE;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_TlsSessionImpl::GetSessionId
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -441,24 +449,29 @@ NPT_TlsSessionImpl::GetCipherSuiteId()
 |   NPT_TlsSessionImpl::GetPeerCertificateInfo
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
+NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info,
+                                           NPT_Ordinal             position)
 {
     if (m_SSL == NULL || ssl_handshake_status(m_SSL) == SSL_NOT_OK) {
         // no handshake done
-        NPT_SetMemory(&cert_info, 0, sizeof(cert_info));
         return NPT_ERROR_INVALID_STATE;
     }
 
-    cert_info.subject.common_name         = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_COMMON_NAME);
-    cert_info.subject.organization        = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_ORGANIZATION);
-    cert_info.subject.organizational_name = ssl_get_cert_dn(m_SSL, SSL_X509_CERT_ORGANIZATIONAL_NAME);
-    cert_info.issuer.common_name          = ssl_get_cert_dn(m_SSL, SSL_X509_CA_CERT_COMMON_NAME);
-    cert_info.issuer.organization         = ssl_get_cert_dn(m_SSL, SSL_X509_CA_CERT_ORGANIZATION);
-    cert_info.issuer.organizational_name  = ssl_get_cert_dn(m_SSL, SSL_X509_CA_CERT_ORGANIZATIONAL_NAME);
+    // find the certificate at the requested index
+    const SSL_X509_CERT* cert = ssl_get_peer_cert(m_SSL, position);
+    if (cert == NULL) return NPT_ERROR_NO_SUCH_ITEM;
     
-    ssl_get_cert_fingerprints(m_SSL, cert_info.fingerprint.md5, cert_info.fingerprint.sha1);
+    // get the certificate fields 
+    cert_info.subject.common_name         = ssl_cert_get_dn(cert, SSL_X509_CERT_COMMON_NAME);
+    cert_info.subject.organization        = ssl_cert_get_dn(cert, SSL_X509_CERT_ORGANIZATION);
+    cert_info.subject.organizational_name = ssl_cert_get_dn(cert, SSL_X509_CERT_ORGANIZATIONAL_NAME);
+    cert_info.issuer.common_name          = ssl_cert_get_dn(cert, SSL_X509_CA_CERT_COMMON_NAME);
+    cert_info.issuer.organization         = ssl_cert_get_dn(cert, SSL_X509_CA_CERT_ORGANIZATION);
+    cert_info.issuer.organizational_name  = ssl_cert_get_dn(cert, SSL_X509_CA_CERT_ORGANIZATIONAL_NAME);
+    
+    ssl_cert_get_fingerprints(cert, cert_info.fingerprint.md5, cert_info.fingerprint.sha1);
     SSL_DateTime not_before, not_after;
-    ssl_get_cert_validity_dates(m_SSL, &not_before, &not_after);
+    ssl_cert_get_validity_dates(cert, &not_before, &not_after);
     cert_info.issue_date.m_Year        = not_before.year;
     cert_info.issue_date.m_Month       = not_before.month;
     cert_info.issue_date.m_Day         = not_before.day;
@@ -479,7 +492,7 @@ NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
     // alternate names
     cert_info.alternate_names.Clear();
     const char* alt_name = NULL;
-    for (unsigned int i=0; (alt_name=ssl_get_cert_subject_alt_dnsname(m_SSL, i)); i++) {
+    for (unsigned int i=0; (alt_name=ssl_cert_get_subject_alt_dnsname(cert, i)); i++) {
         cert_info.alternate_names.Add(NPT_String(alt_name));
     }
     
@@ -686,11 +699,32 @@ NPT_TlsOutputStream::Write(const void* buffer,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_Tls::GetDefaultTrustAnchors
++---------------------------------------------------------------------*/
+const NPT_TlsTrustAnchorData*
+NPT_Tls::GetDefaultTrustAnchors(NPT_Ordinal indx)
+{
+    if (indx == 0) {
+        return NptTlsDefaultTrustAnchorsBase;
+    } else if (indx == 2) {
+        return NptTlsDefaultTrustAnchorsExtended;
+    } else {
+        return NULL;
+    }
+}
+
+/*----------------------------------------------------------------------
 |   NPT_TlsContext::NPT_TlsContext
 +---------------------------------------------------------------------*/
 NPT_TlsContext::NPT_TlsContext(NPT_Flags options) :
     m_Impl(new NPT_TlsContextImpl(options))
 {
+    if (options & OPTION_ADD_DEFAULT_TRUST_ANCHORS) {
+        const NPT_TlsTrustAnchorData* ta = NPT_Tls::GetDefaultTrustAnchors(0);
+        if (ta) {
+            AddTrustAnchors(ta);
+        }
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -714,6 +748,17 @@ NPT_TlsContext::LoadKey(NPT_TlsKeyFormat     key_format,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_TlsContext::SelfSignCertificate
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_TlsContext::SelfSignCertificate(const char* common_name,
+                                    const char* organization,
+                                    const char* organizational_name)
+{
+    return m_Impl->SelfSignCertificate(common_name, organization, organizational_name);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_TlsContext::AddTrustAnchor
 +---------------------------------------------------------------------*/
 NPT_Result 
@@ -730,18 +775,16 @@ NPT_Result
 NPT_TlsContext::AddTrustAnchors(const NPT_TlsTrustAnchorData* anchors,
                                 NPT_Cardinal                  anchor_count)
 {
-    return m_Impl->AddTrustAnchors(anchors, anchor_count);
-}
-
-/*----------------------------------------------------------------------
-|   NPT_TlsContext::SelfSignCertificate
-+---------------------------------------------------------------------*/
-NPT_Result 
-NPT_TlsContext::SelfSignCertificate(const char* common_name,
-                                    const char* organization,
-                                    const char* organizational_name)
-{
-    return m_Impl->SelfSignCertificate(common_name, organization, organizational_name);
+    if (anchors == NULL) return NPT_SUCCESS;
+    for (unsigned int i=0; 
+         anchor_count     ? 
+         (i<anchor_count) :
+         (anchors[i].cert_data && anchors[i].cert_size); 
+         i++) {
+         // add the trust anchor and ignore the error 
+         m_Impl->AddTrustAnchor(anchors[i].cert_data, anchors[i].cert_size);
+    }
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -791,6 +834,15 @@ NPT_TlsSession::VerifyPeerCertificate()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_TlsSession::VerifyDnsNameMatch
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_TlsSession::VerifyDnsNameMatch(const char* hostname)
+{
+    return m_Impl->VerifyDnsNameMatch(hostname);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_TlsClientSession::GetSessionId
 +---------------------------------------------------------------------*/
 NPT_Result 
@@ -812,9 +864,10 @@ NPT_TlsSession::GetCipherSuiteId()
 |   NPT_TlsSession::GetPeerCertificateInfo
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_TlsSession::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info)
+NPT_TlsSession::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info,
+                                       unsigned int            position)
 {
-    return m_Impl->GetPeerCertificateInfo(cert_info);
+    return m_Impl->GetPeerCertificateInfo(cert_info, position);
 }
 
 /*----------------------------------------------------------------------
@@ -855,6 +908,104 @@ NPT_TlsServerSession::NPT_TlsServerSession(NPT_TlsContextReference&   context,
                                            NPT_OutputStreamReference& output) :
     NPT_TlsSession(context, new NPT_TlsServerSessionImpl(context->m_Impl->m_SSL_CTX, input, output))
 {
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::NPT_HttpTlsConnector
++---------------------------------------------------------------------*/
+NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_Flags options) :
+    m_TlsContext(new NPT_TlsContext(NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS |
+                                    (options & OPTION_ACCEPT_SELF_SIGNED_CERTS)?NPT_TlsContext::OPTION_VERIFY_LATER:0)),
+    m_Options(options)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::NPT_HttpTlsConnector
++---------------------------------------------------------------------*/
+NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_TlsContextReference& tls_context, NPT_Flags options) :
+    m_TlsContext(tls_context),
+    m_Options(options)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::VerifyPeer
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* hostname, NPT_UInt16 /*port*/) 
+{
+    if (m_Options & OPTION_ACCEPT_SELF_SIGNED_CERTS) {
+        // verify the cert ourselves
+        NPT_Result result = session.VerifyPeerCertificate();
+        if (NPT_FAILED(result) && result != NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED) {
+            NPT_LOG_WARNING_2("TLS certificate verification failed (%d:%s)", result, NPT_ResultText(result));
+            return result;
+        }
+    } else {
+        // check the hostname
+        NPT_Result result = session.VerifyDnsNameMatch(hostname);
+        if (NPT_FAILED(result)) {
+            NPT_LOG_WARNING_2("TLS certificate does not match DNS name (%d:%s)", result, NPT_ResultText(result));
+            return NPT_ERROR_TLS_DNS_NAME_MISMATCH;
+        }
+    }
+
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::Connect
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpTlsConnector::Connect(const char*                hostname, 
+                              NPT_UInt16                 port, 
+                              NPT_Timeout                connection_timeout,
+                              NPT_Timeout                io_timeout,
+                              NPT_Timeout                name_resolver_timeout,
+                              NPT_InputStreamReference&  input_stream, 
+                              NPT_OutputStreamReference& output_stream)
+{
+    // default values
+    input_stream  = NULL;
+    output_stream = NULL;
+    
+    // get the address and port to which we need to connect
+    NPT_IpAddress address;
+    NPT_CHECK_FINE(address.ResolveName(hostname, name_resolver_timeout));
+
+    // connect to the server
+    NPT_LOG_FINE_2("TLS connector will connect to %s:%d", hostname, port);
+    NPT_TcpClientSocket connection;
+    connection.SetReadTimeout(io_timeout);
+    connection.SetWriteTimeout(io_timeout);
+    NPT_SocketAddress socket_address(address, port);
+    NPT_CHECK_FINE(connection.Connect(socket_address, connection_timeout));
+
+    // get the streams
+    NPT_InputStreamReference  raw_input;
+    NPT_OutputStreamReference raw_output;
+    NPT_CHECK_FINE(connection.GetInputStream(raw_input));
+    NPT_CHECK_FINE(connection.GetOutputStream(raw_output));
+    
+    // setup the TLS connection
+    NPT_TlsClientSession tls_session(m_TlsContext, raw_input, raw_output);
+    NPT_Result result = tls_session.Handshake();
+    if (NPT_FAILED(result)) {
+        NPT_LOG_WARNING_2("TLS handshake failed (%d:%s)", result, NPT_ResultText(result));
+        return result;
+    }
+    result = VerifyPeer(tls_session, hostname, port);
+    if (NPT_FAILED(result)) {
+        NPT_LOG_WARNING_2("VerifyPeer failed (%d:%s)", result, NPT_ResultText(result));
+        return result;
+    }
+    
+    // return the TLS streams
+    tls_session.GetInputStream(input_stream);
+    tls_session.GetOutputStream(output_stream);
+    
+    return NPT_SUCCESS;
 }
 
 #endif // NPT_CONFIG_ENABLE_TLS

@@ -226,17 +226,24 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx)
     free(ssl_ctx->ssl_sessions);
 #endif
 
-    i = 0;
-    while (i < CONFIG_SSL_MAX_CERTS && ssl_ctx->certs[i].buf)
+    /* GBG: changed */
     {
-        free(ssl_ctx->certs[i].buf);
-        ssl_ctx->certs[i++].buf = NULL;
+        SSL_CERT* cert = ssl_ctx->certs;
+        while (cert) {
+            SSL_CERT* next = cert->next;
+            free(cert->buf);
+            free(cert);
+            cert = next;
+        }
     }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-    remove_ca_certs(ssl_ctx->ca_cert_ctx);
+    /* GBG: remove - remove_ca_certs(ssl_ctx->ca_cert_ctx); *?
+    /* GBG: added */
+    if (ssl_ctx->ca_certs) x509_free(ssl_ctx->ca_certs);
+    /* /GBG */
 #endif
-    ssl_ctx->chain_length = 0;
+    /* GBG: removed - ssl_ctx->chain_length = 0; */
     SSL_CTX_MUTEX_DESTROY(ssl_ctx->mutex);
     RSA_free(ssl_ctx->rsa_ctx);
     RNG_terminate();
@@ -343,23 +350,11 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
  */
 int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 {
-    int ret = SSL_ERROR_NO_CERT_DEFINED, i = 0;
+    int ret = SSL_ERROR_NO_CERT_DEFINED;
     SSL_CERT *ssl_cert;
+    SSL_CERT *ssl_cert_tail;
     X509_CTX *cert = NULL;
     int offset;
-
-    while (ssl_ctx->certs[i].buf && i < CONFIG_SSL_MAX_CERTS) 
-        i++;
-
-    if (i == CONFIG_SSL_MAX_CERTS) /* too many certs */
-    {
-#ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: maximum number of certs added - change of "
-                "compile-time configuration required\n");
-#endif
-        goto error;
-    }
-
     if ((ret = x509_new(buf, &offset, &cert)))
         goto error;
 
@@ -368,11 +363,26 @@ int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
         x509_print(cert, NULL);
 #endif
 
-    ssl_cert = &ssl_ctx->certs[i];
+    /* GBG: modified */
+    ssl_cert = (SSL_CERT*)malloc(sizeof(SSL_CERT));
+    if (ssl_cert == NULL) {
+        ret = SSL_NOT_OK;
+        goto error;
+    }
+    ssl_cert_tail = ssl_ctx->certs;
+    while (ssl_cert_tail && ssl_cert_tail->next) {
+        ssl_cert_tail = ssl_cert_tail->next;
+    }    
+    if (ssl_cert_tail == NULL) {
+        ssl_ctx->certs = ssl_cert;
+    } else {
+        ssl_cert_tail->next = ssl_cert;
+    }
+    ssl_cert->next = NULL;
     ssl_cert->size = len;
     ssl_cert->buf = (uint8_t *)malloc(len);
     memcpy(ssl_cert->buf, buf, len);
-    ssl_ctx->chain_length++;
+    /* GBG: removed - ssl_ctx->chain_length++; */
     len -= offset;
     ret = SSL_OK;           /* ok so far */
 
@@ -383,11 +393,12 @@ int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     }
 
 error:
-    x509_free(cert);        /* don't need anymore */
+    if (cert) x509_free(cert);        /* don't need anymore */
     return ret;
 }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
+#if 0 /* GBG: removed */
 /**
  * Add a certificate authority.
  */
@@ -430,35 +441,76 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 error:
     return ret;
 }
+#else /* GBG */
+/* GBG: added */
+int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *cert_data, int cert_data_size)
+{
+    X509_CTX* ca_cert = NULL;
+    int       x509_size = cert_data_size;
+    int       result;
+    
+    result = x509_new(cert_data, &x509_size, &ca_cert);
+    if (result != SSL_OK) return SSL_X509_ERROR(result);
+    ca_cert->next = ssl_ctx->ca_certs;
+    ssl_ctx->ca_certs = ca_cert;
+    
+    return SSL_OK;
+}
+#endif /* GBG */
 
+/* GBG added */
+EXP_FUNC const X509_CTX* ssl_get_peer_cert(const SSL* ssl, unsigned int position)
+{
+    X509_CTX* cert = ssl->x509_ctx;
+    
+    /* look for the cert at the requested position */
+    while (position && cert) {
+        cert = cert->next;
+        --position;
+    }
+    if (position) return NULL;
+    
+    /* past the last cert, check for a cert in the list of trust anchors */
+    if (cert == NULL && ssl->x509_ctx && ssl->ssl_ctx) {
+        X509_CTX* ca_cert = ssl->ssl_ctx->ca_certs;
+        cert = ssl->x509_ctx;
+        while (cert->next) cert = cert->next;
+        while (ca_cert) {
+            if (asn1_compare_dn(cert->ca_cert_dn, ca_cert->cert_dn) == 0) {
+                return ca_cert;
+            }
+            ca_cert = ca_cert->next;
+        }
+    }
+    
+    return cert;
+}
 
 /*
  * Retrieve an X.509 distinguished name component
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
+EXP_FUNC const char * STDCALL ssl_cert_get_dn(const X509_CTX* cert, int component)
 {
-    if (ssl->x509_ctx == NULL)
-        return NULL;
-
+    if (cert == NULL) return NULL;
     switch (component)
     {
         case SSL_X509_CERT_COMMON_NAME:
-            return ssl->x509_ctx->cert_dn[X509_COMMON_NAME];
+            return cert->cert_dn[X509_COMMON_NAME];
 
         case SSL_X509_CERT_ORGANIZATION:
-            return ssl->x509_ctx->cert_dn[X509_ORGANIZATION];
+            return cert->cert_dn[X509_ORGANIZATION];
 
         case SSL_X509_CERT_ORGANIZATIONAL_NAME:       
-            return ssl->x509_ctx->cert_dn[X509_ORGANIZATIONAL_UNIT];
+            return cert->cert_dn[X509_ORGANIZATIONAL_UNIT];
 
         case SSL_X509_CA_CERT_COMMON_NAME:
-            return ssl->x509_ctx->ca_cert_dn[X509_COMMON_NAME];
+            return cert->ca_cert_dn[X509_COMMON_NAME];
 
         case SSL_X509_CA_CERT_ORGANIZATION:
-            return ssl->x509_ctx->ca_cert_dn[X509_ORGANIZATION];
+            return cert->ca_cert_dn[X509_ORGANIZATION];
 
         case SSL_X509_CA_CERT_ORGANIZATIONAL_NAME:       
-            return ssl->x509_ctx->ca_cert_dn[X509_ORGANIZATIONAL_UNIT];
+            return cert->ca_cert_dn[X509_ORGANIZATIONAL_UNIT];
 
         default:
             return NULL;
@@ -468,44 +520,44 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
 /*
  * Retrieve a "Subject Alternative Name" from a v3 certificate
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_subject_alt_dnsname(const SSL *ssl,
+EXP_FUNC const char * STDCALL ssl_cert_get_subject_alt_dnsname(const X509_CTX* cert,
         int dnsindex)
 {
     int i;
 
-    if (ssl->x509_ctx == NULL || ssl->x509_ctx->subject_alt_dnsnames == NULL)
+    if (cert == NULL || cert->subject_alt_dnsnames == NULL)
         return NULL;
 
     for (i = 0; i < dnsindex; ++i)
     {
-        if (ssl->x509_ctx->subject_alt_dnsnames[i] == NULL)
+        if (cert->subject_alt_dnsnames[i] == NULL)
             return NULL;
     }
 
-    return ssl->x509_ctx->subject_alt_dnsnames[dnsindex];
+    return cert->subject_alt_dnsnames[dnsindex];
 }
 
 /* GBG added */
-EXP_FUNC void ssl_get_cert_fingerprints(const SSL* ssl, unsigned char* md5, unsigned char* sha1)
+EXP_FUNC void ssl_cert_get_fingerprints(const X509_CTX* cert, unsigned char* md5, unsigned char* sha1)
 {
-    if (ssl->x509_ctx == NULL) {
+    if (cert == NULL) {
         memset(md5, 0, MD5_SIZE);
         memset(sha1, 0, SHA1_SIZE);
         return;
     }
-    memcpy(md5,  ssl->x509_ctx->fingerprint.md5, MD5_SIZE);
-    memcpy(sha1, ssl->x509_ctx->fingerprint.sha1, SHA1_SIZE);
+    memcpy(md5,  cert->fingerprint.md5, MD5_SIZE);
+    memcpy(sha1, cert->fingerprint.sha1, SHA1_SIZE);
 }
 
-EXP_FUNC void ssl_get_cert_validity_dates(const SSL* ssl, SSL_DateTime* not_before, SSL_DateTime* not_after)
+EXP_FUNC void ssl_cert_get_validity_dates(const X509_CTX* cert, SSL_DateTime* not_before, SSL_DateTime* not_after)
 {
-    if (ssl->x509_ctx == NULL) {
+    if (cert == NULL) {
         memset(not_before, 0, sizeof(SSL_DateTime));
         memset(not_after, 0, sizeof(SSL_DateTime));
         return;
     }
-    *not_before = ssl->x509_ctx->not_before;
-    *not_after  = ssl->x509_ctx->not_after;
+    *not_before = cert->not_before;
+    *not_after  = cert->not_after;
 }
 /* /GBG added */
 
@@ -1515,24 +1567,23 @@ error:
  */
 int send_certificate(SSL *ssl)
 {
-    int i = 0;
     uint8_t *buf = ssl->bm_data;
     int offset = 7;
     int chain_length;
+    SSL_CERT* cert = ssl->ssl_ctx->certs; /* GBG: added */
 
     buf[0] = HS_CERTIFICATE;
     buf[1] = 0;
     buf[4] = 0;
 
-    while (i < ssl->ssl_ctx->chain_length)
+    while (cert)
     {
-        SSL_CERT *cert = &ssl->ssl_ctx->certs[i];
         buf[offset++] = 0;        
         buf[offset++] = cert->size >> 8;        /* cert 1 length */
         buf[offset++] = cert->size & 0xff;
         memcpy(&buf[offset], cert->buf, cert->size);
         offset += cert->size;
-        i++;
+        cert = cert->next;
     }
 
     chain_length = offset - 7;
@@ -1732,8 +1783,10 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
             return SSL_BUILD_SKELETON_MODE;
 #endif
 
+#if 0 /* GBG: removed */
         case SSL_MAX_CERT_CFG_OFFSET:
             return CONFIG_SSL_MAX_CERTS;
+#endif
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
         case SSL_MAX_CA_CERT_CFG_OFFSET:
@@ -1756,7 +1809,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
     int ret;
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx, NULL);
+    ret = x509_verify(ssl->ssl_ctx->ca_certs /* GBG: modified */, ssl->x509_ctx, NULL);
     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (ret)        /* modify into an SSL error type */

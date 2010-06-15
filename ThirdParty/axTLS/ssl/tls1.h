@@ -134,11 +134,14 @@ typedef struct
     uint8_t master_secret[SSL_SECRET_SIZE];
 } SSL_SESSION;
 
-typedef struct
+typedef struct _SSL_CERT /* GBG: added */
 {
     uint8_t *buf;
     int size;
+    struct _SSL_CERT* next; /* GBG: added */
 } SSL_CERT;
+
+typedef X509_CTX SSL_X509_CERT;
 
 typedef struct
 {
@@ -195,14 +198,15 @@ typedef struct _SSL SSL;
 struct _SSL_CTX
 {
     uint32_t options;
-    uint8_t chain_length;
+    /* GBG: removed - uint8_t chain_length; */
     RSA_CTX *rsa_ctx;
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-    CA_CERT_CTX *ca_cert_ctx;
+    /* GBG: removed CA_CERT_CTX *ca_cert_ctx; */
+    X509_CTX* ca_certs; /* GBG: added */
 #endif
     SSL *head;
     SSL *tail;
-    SSL_CERT certs[CONFIG_SSL_MAX_CERTS];
+    SSL_CERT* certs; /* GBG: modified */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t num_sessions;
     SSL_SESSION **ssl_sessions;
@@ -247,7 +251,7 @@ int pkcs12_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
 int load_key_certs(SSL_CTX *ssl_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len);
-void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx);
+/* GBG: removed - void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx); */
 #endif
 #ifdef CONFIG_SSL_ENABLE_CLIENT
 int do_client_connect(SSL *ssl);

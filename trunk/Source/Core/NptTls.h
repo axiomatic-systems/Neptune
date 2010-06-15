@@ -38,6 +38,7 @@
 #include "NptConfig.h"
 #include "NptStreams.h"
 #include "NptTime.h"
+#include "NptHttp.h"
 
 /*----------------------------------------------------------------------
 |   error codes
@@ -71,6 +72,7 @@ const NPT_Result NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED          = (NPT_ERROR_BAS
 const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_CHAIN        = (NPT_ERROR_BASE_TLS-27);
 const NPT_Result NPT_ERROR_TLS_CERTIFICATE_UNSUPPORTED_DIGEST   = (NPT_ERROR_BASE_TLS-28);
 const NPT_Result NPT_ERROR_TLS_CERTIFICATE_INVALID_PRIVATE_KEY  = (NPT_ERROR_BASE_TLS-29);
+const NPT_Result NPT_ERROR_TLS_DNS_NAME_MISMATCH                = (NPT_ERROR_BASE_TLS-30);
 
 /*----------------------------------------------------------------------
 |   constants
@@ -102,17 +104,12 @@ struct NPT_TlsTrustAnchorData {
 };
 
 /*----------------------------------------------------------------------
-|   constants
-+---------------------------------------------------------------------*/
-const unsigned int NPT_TLS_CONTEXT_OPTION_VERIFY_LATER               = 1;
-const unsigned int NPT_TLS_CONTEXT_OPTION_REQUIRE_CLIENT_CERTIFICATE = 2;
-
-/*----------------------------------------------------------------------
 |   NPT_Tls
 +---------------------------------------------------------------------*/
 class NPT_Tls
 {
 public:
+    static const NPT_TlsTrustAnchorData* GetDefaultTrustAnchors(NPT_Ordinal indx=0);
     static bool MatchDnsNames(const char*                 hostname,
                               const NPT_List<NPT_String>& dns_names);
     static bool MatchDnsName(const char* hostname, const char* dns_name);
@@ -127,6 +124,11 @@ private:
 class NPT_TlsContext
 {
 public:
+    enum {
+        OPTION_VERIFY_LATER               = 1,
+        OPTION_REQUIRE_CLIENT_CERTIFICATE = 2,
+        OPTION_ADD_DEFAULT_TRUST_ANCHORS  = 4
+    };
     NPT_TlsContext(NPT_Flags options=0);
    ~NPT_TlsContext();
    
@@ -135,6 +137,14 @@ public:
                        const unsigned char* key_data,
                        NPT_Size             key_data_size,
                        const char*          password);
+      
+    NPT_Result SelfSignCertificate(const char* common_name,
+                                   const char* organization,
+                                   const char* organizational_name);
+                                   
+    /** 
+     * Add one trust anchor
+     */
     NPT_Result AddTrustAnchor(const unsigned char* ta_data,
                               NPT_Size             ta_data_size);
     /**
@@ -146,11 +156,7 @@ public:
      */
     NPT_Result AddTrustAnchors(const NPT_TlsTrustAnchorData* anchors, 
                                NPT_Cardinal                  anchor_count = 0);
-      
-    NPT_Result SelfSignCertificate(const char* common_name,
-                                   const char* organization,
-                                   const char* organizational_name);
-                                   
+
 protected:
     NPT_TlsContextImpl* m_Impl;
     
@@ -195,8 +201,9 @@ public:
     virtual ~NPT_TlsSession();
     virtual NPT_Result Handshake();
     virtual NPT_Result GetHandshakeStatus();
-    virtual NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& info);
+    virtual NPT_Result GetPeerCertificateInfo(NPT_TlsCertificateInfo& info, NPT_Ordinal position=0);
     virtual NPT_Result VerifyPeerCertificate();
+    virtual NPT_Result VerifyDnsNameMatch(const char* hostname);
     virtual NPT_Result GetSessionId(NPT_DataBuffer& session_id);
     virtual NPT_UInt32 GetCipherSuiteId();
     virtual NPT_Result GetInputStream(NPT_InputStreamReference& stream);
@@ -232,6 +239,36 @@ public:
     NPT_TlsServerSession(NPT_TlsContextReference&   context,
                          NPT_InputStreamReference&  input,
                          NPT_OutputStreamReference& output);
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector
++---------------------------------------------------------------------*/
+class NPT_HttpTlsConnector : public NPT_HttpClient::Connector
+{
+public:
+    enum {
+        OPTION_ACCEPT_SELF_SIGNED_CERTS = 1
+    };
+    NPT_HttpTlsConnector(NPT_Flags options = 0);
+    NPT_HttpTlsConnector(NPT_TlsContextReference& tls_context, NPT_Flags options = 0);
+    virtual ~NPT_HttpTlsConnector() {}
+    NPT_TlsContext& GetTlsContext() { return *m_TlsContext; }
+    virtual NPT_Result Connect(const char*                   hostname, 
+                               NPT_UInt16                    port, 
+                               NPT_Timeout                   connection_timeout,
+                               NPT_Timeout                   io_timeout,
+                               NPT_Timeout                   name_resolver_timeout,
+                               NPT_InputStreamReference&     input_stream, 
+                               NPT_OutputStreamReference&    output_stream);
+                            
+    virtual NPT_Result VerifyPeer(NPT_TlsClientSession& session,
+                                  const char*           hostname,
+                                  NPT_UInt16            port);
+
+private:
+    NPT_TlsContextReference m_TlsContext;
+    NPT_Flags               m_Options;
 };
 
 /*----------------------------------------------------------------------

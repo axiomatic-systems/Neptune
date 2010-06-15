@@ -73,6 +73,7 @@
 /* Begin PBXBuildFile section */
 		CA057AB011BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */; };
 		CA057AB111BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */; };
+		CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA16FE6111C6C882006E2A86 /* NptAppleLogConfig.mm */; };
 		CA197D250E1AE4400018E87C /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA197D280E1AE4790018E87C /* QueueTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA197D1A0E1AE4200018E87C /* QueueTest1.cpp */; };
 		CA1A5EAF0EC0154D00A9040C /* x509.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E850EC0145900A9040C /* x509.c */; };
@@ -750,6 +751,8 @@
 		CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsBase.cpp; sourceTree = "<group>"; };
 		CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsExtended.cpp; sourceTree = "<group>"; };
 		CA096EF10ED0DBCE00A5103D /* NptResults.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptResults.cpp; sourceTree = "<group>"; };
+		CA16FE6111C6C882006E2A86 /* NptAppleLogConfig.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NptAppleLogConfig.mm; sourceTree = "<group>"; };
+		CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		CA197D1A0E1AE4200018E87C /* QueueTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = QueueTest1.cpp; sourceTree = "<group>"; };
 		CA197D1E0E1AE4360018E87C /* QueueTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = QueueTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA1A5E670EC0145900A9040C /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
@@ -1247,6 +1250,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA16FE6011C6C882006E2A86 /* Apple */ = {
+			isa = PBXGroup;
+			children = (
+				CA16FE6111C6C882006E2A86 /* NptAppleLogConfig.mm */,
+			);
+			path = Apple;
+			sourceTree = "<group>";
+		};
 		CA197D190E1AE4200018E87C /* Queue1 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1702,6 +1713,7 @@
 				CAE417A50E0DC16300A530D1 /* Apps */,
 				CAA979D50CF1648300C01909 /* Tests */,
 				F912B6A00B8EB1C700C1E90D /* Products */,
+				CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1844,6 +1856,7 @@
 		F912B6EE0B8EB27400C1E90D /* System */ = {
 			isa = PBXGroup;
 			children = (
+				CA16FE6011C6C882006E2A86 /* Apple */,
 				CA289B6610E16150001BC817 /* Cocoa */,
 				CA5041A70C5AE2180060E6FE /* Null */,
 				F912B6EF0B8EB27400C1E90D /* Bsd */,
@@ -2977,6 +2990,7 @@
 				CA806989118A602B009D099D /* NptCrypto.cpp in Sources */,
 				CA057AB011BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */,
 				CA057AB111BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */,
+				CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

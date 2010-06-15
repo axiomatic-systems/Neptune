@@ -871,10 +871,11 @@ NPT_HttpStaticProxySelector::GetProxyForUrl(const NPT_HttpUrl& /* url */,
 /*----------------------------------------------------------------------
 |   NPT_HttpClient::NPT_HttpClient
 +---------------------------------------------------------------------*/
-NPT_HttpClient::NPT_HttpClient(Connector* connector) :
+NPT_HttpClient::NPT_HttpClient(Connector* connector, bool transfer_ownership) :
     m_ProxySelector(NPT_HttpProxySelector::GetSystemDefault()),
     m_ProxySelectorIsOwned(false),
     m_Connector(connector),
+    m_ConnectorIsOwned(transfer_ownership),
     m_UserAgent("Neptune/" NPT_NEPTUNE_VERSION_STRING)
 {
     m_Config.m_FollowRedirect      = true;
@@ -882,7 +883,10 @@ NPT_HttpClient::NPT_HttpClient(Connector* connector) :
     m_Config.m_IoTimeout           = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
     m_Config.m_NameResolverTimeout = NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT;
 
-    if (connector == NULL) m_Connector = new NPT_HttpTcpConnector();
+    if (connector == NULL) {
+        m_Connector = new NPT_HttpTcpConnector();
+        m_ConnectorIsOwned = true;
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -893,7 +897,7 @@ NPT_HttpClient::~NPT_HttpClient()
     if (m_ProxySelectorIsOwned) {
         delete m_ProxySelector;
     }
-    delete m_Connector;
+    if (m_ConnectorIsOwned) delete m_Connector;
 }
 
 /*----------------------------------------------------------------------
@@ -1223,8 +1227,10 @@ NPT_HttpServer::Bind()
     NPT_Result result = m_Socket.Bind(NPT_SocketAddress(m_Config.m_ListenAddress, m_Config.m_ListenPort));
     if (NPT_FAILED(result)) return result;
 
-    // remember that we're bound
-    m_BoundPort = m_Config.m_ListenPort;
+    // update the bound port info
+    NPT_SocketInfo info;
+    m_Socket.GetInfo(info);
+    m_BoundPort = info.local_address.GetPort();
     
     return NPT_SUCCESS;
 }
@@ -1353,10 +1359,6 @@ NPT_HttpServer::Loop()
             NPT_LOG_FINE_2("ResponToClient returned %d (%s)", 
                            result,
                            NPT_ResultText(result));
-
-            // release the stream references so that the socket can be closed
-            input  = NULL;
-            output = NULL;
         } else {
             NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)",
                           result,
@@ -1367,7 +1369,11 @@ NPT_HttpServer::Loop()
                 NPT_System::Sleep(1.0);
             }
         }
-    } while (result != NPT_ERROR_TERMINATED);
+
+        // release the stream references so that the socket can be closed
+        input  = NULL;
+        output = NULL;
+    } while (m_Run && result != NPT_ERROR_TERMINATED);
     
     return result;
 }
@@ -1482,7 +1488,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
         handler = NULL;
     }
 
-    // augment the headers with server informatiln
+    // augment the headers with server information
     if (m_ServerHeader.GetLength()) {
         response->GetHeaders().SetHeader(NPT_HTTP_HEADER_SERVER, m_ServerHeader, false);
     }
@@ -1542,6 +1548,14 @@ NPT_HttpResponder::NPT_HttpResponder(NPT_InputStreamReference&  input,
 +---------------------------------------------------------------------*/
 NPT_HttpResponder::~NPT_HttpResponder()
 {
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpServer::Terminate
++---------------------------------------------------------------------*/
+void NPT_HttpServer::Terminate()
+{
+    m_Run = false;
 }
 
 /*----------------------------------------------------------------------
@@ -1656,6 +1670,11 @@ NPT_HttpResponder::SendResponseHeaders(NPT_HttpResponse& response)
 
     return NPT_SUCCESS;
 }
+
+/*----------------------------------------------------------------------
+|   NPT_HttpRequestHandler Dynamic Cast Anchor
++---------------------------------------------------------------------*/
+NPT_DEFINE_DYNAMIC_CAST_ANCHOR(NPT_HttpRequestHandler)
 
 /*----------------------------------------------------------------------
 |   NPT_HttpRequestHandler::SendResponseBody

@@ -553,6 +553,8 @@ err_no_match:
     return ret;
 }
 
+
+#if 0 /* GBG: removed */
 /**
  * Clean up all of the CA certificates.
  */
@@ -571,6 +573,7 @@ void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx)
 
     free(ca_cert_ctx);
 }
+#endif /* GBG */
 
 /*
  * Compare 2 distinguished names for equality 

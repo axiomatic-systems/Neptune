@@ -328,7 +328,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
  * - The certificate chain is valid.
  * - The signature of the certificate is valid.
  */
-int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, const SSL_DateTime* now) 
+int x509_verify(X509_CTX* ca_certs /* GBG: changed */, const X509_CTX *cert, const SSL_DateTime* now) 
 {
     int ret = X509_OK, i = 0;
     bigint *cert_sig;
@@ -380,24 +380,18 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, const SSL_
     /* last cert in the chain - look for a trusted cert */
     if (next_cert == NULL)
     {
-       if (ca_cert_ctx != NULL) 
-       {
-            /* go thu the CA store */
-           while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
-            {
-                if (asn1_compare_dn(cert->ca_cert_dn,
-                                            ca_cert_ctx->cert[i]->cert_dn) == 0)
-                {
-                    /* use this CA certificate for signature verification */
-                    match_ca_cert = 1;
-                    ctx = ca_cert_ctx->cert[i]->rsa_ctx->bi_ctx;
-                    mod = ca_cert_ctx->cert[i]->rsa_ctx->m;
-                    expn = ca_cert_ctx->cert[i]->rsa_ctx->e;
-                    break;
-                }
-
-                i++;
+        /* GBG: modified */
+        X509_CTX* ca_cert = ca_certs;
+        while (ca_cert) {
+            if (asn1_compare_dn(cert->ca_cert_dn, ca_cert->cert_dn) == 0) {
+                /* use this CA certificate for signature verification */
+                match_ca_cert = 1;
+                ctx  = ca_cert->rsa_ctx->bi_ctx;
+                mod  = ca_cert->rsa_ctx->m;
+                expn = ca_cert->rsa_ctx->e;
+                break;
             }
+            ca_cert = ca_cert->next;
         }
 
        /* couldn't find a trusted cert (& let self-signed errors be returned) */
@@ -450,7 +444,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert, const SSL_
     /* go down the certificate chain using recursion. */
     if (next_cert != NULL)
     {
-        ret = x509_verify(ca_cert_ctx, next_cert, now);
+        ret = x509_verify(ca_certs, next_cert, now);
     }
 
 end_verify:

@@ -41,6 +41,7 @@
 #include "NptBufferedStreams.h"
 #include "NptSockets.h"
 #include "NptMap.h"
+#include "NptDynamicCast.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -377,8 +378,12 @@ public:
     /**
      * @param connector Pointer to a Connector instance, or NULL to use 
      * the default (TCP) connector.
+     * @param transfer_ownership Boolean flag. If true, the NPT_HttpClient object
+     * becomes the owner of the passed Connector and will delete it when it is 
+     * itself deleted. If false, the caller keeps the ownership of the connector. 
+     * This flag is ignored if the connector parameter is NULL.
      */
-    NPT_HttpClient(Connector* connector = NULL);
+    NPT_HttpClient(Connector* connector = NULL, bool transfer_ownership = true);
 
     virtual ~NPT_HttpClient();
 
@@ -405,6 +410,7 @@ protected:
     NPT_HttpProxySelector* m_ProxySelector;
     bool                   m_ProxySelectorIsOwned;
     Connector*             m_Connector;
+    bool                   m_ConnectorIsOwned;
     NPT_String             m_UserAgent;
 };
 
@@ -441,6 +447,8 @@ private:
 class NPT_HttpRequestHandler 
 {
 public:
+    NPT_IMPLEMENT_DYNAMIC_CAST(NPT_HttpRequestHandler)
+
     // destructor
     virtual ~NPT_HttpRequestHandler() {}
 
@@ -555,6 +563,8 @@ public:
                                 NPT_HttpRequestContext*    context);
     NPT_Result Loop();
     
+    void Terminate();
+    
     /**
      * Add a request handler. The ownership of the handler is NOT transfered to this object,
      * so the caller is responsible for the lifetime management of the handler object.
@@ -595,6 +605,7 @@ protected:
     Config                   m_Config;
     NPT_List<HandlerConfig*> m_RequestHandlers;
     NPT_String               m_ServerHeader;
+    bool                     m_Run;
 };
 
 /*----------------------------------------------------------------------

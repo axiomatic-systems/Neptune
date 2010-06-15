@@ -372,7 +372,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
  * This will usually be used by a client to check that the server's common 
  * name matches the URL.
  *
- * @param ssl [in] An SSL object reference.
+ * @param ssl [in] An SSL_X509_CERT object reference. [GBG: modified]
  * @param component [in] one of:
  * - SSL_X509_CERT_COMMON_NAME
  * - SSL_X509_CERT_ORGANIZATION
@@ -383,7 +383,8 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
  * @return The appropriate string (or null if not defined)
  * @note Verification build mode must be enabled.
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component);
+/* GBG: modified */
+EXP_FUNC const char * STDCALL ssl_cert_get_dn(const SSL_X509_CERT *cert, int component);
 
 /**
  * @brief Retrieve a Subject Alternative DNSName
@@ -394,16 +395,18 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component);
  * This will usually be used by a client to check that the server's DNS  
  * name matches the URL.
  *
- * @param ssl [in] An SSL object reference.
+ * @param ssl [in] An SSL_X509_CERT object reference. [GBG: modified]
  * @param dnsindex [in] The index of the DNS name to retrieve.
  * @return The appropriate string (or null if not defined)
  * @note Verification build mode must be enabled.
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_subject_alt_dnsname(const SSL *ssl, int dnsindex);
+/* GBG: modified */
+EXP_FUNC const char * STDCALL ssl_cert_get_subject_alt_dnsname(const SSL_X509_CERT *cert, int dnsindex);
 
 /* GBG added */
-EXP_FUNC void ssl_get_cert_fingerprints(const SSL* ssl, unsigned char* md5, unsigned char* sha1);
-EXP_FUNC void ssl_get_cert_validity_dates(const SSL* ssl, SSL_DateTime* not_before, SSL_DateTime* not_after);
+EXP_FUNC const SSL_X509_CERT* ssl_get_peer_cert(const SSL* ssl, unsigned int position);
+EXP_FUNC void ssl_cert_get_fingerprints(const SSL_X509_CERT *cert, unsigned char* md5, unsigned char* sha1);
+EXP_FUNC void ssl_cert_get_validity_dates(const SSL_X509_CERT *cert, SSL_DateTime* not_before, SSL_DateTime* not_after);
 
 /**
  * @brief Force the client to perform its handshake again.

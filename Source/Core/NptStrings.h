@@ -116,8 +116,8 @@ public:
     // processing
     void MakeLowercase();
     void MakeUppercase();
-    void Replace(char a, char b);
-    void Replace(char a, const char* b);
+    const NPT_String& Replace(char a, char b);
+    const NPT_String& Replace(char a, const char* b);
 
     // search
     int  Find(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;
@@ -128,18 +128,19 @@ public:
     bool EndsWith(const char* s, bool ignore_case = false) const;
 
     // editing
-    void Insert(const char* s, NPT_Ordinal where = 0);
-    void Erase(NPT_Ordinal start, NPT_Cardinal count = 1);
-    void Replace(const char* before, const char* after, bool ignore_case = false);
-    void TrimLeft();
-    void TrimLeft(char c);
-    void TrimLeft(const char* chars);
-    void TrimRight();
-    void TrimRight(char c);
-    void TrimRight(const char* chars);
-    void Trim();
-    void Trim(char c);
-    void Trim(const char* chars);
+    const NPT_String& Insert(const char* s, NPT_Ordinal where = 0);
+    const NPT_String& Erase(NPT_Ordinal start, NPT_Cardinal count = 1);
+    const NPT_String& Replace(const char* before, const char* after);
+    // void Replace(NPT_Ordinal start, NPT_Cardinal count, const char* s);
+    const NPT_String& TrimLeft();
+    const NPT_String& TrimLeft(char c);
+    const NPT_String& TrimLeft(const char* chars);
+    const NPT_String& TrimRight();
+    const NPT_String& TrimRight(char c);
+    const NPT_String& TrimRight(const char* chars);
+    const NPT_String& Trim();
+    const NPT_String& Trim(char c);
+    const NPT_String& Trim(const char* chars);
 
     // type casting
     operator char*() const        { return m_Chars ? m_Chars: &EmptyString; }

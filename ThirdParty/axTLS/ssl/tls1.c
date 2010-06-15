@@ -238,10 +238,10 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx)
     }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-    /* GBG: remove - remove_ca_certs(ssl_ctx->ca_cert_ctx); *?
+    /* GBG: remove - remove_ca_certs(ssl_ctx->ca_cert_ctx); */
     /* GBG: added */
     if (ssl_ctx->ca_certs) x509_free(ssl_ctx->ca_certs);
-    /* /GBG */
+    /* GBG */
 #endif
     /* GBG: removed - ssl_ctx->chain_length = 0; */
     SSL_CTX_MUTEX_DESTROY(ssl_ctx->mutex);

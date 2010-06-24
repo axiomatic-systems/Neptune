@@ -1712,8 +1712,10 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
 
     // return a tree if we have one 
     node = m_Tree;
-    if (incremental || m_Tree) {
+    if (incremental) {
         return result;
+    } else if (m_Tree) {
+        return NPT_SUCCESS;
     } else {
         // delete anything that has been created 
         NPT_XmlElementNode* parent = m_CurrentElement; 

@@ -1185,7 +1185,8 @@ NPT_HttpRequestContext::NPT_HttpRequestContext(const NPT_SocketAddress* local_ad
 +---------------------------------------------------------------------*/
 NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
     m_BoundPort(0),
-    m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING)
+    m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING),
+    m_Run(true)
 {
     m_Config.m_ListenAddress     = NPT_IpAddress::Any;
     m_Config.m_ListenPort        = listen_port;
@@ -1198,7 +1199,8 @@ NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
 +---------------------------------------------------------------------*/
 NPT_HttpServer::NPT_HttpServer(NPT_IpAddress listen_address, NPT_UInt16 listen_port) :
     m_BoundPort(0),
-    m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING)
+    m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING),
+    m_Run(true)
 {
     m_Config.m_ListenAddress     = listen_address;
     m_Config.m_ListenPort        = listen_port;

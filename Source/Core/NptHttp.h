@@ -80,7 +80,7 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_HEADER_COOKIE              "Cookie"
 #define NPT_HTTP_HEADER_ACCEPT_RANGES       "Accept-Ranges"
 #define NPT_HTTP_HEADER_CONTENT_RANGE       "Content-Range"
-#define NPT_HTTP_HEADER_AUTHORIZATION		"Authorization"
+#define NPT_HTTP_HEADER_AUTHORIZATION       "Authorization"
 
 #define NPT_HTTP_TRANSFER_ENCODING_CHUNKED  "chunked"
 
@@ -687,4 +687,3 @@ protected:
 };
 
 #endif // _NPT_HTTP_H_
-

@@ -89,8 +89,8 @@ private:
     
 private:
     // members
-	bool                      m_Flush;
-    bool					  m_Append;
+    bool                      m_Flush;
+    bool                      m_Append;
     NPT_String                m_Filename;
     NPT_Flags                 m_FormatFilter;
     NPT_LargeSize             m_MaxFilesize;
@@ -438,8 +438,8 @@ NPT_LogManager::Configure(const char* config_sources)
     }
     NPT_String config_sources_system;
     if (NPT_SUCCEEDED(NPT_GetSystemLogConfig(config_sources_system))) {
-		config_sources = config_sources_system;
-	}
+        config_sources = config_sources_system;
+    }
     NPT_String config_sources_env;
     if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_CONFIG_LOG_CONFIG_ENV, config_sources_env))) {
         config_sources = config_sources_env;
@@ -1036,12 +1036,12 @@ NPT_LogFileHandler::Log(const NPT_LogRecord& record)
     if (m_MaxFilesize > 0) {
         /* get current file size */
         NPT_LargeSize size;
-		NPT_File::GetSize(m_Filename, size);
+        NPT_File::GetSize(m_Filename, size);
 
         /* time to recycle ? */
         if (size > m_MaxFilesize) {
             /* release stream to force a reopen later 
-			   and to be able to rename file */
+               and to be able to rename file */
             m_Stream = NULL;
 
             /* rename file using current time */
@@ -1052,16 +1052,16 @@ NPT_LogFileHandler::Log(const NPT_LogRecord& record)
             NPT_String new_name = NPT_FilePath::Create(
                 NPT_FilePath::DirName(m_Filename),
                 NPT_FilePath::BaseName(m_Filename, false) + 
-					"-" + 
-					suffix + 
-					NPT_FilePath::FileExtension(m_Filename));
+                    "-" + 
+                    suffix + 
+                    NPT_FilePath::FileExtension(m_Filename));
 
             NPT_File::Rename(m_Filename, new_name);
         }
     }
     
     /* try to reopen the file if it failed to open 
-	   previously or if we rotated it */
+       previously or if we rotated it */
     if (m_Stream.IsNull()) {
         Open(m_Append);
     }

@@ -98,9 +98,9 @@ protected:
     virtual void CompressBlock(const NPT_UInt8* block) = 0;
     
     // members
-	NPT_UInt64 m_Length;
+    NPT_UInt64 m_Length;
     NPT_UInt32 m_Pending;
-	NPT_UInt8  m_Buffer[NPT_BASIC_DIGEST_BLOCK_SIZE];
+    NPT_UInt8  m_Buffer[NPT_BASIC_DIGEST_BLOCK_SIZE];
 };
 
 /*----------------------------------------------------------------------
@@ -118,28 +118,28 @@ NPT_BasicDigest::NPT_BasicDigest() :
 NPT_Result
 NPT_BasicDigest::Update(const NPT_UInt8* data, NPT_Size data_size)
 {
-	while (data_size > 0) {
-		if (m_Pending == 0 && data_size >= NPT_BASIC_DIGEST_BLOCK_SIZE) {
-			CompressBlock(data);
-			m_Length  += NPT_BASIC_DIGEST_BLOCK_SIZE * 8;
-			data      += NPT_BASIC_DIGEST_BLOCK_SIZE;
-			data_size -= NPT_BASIC_DIGEST_BLOCK_SIZE;
-		} else {
-			unsigned int chunk = data_size;
+    while (data_size > 0) {
+        if (m_Pending == 0 && data_size >= NPT_BASIC_DIGEST_BLOCK_SIZE) {
+            CompressBlock(data);
+            m_Length  += NPT_BASIC_DIGEST_BLOCK_SIZE * 8;
+            data      += NPT_BASIC_DIGEST_BLOCK_SIZE;
+            data_size -= NPT_BASIC_DIGEST_BLOCK_SIZE;
+        } else {
+            unsigned int chunk = data_size;
             if (chunk > (NPT_BASIC_DIGEST_BLOCK_SIZE - m_Pending)) {
                 chunk = NPT_BASIC_DIGEST_BLOCK_SIZE - m_Pending;
             }
-			NPT_CopyMemory(&m_Buffer[m_Pending], data, chunk);
-			m_Pending += chunk;
-			data      += chunk;
-			data_size -= chunk;
-			if (m_Pending == NPT_BASIC_DIGEST_BLOCK_SIZE) {
-				CompressBlock(m_Buffer);
-				m_Length += 8 * NPT_BASIC_DIGEST_BLOCK_SIZE;
-				m_Pending = 0;
-			}
-		}
-	}
+            NPT_CopyMemory(&m_Buffer[m_Pending], data, chunk);
+            m_Pending += chunk;
+            data      += chunk;
+            data_size -= chunk;
+            if (m_Pending == NPT_BASIC_DIGEST_BLOCK_SIZE) {
+                CompressBlock(m_Buffer);
+                m_Length += 8 * NPT_BASIC_DIGEST_BLOCK_SIZE;
+                m_Pending = 0;
+            }
+        }
+    }
     
     return NPT_SUCCESS;
 }
@@ -154,36 +154,36 @@ NPT_BasicDigest::ComputeDigest(NPT_UInt32*     state,
                                bool            big_endian,
                                NPT_DataBuffer& digest)
 {
-	// increase the length of the message
-	m_Length += m_Pending * 8;
+    // increase the length of the message
+    m_Length += m_Pending * 8;
 
-	// append the '1' bit
-	m_Buffer[m_Pending++] = 0x80;
+    // append the '1' bit
+    m_Buffer[m_Pending++] = 0x80;
 
-	// if there isn't enough space left for the size (8 bytes), then compress.
-	// then we can fall back to padding zeros and length encoding as normal. 
-	if (m_Pending > NPT_BASIC_DIGEST_BLOCK_SIZE-8) {
-		while (m_Pending < NPT_BASIC_DIGEST_BLOCK_SIZE) {
-			m_Buffer[m_Pending++] = 0;
-		}
-		CompressBlock(m_Buffer);
-		m_Pending = 0;
-	}
+    // if there isn't enough space left for the size (8 bytes), then compress.
+    // then we can fall back to padding zeros and length encoding as normal. 
+    if (m_Pending > NPT_BASIC_DIGEST_BLOCK_SIZE-8) {
+        while (m_Pending < NPT_BASIC_DIGEST_BLOCK_SIZE) {
+            m_Buffer[m_Pending++] = 0;
+        }
+        CompressBlock(m_Buffer);
+        m_Pending = 0;
+    }
 
-	// pad with zeroes up until the length
-	while (m_Pending < NPT_BASIC_DIGEST_BLOCK_SIZE-8) {
-		m_Buffer[m_Pending++] = 0;
-	}
+    // pad with zeroes up until the length
+    while (m_Pending < NPT_BASIC_DIGEST_BLOCK_SIZE-8) {
+        m_Buffer[m_Pending++] = 0;
+    }
 
-	// store length
+    // store length
     if (big_endian) {
         NPT_BytesFromInt64Be(&m_Buffer[NPT_BASIC_DIGEST_BLOCK_SIZE-8], m_Length);
     } else {
         NPT_BytesFromInt64Le(&m_Buffer[NPT_BASIC_DIGEST_BLOCK_SIZE-8], m_Length);
     }
-	CompressBlock(m_Buffer);
+    CompressBlock(m_Buffer);
 
-	// copy output
+    // copy output
     digest.SetDataSize(4*state_count);
     NPT_UInt8* out = digest.UseData();
     if (big_endian) {
@@ -197,7 +197,7 @@ NPT_BasicDigest::ComputeDigest(NPT_UInt32*     state,
             out += 4;
         }
     }
-	return NPT_SUCCESS;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -216,7 +216,7 @@ private:
     virtual void CompressBlock(const NPT_UInt8* block);
     
     // members
-	NPT_UInt32 m_State[5];
+    NPT_UInt32 m_State[5];
 };
 
 /*----------------------------------------------------------------------
@@ -224,11 +224,11 @@ private:
 +---------------------------------------------------------------------*/
 NPT_Sha1Digest::NPT_Sha1Digest()
 {
-	m_State[0] = 0x67452301UL;
-	m_State[1] = 0xefcdab89UL;
-	m_State[2] = 0x98badcfeUL;
-	m_State[3] = 0x10325476UL;
-	m_State[4] = 0xc3d2e1f0UL;
+    m_State[0] = 0x67452301UL;
+    m_State[1] = 0xefcdab89UL;
+    m_State[2] = 0x98badcfeUL;
+    m_State[3] = 0x10325476UL;
+    m_State[4] = 0xc3d2e1f0UL;
 }
 
 /*----------------------------------------------------------------------
@@ -237,11 +237,11 @@ NPT_Sha1Digest::NPT_Sha1Digest()
 void
 NPT_Sha1Digest::CompressBlock(const NPT_UInt8* block)
 {
-	NPT_UInt32 a,b,c,d,e,t,W[80];
+    NPT_UInt32 a,b,c,d,e,t,W[80];
 
-	// copy the 512-bit block into W[0..15]
-	for (unsigned int i = 0; i < 16; i++) {
-		W[i] = NPT_BytesToInt32Be(&block[4*i]);
+    // copy the 512-bit block into W[0..15]
+    for (unsigned int i = 0; i < 16; i++) {
+        W[i] = NPT_BytesToInt32Be(&block[4*i]);
     }
     
     // copy the state to local variables
@@ -307,7 +307,7 @@ protected:
     virtual void CompressBlock(const NPT_UInt8* block);
     
     // members
-	NPT_UInt32 m_State[4];
+    NPT_UInt32 m_State[4];
 };
 
 /*----------------------------------------------------------------------
@@ -315,10 +315,10 @@ protected:
 +---------------------------------------------------------------------*/
 NPT_Md5Digest::NPT_Md5Digest()
 {
-	m_State[0] = 0x67452301UL;
-	m_State[1] = 0xefcdab89UL;
-	m_State[2] = 0x98badcfeUL;
-	m_State[3] = 0x10325476UL;
+    m_State[0] = 0x67452301UL;
+    m_State[1] = 0xefcdab89UL;
+    m_State[2] = 0x98badcfeUL;
+    m_State[3] = 0x10325476UL;
 }
 
 /*----------------------------------------------------------------------
@@ -327,12 +327,12 @@ NPT_Md5Digest::NPT_Md5Digest()
 void
 NPT_Md5Digest::CompressBlock(const NPT_UInt8* block)
 {
-	NPT_UInt32 a,b,c,d,W[16];
+    NPT_UInt32 a,b,c,d,W[16];
 
-	// copy the 512-bit block into W[0..15]
+    // copy the 512-bit block into W[0..15]
     unsigned int i;
-	for (i = 0; i < 16; i++) {
-		W[i] = NPT_BytesToInt32Le(&block[4*i]);
+    for (i = 0; i < 16; i++) {
+        W[i] = NPT_BytesToInt32Le(&block[4*i]);
     }
     
     // copy the state to local variables
@@ -432,7 +432,7 @@ NPT_Md5Digest::GetDigest(NPT_DataBuffer& digest)
 /*----------------------------------------------------------------------
 |   NPT_HmacDigest
 |
-|	compute Digest(key XOR opad, Digest(key XOR ipad, data))
+|   compute Digest(key XOR opad, Digest(key XOR ipad, data))
 |   key is the MAC key
 |   ipad is the byte 0x36 repeated 64 times
 |   opad is the byte 0x5c repeated 64 times
@@ -468,7 +468,7 @@ NPT_HmacDigest::NPT_HmacDigest(NPT_Digest::Algorithm algorithm,
     NPT_Digest::Create(algorithm, m_InnerDigest);
     NPT_Digest::Create(algorithm, m_OuterDigest);
     
-	NPT_UInt8 workspace[NPT_BASIC_DIGEST_BLOCK_SIZE];
+    NPT_UInt8 workspace[NPT_BASIC_DIGEST_BLOCK_SIZE];
     
     // if the key is larger than the block size, use a digest of the key
     NPT_DataBuffer hk;
@@ -484,24 +484,24 @@ NPT_HmacDigest::NPT_HmacDigest(NPT_Digest::Algorithm algorithm,
 
     // compute key XOR ipad
     for (unsigned int i = 0; i < key_size; i++) {
-		workspace[i] = key[i] ^ 0x36;
+        workspace[i] = key[i] ^ 0x36;
     }
     for (unsigned int i = key_size; i < NPT_BASIC_DIGEST_BLOCK_SIZE; i++) {
-		workspace[i] = 0x36;
+        workspace[i] = 0x36;
     }
     
-	// start the inner digest with (key XOR ipad)
+    // start the inner digest with (key XOR ipad)
     m_InnerDigest->Update(workspace, NPT_BASIC_DIGEST_BLOCK_SIZE);
 
     // compute key XOR opad
     for (unsigned int i = 0; i < key_size; i++) {
-		workspace[i] = key[i] ^ 0x5c;
+        workspace[i] = key[i] ^ 0x5c;
     }
     for (unsigned int i = key_size; i < NPT_BASIC_DIGEST_BLOCK_SIZE; i++) {
-		workspace[i] = 0x5c;
+        workspace[i] = 0x5c;
     }
     
-	// start the outer digest with (key XOR opad)
+    // start the outer digest with (key XOR opad)
     m_OuterDigest->Update(workspace, NPT_BASIC_DIGEST_BLOCK_SIZE);
 }
 

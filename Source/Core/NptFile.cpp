@@ -360,8 +360,8 @@ NPT_File::GetSize(NPT_LargeSize& size)
 NPT_Result        
 NPT_File::GetSize(const char* path, NPT_LargeSize& size)
 {
-	NPT_File file(path);
-	return file.GetSize(size);
+    NPT_File file(path);
+    return file.GetSize(size);
 }
 
 /*----------------------------------------------------------------------
@@ -404,5 +404,3 @@ NPT_File::ListDir(NPT_List<NPT_String>& entries)
     entries.Clear();
     return ListDir(m_Path.GetChars(), entries);
 }
-
-

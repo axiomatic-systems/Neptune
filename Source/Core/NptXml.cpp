@@ -2252,14 +2252,14 @@ NPT_XmlNodeCanonicalWriter::operator()(NPT_XmlNode*& node) const
 NPT_XmlSerializer::NPT_XmlSerializer(NPT_OutputStream* output,
                                      NPT_Cardinal      indentation,
                                      bool              shrink_empty_elements,
-									 bool			   add_xml_decl) :
+                                     bool              add_xml_decl) :
     m_Output(output),
     m_ElementPending(false),
     m_Depth(0),
     m_Indentation(indentation),
     m_ElementHasText(false),
     m_ShrinkEmptyElements(shrink_empty_elements),
-	m_AddXmlDecl(add_xml_decl)
+    m_AddXmlDecl(add_xml_decl)
 {
 }
 
@@ -2276,7 +2276,7 @@ NPT_XmlSerializer::~NPT_XmlSerializer()
 NPT_Result 
 NPT_XmlSerializer::StartDocument()
 {
-	if (!m_AddXmlDecl) return NPT_SUCCESS;
+    if (!m_AddXmlDecl) return NPT_SUCCESS;
 
     return m_Output->WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
 }
@@ -2493,9 +2493,9 @@ NPT_XmlSerializer::Comment(const char* comment)
 |   NPT_XmlWriter::Serialize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlWriter::Serialize(NPT_XmlNode&	   node, 
-						 NPT_OutputStream& output, 
-						 bool			   add_xml_decl)
+NPT_XmlWriter::Serialize(NPT_XmlNode&      node, 
+                         NPT_OutputStream& output, 
+                         bool              add_xml_decl)
 {
     NPT_XmlSerializer serializer(&output, m_Indentation, true, add_xml_decl);
     NPT_XmlNodeWriter node_writer(serializer);
@@ -2510,8 +2510,8 @@ NPT_XmlWriter::Serialize(NPT_XmlNode&	   node,
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_XmlCanonicalizer::Serialize(NPT_XmlNode&      node, 
-								NPT_OutputStream& output, 
-								bool			  add_xml_decl)
+                                NPT_OutputStream& output, 
+                                bool              add_xml_decl)
 {
     // create a serializer with no indentation and no shrinking of empty elements
     NPT_XmlSerializer serializer(&output, 0, false, add_xml_decl);

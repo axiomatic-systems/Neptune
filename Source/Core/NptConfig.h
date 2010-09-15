@@ -57,6 +57,8 @@
 #define NPT_CONFIG_HAVE_MEMSET
 #define NPT_CONFIG_HAVE_MEMCMP
 #define NPT_CONFIG_HAVE_GETENV
+#define NPT_CONFIG_HAVE_SETENV
+#define NPT_CONFIG_HAVE_UNSETENV
 #define NPT_CONFIG_HAVE_READDIR_R
 #endif /* NPT_CONFIG_HAS_STD_C */
 
@@ -213,6 +215,9 @@ typedef long NPT_PointerLong;
 #undef NPT_CONFIG_HAVE_GETENV
 #define NPT_CONFIG_HAVE_DUPENV_S
 #define dupenv_s _dupenv_s
+#undef NPT_CONFIG_HAVE_SETENV
+#define NPT_CONFIG_HAVE_PUTENV_S
+#define putenv_s _putenv_s
 #else
 #undef NPT_CONFIG_HAVE_GMTIME_R
 #undef NPT_CONFIG_HAVE_LOCALTIME_R

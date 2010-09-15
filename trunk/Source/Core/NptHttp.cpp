@@ -977,7 +977,7 @@ NPT_HttpEnvProxySelector::GetProxyForUrl(const NPT_HttpUrl&    url,
                     // exact match
                     return NPT_ERROR_HTTP_NO_PROXY;
                 }
-                if (url.GetHost()[url.GetHost().GetLength()-(*i).GetLength()-1] == '.') {
+                if (url.GetHost().GetChars()[url.GetHost().GetLength()-(*i).GetLength()-1] == '.') {
                     // subdomain match
                     return NPT_ERROR_HTTP_NO_PROXY;
                 }

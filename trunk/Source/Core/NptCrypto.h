@@ -63,8 +63,14 @@ public:
     // methods
     virtual           ~NPT_BlockCipher() {}
     virtual NPT_Size   GetBlockSize() = 0;
-    virtual NPT_Result ProcessBlock(const NPT_UInt8* block_in, NPT_UInt8* block_out) = 0;
-
+    virtual Direction  GetDirection() = 0;
+    virtual Algorithm  GetAlgorithm() = 0;
+    virtual NPT_Result ProcessBlock(const NPT_UInt8* input, NPT_UInt8* output) = 0;
+    /**
+     * @param iv Initial vector (same size as cipher block size), or NULL for an IV made up of all zeros.
+     */
+    virtual NPT_Result ProcessCbc(const NPT_UInt8* input, NPT_Size input_size, const NPT_UInt8* iv, NPT_DataBuffer& output);
+    
 protected:
     NPT_BlockCipher() {} // don't instantiate directly
 };

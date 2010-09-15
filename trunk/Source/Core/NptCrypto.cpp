@@ -391,6 +391,7 @@ public:
         return NPT_ERROR_INTERNAL;
     }
     NPT_Size   GetBlockSize() { return NPT_AES_BLOCK_SIZE; }
+    Algorithm  GetAlgorithm() { return AES_128;            }
 
 protected:
     NPT_UInt32   m_eK[60];
@@ -405,6 +406,7 @@ class NPT_AesBlockEncrypter : public NPT_AesBlockCipher {
 public:
     NPT_AesBlockEncrypter(const NPT_UInt8* key, NPT_Size key_size) :
         NPT_AesBlockCipher(key, key_size) {}
+    Direction  GetDirection() { return ENCRYPT; }
     NPT_Result ProcessBlock(const NPT_UInt8* block_in, NPT_UInt8* block_out);
 };
 
@@ -415,6 +417,7 @@ class NPT_AesBlockDecrypter : public NPT_AesBlockCipher {
 public:
     NPT_AesBlockDecrypter(const NPT_UInt8* key, NPT_Size key_size) :
         NPT_AesBlockCipher(key, key_size) {}
+    Direction  GetDirection() { return DECRYPT; }
     NPT_Result ProcessBlock(const NPT_UInt8* block_in, NPT_UInt8* block_out);
 };
 
@@ -738,5 +741,93 @@ NPT_BlockCipher::Create(Algorithm         algorithm,
         default:
             return NPT_ERROR_NOT_SUPPORTED;
     } 
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BlockCipher::ProcessCbc
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_BlockCipher::ProcessCbc(const NPT_UInt8* input, NPT_Size input_size, const NPT_UInt8* iv, NPT_DataBuffer& output)
+{
+    // this version only supports block sizes of 16
+    if (GetBlockSize() != 16) return NPT_ERROR_NOT_SUPPORTED;
+    
+    // decrypt or encrypt depending on the direction of the cipher
+    NPT_UInt8 chain[16];
+    if (iv) {
+        NPT_CopyMemory(chain, iv, 16);
+    } else {
+        NPT_SetMemory(chain, 0, 16);
+    }
+    if (GetDirection() == ENCRYPT) {
+        // pad
+        unsigned int padding_size = 16-(input_size%16);
+        NPT_DataBuffer padded_input;
+        padded_input.SetDataSize(input_size+padding_size);
+        NPT_UInt8* plaintext = padded_input.UseData();
+        NPT_CopyMemory(plaintext, input, input_size);
+        for (unsigned int x=0; x<padding_size; x++) {
+            plaintext[input_size+x] = padding_size;
+        }
+        
+        // process all blocks
+        unsigned int block_count = (input_size+padding_size)/16;
+        output.SetDataSize(block_count*16);
+        NPT_UInt8* ciphertext = output.UseData();
+        for (unsigned int x=0; x<block_count; x++) {
+            // xor with the chaining block
+            for (unsigned int y=0; y<16; y++) {
+                plaintext[y] ^= chain[y];
+            }
+            
+            // encrypt the block
+            NPT_Result result = ProcessBlock(plaintext, ciphertext);
+            if (NPT_FAILED(result)) return result;
+            
+            // chain and move forward to the next block
+            NPT_CopyMemory(chain, ciphertext, 16);
+            plaintext  += 16;
+            ciphertext += 16;
+        }
+    } else {
+        // check that we have an integral number of blocks
+        if (input_size%16) return NPT_ERROR_INVALID_PARAMETERS;
+        
+        // process all blocks
+        unsigned int block_count = input_size/16;
+        output.SetBufferSize(block_count*16);
+        NPT_UInt8* plaintext = output.UseData();
+        const NPT_UInt8* ciphertext = input;
+        for (unsigned int x=0; x<block_count; x++) {
+            // decrypt block
+            NPT_Result result = ProcessBlock(ciphertext, plaintext);
+            if (NPT_FAILED(result)) return result;
+            
+            // xor with the chaining block
+            for (unsigned int y=0; y<16; y++) {
+                plaintext[y] ^= chain[y];
+            }
+            
+            // chain and move forward to the next block
+            NPT_CopyMemory(chain, ciphertext, 16);
+            plaintext  += 16;
+            ciphertext += 16;
+        }
+        
+        // padding
+        plaintext -= 16;
+        unsigned int padding_size = plaintext[15];
+        if (padding_size == 0 || padding_size > 16) {
+            return NPT_ERROR_INVALID_FORMAT;
+        }
+        for (unsigned int y=0; y<padding_size; y++) {
+            if (plaintext[15-y] != padding_size) {
+                return NPT_ERROR_INVALID_FORMAT;
+            }
+        }
+        output.SetDataSize(block_count*16 - padding_size);
+    }
+    
+    return NPT_SUCCESS;
 }
 

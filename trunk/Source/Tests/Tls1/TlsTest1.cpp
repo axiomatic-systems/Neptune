@@ -150,16 +150,16 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
     client_socket->GetInputStream(input);
     client_socket->GetOutputStream(output);
     delete client_socket;
-    NPT_TlsContextReference context(new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER));
+    NPT_TlsContext context(NPT_TlsContext::OPTION_VERIFY_LATER);
     
     NPT_DataBuffer ta_data;
     NPT_Base64::Decode(EquifaxCA, NPT_StringLength(EquifaxCA), ta_data);
-    result = context->AddTrustAnchor(ta_data.GetData(), ta_data.GetDataSize());
+    result = context.AddTrustAnchor(ta_data.GetData(), ta_data.GetDataSize());
     if (NPT_FAILED(result)) {
         printf("!ERROR: context->AddTrustAnchor() \n");
         return 1;
     }
-    result = context->AddTrustAnchors(NPT_Tls::GetDefaultTrustAnchors(0));
+    result = context.AddTrustAnchors(NPT_Tls::GetDefaultTrustAnchors(0));
     if (NPT_FAILED(result)) {
         printf("!ERROR: context->AddTrustAnchors() \n");
         return 1;
@@ -167,9 +167,9 @@ TestRemoteServer(const char* hostname, unsigned int port, bool verify_cert, NPT_
 
     if (client_key) {
         /* self-signed cert */
-        result = context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+        result = context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
         CHECK(result == NPT_SUCCESS);
-        result = context->SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
+        result = context.SelfSignCertificate("MyClientCommonName", "MyClientOrganization", "MyClientOrganizationalName");
     }
     
     NPT_TlsClientSession session(context, input, output);
@@ -253,17 +253,11 @@ TlsTestServer::Run()
     socket.WaitForNewClient(client);
     printf("@@@ Client connected\n");
     
-    NPT_TlsContextReference tls_context;
-    if (m_Mode == 0) {
-        tls_context = new NPT_TlsContext();
-    } else if (m_Mode == 1) {
-        /* require client authentication */
-        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_REQUIRE_CLIENT_CERTIFICATE | NPT_TlsContext::OPTION_VERIFY_LATER);
-    }
+    NPT_TlsContext tls_context(m_Mode?(NPT_TlsContext::OPTION_REQUIRE_CLIENT_CERTIFICATE | NPT_TlsContext::OPTION_VERIFY_LATER):0);
     /* self-signed cert */
-    result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
+    result = tls_context.LoadKey(NPT_TLS_KEY_FORMAT_PKCS8, TestClient_p8_1, TestClient_p8_1_len, "neptune");
     CHECK(result == NPT_SUCCESS);
-    result = tls_context->SelfSignCertificate("MyServerCommonName", "MyServerOrganization", "MyServerOrganizationalName");
+    result = tls_context.SelfSignCertificate("MyServerCommonName", "MyServerOrganization", "MyServerOrganizationalName");
     
     NPT_InputStreamReference  socket_input;
     NPT_OutputStreamReference socket_output;

@@ -166,3 +166,4 @@ class NPT_PropertyValue
 };
 
 #endif // _NPT_COMMON_H_
+

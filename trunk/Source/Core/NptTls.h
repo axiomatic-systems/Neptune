@@ -166,8 +166,6 @@ protected:
     friend class NPT_TlsServerSession;
 };
 
-typedef NPT_Reference<NPT_TlsContext> NPT_TlsContextReference;
-
 /*----------------------------------------------------------------------
 |   NPT_TlsCertificateInfo
 +---------------------------------------------------------------------*/
@@ -210,10 +208,10 @@ public:
     virtual NPT_Result GetOutputStream(NPT_OutputStreamReference& stream);
     
 protected:
-    NPT_TlsSession(NPT_TlsContextReference& context, 
-                   NPT_TlsSessionImpl*      impl);
+    NPT_TlsSession(NPT_TlsContext&     context, 
+                   NPT_TlsSessionImpl* impl);
 
-    NPT_TlsContextReference           m_Context;
+    NPT_TlsContext&                   m_Context;
     NPT_Reference<NPT_TlsSessionImpl> m_Impl;
     NPT_InputStreamReference          m_InputStream;
     NPT_OutputStreamReference         m_OutputStream;
@@ -225,7 +223,7 @@ protected:
 class NPT_TlsClientSession : public NPT_TlsSession
 {
 public:
-    NPT_TlsClientSession(NPT_TlsContextReference&   context,
+    NPT_TlsClientSession(NPT_TlsContext&            context,
                          NPT_InputStreamReference&  input,
                          NPT_OutputStreamReference& output);
 };
@@ -236,7 +234,7 @@ public:
 class NPT_TlsServerSession : public NPT_TlsSession
 {
 public:
-    NPT_TlsServerSession(NPT_TlsContextReference&   context,
+    NPT_TlsServerSession(NPT_TlsContext&            context,
                          NPT_InputStreamReference&  input,
                          NPT_OutputStreamReference& output);
 };
@@ -248,27 +246,43 @@ class NPT_HttpTlsConnector : public NPT_HttpClient::Connector
 {
 public:
     enum {
-        OPTION_ACCEPT_SELF_SIGNED_CERTS = 1
+        OPTION_ACCEPT_SELF_SIGNED_CERTS = 1,
+        OPTION_ACCEPT_HOSTNAME_MISMATCH = 2
     };
     NPT_HttpTlsConnector(NPT_Flags options = 0);
-    NPT_HttpTlsConnector(NPT_TlsContextReference& tls_context, NPT_Flags options = 0);
+    NPT_HttpTlsConnector(NPT_TlsContext& tls_context, NPT_Flags options = 0);
     virtual ~NPT_HttpTlsConnector() {}
-    NPT_TlsContext& GetTlsContext() { return *m_TlsContext; }
-    virtual NPT_Result Connect(const char*                   hostname, 
-                               NPT_UInt16                    port, 
-                               NPT_Timeout                   connection_timeout,
-                               NPT_Timeout                   io_timeout,
-                               NPT_Timeout                   name_resolver_timeout,
+    NPT_TlsContext& GetTlsContext() { return m_TlsContext; }
+    virtual NPT_Result Connect(const NPT_HttpUrl&            url,
+                               NPT_HttpClient&               client,
+                               const NPT_HttpProxyAddress*   proxy,
                                NPT_InputStreamReference&     input_stream, 
                                NPT_OutputStreamReference&    output_stream);
                             
     virtual NPT_Result VerifyPeer(NPT_TlsClientSession& session,
-                                  const char*           hostname,
-                                  NPT_UInt16            port);
+                                  const char*           hostname);
 
 private:
-    NPT_TlsContextReference m_TlsContext;
-    NPT_Flags               m_Options;
+    // singleton management
+    class Cleanup {
+        static Cleanup Automatic;
+        ~Cleanup() {
+            if (DefaultTlsContext) {
+                delete DefaultTlsContext;
+                DefaultTlsContext = NULL;
+            }
+        }
+    };
+    
+    // class methods
+    static NPT_TlsContext& GetDefaultTlsContext();
+    
+    // class members
+    static NPT_TlsContext* DefaultTlsContext;
+    
+    // members
+    NPT_TlsContext& m_TlsContext;
+    NPT_Flags       m_Options;
 };
 
 /*----------------------------------------------------------------------

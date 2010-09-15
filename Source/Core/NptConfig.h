@@ -216,6 +216,7 @@ typedef long NPT_PointerLong;
 #define NPT_CONFIG_HAVE_DUPENV_S
 #define dupenv_s _dupenv_s
 #undef NPT_CONFIG_HAVE_SETENV
+#undef NPT_CONFIG_HAVE_UNSETENV
 #define NPT_CONFIG_HAVE_PUTENV_S
 #define putenv_s _putenv_s
 #else

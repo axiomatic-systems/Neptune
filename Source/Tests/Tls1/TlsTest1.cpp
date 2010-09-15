@@ -334,11 +334,10 @@ class TestTlsConnector : public NPT_HttpTlsConnector
 {
 public:
     virtual NPT_Result VerifyPeer(NPT_TlsClientSession& session,
-                                  const char*           hostname,
-                                  NPT_UInt16            port) {
-        printf("+++ Verifying Peer (hostname=%s, port=%d)\n", hostname, port);
+                                  const char*           hostname) {
+        printf("+++ Verifying Peer (hostname=%s)\n", hostname);
         PrintSessionInfo(session);
-        return NPT_HttpTlsConnector::VerifyPeer(session, hostname, port);
+        return NPT_HttpTlsConnector::VerifyPeer(session, hostname);
     }
 };
 

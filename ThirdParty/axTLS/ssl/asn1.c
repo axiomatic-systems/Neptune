@@ -447,8 +447,8 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
         }
         /* add the prefix if there is one */
         if (name_prefix) {
-            int name_prefix_len = strlen(name_prefix);
-            int name_len        = strlen(name);
+            int name_prefix_len = (int)strlen(name_prefix);
+            int name_len        = (int)strlen(name);
             char* compound = malloc(name_prefix_len+name_len+2);
             memcpy(compound, name_prefix, name_prefix_len);
             compound[name_prefix_len] = '=';

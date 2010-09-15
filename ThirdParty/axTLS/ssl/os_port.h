@@ -75,7 +75,11 @@ uint64_t SSL_GetRandomSeed();
 #define STDCALL
 #define EXP_FUNC
 
-typedef struct NPT_Mutex* SSL_CTX_MUTEX_TYPE;
+#if defined(__cplusplus) 
+typedef class NPT_Mutex* SSL_CTX_MUTEX_TYPE;
+#else
+typedef void* SSL_CTX_MUTEX_TYPE;
+#endif
 void SSL_Mutex_Create(SSL_CTX_MUTEX_TYPE* mutex);
 void SSL_Mutex_Destroy(SSL_CTX_MUTEX_TYPE mutex);
 void SSL_Mutex_Lock(SSL_CTX_MUTEX_TYPE mutex);

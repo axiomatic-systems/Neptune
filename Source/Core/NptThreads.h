@@ -103,6 +103,20 @@ class NPT_Lock : public T,
 };
 
 /*----------------------------------------------------------------------
+|   NPT_SingletonLock
++---------------------------------------------------------------------*/
+class NPT_SingletonLock
+{
+public:
+    static NPT_Mutex& GetInstance() {
+        return Instance;
+    }
+    
+private:
+    static NPT_Mutex Instance;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_SharedVariableInterface
 +---------------------------------------------------------------------*/
 class NPT_SharedVariableInterface

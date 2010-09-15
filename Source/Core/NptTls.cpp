@@ -52,6 +52,7 @@ NPT_SET_LOCAL_LOGGER("neptune.tls")
 |   constants
 +---------------------------------------------------------------------*/
 const unsigned int NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE = 16;
+const unsigned int NPT_HTTP_TLS_CONNECTOR_MAX_PROXY_RESPONSE_SIZE = (16*1024);
 
 /*----------------------------------------------------------------------
 |   types
@@ -107,6 +108,42 @@ SSL_GetRandomSeed()
     NPT_TimeStamp ts;
     NPT_System::GetCurrentTimeStamp(ts);
     return ts.ToNanos();
+}
+
+/*----------------------------------------------------------------------
+|   SSL_Mutex_Create
++---------------------------------------------------------------------*/
+void 
+SSL_Mutex_Create(NPT_Mutex** mutex)
+{
+    *mutex = new NPT_Mutex();
+}
+
+/*----------------------------------------------------------------------
+|   SSL_Mutex_Destroy
++---------------------------------------------------------------------*/
+void 
+SSL_Mutex_Destroy(NPT_Mutex* mutex)
+{
+    delete mutex;
+}
+
+/*----------------------------------------------------------------------
+|   SSL_Mutex_Lock
++---------------------------------------------------------------------*/
+void 
+SSL_Mutex_Lock(NPT_Mutex* mutex)
+{
+    mutex->Lock();
+}
+
+/*----------------------------------------------------------------------
+|   SSL_Mutex_Lock
++---------------------------------------------------------------------*/
+void 
+SSL_Mutex_Unlock(NPT_Mutex* mutex)
+{
+    mutex->Unlock();
 }
 
 /*----------------------------------------------------------------------
@@ -790,8 +827,8 @@ NPT_TlsContext::AddTrustAnchors(const NPT_TlsTrustAnchorData* anchors,
 /*----------------------------------------------------------------------
 |   NPT_TlsSession::NPT_TlsSession
 +---------------------------------------------------------------------*/
-NPT_TlsSession::NPT_TlsSession(NPT_TlsContextReference& context, 
-                               NPT_TlsSessionImpl*      impl) :
+NPT_TlsSession::NPT_TlsSession(NPT_TlsContext&     context, 
+                               NPT_TlsSessionImpl* impl) :
     m_Context(context),
     m_Impl(impl),
     m_InputStream(new NPT_TlsInputStream(m_Impl)),
@@ -893,29 +930,34 @@ NPT_TlsSession::GetOutputStream(NPT_OutputStreamReference& stream)
 /*----------------------------------------------------------------------
 |   NPT_TlsClientSession::NPT_TlsClientSession
 +---------------------------------------------------------------------*/
-NPT_TlsClientSession::NPT_TlsClientSession(NPT_TlsContextReference&   context,
+NPT_TlsClientSession::NPT_TlsClientSession(NPT_TlsContext&            context,
                                            NPT_InputStreamReference&  input,
                                            NPT_OutputStreamReference& output) :
-    NPT_TlsSession(context, new NPT_TlsClientSessionImpl(context->m_Impl->m_SSL_CTX, input, output))
+    NPT_TlsSession(context, new NPT_TlsClientSessionImpl(context.m_Impl->m_SSL_CTX, input, output))
 {
 }
 
 /*----------------------------------------------------------------------
 |   NPT_TlsServerSession::NPT_TlsServerSession
 +---------------------------------------------------------------------*/
-NPT_TlsServerSession::NPT_TlsServerSession(NPT_TlsContextReference&   context,
+NPT_TlsServerSession::NPT_TlsServerSession(NPT_TlsContext&            context,
                                            NPT_InputStreamReference&  input,
                                            NPT_OutputStreamReference& output) :
-    NPT_TlsSession(context, new NPT_TlsServerSessionImpl(context->m_Impl->m_SSL_CTX, input, output))
+    NPT_TlsSession(context, new NPT_TlsServerSessionImpl(context.m_Impl->m_SSL_CTX, input, output))
 {
 }
+
+/*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::DefaultTlsContext
++---------------------------------------------------------------------*/
+NPT_TlsContext* 
+NPT_HttpTlsConnector::DefaultTlsContext = NULL;
 
 /*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::NPT_HttpTlsConnector
 +---------------------------------------------------------------------*/
 NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_Flags options) :
-    m_TlsContext(new NPT_TlsContext(NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS |
-                                    (options & OPTION_ACCEPT_SELF_SIGNED_CERTS)?NPT_TlsContext::OPTION_VERIFY_LATER:0)),
+    m_TlsContext(GetDefaultTlsContext()),
     m_Options(options)
 {
 }
@@ -923,28 +965,54 @@ NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_Flags options) :
 /*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::NPT_HttpTlsConnector
 +---------------------------------------------------------------------*/
-NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_TlsContextReference& tls_context, NPT_Flags options) :
+NPT_HttpTlsConnector::NPT_HttpTlsConnector(NPT_TlsContext& tls_context, NPT_Flags options) :
     m_TlsContext(tls_context),
     m_Options(options)
 {
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpTlsConnector::GetDefaultTlsContext
++---------------------------------------------------------------------*/
+NPT_TlsContext&
+NPT_HttpTlsConnector::GetDefaultTlsContext()
+{
+    if (DefaultTlsContext == NULL) {
+        NPT_SingletonLock::GetInstance().Lock();
+        if (DefaultTlsContext == NULL) {
+            DefaultTlsContext = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | 
+                                                   NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
+        }
+        NPT_SingletonLock::GetInstance().Unlock();
+    }
+    
+    return *DefaultTlsContext;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::VerifyPeer
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* hostname, NPT_UInt16 /*port*/) 
+NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* hostname) 
 {
-    if (m_Options & OPTION_ACCEPT_SELF_SIGNED_CERTS) {
-        // verify the cert ourselves
-        NPT_Result result = session.VerifyPeerCertificate();
-        if (NPT_FAILED(result) && result != NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED) {
-            NPT_LOG_WARNING_2("TLS certificate verification failed (%d:%s)", result, NPT_ResultText(result));
-            return result;
+    // verify the certificate
+    NPT_Result result = session.VerifyPeerCertificate();
+    if (NPT_FAILED(result)) {
+        if (result == NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED) {
+            if (!m_Options && OPTION_ACCEPT_SELF_SIGNED_CERTS) {
+                // self-signed certs are not acceptable
+                NPT_LOG_FINE("accepting self-signed certificate");
+                return result;
+            }
         }
-    } else {
+        NPT_LOG_WARNING_2("TLS certificate verification failed (%d:%s)", result, NPT_ResultText(result));
+        return result;
+    }
+
+    // chech the DNS name
+    if (!(m_Options & OPTION_ACCEPT_HOSTNAME_MISMATCH)) {
         // check the hostname
-        NPT_Result result = session.VerifyDnsNameMatch(hostname);
+        result = session.VerifyDnsNameMatch(hostname);
         if (NPT_FAILED(result)) {
             NPT_LOG_WARNING_2("TLS certificate does not match DNS name (%d:%s)", result, NPT_ResultText(result));
             return NPT_ERROR_TLS_DNS_NAME_MISMATCH;
@@ -958,29 +1026,41 @@ NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* host
 |   NPT_HttpTlsConnector::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpTlsConnector::Connect(const char*                hostname, 
-                              NPT_UInt16                 port, 
-                              NPT_Timeout                connection_timeout,
-                              NPT_Timeout                io_timeout,
-                              NPT_Timeout                name_resolver_timeout,
-                              NPT_InputStreamReference&  input_stream, 
-                              NPT_OutputStreamReference& output_stream)
+NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&          url,
+                              NPT_HttpClient&             client,
+                              const NPT_HttpProxyAddress* proxy,
+                              NPT_InputStreamReference&   input_stream, 
+                              NPT_OutputStreamReference&  output_stream)
 {
     // default values
     input_stream  = NULL;
     output_stream = NULL;
     
-    // get the address and port to which we need to connect
+    // decide which server we need to connect to
+    const char* peer_hostname = (const char*)url.GetHost();
+    const char* server_hostname;
+    NPT_UInt16  server_port;
+    if (proxy) {
+        // the proxy is set
+        server_hostname = (const char*)proxy->GetHostName();
+        server_port     = proxy->GetPort();
+    } else {
+        // no proxy: connect directly
+        server_hostname = peer_hostname;
+        server_port     = url.GetPort();
+    }
+    
+    // resolve the server address
     NPT_IpAddress address;
-    NPT_CHECK_FINE(address.ResolveName(hostname, name_resolver_timeout));
+    NPT_CHECK_FINE(address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
 
     // connect to the server
-    NPT_LOG_FINE_2("TLS connector will connect to %s:%d", hostname, port);
+    NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
     NPT_TcpClientSocket connection;
-    connection.SetReadTimeout(io_timeout);
-    connection.SetWriteTimeout(io_timeout);
-    NPT_SocketAddress socket_address(address, port);
-    NPT_CHECK_FINE(connection.Connect(socket_address, connection_timeout));
+    connection.SetReadTimeout(client.GetConfig().m_IoTimeout);
+    connection.SetWriteTimeout(client.GetConfig().m_IoTimeout);
+    NPT_SocketAddress socket_address(address, server_port);
+    NPT_CHECK_FINE(connection.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
 
     // get the streams
     NPT_InputStreamReference  raw_input;
@@ -988,22 +1068,74 @@ NPT_HttpTlsConnector::Connect(const char*                hostname,
     NPT_CHECK_FINE(connection.GetInputStream(raw_input));
     NPT_CHECK_FINE(connection.GetOutputStream(raw_output));
     
-    // setup the TLS connection
-    NPT_TlsClientSession tls_session(m_TlsContext, raw_input, raw_output);
-    NPT_Result result = tls_session.Handshake();
-    if (NPT_FAILED(result)) {
-        NPT_LOG_WARNING_2("TLS handshake failed (%d:%s)", result, NPT_ResultText(result));
-        return result;
-    }
-    result = VerifyPeer(tls_session, hostname, port);
-    if (NPT_FAILED(result)) {
-        NPT_LOG_WARNING_2("VerifyPeer failed (%d:%s)", result, NPT_ResultText(result));
-        return result;
-    }
+    if (url.GetSchemeId() == NPT_Url::SCHEME_ID_HTTPS) {
+        if (proxy) {
+            // RFC 2817 CONNECT
+            NPT_String connect_host = url.GetHost() + ":" + NPT_String::FromInteger(url.GetPort());
+            NPT_String connect = "CONNECT " + connect_host + " HTTP/1.1\r\n"
+                                 "Host: " + connect_host + "\r\n\r\n";
+            NPT_Result result = raw_output->WriteFully(connect.GetChars(), connect.GetLength());
+            if (NPT_FAILED(result)) return result;
+            NPT_String connect_response;
+            connect_response.Reserve(1024);
+            bool connect_ok = false;
+            for (unsigned int x=0; x<NPT_HTTP_TLS_CONNECTOR_MAX_PROXY_RESPONSE_SIZE; x++) {
+                connect_response.Reserve(x+1);
+                result = raw_input->Read(connect_response.UseChars()+x, 1);
+                if (NPT_FAILED(result)) return result;
+                if (connect_response.GetChars()[x] == '\n') {
+                    connect_response.SetLength(x+1);
+                    if (!connect_ok) {
+                        // check the connection result
+                        NPT_LOG_FINE_1("proxy response: %s", connect_response.GetChars());
+                        if (connect_response.GetLength() < 12) {
+                            return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+                        }
+                        if (!connect_response.StartsWith("HTTP/1.")) {
+                            return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+                        }
+                        if (connect_response[8] != ' ') {
+                            return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+                        }
+                        NPT_String status_code = connect_response.SubString(9, 3);
+                        if (status_code != "200") {
+                            NPT_LOG_WARNING_1("proxy response is not 200 (%s)", status_code.GetChars());
+                            return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+                        }
+                        connect_ok = true;
+                    } else {
+                        if (connect_response.EndsWith("\r\n\r\n")) {
+                            // this is the end, my friend
+                            break;
+                        }
+                    }
+                }
+            }
+            if (!connect_ok) {
+                return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+            }
+        }
+        
+        // setup the TLS connection
+        NPT_TlsClientSession tls_session(m_TlsContext, raw_input, raw_output);
+        NPT_Result result = tls_session.Handshake();
+        if (NPT_FAILED(result)) {
+            NPT_LOG_WARNING_2("TLS handshake failed (%d:%s)", result, NPT_ResultText(result));
+            return result;
+        }
+        result = VerifyPeer(tls_session, peer_hostname);
+        if (NPT_FAILED(result)) {
+            NPT_LOG_WARNING_2("VerifyPeer failed (%d:%s)", result, NPT_ResultText(result));
+            return result;
+        }
     
-    // return the TLS streams
-    tls_session.GetInputStream(input_stream);
-    tls_session.GetOutputStream(output_stream);
+        // return the TLS streams
+        tls_session.GetInputStream(input_stream);
+        tls_session.GetOutputStream(output_stream);
+    } else {
+        input_stream  = raw_input;
+        output_stream = raw_output;
+    }
     
     return NPT_SUCCESS;
 }

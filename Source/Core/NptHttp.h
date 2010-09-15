@@ -341,11 +341,16 @@ class NPT_HttpProxySelector
 {
 public:
     // class methods
-    static NPT_HttpProxySelector* GetSystemDefault();
-
+    static NPT_HttpProxySelector* GetDefault();
+    static NPT_HttpProxySelector* GetSystemSelector();
+    
     // methods
     virtual ~NPT_HttpProxySelector() {};
     virtual NPT_Result GetProxyForUrl(const NPT_HttpUrl& url, NPT_HttpProxyAddress& proxy) = 0;
+    
+private:
+    // class members
+    static NPT_HttpProxySelector* m_SystemDefault;
 };
 
 /*----------------------------------------------------------------------
@@ -365,13 +370,11 @@ public:
     public:
         virtual ~Connector() {}
 
-        virtual NPT_Result Connect(const char*                hostname, 
-                                   NPT_UInt16                 port, 
-                                   NPT_Timeout                connection_timeout,
-                                   NPT_Timeout                io_timeout,
-                                   NPT_Timeout                name_resolver_timeout,
-                                   NPT_InputStreamReference&  input_stream,
-                                   NPT_OutputStreamReference& output_stream) = 0;
+        virtual NPT_Result Connect(const NPT_HttpUrl&          url,
+                                   NPT_HttpClient&             client,
+                                   const NPT_HttpProxyAddress* proxy,
+                                   NPT_InputStreamReference&   input_stream,
+                                   NPT_OutputStreamReference&  output_stream) = 0;
         virtual NPT_Result Abort() { return NPT_SUCCESS; }
     };
 
@@ -391,8 +394,12 @@ public:
     NPT_Result SendRequest(NPT_HttpRequest&   request,
                            NPT_HttpResponse*& response);
     NPT_Result Abort();
+    const Config& GetConfig() const { return m_Config; }
     NPT_Result SetConfig(const Config& config);
-    NPT_Result SetProxy(const char* hostname, NPT_UInt16 port);
+    NPT_Result SetProxy(const char* http_proxy_hostname, 
+                        NPT_UInt16  http_proxy_port,
+                        const char* https_proxy_hostname = NULL,
+                        NPT_UInt16  https_proxy_port = 0);
     NPT_Result SetProxySelector(NPT_HttpProxySelector* selector);
     NPT_Result SetConnector(Connector* connector);
     NPT_Result SetTimeouts(NPT_Timeout connection_timeout,
@@ -687,3 +694,4 @@ protected:
 };
 
 #endif // _NPT_HTTP_H_
+

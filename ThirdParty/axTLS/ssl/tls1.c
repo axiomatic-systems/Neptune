@@ -1762,6 +1762,7 @@ EXP_FUNC int STDCALL ssl_handshake_status(const SSL *ssl)
     return ssl->hs_status;
 }
 
+#if 0 /* GBG: removed */
 /*
  * Retrieve various parameters about the SSL engine.
  */
@@ -1800,6 +1801,7 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
             return 0;
     }
 }
+#endif /* GBG */
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 /**

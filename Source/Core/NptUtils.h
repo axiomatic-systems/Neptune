@@ -138,7 +138,13 @@ NPT_ParseMimeParameters(const char*                      encoded,
 /*----------------------------------------------------------------------
 |    environment variables
 +---------------------------------------------------------------------*/
-NPT_Result NPT_GetEnvironment(const char* name, NPT_String& value);
+class NPT_Environment {
+public:
+    static NPT_Result Get(const char* name, NPT_String& value);
+    static NPT_Result Set(const char* name, const char* value);
+};
+// compat for older APIs
+#define NPT_GetEnvironment(_x,_y) NPT_Environment::Get(_x,_y)
 
 /*----------------------------------------------------------------------
 |   string utils

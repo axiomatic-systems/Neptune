@@ -441,7 +441,7 @@ NPT_LogManager::Configure(const char* config_sources)
         config_sources = config_sources_system;
     }
     NPT_String config_sources_env;
-    if (NPT_SUCCEEDED(NPT_GetEnvironment(NPT_CONFIG_LOG_CONFIG_ENV, config_sources_env))) {
+    if (NPT_SUCCEEDED(NPT_Environment::Get(NPT_CONFIG_LOG_CONFIG_ENV, config_sources_env))) {
         config_sources = config_sources_env;
     }
 

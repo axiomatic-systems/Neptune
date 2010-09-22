@@ -536,8 +536,8 @@ NPT_Result
 NPT_Digest::Create(Algorithm algorithm, NPT_Digest*& digest)
 {
     switch (algorithm) {
-        case SHA1: digest = new NPT_Sha1Digest(); return NPT_SUCCESS;
-        case MD5:  digest = new NPT_Md5Digest();  return NPT_SUCCESS;
+        case ALGORITHM_SHA1: digest = new NPT_Sha1Digest(); return NPT_SUCCESS;
+        case ALGORITHM_MD5:  digest = new NPT_Md5Digest();  return NPT_SUCCESS;
         default: return NPT_ERROR_NOT_SUPPORTED;
     }
 }
@@ -552,8 +552,8 @@ NPT_Hmac::Create(NPT_Digest::Algorithm algorithm,
                  NPT_Digest*&          digest)
 {
     switch (algorithm) {
-        case NPT_Digest::SHA1: 
-        case NPT_Digest::MD5:
+        case NPT_Digest::ALGORITHM_SHA1: 
+        case NPT_Digest::ALGORITHM_MD5:
             digest = new NPT_HmacDigest(algorithm, key, key_size); 
             return NPT_SUCCESS;
         default: return NPT_ERROR_NOT_SUPPORTED;

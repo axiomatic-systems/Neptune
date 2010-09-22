@@ -24,7 +24,6 @@
 				CAE417770E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417790E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE4177B0E0DC10600A530D1 /* PBXTargetDependency */,
-				CA30B77A0F0DCEFE0085B46E /* PBXTargetDependency */,
 				CAE4177D0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE4177F0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417810E0DC10600A530D1 /* PBXTargetDependency */,
@@ -36,6 +35,11 @@
 				CAE4178D0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE4178F0E0DC10600A530D1 /* PBXTargetDependency */,
 				CAE417910E0DC10600A530D1 /* PBXTargetDependency */,
+				CAE063D71241479100E5AFC4 /* PBXTargetDependency */,
+				CAE063D91241479800E5AFC4 /* PBXTargetDependency */,
+				CAE063DB124147A100E5AFC4 /* PBXTargetDependency */,
+				CA30B77A0F0DCEFE0085B46E /* PBXTargetDependency */,
+				CAE063DD124147B300E5AFC4 /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = Tests;
@@ -164,6 +168,7 @@
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A170CF1654A00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A1D0CF1659200C01909 /* StringsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979ED0CF1648300C01909 /* StringsTest1.cpp */; };
+		CAE063D31241473B00E5AFC4 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
 		CAE416A20E0DBD7400A530D1 /* MiscTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979E90CF1648300C01909 /* MiscTest1.cpp */; };
 		CAE416A50E0DBD8800A530D1 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAE416C00E0DBE0C00A530D1 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
@@ -460,6 +465,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
+		};
+		CAE063D61241479100E5AFC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA8069D8118B577E009D099D;
+			remoteInfo = CryptoTest1;
+		};
+		CAE063D81241479800E5AFC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA289DB610E31600001BC817;
+			remoteInfo = SocketsTest1;
+		};
+		CAE063DA124147A100E5AFC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA4090C310AA257B00ED81C5;
+			remoteInfo = TimeTest1;
+		};
+		CAE063DC124147B300E5AFC4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA97E01F0E2FDFB30090CC9B;
+			remoteInfo = StreamsTest1;
 		};
 		CAE416A00E0DBD6B00A530D1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1272,6 +1305,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAE063D31241473B00E5AFC4 /* libaxTLS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3186,6 +3220,26 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CAA97A120CF1654A00C01909 /* PBXContainerItemProxy */;
+		};
+		CAE063D71241479100E5AFC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA8069D8118B577E009D099D /* CryptoTest1 */;
+			targetProxy = CAE063D61241479100E5AFC4 /* PBXContainerItemProxy */;
+		};
+		CAE063D91241479800E5AFC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA289DB610E31600001BC817 /* SocketsTest1 */;
+			targetProxy = CAE063D81241479800E5AFC4 /* PBXContainerItemProxy */;
+		};
+		CAE063DB124147A100E5AFC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA4090C310AA257B00ED81C5 /* TimeTest1 */;
+			targetProxy = CAE063DA124147A100E5AFC4 /* PBXContainerItemProxy */;
+		};
+		CAE063DD124147B300E5AFC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */;
+			targetProxy = CAE063DC124147B300E5AFC4 /* PBXContainerItemProxy */;
 		};
 		CAE416A10E0DBD6B00A530D1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

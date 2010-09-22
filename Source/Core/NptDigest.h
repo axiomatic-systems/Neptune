@@ -45,8 +45,8 @@ class NPT_Digest {
 public:
     // types
     typedef enum {
-        SHA1,
-        MD5
+        ALGORITHM_SHA1,
+        ALGORITHM_MD5
     } Algorithm;
     
     // factory

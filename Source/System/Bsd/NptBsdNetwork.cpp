@@ -48,6 +48,14 @@
 #define ARPHRD_ETHER 1
 #endif
 
+#if defined(_SIZEOF_ADDR_IFREQ)
+#define NPT_IFREQ_SIZE(ifr) _SIZEOF_ADDR_IFREQ(*ifr)
+#elif defined(NPT_CONFIG_HAVE_SOCKADDR_SA_LEN)
+#define NPT_IFREQ_SIZE(ifr) (sizeof(ifr->ifr_name) + ifr->ifr_addr.sa_len)
+#else
+#define NPT_IFREQ_SIZE(ifr) sizeof(*ifr)
+#endif
+
 /*----------------------------------------------------------------------
 |       NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
@@ -92,29 +100,11 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
     
     // iterate over all objects
     unsigned char *entries;
-    for (entries = buffer; entries < buffer+config.ifc_len;) {
+    for (entries = (unsigned char*)config.ifc_req; entries < (unsigned char*)config.ifc_req+config.ifc_len;) {
         struct ifreq* entry = (struct ifreq*)entries;
-        // get the size of the addresses
-        unsigned int address_length;
-#if defined(NPT_CONFIG_HAVE_SOCKADDR_SA_LEN)
-        address_length = sizeof(struct sockaddr) > entry->ifr_addr.sa_len ?
-            sizeof(sockaddr) : entry->ifr_addr.sa_len;
-#else
-        switch (entry->ifr_addr.sa_family) {
-#if defined(AF_INET6)
-            case AF_INET6:
-                address_length = sizeof(struct sockaddr_in6);
-                break;
-#endif // defined(AF_INET6)
-                
-            default:
-                address_length = sizeof(struct sockaddr);
-                break;
-        }
-#endif
                 
         // point to the next entry
-        entries += address_length + sizeof(entry->ifr_name);
+        entries += NPT_IFREQ_SIZE(entry);
         
         // ignore anything except AF_INET and AF_LINK addresses
         if (entry->ifr_addr.sa_family != AF_INET

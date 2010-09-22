@@ -53,7 +53,7 @@ TestDigests()
     NPT_Digest* md5 = NULL;
     NPT_Result result;
     
-    result = NPT_Digest::Create(NPT_Digest::SHA1, sha1);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA1, sha1);
     SHOULD_SUCCEED(result);
     NPT_String data = "hello";
     result = sha1->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
@@ -66,7 +66,7 @@ TestDigests()
     SHOULD_EQUAL_MEM(digest.GetData(), digest1, 20);
     delete sha1;
     
-    result = NPT_Digest::Create(NPT_Digest::SHA1, sha1);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA1, sha1);
     SHOULD_SUCCEED(result);
     data = "Hello, this is a test for the Neptune digest functionality. Blablabla. Bliblibli";
     result = sha1->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
@@ -78,7 +78,7 @@ TestDigests()
     SHOULD_EQUAL_MEM(digest.GetData(), digest2, 20);
     delete sha1;
     
-    result = NPT_Digest::Create(NPT_Digest::SHA1, sha1);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA1, sha1);
     SHOULD_SUCCEED(result);
     data = "0123456789";
     for (unsigned int a=0; a<6; a++) {
@@ -92,7 +92,7 @@ TestDigests()
     SHOULD_EQUAL_MEM(digest.GetData(), digest3, 20);
     delete sha1;
     
-    result = NPT_Digest::Create(NPT_Digest::MD5, md5);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_MD5, md5);
     SHOULD_SUCCEED(result);
     data = "hello";
     result = md5->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
@@ -104,7 +104,7 @@ TestDigests()
     SHOULD_EQUAL_MEM(digest.GetData(), digest11, 16);
     delete md5;
     
-    result = NPT_Digest::Create(NPT_Digest::MD5, md5);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_MD5, md5);
     SHOULD_SUCCEED(result);
     data = "Hello, this is a test for the Neptune digest functionality. Blablabla. Bliblibli";
     result = md5->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
@@ -116,7 +116,7 @@ TestDigests()
     SHOULD_EQUAL_MEM(digest.GetData(), digest12, 16);
     delete md5;
     
-    result = NPT_Digest::Create(NPT_Digest::MD5, md5);
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_MD5, md5);
     SHOULD_SUCCEED(result);
     data = "0123456789";
     for (unsigned int a=0; a<6; a++) {
@@ -146,7 +146,7 @@ TestHmac()
     
     char key1[] = "hello";
     int  key1_size = 5;
-    result = NPT_Hmac::Create(NPT_Digest::MD5, (const NPT_UInt8*)key1, key1_size, hmac);
+    result = NPT_Hmac::Create(NPT_Digest::ALGORITHM_MD5, (const NPT_UInt8*)key1, key1_size, hmac);
     SHOULD_SUCCEED(result);
     data = "Hello, this is a test for the Neptune digest functionality. Blablabla. Bliblibli";
     result = hmac->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
@@ -160,7 +160,7 @@ TestHmac()
     
     char key2[] = "hello-this-is-a-long-key";
     int  key2_size = 24;
-    result = NPT_Hmac::Create(NPT_Digest::MD5, (const NPT_UInt8*)key2, key2_size, hmac);
+    result = NPT_Hmac::Create(NPT_Digest::ALGORITHM_MD5, (const NPT_UInt8*)key2, key2_size, hmac);
     SHOULD_SUCCEED(result);
     data = "Hello, this is a test for the Neptune digest functionality. Blablabla. Bliblibli";
     result = hmac->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());

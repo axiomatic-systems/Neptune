@@ -157,7 +157,7 @@ public:
             }
             m_Counter++;
             NPT_System::GetCurrentTimeStamp(then);
-        } while (then.ToMillis()-now.ToMillis() < 3000);
+        } while (then.ToMillis()-now.ToMillis() < 30000);
     }
     
     int        m_Prio;

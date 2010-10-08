@@ -79,6 +79,8 @@ public:
     void Run() {
         NPT_Debug("Thread3::Run - start\n");
 
+        NPT_Thread::SetCurrentThreadPriority(NPT_THREAD_PRIORITY_ABOVE_NORMAL);
+
         // sleep a while
         NPT_TimeInterval duration(3.1f);
         NPT_System::Sleep(duration);
@@ -112,6 +114,9 @@ public:
     void Run() {
         NPT_Debug("Thread4::Run - start\n");
 
+        // change the prio
+        NPT_Thread::SetCurrentThreadPriority(NPT_THREAD_PRIORITY_BELOW_NORMAL);
+        
         // sleep a while
         NPT_TimeInterval duration(4.3f);
         NPT_System::Sleep(duration);
@@ -130,6 +135,53 @@ class T1 : public NPT_Runnable
         NPT_Debug("*** T1 done ***\n");
     }
 };
+
+/*----------------------------------------------------------------------
+|       TestPrio
++---------------------------------------------------------------------*/
+class PrioThread : public NPT_Runnable
+{
+public:
+    PrioThread(int prio) : m_Prio(prio), m_Counter(0) {}
+    void Run() {
+        NPT_Thread::SetCurrentThreadPriority(m_Prio);
+        NPT_TimeStamp now;
+        NPT_TimeStamp then;
+        NPT_System::GetCurrentTimeStamp(now);
+        do {
+            for (unsigned int i=0; i<10000; i++) {
+                m_Counter++;
+            }
+            for (unsigned int i=0; i<10000; i++) {
+                m_Counter--;
+            }
+            m_Counter++;
+            NPT_System::GetCurrentTimeStamp(then);
+        } while (then.ToMillis()-now.ToMillis() < 3000);
+    }
+    
+    int        m_Prio;
+    NPT_UInt64 m_Counter;
+};
+static void
+TestPrio()
+{
+    PrioThread p1(NPT_THREAD_PRIORITY_NORMAL);
+    PrioThread p2(NPT_THREAD_PRIORITY_BELOW_NORMAL);
+    PrioThread p3(NPT_THREAD_PRIORITY_ABOVE_NORMAL);
+    NPT_Thread t1(p1);
+    NPT_Thread t2(p2);
+    NPT_Thread t3(p3);
+    t1.Start();
+    t2.Start();
+    t3.Start();
+    t1.Wait();
+    t2.Wait();
+    t3.Wait();
+    NPT_Debug("### Prio NORMAL       -> %lld iterations\n", p1.m_Counter);
+    NPT_Debug("### Prio BELOW NORMAL -> %lld iterations\n", p2.m_Counter);
+    NPT_Debug("### Prio ABOVE NORMAL -> %lld iterations\n", p3.m_Counter);
+}
 
 /*----------------------------------------------------------------------
 |       Test1
@@ -435,7 +487,8 @@ main(int argc, char** argv)
                    _CRTDBG_LEAK_CHECK_DF);
     _CrtSetAllocHook(AllocHook);
 #endif
-
+    
+    TestPrio();
     Test3(100000, 0.0f, 0.0f);
     Test3(300, 0.1f, 0.0f);
     Test3(100, 0.5f, 0.4f);

@@ -68,6 +68,7 @@
 				CAE417E60E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CAE417E80E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CAE417EA0E0DC1FD00A530D1 /* PBXTargetDependency */,
+				CA451F731252BE430045CF69 /* PBXTargetDependency */,
 			);
 			name = Apps;
 			productName = Apps;
@@ -305,13 +306,6 @@
 			remoteGlobalIDString = CA197D1D0E1AE4360018E87C;
 			remoteInfo = QueueTest1;
 		};
-		CA1A5EAD0EC0153600A9040C /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
-			remoteInfo = Neptune;
-		};
 		CA289DBB10E31613001BC817 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
@@ -353,6 +347,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
+		};
+		CA451F681252BE110045CF69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
+			remoteInfo = axTLS;
+		};
+		CA451F721252BE430045CF69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA790DA81233BDC100875081;
+			remoteInfo = NetGet;
 		};
 		CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2085,7 +2093,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				CA1A5EAE0EC0153600A9040C /* PBXTargetDependency */,
 			);
 			name = axTLS;
 			productName = axTLS;
@@ -2666,6 +2673,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CA451F691252BE110045CF69 /* PBXTargetDependency */,
 			);
 			name = Neptune;
 			productName = Neptune;
@@ -3106,11 +3114,6 @@
 			target = CA197D1D0E1AE4360018E87C /* QueueTest1 */;
 			targetProxy = CA197D260E1AE4540018E87C /* PBXContainerItemProxy */;
 		};
-		CA1A5EAE0EC0153600A9040C /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
-			targetProxy = CA1A5EAD0EC0153600A9040C /* PBXContainerItemProxy */;
-		};
 		CA289DBC10E31613001BC817 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
@@ -3140,6 +3143,16 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CA4090C810AA259200ED81C5 /* PBXContainerItemProxy */;
+		};
+		CA451F691252BE110045CF69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
+			targetProxy = CA451F681252BE110045CF69 /* PBXContainerItemProxy */;
+		};
+		CA451F731252BE430045CF69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA790DA81233BDC100875081 /* NetGet */;
+			targetProxy = CA451F721252BE430045CF69 /* PBXContainerItemProxy */;
 		};
 		CA550D4B0D20A37E00B22D72 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

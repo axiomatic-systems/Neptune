@@ -46,6 +46,19 @@ const int NPT_ERROR_CALLBACK_HANDLER_SHUTDOWN = NPT_ERROR_BASE_THREADS-0;
 const int NPT_ERROR_CALLBACK_NOTHING_PENDING  = NPT_ERROR_BASE_THREADS-1;
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+const int NPT_THREAD_PRIORITY_MIN           = -15;
+const int NPT_THREAD_PRIORITY_IDLE          = -15;
+const int NPT_THREAD_PRIORITY_LOWEST        =  -2;
+const int NPT_THREAD_PRIORITY_BELOW_NORMAL  =  -1;
+const int NPT_THREAD_PRIORITY_NORMAL        =   0;
+const int NPT_THREAD_PRIORITY_ABOVE_NORMAL  =   1;
+const int NPT_THREAD_PRIORITY_HIGHEST       =   2;
+const int NPT_THREAD_PRIORITY_TIME_CRITICAL =  15;
+const int NPT_THREAD_PRIORITY_MAX           =  15;
+
+/*----------------------------------------------------------------------
 |   NPT_MutexInterface
 +---------------------------------------------------------------------*/
 class NPT_MutexInterface
@@ -209,7 +222,8 @@ class NPT_ThreadInterface: public NPT_Runnable, public NPT_Interruptible
     // methods
     virtual           ~NPT_ThreadInterface() {}
     virtual NPT_Result Start() = 0;
-    virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE)  = 0;
+    virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;
+    virtual NPT_Result SetPriority(int /*priority*/) { return NPT_SUCCESS; } 
 };
 
 /*----------------------------------------------------------------------
@@ -223,6 +237,7 @@ class NPT_Thread : public NPT_ThreadInterface
 
     // class methods
     static ThreadId GetCurrentThreadId();
+    static NPT_Result SetCurrentThreadPriority(int priority);
 
     // methods
     explicit NPT_Thread(bool detached = false);
@@ -235,6 +250,9 @@ class NPT_Thread : public NPT_ThreadInterface
     } 
     NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE)  { 
         return m_Delegate->Wait(timeout);  
+    }
+    NPT_Result SetPriority(int priority)  { 
+        return m_Delegate->SetPriority(priority);  
     }
 
     // NPT_Runnable methods

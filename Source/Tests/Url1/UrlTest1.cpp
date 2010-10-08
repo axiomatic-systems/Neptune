@@ -59,7 +59,9 @@ static ParseTestVector ParseTestVectors[] = {
   {"http://foo.bar/",                                                        true,  "http", "foo.bar", 80,  "/",                   NULL,                            NULL,       "http://foo.bar/"},
   {"http://foo.bar/blabla/blibli/?query",                                    true,  "http", "foo.bar", 80,  "/blabla/blibli/",     "query",                         NULL,       "http://foo.bar/blabla/blibli/?query"},
   {"http://foo.bar/blabla/blibli/?query=1&bla=%20&slash=/&foo=a#fragment",   true,  "http", "foo.bar", 80,  "/blabla/blibli/",     "query=1&bla=%20&slash=/&foo=a", "fragment", "http://foo.bar/blabla/blibli/?query=1&bla=%20&slash=/&foo=a#fragment"},
-  {"http://foo.bar/blabla%20foo/blibli/?query=1&bla=2&slash=/&foo=a#fragment", true,  "http", "foo.bar", 80,  "/blabla%20foo/blibli/", "query=1&bla=2&slash=/&foo=a",   "fragment", "http://foo.bar/blabla%20foo/blibli/?query=1&bla=2&slash=/&foo=a#fragment"},
+  {"http://foo.bar/blabla%20foo/blibli/?query=1&bla=2&slash=/&foo=a#fragment", true,  "http", "foo.bar", 80,  "/blabla%20foo/blibli/", "query=1&bla=2&slash=/&foo=a","fragment", "http://foo.bar/blabla%20foo/blibli/?query=1&bla=2&slash=/&foo=a#fragment"},
+  {"http://foo.bar?query",                                                   true,  "http", "foo.bar", 80,  NULL,                  "query",                         NULL,       "http://foo.bar/?query"},
+  {"http://foo.bar#fragment",                                                true,  "http", "foo.bar", 80,  NULL,                   NULL,                           "fragment", "http://foo.bar/#fragment"}
 };
  
 typedef struct {

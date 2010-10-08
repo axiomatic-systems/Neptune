@@ -535,7 +535,7 @@ NPT_Url::Parse(const char* url, NPT_UInt16 default_port)
             break;
 
           case NPT_URL_PARSER_STATE_HOST:
-            if (c == ':' || c == '/' || c == '\0') {
+            if (c == ':' || c == '/' || c == '\0' || c == '?' || c == '#') {
                 m_Host.Assign(mark, (NPT_Size)(url-1-mark));
                 if (c == ':') {
                     mark = url;

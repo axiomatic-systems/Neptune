@@ -860,10 +860,11 @@ NPT_Logger::Log(int          level,
     char*    message = buffer;
     int      result;        
     va_list  args;
-    va_start(args, msg);
     for(;;) {
         /* try to format the message (it might not fit) */
+        va_start(args, msg);
         result = NPT_FormatStringVN(message, buffer_size-1, msg, args);
+        va_end(args);
         if (result >= (int)(buffer_size-1)) result = -1;
         message[buffer_size-1] = 0; /* force a NULL termination */
         if (result >= 0) break;
@@ -912,8 +913,6 @@ NPT_Logger::Log(int          level,
 
     /* free anything we may have allocated */
     if (message != buffer) delete[] message;
-
-    va_end(args);
 }
 
 /*----------------------------------------------------------------------

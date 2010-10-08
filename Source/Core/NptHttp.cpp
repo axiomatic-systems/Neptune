@@ -750,9 +750,17 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
     
     // check the response line
     int first_space = line.Find(' ');
-    if (first_space < 0) return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+    if (first_space != 8) return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
     int second_space = line.Find(' ', first_space+1);
-    if (second_space < 0 || second_space-first_space != 4) {
+    if (second_space < 0) {
+        // some servers omit (incorrectly) the space and Reason-Code 
+        // but we don't fail them just for that. Just check that the
+        // status code looks ok
+        if (line.GetLength() != 12) {
+            return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+        }
+    } else if (second_space-first_space != 4) {
+        // the status code is not of length 3
         return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
     }
 
@@ -842,15 +850,8 @@ class NPT_HttpEnvProxySelector : public NPT_HttpProxySelector
 {
 public:
     // singleton management
-    static NPT_HttpEnvProxySelector* GetInstance();
-    
-    // NPT_HttpProxySelector methods
-    NPT_Result GetProxyForUrl(const NPT_HttpUrl& url, NPT_HttpProxyAddress& proxy);
-
-private:
-    // singleton management
     class Cleanup {
-        static Cleanup Automatic;
+        static Cleanup AutomaticCleaner;
         ~Cleanup() {
             if (Instance) {
                 delete Instance;
@@ -858,7 +859,12 @@ private:
             }
         }
     };
+    static NPT_HttpEnvProxySelector* GetInstance();
     
+    // NPT_HttpProxySelector methods
+    NPT_Result GetProxyForUrl(const NPT_HttpUrl& url, NPT_HttpProxyAddress& proxy);
+
+private:    
     // class variables
     static NPT_HttpEnvProxySelector* Instance;
     
@@ -872,6 +878,7 @@ private:
     NPT_HttpProxyAddress m_AllProxy;
 };
 NPT_HttpEnvProxySelector* NPT_HttpEnvProxySelector::Instance = NULL;
+NPT_HttpEnvProxySelector::Cleanup NPT_HttpEnvProxySelector::Cleanup::AutomaticCleaner;
 
 /*----------------------------------------------------------------------
 |   NPT_HttpEnvProxySelector::GetInstance
@@ -1280,7 +1287,13 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         headers.SetHeader(NPT_HTTP_HEADER_USER_AGENT, m_UserAgent, false); // set but don't replace 
     }
     NPT_String host = request.GetUrl().GetHost();
-    if (request.GetUrl().GetPort() != NPT_HTTP_DEFAULT_PORT) {
+    NPT_UInt16 default_port = 0;
+    switch (request.GetUrl().GetSchemeId()) {
+        case NPT_Uri::SCHEME_ID_HTTP:  default_port = NPT_HTTP_DEFAULT_PORT;  break;
+        case NPT_Uri::SCHEME_ID_HTTPS: default_port = NPT_HTTPS_DEFAULT_PORT; break;
+        default: break;
+    }
+    if (request.GetUrl().GetPort() != default_port) {
         host += ":";
         host += NPT_String::FromInteger(request.GetUrl().GetPort());
     }
@@ -1391,19 +1404,42 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
              response->GetStatusCode() == 303 ||
              response->GetStatusCode() == 307)) {
             // handle redirect
-            NPT_HttpHeader* location = response->GetHeaders().GetHeader(NPT_HTTP_HEADER_LOCATION);
+            const NPT_String* location = response->GetHeaders().GetHeaderValue(NPT_HTTP_HEADER_LOCATION);
             if (location) {
-                // replace the request url
-                if (NPT_SUCCEEDED(request.SetUrl(location->GetValue()))) {
-                    NPT_LOG_FINE_1("redirecting to %s", location->GetValue().GetChars());
-                    keep_going = true;
-                    delete response;
-                    response = NULL;
+                // check for location fields that are not absolute URLs 
+                // (this is not allowed by the standard, but many web servers do it
+                if (location->StartsWith("/") || 
+                    (!location->StartsWith("http://",  true) &&
+                     !location->StartsWith("https://", true))) {
+                    NPT_LOG_FINE_1("Location: header (%s) is not an absolute URL, using it as a relative URL", location->GetChars());
+                    if (location->StartsWith("/")) {
+                        NPT_LOG_FINE_1("redirecting to absolute path %s", location->GetChars());
+                        request.GetUrl().ParsePathPlus(*location);
+                    } else {
+                        NPT_String redirect_path = request.GetUrl().GetPath();
+                        if (!redirect_path.EndsWith("/")) redirect_path += "/";
+                        redirect_path += *location;
+                        NPT_LOG_FINE_1("redirecting to absolute path %s", redirect_path.GetChars());
+                        request.GetUrl().ParsePathPlus(redirect_path);
+                    }
+                } else {
+                    // replace the request url
+                    NPT_LOG_FINE_1("redirecting to %s", location->GetChars());
+                    request.SetUrl(*location);
                 }
+                keep_going = true;
+                delete response;
+                response = NULL;
             }
         }       
-    } while (keep_going && watchdog--);
+    } while (keep_going && --watchdog);
 
+    // check if we were bitten by the watchdog
+    if (watchdog == 0) {
+        NPT_LOG_WARNING("too many HTTP redirects");
+        return NPT_ERROR_HTTP_TOO_MANY_REDIRECTS;
+    }
+    
     return result;
 }
 

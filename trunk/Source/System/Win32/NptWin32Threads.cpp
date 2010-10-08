@@ -383,6 +383,9 @@ NPT_AtomicVariable::NPT_AtomicVariable(int value)
 class NPT_Win32Thread : public NPT_ThreadInterface
 {
  public:
+	// class methods
+	static NPT_Result SetThreadPriority(HANDLE thread, int priority);
+
     // methods
                 NPT_Win32Thread(NPT_Thread*   delegator,
                                 NPT_Runnable& target,
@@ -390,6 +393,7 @@ class NPT_Win32Thread : public NPT_ThreadInterface
                ~NPT_Win32Thread();
     NPT_Result  Start(); 
     NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+	NPT_Result  SetPriority(int priority);
 
  private:
     // methods
@@ -436,6 +440,37 @@ NPT_Win32Thread::~NPT_Win32Thread()
     if (m_ThreadHandle) {
         CloseHandle(m_ThreadHandle);
     }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Win32Thread::SetThreadPriority
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Win32Thread::SetThreadPriority(HANDLE thread, int priority)
+{
+	int win32_priority;
+	if (priority < NPT_THREAD_PRIORITY_LOWEST) {
+		win32_priority = THREAD_PRIORITY_IDLE;
+	} else if (priority < NPT_THREAD_PRIORITY_BELOW_NORMAL) {
+		win32_priority = THREAD_PRIORITY_LOWEST;
+	} else if (priority < NPT_THREAD_PRIORITY_NORMAL) {
+		win32_priority = THREAD_PRIORITY_BELOW_NORMAL;
+	} else if (priority < NPT_THREAD_PRIORITY_ABOVE_NORMAL) {
+		win32_priority = THREAD_PRIORITY_NORMAL;
+	} else if (priority < NPT_THREAD_PRIORITY_HIGHEST) {
+		win32_priority = THREAD_PRIORITY_ABOVE_NORMAL;
+	} else if (priority < NPT_THREAD_PRIORITY_TIME_CRITICAL) {
+		win32_priority = THREAD_PRIORITY_HIGHEST;
+	} else {
+		win32_priority = THREAD_PRIORITY_TIME_CRITICAL;
+	}
+	BOOL result = ::SetThreadPriority(thread, win32_priority);
+	if (!result) {
+		NPT_LOG_WARNING_1("SetThreadPriority failed (%x)", GetLastError());
+		return NPT_FAILURE;
+	}
+
+	return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -521,6 +556,16 @@ NPT_Win32Thread::Run()
 }
 
 /*----------------------------------------------------------------------
+|   NPT_Win32Thread::SetPriority
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_Win32Thread::SetPriority(int priority)
+{
+	if (m_ThreadHandle == 0) return NPT_ERROR_INVALID_STATE;
+	return NPT_Win32Thread::SetThreadPriority(m_ThreadHandle, priority);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_Win32Thread::Wait
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -549,6 +594,15 @@ NPT_Thread::ThreadId
 NPT_Thread::GetCurrentThreadId()
 {
     return ::GetCurrentThreadId();
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Thread::SetCurrentThreadPriority
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_Thread::SetCurrentThreadPriority(int priority)
+{
+	return NPT_Win32Thread::SetThreadPriority(::GetCurrentThread(), priority);
 }
 
 /*----------------------------------------------------------------------

@@ -361,11 +361,11 @@ class NPT_PosixThread : public NPT_ThreadInterface
                ~NPT_PosixThread();
     NPT_Result  Start(); 
     NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
-
+    
  private:
     // methods
     static void* EntryPoint(void* argument);
-
+    
     // NPT_Runnable methods
     void Run();
 
@@ -420,6 +420,15 @@ NPT_Thread::GetCurrentThreadId()
 {
     pthread_t pid = pthread_self();
     return (NPT_Thread::ThreadId)((void*)pid);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Thread::SetCurrentThreadPriority
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Thread::SetCurrentThreadPriority(int /*priority*/)
+{
+    return NPT_SUCCESS; // ignored
 }
 
 /*----------------------------------------------------------------------

@@ -47,7 +47,7 @@ static const char * server_finished = "server finished";
 static const char * client_finished = "client finished";
 
 static int do_handshake(SSL *ssl, uint8_t *buf, int read_len);
-static void set_key_block(SSL *ssl, int is_write);
+static int set_key_block(SSL *ssl, int is_write);
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len);
 static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt);
 static int send_raw_packet(SSL *ssl, uint8_t protocol);
@@ -1133,13 +1133,16 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
  * Work out the cipher keys we are going to use for this session based on the
  * master secret.
  */
-static void set_key_block(SSL *ssl, int is_write)
+static int set_key_block(SSL *ssl, int is_write)
 {
     const cipher_info_t *ciph_info = get_cipher_info(ssl->cipher);
     uint8_t *q;
     uint8_t client_key[32], server_key[32]; /* big enough for AES256 */
     uint8_t client_iv[16], server_iv[16];   /* big enough for AES128/256 */
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
+
+    if (ciph_info == NULL)
+        return -1;
 
     /* only do once in a handshake */
     if (ssl->dc->key_block == NULL)
@@ -1212,6 +1215,7 @@ static void set_key_block(SSL *ssl, int is_write)
     }
 
     ssl->cipher_info = ciph_info;
+    return 0;
 }
 
 /**
@@ -1319,7 +1323,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
                 ssl->dc->bm_proc_index = 0;
                 ret = do_handshake(ssl, buf, read_len);
             }
-            else /* no client renogiation allowed */
+            else /* no client renegotiation allowed */
             {
                 ret = SSL_ERROR_NO_CLIENT_RENOG;              
                 goto error;
@@ -1335,7 +1339,12 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 
             /* all encrypted from now on */
             SET_SSL_FLAG(SSL_RX_ENCRYPTED);
-            set_key_block(ssl, 0);
+            if (set_key_block(ssl, 0) < 0)
+            {
+                ret = SSL_ERROR_INVALID_HANDSHAKE;
+                goto error;
+            }
+            
             memset(ssl->read_sequence, 0, 8);
             break;
 
@@ -1425,7 +1434,10 @@ int send_change_cipher_spec(SSL *ssl)
     int ret = send_packet(ssl, PT_CHANGE_CIPHER_SPEC, 
             g_chg_cipher_spec_pkt, sizeof(g_chg_cipher_spec_pkt));
     SET_SSL_FLAG(SSL_TX_ENCRYPTED);
-    set_key_block(ssl, 1);
+
+    if (ret >= 0 && set_key_block(ssl, 1) < 0)
+        ret = SSL_ERROR_INVALID_HANDSHAKE;
+
     memset(ssl->write_sequence, 0, 8);
     return ret;
 }
@@ -1494,7 +1506,6 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_INVALID_HANDSHAKE:
         case SSL_ERROR_INVALID_PROT_MSG:
-        case SSL_ERROR_NO_CLIENT_RENOG:
             alert_num = SSL_ALERT_HANDSHAKE_FAILURE;
             break;
 
@@ -1515,6 +1526,10 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_BAD_CERTIFICATE:
             alert_num = SSL_ALERT_BAD_CERTIFICATE;
+            break;
+
+        case SSL_ERROR_NO_CLIENT_RENOG:
+            alert_num = SSL_ALERT_NO_RENEGOTIATION;
             break;
 
         default:
@@ -2118,6 +2133,10 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
 
         case SSL_ALERT_DECRYPT_ERROR:
             printf("decrypt error");
+            break;
+
+        case SSL_ALERT_NO_RENEGOTIATION:
+            printf("no renegotiation");
             break;
 
         default:

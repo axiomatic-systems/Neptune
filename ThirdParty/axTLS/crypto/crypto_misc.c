@@ -154,7 +154,7 @@ EXP_FUNC void STDCALL RNG_terminate(void)
 /**
  * Set a series of bytes with a random number. Individual bytes can be 0
  */
-EXP_FUNC void STDCALL get_random(unsigned int num_rand_bytes, uint8_t *rand_data)
+EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
 {   
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
     /* use the Linux default */
@@ -175,7 +175,7 @@ EXP_FUNC void STDCALL get_random(unsigned int num_rand_bytes, uint8_t *rand_data
     big_num1 ^= rng_num;
 
     memcpy(rand_data, &big_num1, sizeof(uint64_t));
-    if (num_rand_bytes > sizeof(uint64_t))
+    if (num_rand_bytes > (int)sizeof(uint64_t))
         memcpy(&rand_data[8], &big_num2, sizeof(uint64_t));
 
     if (num_rand_bytes > 16)

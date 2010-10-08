@@ -1,4 +1,4 @@
- /*****************************************************************
+/*****************************************************************
 |
 |      HTTP Client Test Program 2
 |
@@ -13,53 +13,7 @@
 #include "Neptune.h"
 #include "NptDebug.h"
 
-/*----------------------------------------------------------------------
-|       ShowResponse
-+---------------------------------------------------------------------*/
-static void
-ShowResponse(NPT_HttpResponse* response)
-{
-    bool check_available = true;//true;
-    
-    // show entity
-    NPT_HttpEntity* entity = response->GetEntity();
-    if (entity == NULL) return;
-    
-    NPT_Console::OutputF("ENTITY: length=%lld, type=%s, encoding=%s\n",
-                         entity->GetContentLength(),
-                         entity->GetContentType().GetChars(),
-                         entity->GetContentEncoding().GetChars());
-
-    NPT_DataBuffer buffer(65536);
-    NPT_Result result;
-    NPT_InputStreamReference input;
-    entity->GetInputStream(input);
-    
-    NPT_TimeStamp start;
-    NPT_System::GetCurrentTimeStamp(start);
-    float total_read = 0.0f;
-    for (;;) {
-        NPT_Size bytes_read = 0;
-        NPT_LargeSize available = 0;
-        NPT_Size to_read = 65536;
-        if (check_available) {
-            input->GetAvailable(available);
-            if ((NPT_Size)available < to_read) to_read = (NPT_Size)available;
-            if (to_read == 0) {
-                to_read = 1;
-                NPT_TimeStamp sleep_time(0.01f);
-                NPT_System::Sleep(sleep_time);
-            }
-        }
-        result = input->Read(buffer.UseData(), to_read, &bytes_read);
-        if (NPT_FAILED(result)) break;
-        total_read += bytes_read;
-        NPT_TimeStamp now;
-        NPT_System::GetCurrentTimeStamp(now);
-        NPT_TimeStamp duration = now-start;
-        NPT_Console::OutputF("%6d avail, read %6d bytes, %6.3f KB/s\n", (int)available, bytes_read, (float)((total_read/1024.0)/(double)duration));
-    }
-}
+#define LOG_FORMAT "%30s,%3d,%8d,[%30s],%s\n"
 
 /*----------------------------------------------------------------------
 |       TestHttpGet
@@ -73,10 +27,12 @@ TestHttpGet(const char* arg)
     NPT_HttpResponse* response;
 
     NPT_Result result = client.SendRequest(request, response);
-    NPT_Debug("SendRequest returned %d\n", result);
-    if (NPT_FAILED(result)) return;
-
-    ShowResponse(response);
+    if (NPT_FAILED(result)) {
+        printf(LOG_FORMAT, NPT_ResultText(result), 0, 0, "", arg);
+        return;
+    } 
+    const NPT_String* server = response->GetHeaders().GetHeaderValue("Server");
+    printf(LOG_FORMAT, "NPT_SUCCESS", response->GetStatusCode(), (int)response->GetEntity()->GetContentLength(), server?server->GetChars():"", arg);
 
     delete response;
 }
@@ -89,11 +45,19 @@ main(int argc, char** argv)
 {
     // parse args
     if (argc != 2) {
-        NPT_Debug("HttpClientTest2: missing URL argument\n");
+        NPT_Debug("HttpClientTest2: missing URL list argument\n");
         return 1;
     }
 
-    TestHttpGet(argv[1]);
+    NPT_DataBuffer list_buffer;
+    NPT_File::Load(argv[1], list_buffer);
+    NPT_String list_string;
+    list_string.Assign((const char*)list_buffer.GetData(), list_buffer.GetDataSize());
+    NPT_List<NPT_String> urls = list_string.Split("\n");
+    printf("urls: %d\n", urls.GetItemCount());
+    for (NPT_List<NPT_String>::Iterator it = urls.GetFirstItem(); it; ++it) {
+        TestHttpGet((*it).GetChars());
+    }
 
     return 0;
 }

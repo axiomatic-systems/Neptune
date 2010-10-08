@@ -300,20 +300,21 @@ end_oid:
 static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
 {
     int len = X509_NOT_OK;
-
+    int string_type = buf[*offset]; /* GBG */
+    
     /* some certs have this awful crud in them for some reason */
-    if (buf[*offset] != ASN1_PRINTABLE_STR &&  
-        buf[*offset] != ASN1_TELETEX_STR   &&  
-        buf[*offset] != ASN1_IA5_STR       &&  
-        buf[*offset] != ASN1_UNICODE_STR   &&
-        buf[*offset] != ASN1_UTF8_STR      &&
-        buf[*offset] != ASN1_UNIVERSAL_STR)
+    if (string_type != ASN1_PRINTABLE_STR &&  
+        string_type != ASN1_TELETEX_STR   &&  
+        string_type != ASN1_IA5_STR       &&  
+        string_type != ASN1_UNICODE_STR   &&
+        string_type != ASN1_UTF8_STR      &&
+        string_type != ASN1_UNIVERSAL_STR)
         goto end_pnt_str;
 
         (*offset)++;
         len = get_asn1_length(buf, offset);
 
-        if (buf[*offset - 1] == ASN1_UNICODE_STR)
+        if (string_type == ASN1_UNICODE_STR)
         {
             int i;
             *str = (char *)malloc(len/2+1);     /* allow for null */

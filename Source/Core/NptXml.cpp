@@ -1663,6 +1663,7 @@ NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
 +---------------------------------------------------------------------*/
 NPT_XmlParser::~NPT_XmlParser()
 {
+    delete m_CurrentElement;
     delete m_Processor;
 }
 
@@ -1870,10 +1871,12 @@ NPT_XmlParser::OnEndElement(const char* name)
 
     // pop up the stack
     NPT_XmlNode* parent = m_CurrentElement->GetParent();
-    if (parent == NULL) {
+    if (parent) {
+        m_CurrentElement = parent->AsElementNode();
+    } else {
         m_Tree = m_CurrentElement;
+        m_CurrentElement = NULL;
     }
-    m_CurrentElement = parent ? parent->AsElementNode() : NULL;
 
     return NPT_SUCCESS;
 }

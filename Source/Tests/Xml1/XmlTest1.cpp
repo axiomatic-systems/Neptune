@@ -499,22 +499,21 @@ TestMakeStandalone()
 static void
 TestFile(const char* filename)
 {
-    NPT_File*                input;
     NPT_InputStreamReference stream;
     NPT_Result               result;
 
     // open the input file
-    input = new NPT_File(filename);
-    result = input->Open(NPT_FILE_OPEN_MODE_READ);
+    NPT_File input(filename);
+    result = input.Open(NPT_FILE_OPEN_MODE_READ);
     if (NPT_FAILED(result)) {
         NPT_Debug("XmtTest1:: cannot open input (%d)\n", result);
         return;
     }
-    result = input->GetInputStream(stream);
-
+    result = input.GetInputStream(stream);
+    
     // parse the buffer
     NPT_XmlParser parser;
-    NPT_XmlNode*  tree;
+    NPT_XmlNode*  tree = NULL;
     result = parser.Parse(*stream, tree);
     if (NPT_FAILED(result)) {
         NPT_Debug("XmlTest1:: cannot parse input (%d)\n", result);
@@ -532,9 +531,6 @@ TestFile(const char* filename)
 
     // delete the tree
     delete tree;
-
-    // delete the input
-    delete input;
 }
 
 /*----------------------------------------------------------------------

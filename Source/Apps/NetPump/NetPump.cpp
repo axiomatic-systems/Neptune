@@ -669,7 +669,7 @@ main(int argc, char** argv)
         exit(1);
     }
     
-    delete buffer;
+    delete[] buffer;
     return 0;
 }
 

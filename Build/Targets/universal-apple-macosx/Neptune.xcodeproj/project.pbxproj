@@ -13,6 +13,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				CA261074127EB817008E2D29 /* PBXTargetDependency */,
 				CA9DDC5110AE2820008B871E /* PBXTargetDependency */,
 				CA9DDC6E10AE3DFD008B871E /* PBXTargetDependency */,
 				CA9958A81046FFF60073F34A /* PBXTargetDependency */,
@@ -305,6 +306,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = CA197D1D0E1AE4360018E87C;
 			remoteInfo = QueueTest1;
+		};
+		CA261073127EB817008E2D29 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA2F54230EC115E600AEBC12 /* TlsTest1 */;
+			remoteInfo = TlsTest1;
 		};
 		CA289DBB10E31613001BC817 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3120,6 +3128,11 @@
 			isa = PBXTargetDependency;
 			target = CA197D1D0E1AE4360018E87C /* QueueTest1 */;
 			targetProxy = CA197D260E1AE4540018E87C /* PBXContainerItemProxy */;
+		};
+		CA261074127EB817008E2D29 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA2F54230EC115E600AEBC12 /* TlsTest1 */;
+			targetProxy = CA261073127EB817008E2D29 /* PBXContainerItemProxy */;
 		};
 		CA289DBC10E31613001BC817 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

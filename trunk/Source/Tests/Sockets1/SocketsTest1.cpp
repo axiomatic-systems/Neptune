@@ -90,6 +90,19 @@ public:
     NPT_SharedVariable m_Ready;
 };
 
+static void
+TestFoo()
+{
+	NPT_IpAddress ip_address;
+	ip_address.ResolveName("zebulon.bok.net");
+	NPT_SocketAddress socket_address(ip_address, 80);
+	do {
+		NPT_TcpClientSocket tcp_client;
+		NPT_Result result = tcp_client.Connect(socket_address);
+		NPT_System::Sleep(1.0f);
+	} while(1);
+}
+
 /*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
@@ -108,6 +121,8 @@ main(int /*argc*/, char** /*argv*/)
     //freopen("CONOUT$", "w", stdout);
 #endif 
     
+	TestFoo();
+
     NPT_Result result;
     TcpServerThread*     server_thread = NULL;
     NPT_TcpClientSocket* tcp_client = NULL;

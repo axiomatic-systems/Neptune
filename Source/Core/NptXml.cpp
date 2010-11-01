@@ -1100,6 +1100,7 @@ public:
 
     // methods
     NPT_Result ProcessBuffer(const char* buffer, NPT_Size size);
+    void       Reset();
     
 private:
     // types
@@ -1222,6 +1223,17 @@ NPT_XmlProcessor::NPT_XmlProcessor(NPT_XmlParser* parser) :
     m_Context(CONTEXT_NONE),
     m_SkipNewline(false)
 {
+}
+
+/*----------------------------------------------------------------------
+|   NPT_XmlProcessor::Reset
++---------------------------------------------------------------------*/
+void
+NPT_XmlProcessor::Reset()
+{
+    m_State       = STATE_IN_WHITESPACE;
+    m_Context     = CONTEXT_NONE;
+    m_SkipNewline = false;
 }
 
 /*----------------------------------------------------------------------
@@ -1770,15 +1782,25 @@ NPT_XmlParser::Parse(const char*   xml,
     node = m_Tree;
 
     // parse the buffer
-    NPT_CHECK(m_Processor->ProcessBuffer(xml, size));
-
+    NPT_Result result = m_Processor->ProcessBuffer(xml, size);
+    if (NPT_FAILED(result)) {
+        delete m_CurrentElement;
+        m_CurrentElement = NULL;
+        m_Processor->Reset();
+        return result;
+    }
+    
     // return a tree if we have one 
     node = m_Tree;
 
     if (incremental) {
         return NPT_SUCCESS;
     } else {
-        return m_Tree?NPT_SUCCESS:NPT_FAILURE;
+        if (m_Tree == NULL) {
+            return NPT_FAILURE;
+        } else {
+            return NPT_SUCCESS;
+        }
     }
 }
 

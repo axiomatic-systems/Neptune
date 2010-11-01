@@ -265,7 +265,7 @@ public:
 private:
     // singleton management
     class Cleanup {
-        static Cleanup Automatic;
+        static Cleanup AutomaticCLeaner;
         ~Cleanup() {
             if (DefaultTlsContext) {
                 delete DefaultTlsContext;

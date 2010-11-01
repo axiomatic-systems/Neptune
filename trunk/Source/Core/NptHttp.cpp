@@ -749,8 +749,11 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
     NPT_CHECK_WARNING(stream.ReadLine(line, NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH));
     
     // check the response line
+    // we are lenient here, as we allow the response to deviate slightly from
+    // strict HTTP (for example, ICY servers response with a method equal to
+    // ICY insead of HTTP/1.X
     int first_space = line.Find(' ');
-    if (first_space != 8) return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
+    if (first_space < 1) return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
     int second_space = line.Find(' ', first_space+1);
     if (second_space < 0) {
         // some servers omit (incorrectly) the space and Reason-Code 

@@ -423,7 +423,7 @@ error:
 }
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 0, 4, 1, 0, 0, 0 };
+static const uint8_t g_cert_request[] = { HS_CERT_REQ, 0, 0, 4, 1, /* GBG: changed from 0 to 1 */ 1, 0, 0 };
 
 /*
  * Send the certificate request message.

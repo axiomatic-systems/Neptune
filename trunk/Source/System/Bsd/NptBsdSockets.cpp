@@ -399,6 +399,11 @@ MapErrorCode(int error)
             return NPT_ERROR_INTERRUPTED;
 #endif
 
+#if defined(EACCES)
+        case EACCES:
+            return NPT_ERROR_PERMISSION_DENIED;
+#endif
+
         default:
             return NPT_ERROR_ERRNO(error);
     }

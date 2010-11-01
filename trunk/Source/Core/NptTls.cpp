@@ -950,8 +950,8 @@ NPT_TlsServerSession::NPT_TlsServerSession(NPT_TlsContext&            context,
 /*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::DefaultTlsContext
 +---------------------------------------------------------------------*/
-NPT_TlsContext* 
-NPT_HttpTlsConnector::DefaultTlsContext = NULL;
+NPT_HttpTlsConnector::Cleanup NPT_HttpTlsConnector::Cleanup::AutomaticCLeaner;
+NPT_TlsContext* NPT_HttpTlsConnector::DefaultTlsContext = NULL;
 
 /*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::NPT_HttpTlsConnector

@@ -150,7 +150,7 @@ TestBenchmark()
         elapsed  = after.ToSeconds()-before.ToSeconds();
     } while (elapsed < 10.0f);
     NPT_Console::OutputF("AES: %d blocks in 10 seconds: %f MB/s\n", block_count, ((block_count*16.0f)/1000000.0f)/elapsed);
-    delete data;
+    delete[] data;
     
     return 0;
 }

@@ -725,7 +725,21 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
         }
     } else if (FD_ISSET(m_SocketFd, &except_set)) {
         NPT_LOG_FINE("select socket exception is set");
-        result = MapErrorCode(GetSocketError());
+
+        int error = 0;
+        socklen_t length = sizeof(error);
+        io_result = getsockopt(m_SocketFd, 
+                                SOL_SOCKET, 
+                                SO_ERROR, 
+                                (SocketOption)&error, 
+                                &length);
+        if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+            result = MapErrorCode(GetSocketError());
+        } else if (error) {
+            result = MapErrorCode(error);
+        } else {
+            result = NPT_FAILURE;
+        }
     } else {
         // should not happen
         NPT_LOG_FINE("unexected select state");

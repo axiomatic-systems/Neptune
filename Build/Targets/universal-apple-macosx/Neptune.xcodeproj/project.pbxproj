@@ -170,6 +170,8 @@
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A170CF1654A00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A1D0CF1659200C01909 /* StringsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979ED0CF1648300C01909 /* StringsTest1.cpp */; };
+		CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */ = {isa = PBXBuildFile; fileRef = CAD78DD212A99DC500D7EBA7 /* NptHash.h */; };
+		CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */; };
 		CAE063D31241473B00E5AFC4 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
 		CAE416A20E0DBD7400A530D1 /* MiscTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979E90CF1648300C01909 /* MiscTest1.cpp */; };
 		CAE416A50E0DBD8800A530D1 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
@@ -311,7 +313,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA2F54230EC115E600AEBC12 /* TlsTest1 */;
+			remoteGlobalIDString = CA2F54230EC115E600AEBC12;
 			remoteInfo = TlsTest1;
 		};
 		CA289DBB10E31613001BC817 /* PBXContainerItemProxy */ = {
@@ -928,6 +930,8 @@
 		CAA979FD0CF1648300C01909 /* ZipTestData1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZipTestData1.cpp; sourceTree = "<group>"; };
 		CAA97A010CF164A700C01909 /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XmlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA97A1B0CF1654A00C01909 /* StringsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StringsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAD78DD212A99DC500D7EBA7 /* NptHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptHash.h; sourceTree = "<group>"; };
+		CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptHash.cpp; sourceTree = "<group>"; };
 		CAE4169B0E0DBD6600A530D1 /* MiscTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE416B90E0DBDF800A530D1 /* ArraysTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ArraysTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAE416C60E0DBE2F00A530D1 /* BufferedStreamsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BufferedStreamsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1862,6 +1866,8 @@
 		F912B6AF0B8EB27400C1E90D /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */,
+				CAD78DD212A99DC500D7EBA7 /* NptHash.h */,
 				CA806987118A602B009D099D /* NptCrypto.cpp */,
 				CA806988118A602B009D099D /* NptCrypto.h */,
 				CAEB8EC111864F0B00B4AF01 /* NptDigest.cpp */,
@@ -2067,6 +2073,7 @@
 				CA289B6B10E16150001BC817 /* NptCocoaMessageQueue.h in Headers */,
 				CAEB8EC611864F0B00B4AF01 /* NptDigest.h in Headers */,
 				CA80698A118A602B009D099D /* NptCrypto.h in Headers */,
+				CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3113,6 +3120,7 @@
 				CA057AB011BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */,
 				CA057AB111BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */,
 				CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */,
+				CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

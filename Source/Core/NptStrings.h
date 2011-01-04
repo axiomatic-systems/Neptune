@@ -43,6 +43,7 @@
 #include "NptConstants.h"
 #include "NptList.h"
 #include "NptDebug.h"
+#include "NptHash.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -99,6 +100,10 @@ public:
     
     // buffer management
     void       Reserve(NPT_Size length);
+
+    // hashing
+    NPT_UInt32 GetHash32() const;
+    NPT_UInt64 GetHash64() const;
 
     // conversions
     NPT_String ToLowercase() const;
@@ -335,5 +340,15 @@ inline bool operator>=(const NPT_String& s1, const char* s2) {
 inline bool operator>=(const char* s1, const NPT_String& s2) {
     return s2.Compare(s1) <= 0; 
 }
+
+/*----------------------------------------------------------------------
+|   hashing
++---------------------------------------------------------------------*/
+template <>
+struct NPT_Hash<NPT_String>
+{
+    NPT_UInt32 operator()(const NPT_String& s) const { return s.GetHash32(); }
+};
+
 
 #endif // _NPT_STRINGS_H_

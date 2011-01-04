@@ -40,6 +40,7 @@
 #include "NptStrings.h"
 #include "NptMap.h"
 #include "NptDataBuffer.h"
+#include "NptHash.h"
 
 #if defined (NPT_CONFIG_HAVE_STDIO_H)
 #include <stdio.h>

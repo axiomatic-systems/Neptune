@@ -171,6 +171,16 @@ NPT_String::NPT_String(const char* str, NPT_Size length)
     if (str == NULL || length == 0) {
         m_Chars = NULL;
     } else {
+        for (unsigned int i=0; i<length-1; i++) {
+            if (str[i] == '\0') {
+                if (i == 0) {
+                    m_Chars = NULL;
+                    return;
+                }
+                length = i;
+                break;
+            }
+        }
         m_Chars = Buffer::Create(str, length);
     }
 }
@@ -286,6 +296,17 @@ NPT_String::Assign(const char* str, NPT_Size length)
     if (str == NULL || length == 0) {
         Reset();
     } else {
+        for (unsigned int i=0; i<length-1; i++) {
+            if (str[i] == '\0') {
+                if (i == 0) {
+                    Reset();
+                    return;
+                } else {
+                    length = i;
+                    break;
+                }
+            }
+        }
         PrepareToWrite(length);
         CopyBuffer(m_Chars, str, length);
         m_Chars[length] = '\0';
@@ -323,6 +344,24 @@ NPT_String::operator=(const NPT_String& str)
         Assign(str.GetChars(), str.GetLength());
     }
     return *this;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_String::GetHash32
++---------------------------------------------------------------------*/
+NPT_UInt32 
+NPT_String::GetHash32() const
+{
+    return NPT_Fnv1aHashStr32(GetChars());
+}
+
+/*----------------------------------------------------------------------
+|   NPT_String::GetHash64
++---------------------------------------------------------------------*/
+NPT_UInt64
+NPT_String::GetHash64() const
+{
+    return NPT_Fnv1aHashStr64(GetChars());
 }
 
 /*----------------------------------------------------------------------

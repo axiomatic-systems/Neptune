@@ -624,7 +624,24 @@ main(int /*argc*/, char** /*argv*/)
     NPT_CopyStringN(s_buf, "hello", 4);
     StringTest("", s_buf, "hell");
     
+    NPT_String hs1 = "curds and whey";
+    IntTest("", hs1.GetHash32(), 0x22d5344e);
     
+    
+    char buffer[6] = "abcde";
+    NPT_String tr0(buffer, 5);
+    IntTest("", tr0.GetLength(), 5);
+    buffer[1] = 0;
+    NPT_String tr1(buffer, 5);
+    IntTest("", tr1.GetLength(), 1);
+    buffer[0] = 0;
+    NPT_String tr2(buffer, 5);
+    IntTest("", tr2.GetLength(), 0);
+    tr0.Assign(buffer, 5);
+    IntTest("", tr0.GetLength(), 0);
+    buffer[0] = 'a';
+    tr0.Assign(buffer, 5);
+    IntTest("", tr0.GetLength(), 1);
     
     printf("------------------------- done -----\n");
     return 0;

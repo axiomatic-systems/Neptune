@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Core\NptBase64.cpp" />
+    <ClCompile Include="..\..\..\..\Source\Core\NptHash.cpp" />
     <ClCompile Include="..\..\..\..\Source\System\Bsd\NptBsdSockets.cpp" />
     <ClCompile Include="..\..\..\..\Source\Core\NptBufferedStreams.cpp" />
     <ClCompile Include="..\..\..\..\Source\Core\NptCommon.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="..\..\..\..\Source\Data\TLS\NptTlsDefaultTrustAnchorsExtended.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Source\Core\NptHash.h" />
     <ClInclude Include="..\..\..\..\ThirdParty\axTLS\crypto\bigint.h" />
     <ClInclude Include="..\..\..\..\ThirdParty\axTLS\crypto\bigint_impl.h" />
     <ClInclude Include="..\..\..\..\ThirdParty\axTLS\ssl\cert.h" />

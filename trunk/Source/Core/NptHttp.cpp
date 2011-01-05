@@ -1582,7 +1582,13 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
     // wait for a connection
     NPT_Socket* client;
     NPT_LOG_FINE_1("waiting for connection on port %d...", m_Config.m_ListenPort);
-    NPT_CHECK_WARNING(m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout));
+    NPT_Result result;
+    result = m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout);
+    if (result != NPT_ERROR_TIMEOUT) {
+        NPT_CHECK_WARNING(result);
+    } else {
+        NPT_CHECK_FINE(result);
+    }
     if (client == NULL) return NPT_ERROR_INTERNAL;
 
     // get the client info

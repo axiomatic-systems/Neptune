@@ -216,6 +216,9 @@
     <ClCompile Include="..\..\..\..\Source\Data\TLS\NptTlsDefaultTrustAnchorsExtended.cpp">
       <Filter>Source Files\TLS\Data</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\Core\NptHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\ThirdParty\axTLS\crypto\bigint.h">
@@ -378,6 +381,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\Source\Core\NptXml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Source\Core\NptHash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

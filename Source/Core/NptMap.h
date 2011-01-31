@@ -38,6 +38,7 @@
 #include "NptTypes.h"
 #include "NptResults.h"
 #include "NptList.h"
+#include "NptHash.h"
 
 /*----------------------------------------------------------------------
 |   NPT_Map
@@ -328,9 +329,9 @@ public:
         Entry(NPT_UInt32 hash_value, const K& key)                 : m_HashValue(hash_value), m_Key(key) {}
         
         // accessors
-        const K&         GetKey()       const { return m_Key;   }
-        const V&         GetValue()     const { return m_Value; }
-        const NPT_UInt32 GetHashValue() const { return m_HashValue; }
+        const K&   GetKey()       const { return m_Key;   }
+        const V&   GetValue()     const { return m_Value; }
+        NPT_UInt32 GetHashValue() const { return m_HashValue; }
         
         // operators 
         bool operator==(const Entry& other) const {

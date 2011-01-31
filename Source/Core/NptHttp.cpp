@@ -56,6 +56,10 @@ const char* const NPT_HTTP_DEFAULT_403_HTML = "<html><head><title>403 Forbidden<
 const char* const NPT_HTTP_DEFAULT_404_HTML = "<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></html>";
 const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal Error</title></head><body><h1>Internal Error</h1><p>The server encountered an unexpected condition which prevented it from fulfilling the request.</p></html>";
 
+#if !defined(NPT_CONFIG_HTTP_DEFAULT_USER_AGENT)
+#define NPT_CONFIG_HTTP_DEFAULT_USER_AGENT "Neptune/" NPT_NEPTUNE_VERSION_STRING
+#endif
+
 /*----------------------------------------------------------------------
 |   NPT_HttpUrl::NPT_HttpUrl
 +---------------------------------------------------------------------*/
@@ -1127,7 +1131,7 @@ NPT_HttpClient::NPT_HttpClient(Connector* connector, bool transfer_ownership) :
     m_ProxySelectorIsOwned(false),
     m_Connector(connector),
     m_ConnectorIsOwned(transfer_ownership),
-    m_UserAgent("Neptune/" NPT_NEPTUNE_VERSION_STRING)
+    m_UserAgent(NPT_CONFIG_HTTP_DEFAULT_USER_AGENT)
 {
     m_Config.m_FollowRedirect      = true;
     m_Config.m_ConnectionTimeout   = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;

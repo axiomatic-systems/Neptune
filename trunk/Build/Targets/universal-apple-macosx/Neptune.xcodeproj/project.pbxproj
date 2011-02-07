@@ -70,6 +70,7 @@
 				CAE417E80E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CAE417EA0E0DC1FD00A530D1 /* PBXTargetDependency */,
 				CA451F731252BE430045CF69 /* PBXTargetDependency */,
+				CAAAA08412FF827D00ABC84B /* PBXTargetDependency */,
 			);
 			name = Apps;
 			productName = Apps;
@@ -170,6 +171,9 @@
 		CAA97A0C0CF164FC00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A170CF1654A00C01909 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAA97A1D0CF1659200C01909 /* StringsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979ED0CF1648300C01909 /* StringsTest1.cpp */; };
+		CAAAA08212FF825800ABC84B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CAAAA08512FF828A00ABC84B /* NetResolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAAAA07612FF823200ABC84B /* NetResolve.cpp */; };
+		CAC5048312FFB7EF00FEB1D8 /* NptBsdResolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */; };
 		CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */ = {isa = PBXBuildFile; fileRef = CAD78DD212A99DC500D7EBA7 /* NptHash.h */; };
 		CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */; };
 		CAE063D31241473B00E5AFC4 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
@@ -483,6 +487,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
+		};
+		CAAAA08012FF825300ABC84B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CAAAA08312FF827D00ABC84B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CAAAA07B12FF824E00ABC84B;
+			remoteInfo = NetResolve;
 		};
 		CAE063D61241479100E5AFC4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -930,6 +948,9 @@
 		CAA979FD0CF1648300C01909 /* ZipTestData1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZipTestData1.cpp; sourceTree = "<group>"; };
 		CAA97A010CF164A700C01909 /* XmlTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XmlTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA97A1B0CF1654A00C01909 /* StringsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StringsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAAAA07612FF823200ABC84B /* NetResolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetResolve.cpp; sourceTree = "<group>"; };
+		CAAAA07C12FF824E00ABC84B /* NetResolve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetResolve; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptBsdResolver.cpp; sourceTree = "<group>"; };
 		CAD78DD212A99DC500D7EBA7 /* NptHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptHash.h; sourceTree = "<group>"; };
 		CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptHash.cpp; sourceTree = "<group>"; };
 		CAE4169B0E0DBD6600A530D1 /* MiscTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest1; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1166,6 +1187,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA97A170CF1654A00C01909 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAAAA07A12FF824E00ABC84B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAAAA08212FF825800ABC84B /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1726,6 +1755,14 @@
 			path = Zip1;
 			sourceTree = "<group>";
 		};
+		CAAAA07512FF823200ABC84B /* NetResolve */ = {
+			isa = PBXGroup;
+			children = (
+				CAAAA07612FF823200ABC84B /* NetResolve.cpp */,
+			);
+			path = NetResolve;
+			sourceTree = "<group>";
+		};
 		CAE417A50E0DC16300A530D1 /* Apps */ = {
 			isa = PBXGroup;
 			children = (
@@ -1735,6 +1772,7 @@
 				CAE417AA0E0DC16300A530D1 /* NetPing */,
 				CAE417AC0E0DC16300A530D1 /* NetPump */,
 				CA790DA41233BDAA00875081 /* NetGet */,
+				CAAAA07512FF823200ABC84B /* NetResolve */,
 			);
 			name = Apps;
 			path = ../../../Source/Apps;
@@ -1847,6 +1885,7 @@
 				CA8066491187BD08009D099D /* DigestsTest1 */,
 				CA8069D9118B577E009D099D /* CryptoTest1 */,
 				CA790DA91233BDC100875081 /* NetGet */,
+				CAAAA07C12FF824E00ABC84B /* NetResolve */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1963,6 +2002,7 @@
 		F912B6EF0B8EB27400C1E90D /* Bsd */ = {
 			isa = PBXGroup;
 			children = (
+				CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */,
 				F912B6F00B8EB27400C1E90D /* NptBsdNetwork.cpp */,
 				F912B6F10B8EB27400C1E90D /* NptBsdSockets.cpp */,
 			);
@@ -2354,6 +2394,23 @@
 			productReference = CAA97A1B0CF1654A00C01909 /* StringsTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAAAA07B12FF824E00ABC84B /* NetResolve */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAAAA08812FF82A900ABC84B /* Build configuration list for PBXNativeTarget "NetResolve" */;
+			buildPhases = (
+				CAAAA07912FF824E00ABC84B /* Sources */,
+				CAAAA07A12FF824E00ABC84B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAAAA08112FF825300ABC84B /* PBXTargetDependency */,
+			);
+			name = NetResolve;
+			productName = NetResolve;
+			productReference = CAAAA07C12FF824E00ABC84B /* NetResolve */;
+			productType = "com.apple.product-type.tool";
+		};
 		CAE4169A0E0DBD6600A530D1 /* MiscTest1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CAE416B30E0DBDBB00A530D1 /* Build configuration list for PBXNativeTarget "MiscTest1" */;
@@ -2720,6 +2777,13 @@
 				CAE4176C0E0DC0FE00A530D1 /* Tests */,
 				F912B69E0B8EB1C700C1E90D /* Neptune */,
 				CA1A5EA80EC0152A00A9040C /* axTLS */,
+				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
+				CAE4179C0E0DC13A00A530D1 /* NetPump */,
+				CAE417BA0E0DC19400A530D1 /* NetEcho */,
+				CAE417C70E0DC1B400A530D1 /* NetConfig */,
+				CAE417D40E0DC1D600A530D1 /* NetPing */,
+				CA790DA81233BDC100875081 /* NetGet */,
+				CAAAA07B12FF824E00ABC84B /* NetResolve */,
 				CAE416B80E0DBDF800A530D1 /* ArraysTest1 */,
 				CAE416C50E0DBE2F00A530D1 /* BufferedStreamsTest1 */,
 				CA550D4A0D20A37E00B22D72 /* HttpServerTest1 */,
@@ -2739,15 +2803,9 @@
 				CAE417530E0DC0A800A530D1 /* UrlTest1 */,
 				CAA97A000CF164A700C01909 /* XmlTest1 */,
 				CAE417600E0DC0D200A530D1 /* ZipTest1 */,
-				CAE4179C0E0DC13A00A530D1 /* NetPump */,
-				CAE417BA0E0DC19400A530D1 /* NetEcho */,
-				CAE417C70E0DC1B400A530D1 /* NetConfig */,
-				CAE417D40E0DC1D600A530D1 /* NetPing */,
-				CA790DA81233BDC100875081 /* NetGet */,
 				CA97E01F0E2FDFB30090CC9B /* StreamsTest1 */,
 				CAF2EFD60E64A27200948C04 /* FileTest1 */,
 				CA2F54230EC115E600AEBC12 /* TlsTest1 */,
-				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
 				CA99589F1046FFC70073F34A /* HttpClientTest2 */,
 				CA4090C310AA257B00ED81C5 /* TimeTest1 */,
 				CA9DDC6510AE3DD6008B871E /* FileTest2 */,
@@ -2900,6 +2958,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAA97A1D0CF1659200C01909 /* StringsTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAAAA07912FF824E00ABC84B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAAAA08512FF828A00ABC84B /* NetResolve.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3121,6 +3187,7 @@
 				CA057AB111BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */,
 				CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */,
 				CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */,
+				CAC5048312FFB7EF00FEB1D8 /* NptBsdResolver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3261,6 +3328,16 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CAA97A120CF1654A00C01909 /* PBXContainerItemProxy */;
+		};
+		CAAAA08112FF825300ABC84B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CAAAA08012FF825300ABC84B /* PBXContainerItemProxy */;
+		};
+		CAAAA08412FF827D00ABC84B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CAAAA07B12FF824E00ABC84B /* NetResolve */;
+			targetProxy = CAAAA08312FF827D00ABC84B /* PBXContainerItemProxy */;
 		};
 		CAE063D71241479100E5AFC4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3983,6 +4060,36 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = StringsTest1;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CAAAA07E12FF824F00ABC84B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = NetResolve;
+			};
+			name = Debug;
+		};
+		CAAAA07F12FF824F00ABC84B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = NetResolve;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4869,6 +4976,15 @@
 			buildConfigurations = (
 				CAA97A190CF1654A00C01909 /* Debug */,
 				CAA97A1A0CF1654A00C01909 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CAAAA08812FF82A900ABC84B /* Build configuration list for PBXNativeTarget "NetResolve" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAAAA07E12FF824F00ABC84B /* Debug */,
+				CAAAA07F12FF824F00ABC84B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

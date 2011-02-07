@@ -232,5 +232,16 @@ private:
     NPT_List<NPT_NetworkInterfaceAddress> m_Addresses;
 };
 
+/*----------------------------------------------------------------------
+|   NPT_NetworkNameResolver
++---------------------------------------------------------------------*/
+class NPT_NetworkNameResolver
+{
+public:
+    // class methods
+    static NPT_Result Resolve(const char*              name, 
+                              NPT_List<NPT_IpAddress>& addresses,
+                              NPT_Timeout              timeout = NPT_TIMEOUT_INFINITE);
+};
 
 #endif // _NPT_NETWORK_H_

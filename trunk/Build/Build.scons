@@ -192,7 +192,7 @@ LibraryModule(name                  = 'Neptune',
               extra_cpp_defines     = extra_cpp_flags,
               linked_modules        = env['NPT_EXTRA_LIBS']+['Zlib']+['axTLS'])
            
-for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'NetGet', 'MiniHttpServer']:
+for app in ['NetPump', 'NetConfig', 'NetPing', 'NetEcho', 'NetGet', 'NetResolve', 'MiniHttpServer']:
     Application(app, 'Source/Apps/'+app)
     
 tests = ['Arrays1', 

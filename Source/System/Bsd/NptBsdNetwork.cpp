@@ -30,6 +30,7 @@
 #include "NptNetwork.h"
 #include "NptUtils.h"
 #include "NptConstants.h"
+#include "NptSockets.h"
 
 #if defined(NPT_CONFIG_HAVE_NET_IF_DL_H)
 #include <net/if_dl.h>
@@ -39,7 +40,7 @@
 #endif
 
 /*----------------------------------------------------------------------
-|       platform adaptation
+|   platform adaptation
 +---------------------------------------------------------------------*/
 #if !defined(IFHWADDRLEN)
 #define IFHWADDRLEN 6 // default to 48 bits
@@ -57,7 +58,7 @@
 #endif
 
 /*----------------------------------------------------------------------
-|       NPT_NetworkInterface::GetNetworkInterfaces
+|   NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)

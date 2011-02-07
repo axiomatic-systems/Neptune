@@ -103,6 +103,7 @@
 |   sockets
 +---------------------------------------------------------------------*/
 #define NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
+#define NPT_CONFIG_HAVE_GETADDRINFO
 
 /*----------------------------------------------------------------------
 |   platform specifics

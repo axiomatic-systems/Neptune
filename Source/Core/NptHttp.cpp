@@ -42,6 +42,7 @@
 #include "NptSystem.h"
 #include "NptLogging.h"
 #include "NptTls.h"
+#include "NptStreams.h"
 
 /*----------------------------------------------------------------------
 |   logging
@@ -305,6 +306,110 @@ NPT_HttpHeaders::GetHeaderValue(const char* name) const
     } else {
         return &header->GetValue();
     }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream
++---------------------------------------------------------------------*/
+class NPT_HttpEntityBodyInputStream : public NPT_InputStream
+{
+public:
+    // constructor
+    NPT_HttpEntityBodyInputStream(NPT_BufferedInputStreamReference& source,
+                                  NPT_LargeSize                     size,
+                                  bool                              size_is_known,
+                                  bool                              chunked);
+                                  
+    // methods
+    bool SizeIsKnown() { return m_SizeIsKnown; }
+    
+    // NPT_InputStream methods
+    NPT_Result Read(void*     buffer, 
+                    NPT_Size  bytes_to_read, 
+                    NPT_Size* bytes_read = NULL);
+    NPT_Result Seek(NPT_Position /*offset*/) { 
+        return NPT_ERROR_NOT_SUPPORTED; 
+    }
+    NPT_Result Tell(NPT_Position& offset) { 
+        offset = m_Position; 
+        return NPT_SUCCESS; 
+    }
+    NPT_Result GetSize(NPT_LargeSize& size) {
+        size = m_Size;
+        return NPT_SUCCESS; 
+    }
+    NPT_Result GetAvailable(NPT_LargeSize& available);
+    
+private:
+    // members
+    NPT_LargeSize            m_Size;
+    bool                     m_SizeIsKnown;
+    bool                     m_Chunked;
+    NPT_Position             m_Position;
+    NPT_InputStreamReference m_Source;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream::NPT_HttpEntityBodyInputStream
++---------------------------------------------------------------------*/
+NPT_HttpEntityBodyInputStream::NPT_HttpEntityBodyInputStream(
+    NPT_BufferedInputStreamReference& source,
+    NPT_LargeSize                     size,
+    bool                              size_is_known,
+    bool                              chunked) :
+    m_Size(size),
+    m_SizeIsKnown(size_is_known),
+    m_Chunked(chunked)
+{
+    if (chunked) {
+        m_Source = NPT_InputStreamReference(new NPT_HttpChunkedInputStream(source));
+    } else {
+        m_Source = source;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream::Read
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpEntityBodyInputStream::Read(void*     buffer, 
+                                    NPT_Size  bytes_to_read, 
+                                    NPT_Size* bytes_read)
+{
+    if (bytes_read) *bytes_read = 0;
+    
+    // clamp to the max possible read size 
+    if (!m_Chunked && m_SizeIsKnown) {
+        NPT_LargeSize max_can_read = m_Size-m_Position;
+        if (max_can_read == 0) return NPT_ERROR_EOS;
+        if (bytes_to_read > max_can_read) bytes_to_read = max_can_read;
+    }
+    
+    // read from the source
+    NPT_Size source_bytes_read;
+    NPT_Result result = m_Source->Read(buffer, bytes_to_read, &source_bytes_read);
+    if (NPT_SUCCEEDED(result)) {
+        m_Position += source_bytes_read;
+        if (bytes_read) *bytes_read = source_bytes_read;
+    }
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream::GetAvaialble
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpEntityBodyInputStream::GetAvailable(NPT_LargeSize& available)
+{
+    NPT_Result result = m_Source->GetAvailable(available);
+    if (NPT_FAILED(result)) {
+        available = 0;
+        return result;
+    }
+    if (available > m_Size-m_Position) {
+        available = m_Size-m_Position;
+    }
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -1343,7 +1448,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     NPT_CHECK_WARNING(output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
 
     // send request body
-    if (!body_stream.IsNull() && entity->GetContentLength()) {
+    if (entity && entity->GetContentLength() && !body_stream.IsNull()) {
         NPT_CHECK_WARNING(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength()));
     }
 
@@ -1363,16 +1468,26 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     buffered_input_stream->SetBufferSize(0);
 
     // create an entity if one is expected in the response
-    if (request.GetMethod() == NPT_HTTP_METHOD_GET || request.GetMethod() == NPT_HTTP_METHOD_POST) {
+    if (request.GetMethod() != NPT_HTTP_METHOD_HEAD) {
         NPT_HttpEntity* response_entity = new NPT_HttpEntity(response->GetHeaders());
         
+        // check if the content length is known
+        bool have_content_length = (response->GetHeaders().GetHeaderValue(NPT_HTTP_HEADER_CONTENT_LENGTH) != NULL);
+        
         // check for chunked Transfer-Encoding
+        bool chunked = false;
         if (response_entity->GetTransferEncoding() == NPT_HTTP_TRANSFER_ENCODING_CHUNKED) {
-            response_entity->SetInputStream(NPT_InputStreamReference(new NPT_HttpChunkedInputStream(buffered_input_stream)));
+            chunked = true;
             response_entity->SetTransferEncoding(NULL);
-        } else {
-            response_entity->SetInputStream((NPT_InputStreamReference)buffered_input_stream);
         }
+        
+        // create the body stream wrapper
+        NPT_InputStream* response_body_stream = 
+            new NPT_HttpEntityBodyInputStream(buffered_input_stream, 
+                                              response_entity->GetContentLength(),
+                                              have_content_length,
+                                              chunked);
+        response_entity->SetInputStream(NPT_InputStreamReference(response_body_stream));
         response->SetEntity(response_entity);
     }
     
@@ -1884,8 +1999,7 @@ NPT_HttpResponder::ParseRequest(NPT_HttpRequest*&        request,
     m_Input->SetBufferSize(0);
 
     // don't create an entity if no body is expected
-    if (request->GetMethod() == NPT_HTTP_METHOD_GET ||
-        request->GetMethod() == NPT_HTTP_METHOD_HEAD) {
+    if (request->GetMethod() == NPT_HTTP_METHOD_TRACE) {
         return NPT_SUCCESS;
     }
 

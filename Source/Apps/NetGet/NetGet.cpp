@@ -121,6 +121,15 @@ main(int argc, char** argv)
                    entity->GetContentEncoding().GetChars());
         }
         
+        if (verbose) {
+            NPT_InputStreamReference body_stream;
+            entity->GetInputStream(body_stream);
+            if (!body_stream.IsNull()) {
+                NPT_LargeSize size;
+                body_stream->GetSize(size);
+                printf("Loading body stream (declared: %lld bytes)\n", size);
+            }
+        }
         NPT_DataBuffer body;
         result =entity->Load(body);
         if (NPT_FAILED(result)) {

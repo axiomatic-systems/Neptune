@@ -103,7 +103,6 @@
 |   sockets
 +---------------------------------------------------------------------*/
 #define NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
-#define NPT_CONFIG_HAVE_GETADDRINFO
 
 /*----------------------------------------------------------------------
 |   platform specifics
@@ -131,6 +130,7 @@
 
 /* linux */
 #if defined(__linux__)
+#define NPT_CONFIG_HAVE_GETADDRINFO
 #undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
 #endif
 
@@ -142,7 +142,13 @@
 
 /* android */
 #if defined(ANDROID)
+#define NPT_CONFIG_HAVE_GETADDRINFO
 #undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
+#endif
+
+/* OSX and iOS */
+#if defined(__APPLE__)
+#define NPT_CONFIG_HAVE_GETADDRINFO
 #endif
 
 /*----------------------------------------------------------------------
@@ -175,6 +181,7 @@
 /* Microsoft C/C++ Compiler */
 #if defined(_MSC_VER)
 #undef NPT_CONFIG_HAVE_STDINT_H
+#define NPT_CONFIG_HAVE_GETADDRINFO
 #define NPT_CONFIG_STAT_ST_CTIME_IS_ST_BIRTHTIME
 #define NPT_FORMAT_64 "I64"
 #define NPT_CONFIG_INT64_TYPE __int64
@@ -252,7 +259,7 @@ typedef long NPT_PointerLong;
 #define NPT_CONFIG_NO_RTTI
 #endif
 
-/* OSX */
+/* OSX and iOS */
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
 #include <AvailabilityMacros.h>

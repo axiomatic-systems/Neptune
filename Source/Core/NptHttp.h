@@ -65,6 +65,10 @@ const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
 #define NPT_HTTP_METHOD_GET     "GET"
 #define NPT_HTTP_METHOD_HEAD    "HEAD"
 #define NPT_HTTP_METHOD_POST    "POST"
+#define NPT_HTTP_METHOD_PUT     "PUT"
+#define NPT_HTTP_METHOD_OPTIONS "OPTIONS"
+#define NPT_HTTP_METHOD_DELETE  "DELETE"
+#define NPT_HTTP_METHOD_TRACE   "TRACE"
 
 #define NPT_HTTP_HEADER_HOST                "Host"
 #define NPT_HTTP_HEADER_CONNECTION          "Connection"
@@ -380,7 +384,7 @@ public:
     };
 
     /**
-     * @param connector Pointer to a Connector instance, or NULL to use 
+     * @param connector Pointer to a connector instance, or NULL to use 
      * the default (TCP) connector.
      * @param transfer_ownership Boolean flag. If true, the NPT_HttpClient object
      * becomes the owner of the passed Connector and will delete it when it is 
@@ -407,7 +411,7 @@ public:
                            NPT_Timeout io_timeout,
                            NPT_Timeout name_resolver_timeout);
     NPT_Result SetUserAgent(const char* user_agent);
-
+    
 protected:
     // methods
     NPT_Result SendRequestOnce(NPT_HttpRequest&   request,

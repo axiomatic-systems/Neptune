@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """
 
-Visual Studio 2005 Build Script
+Visual Studio 2010 Build Script
 
 $Id: Build.py 87 2008-08-15 19:03:36Z bok $
 
@@ -18,7 +18,7 @@ try:
         VSBINDIR = environ['VISUALSTUDIO_BIN']
 except NameError:
     # Use default value for visual studio.
-    VSBINDIR = 'C:/Program Files/Microsoft Visual Studio 8/Common7/IDE'
+    VSBINDIR = 'C:/Program Files/Microsoft Visual Studio 10.0/Common7/IDE'
     print 'VISUALSTUDIO_BIN not set. Trying default value:'
     print '    ' + VSBINDIR
     print ''

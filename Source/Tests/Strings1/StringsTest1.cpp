@@ -489,7 +489,17 @@ main(int /*argc*/, char** /*argv*/)
     NPT_String r1 = r0;
     r1.Replace('@', '#');
     StringTest("Replace(char, char)", r1, "abcd#fghij#f#");
-
+    r2 = "blablabla";
+    r2.Replace("bla", "blu");
+    StringTest("Replace(str, str)", r2, "blublublu");
+    r2 = "abcdefxxxxijxxxx0";
+    r2.Replace("xxxx", "y");
+    StringTest("Replace(str, str)", r2, "abcdefyijy0");
+    r2 = "abcdefxijx0";
+    r2.Replace("x", "yyyyyy");
+    StringTest("Replace(str, str)", r2, "abcdefyyyyyyijyyyyyy0");
+    
+    
     printf(":: testing Insert\n");
     NPT_String in0;
     in0.Insert("hello", 1);

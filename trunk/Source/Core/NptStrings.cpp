@@ -796,12 +796,13 @@ NPT_String::Replace(char a, const char* str)
 const NPT_String&
 NPT_String::Replace(const char* before, const char* after)
 {
-    int      index = Find(before);
-    NPT_Size size  = NPT_StringLength(before);
+    NPT_Size size_before = NPT_StringLength(before);
+    NPT_Size size_after  = NPT_StringLength(after);
+    int      index       = Find(before);
     while (index != NPT_STRING_SEARCH_FAILED) {
-        Erase(index, size);
+        Erase(index, size_before);
         Insert(after, index);
-        index = Find(before, index+size);
+        index = Find(before, index+size_after);
     }
     return *this;
 }

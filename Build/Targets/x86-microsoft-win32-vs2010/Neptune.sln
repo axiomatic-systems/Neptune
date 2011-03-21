@@ -58,6 +58,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TlsTest1", "TlsTest1\TlsTes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetGet", "NetGet\NetGet.vcxproj", "{1A2D83FE-57D8-4EAB-9CEE-420E1F980489}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetResolve", "NetResolve\NetResolve.vcxproj", "{62F20819-2CD5-463E-85E5-23C0466F05C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -180,6 +182,10 @@ Global
 		{1A2D83FE-57D8-4EAB-9CEE-420E1F980489}.Debug|Win32.Build.0 = Debug|Win32
 		{1A2D83FE-57D8-4EAB-9CEE-420E1F980489}.Release|Win32.ActiveCfg = Release|Win32
 		{1A2D83FE-57D8-4EAB-9CEE-420E1F980489}.Release|Win32.Build.0 = Release|Win32
+		{62F20819-2CD5-463E-85E5-23C0466F05C2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{62F20819-2CD5-463E-85E5-23C0466F05C2}.Debug|Win32.Build.0 = Debug|Win32
+		{62F20819-2CD5-463E-85E5-23C0466F05C2}.Release|Win32.ActiveCfg = Release|Win32
+		{62F20819-2CD5-463E-85E5-23C0466F05C2}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

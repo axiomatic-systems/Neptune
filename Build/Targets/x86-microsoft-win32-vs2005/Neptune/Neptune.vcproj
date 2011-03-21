@@ -332,6 +332,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\Source\System\Bsd\NptBsdResolver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\..\Source\System\Bsd\NptBsdSockets.cpp"
 				>
 			</File>

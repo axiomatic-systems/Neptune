@@ -24,6 +24,7 @@ PrintUsageAndExit(void)
             "\n"
             "  Options:\n"
             "    --verbose    : print verbose information\n"
+            "    --http-1-1   : use HTTP 1.1\n"
             "    --show-proxy : show the proxy that will be used for the connection\n");
 }
 
@@ -40,9 +41,10 @@ main(int argc, char** argv)
     }
 
     // init options
-    bool verbose = false;
+    bool verbose    = false;
     bool show_proxy = false;
-    bool url_set = false;
+    bool url_set    = false;
+    bool http_1_1   = false;
     NPT_HttpUrl url;
     
     // parse command line
@@ -53,6 +55,8 @@ main(int argc, char** argv)
             verbose = true;
         } else if (NPT_StringsEqual(arg, "--show-proxy")) {
             show_proxy = true;
+        } else if (NPT_StringsEqual(arg, "--http-1-1")) {
+            http_1_1 = true;
         } else if (!url_set) {
             NPT_Result result = url.Parse(arg);
             if (NPT_FAILED(result)) {
@@ -87,15 +91,33 @@ main(int argc, char** argv)
     NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
     NPT_HttpClient client;
     NPT_HttpResponse* response;
+    if (http_1_1) {
+        request.SetProtocol(NPT_HTTP_PROTOCOL_1_1);
+    }
     NPT_Result result = client.SendRequest(request, response);
     if (NPT_FAILED(result)) {
         fprintf(stderr, "ERROR: SendRequest failed (%d:%s)\n", result, NPT_ResultText(result));
         return 1;
     }
 
+    // show the request info
+    if (verbose) {
+        printf("#REQUEST: protocol=%s\n", request.GetProtocol().GetChars());
+
+        // show headers
+        NPT_HttpHeaders& headers = request.GetHeaders();
+        NPT_List<NPT_HttpHeader*>::Iterator header = headers.GetHeaders().GetFirstItem();
+        while (header) {
+            printf("%s: %s\n", 
+                      (const char*)(*header)->GetName(),
+                      (const char*)(*header)->GetValue());
+            ++header;
+        }
+    }
+
     // show response info
     if (verbose) {
-        printf("#RESPONSE: protocol=%s, code=%d, reason=%s\n",
+        printf("\n#RESPONSE: protocol=%s, code=%d, reason=%s\n",
                response->GetProtocol().GetChars(),
                response->GetStatusCode(),
                response->GetReasonPhrase().GetChars());
@@ -115,7 +137,7 @@ main(int argc, char** argv)
     NPT_HttpEntity* entity = response->GetEntity();
     if (entity != NULL) {
         if (verbose) {
-            printf("#ENTITY: length=%lld, type=%s, encoding=%s\n",
+            printf("\n#ENTITY: length=%lld, type=%s, encoding=%s\n",
                    entity->GetContentLength(),
                    entity->GetContentType().GetChars(),
                    entity->GetContentEncoding().GetChars());
@@ -135,7 +157,7 @@ main(int argc, char** argv)
         if (NPT_FAILED(result)) {
             fprintf(stderr, "ERROR: failed to load entity (%d)\n", result);
         } else {
-            if (verbose) printf("#BODY: loaded %d bytes\n", (int)body.GetDataSize());
+            if (verbose) printf("\n#BODY: loaded %d bytes\n", (int)body.GetDataSize());
 
             // dump the body
             NPT_OutputStreamReference output;

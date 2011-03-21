@@ -219,6 +219,9 @@
     <ClCompile Include="..\..\..\..\Source\Core\NptHash.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Source\System\Bsd\NptBsdResolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\ThirdParty\axTLS\crypto\bigint.h">

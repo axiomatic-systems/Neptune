@@ -414,7 +414,7 @@ NPT_HttpEntityBodyInputStream::Read(void*     buffer,
     if (!m_Chunked && m_SizeIsKnown) {
         NPT_LargeSize max_can_read = m_Size-m_Position;
         if (max_can_read == 0) return NPT_ERROR_EOS;
-        if (bytes_to_read > max_can_read) bytes_to_read = max_can_read;
+        if (bytes_to_read > max_can_read) bytes_to_read = (NPT_Size)max_can_read;
     }
     
     // read from the source

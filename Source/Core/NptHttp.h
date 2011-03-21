@@ -42,6 +42,9 @@
 #include "NptSockets.h"
 #include "NptMap.h"
 #include "NptDynamicCast.h"
+#include "NptVersion.h"
+#include "NptTime.h"
+#include "NptThreads.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -50,12 +53,17 @@ const unsigned int NPT_HTTP_DEFAULT_PORT  = 80;
 const unsigned int NPT_HTTPS_DEFAULT_PORT = 443;
 const unsigned int NPT_HTTP_INVALID_PORT  = 0;
 
-const NPT_Timeout NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT    = 30000;
-const NPT_Timeout NPT_HTTP_CLIENT_DEFAULT_IO_TIMEOUT            = 30000;
-const NPT_Timeout NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT = 60000;
+const NPT_Timeout  NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT    = 30000;
+const NPT_Timeout  NPT_HTTP_CLIENT_DEFAULT_IO_TIMEOUT            = 30000;
+const NPT_Timeout  NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT = 60000;
+const unsigned int NPT_HTTP_CLIENT_DEFAULT_MAX_REDIRECTS         = 20;
 
 const NPT_Timeout NPT_HTTP_SERVER_DEFAULT_CONNECTION_TIMEOUT    = NPT_TIMEOUT_INFINITE;
 const NPT_Timeout NPT_HTTP_SERVER_DEFAULT_IO_TIMEOUT            = 60000;
+
+const unsigned int NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_POOL_SIZE = 5;
+const unsigned int NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_AGE       = 30; // seconds
+const unsigned int NPT_HTTP_MAX_RECONNECTS                              = 10;
 
 const int NPT_HTTP_PROTOCOL_MAX_LINE_LENGTH  = 8192;
 const int NPT_HTTP_PROTOCOL_MAX_HEADER_COUNT = 100;
@@ -95,8 +103,13 @@ const int NPT_ERROR_HTTP_NO_PROXY              = NPT_ERROR_BASE_HTTP - 2;
 const int NPT_ERROR_HTTP_INVALID_REQUEST       = NPT_ERROR_BASE_HTTP - 3;
 const int NPT_ERROR_HTTP_METHOD_NOT_SUPPORTED  = NPT_ERROR_BASE_HTTP - 4;
 const int NPT_ERROR_HTTP_TOO_MANY_REDIRECTS    = NPT_ERROR_BASE_HTTP - 5;
+const int NPT_ERROR_HTTP_TOO_MANY_RECONNECTS   = NPT_ERROR_BASE_HTTP - 6;
 
 #define NPT_HTTP_LINE_TERMINATOR "\r\n"
+
+#if !defined(NPT_CONFIG_HTTP_DEFAULT_USER_AGENT)
+#define NPT_CONFIG_HTTP_DEFAULT_USER_AGENT "Neptune/" NPT_NEPTUNE_VERSION_STRING
+#endif
 
 /*----------------------------------------------------------------------
 |   types
@@ -365,12 +378,28 @@ class NPT_HttpClient {
 public:
     // types
     struct Config {
-        NPT_Timeout m_ConnectionTimeout;
-        NPT_Timeout m_IoTimeout;
-        NPT_Timeout m_NameResolverTimeout;
-        bool        m_FollowRedirect;
+        Config() : m_ConnectionTimeout(  NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT),
+                   m_IoTimeout(          NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT),
+                   m_NameResolverTimeout(NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT),
+                   m_MaxRedirects(       NPT_HTTP_CLIENT_DEFAULT_MAX_REDIRECTS),
+                   m_UserAgent(          NPT_CONFIG_HTTP_DEFAULT_USER_AGENT) {}
+        NPT_Timeout  m_ConnectionTimeout;
+        NPT_Timeout  m_IoTimeout;
+        NPT_Timeout  m_NameResolverTimeout;
+        NPT_Cardinal m_MaxRedirects;
+        NPT_String   m_UserAgent;
     };
 
+    class Connection {
+    public:
+        virtual ~Connection() {}
+        virtual NPT_InputStreamReference&  GetInputStream()  = 0;
+        virtual NPT_OutputStreamReference& GetOutputStream() = 0;
+        virtual bool                       SupportsPersistence() { return false;                    }
+        virtual bool                       IsRecycled()          { return false;                    }
+        virtual NPT_Result                 Recycle()             { delete this; return NPT_SUCCESS; }
+    };
+    
     class Connector {
     public:
         virtual ~Connector() {}
@@ -378,9 +407,12 @@ public:
         virtual NPT_Result Connect(const NPT_HttpUrl&          url,
                                    NPT_HttpClient&             client,
                                    const NPT_HttpProxyAddress* proxy,
-                                   NPT_InputStreamReference&   input_stream,
-                                   NPT_OutputStreamReference&  output_stream) = 0;
+                                   bool                        reuse, // wether we can reuse a connection or not
+                                   Connection*&                connection) = 0;
         virtual NPT_Result Abort() { return NPT_SUCCESS; }
+        
+    protected:
+        Connector() {} // don't instantiate directly
     };
 
     /**
@@ -411,6 +443,7 @@ public:
                            NPT_Timeout io_timeout,
                            NPT_Timeout name_resolver_timeout);
     NPT_Result SetUserAgent(const char* user_agent);
+    NPT_Result SetOptions(NPT_Flags options, bool on);
     
 protected:
     // methods
@@ -423,8 +456,75 @@ protected:
     bool                   m_ProxySelectorIsOwned;
     Connector*             m_Connector;
     bool                   m_ConnectorIsOwned;
-    NPT_String             m_UserAgent;
 };
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager
++---------------------------------------------------------------------*/
+class NPT_HttpConnectionManager
+{
+public:
+    // singleton management
+    class Cleaner {
+        static Cleaner AutomaticCleaner;
+        ~Cleaner() {
+            if (Instance) {
+                delete Instance;
+                Instance = NULL;
+            }
+        }
+    };
+    static NPT_HttpConnectionManager* GetInstance();
+    
+    class Connection : public NPT_HttpClient::Connection 
+    {
+    public:
+        Connection(NPT_HttpConnectionManager& manager,
+                   const NPT_SocketAddress&   address,
+                   NPT_InputStreamReference   input_stream,
+                   NPT_OutputStreamReference  output_stream);
+                   
+        
+        // NPT_HttpClient::Connection methods
+        virtual NPT_InputStreamReference&  GetInputStream()      { return m_InputStream;           }
+        virtual NPT_OutputStreamReference& GetOutputStream()     { return m_OutputStream;          }
+        virtual bool                       SupportsPersistence() { return true;                    }
+        virtual bool                       IsRecycled()          { return m_IsRecycled;            }
+        virtual NPT_Result                 Recycle();
+
+        // members
+        NPT_HttpConnectionManager& m_Manager;
+        bool                       m_IsRecycled;
+        NPT_TimeStamp              m_TimeStamp;
+        NPT_SocketAddress          m_SocketAddress;
+        NPT_InputStreamReference   m_InputStream;
+        NPT_OutputStreamReference  m_OutputStream;
+    };
+    
+    // destructor
+    ~NPT_HttpConnectionManager();
+    
+    // methods
+    Connection* FindConnection(NPT_SocketAddress& address);
+    NPT_Result  Recycle(Connection* connection);
+    
+private:
+    // class members
+    static NPT_HttpConnectionManager* Instance;
+    
+    // constructor
+    NPT_HttpConnectionManager();
+    
+    // methods
+    NPT_Result Cleanup();
+
+    // members
+    NPT_Mutex             m_Lock;
+    NPT_Cardinal          m_MaxConnections;
+    NPT_Cardinal          m_MaxConnectionAge;
+    NPT_List<Connection*> m_Connections;
+};
+
 
 /*----------------------------------------------------------------------
 |   NPT_HttpRequestContext

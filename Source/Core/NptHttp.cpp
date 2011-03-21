@@ -52,14 +52,9 @@ NPT_SET_LOCAL_LOGGER("neptune.http")
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
-const unsigned int NPT_HTTP_MAX_REDIRECTS = 20;
 const char* const NPT_HTTP_DEFAULT_403_HTML = "<html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>Access to this URL is forbidden.</p></html>";
 const char* const NPT_HTTP_DEFAULT_404_HTML = "<html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL was not found on this server.</p></html>";
 const char* const NPT_HTTP_DEFAULT_500_HTML = "<html><head><title>500 Internal Error</title></head><body><h1>Internal Error</h1><p>The server encountered an unexpected condition which prevented it from fulfilling the request.</p></html>";
-
-#if !defined(NPT_CONFIG_HTTP_DEFAULT_USER_AGENT)
-#define NPT_CONFIG_HTTP_DEFAULT_USER_AGENT "Neptune/" NPT_NEPTUNE_VERSION_STRING
-#endif
 
 /*----------------------------------------------------------------------
 |   NPT_HttpUrl::NPT_HttpUrl
@@ -314,11 +309,13 @@ NPT_HttpHeaders::GetHeaderValue(const char* name) const
 class NPT_HttpEntityBodyInputStream : public NPT_InputStream
 {
 public:
-    // constructor
+    // constructor and desctructor
     NPT_HttpEntityBodyInputStream(NPT_BufferedInputStreamReference& source,
                                   NPT_LargeSize                     size,
                                   bool                              size_is_known,
-                                  bool                              chunked);
+                                  bool                              chunked,
+                                  NPT_HttpClient::Connection*       connection);
+    virtual ~NPT_HttpEntityBodyInputStream();
                                   
     // methods
     bool SizeIsKnown() { return m_SizeIsKnown; }
@@ -341,12 +338,16 @@ public:
     NPT_Result GetAvailable(NPT_LargeSize& available);
     
 private:
+    // methods
+    virtual void OnFullyRead();
+
     // members
-    NPT_LargeSize            m_Size;
-    bool                     m_SizeIsKnown;
-    bool                     m_Chunked;
-    NPT_Position             m_Position;
-    NPT_InputStreamReference m_Source;
+    NPT_LargeSize               m_Size;
+    bool                        m_SizeIsKnown;
+    bool                        m_Chunked;
+    NPT_HttpClient::Connection* m_Connection;
+    NPT_Position                m_Position;
+    NPT_InputStreamReference    m_Source;
 };
 
 /*----------------------------------------------------------------------
@@ -356,15 +357,43 @@ NPT_HttpEntityBodyInputStream::NPT_HttpEntityBodyInputStream(
     NPT_BufferedInputStreamReference& source,
     NPT_LargeSize                     size,
     bool                              size_is_known,
-    bool                              chunked) :
+    bool                              chunked,
+    NPT_HttpClient::Connection*       connection) :
     m_Size(size),
     m_SizeIsKnown(size_is_known),
-    m_Chunked(chunked)
+    m_Chunked(chunked),
+    m_Connection(connection),
+    m_Position(0)
 {
-    if (chunked) {
-        m_Source = NPT_InputStreamReference(new NPT_HttpChunkedInputStream(source));
+    if (size_is_known && size == 0) {
+        OnFullyRead();
     } else {
-        m_Source = source;
+        if (chunked) {
+            m_Source = NPT_InputStreamReference(new NPT_HttpChunkedInputStream(source));
+        } else {
+            m_Source = source;
+        }
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream::~NPT_HttpEntityBodyInputStream
++---------------------------------------------------------------------*/
+NPT_HttpEntityBodyInputStream::~NPT_HttpEntityBodyInputStream()
+{
+    delete m_Connection;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpEntityBodyInputStream::OnFullyRead
++---------------------------------------------------------------------*/
+void
+NPT_HttpEntityBodyInputStream::OnFullyRead()
+{
+    m_Source = NULL;
+    if (m_Connection) {
+        m_Connection->Recycle();
+        m_Connection = NULL;
     }
 }
 
@@ -377,6 +406,9 @@ NPT_HttpEntityBodyInputStream::Read(void*     buffer,
                                     NPT_Size* bytes_read)
 {
     if (bytes_read) *bytes_read = 0;
+ 
+    // return now if we've already reached the end
+    if (m_Source.IsNull()) return NPT_ERROR_EOS;
     
     // clamp to the max possible read size 
     if (!m_Chunked && m_SizeIsKnown) {
@@ -386,12 +418,18 @@ NPT_HttpEntityBodyInputStream::Read(void*     buffer,
     }
     
     // read from the source
-    NPT_Size source_bytes_read;
+    NPT_Size source_bytes_read = 0;
     NPT_Result result = m_Source->Read(buffer, bytes_to_read, &source_bytes_read);
     if (NPT_SUCCEEDED(result)) {
         m_Position += source_bytes_read;
         if (bytes_read) *bytes_read = source_bytes_read;
     }
+    
+    // check if we've reached the end
+    if (result == NPT_ERROR_EOS || (m_SizeIsKnown && (m_Position == m_Size))) {
+        OnFullyRead();
+    } 
+    
     return result;
 }
 
@@ -401,6 +439,10 @@ NPT_HttpEntityBodyInputStream::Read(void*     buffer,
 NPT_Result
 NPT_HttpEntityBodyInputStream::GetAvailable(NPT_LargeSize& available)
 {
+    if (m_Source.IsNull()) {
+        available = 0;
+        return NPT_SUCCESS;
+    }
     NPT_Result result = m_Source->GetAvailable(available);
     if (NPT_FAILED(result)) {
         available = 0;
@@ -898,31 +940,48 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpSimpleConnection
++---------------------------------------------------------------------*/
+class NPT_HttpSimpleConnection : public NPT_HttpClient::Connection
+{
+public:
+    virtual NPT_InputStreamReference&  GetInputStream() {
+        return m_InputStream;
+    }
+    virtual NPT_OutputStreamReference& GetOutputStream() {
+        return m_OutputStream;
+    }
+    
+    // members
+    NPT_InputStreamReference  m_InputStream;
+    NPT_OutputStreamReference m_OutputStream;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpTcpConnector
 +---------------------------------------------------------------------*/
 class NPT_HttpTcpConnector : public NPT_HttpClient::Connector
 {
-    virtual NPT_Result Connect(const NPT_HttpUrl&            url,
-                               NPT_HttpClient&               client,
-                               const NPT_HttpProxyAddress*   proxy,
-                               NPT_InputStreamReference&     input_stream, 
-                               NPT_OutputStreamReference&    output_stream);
+    virtual NPT_Result Connect(const NPT_HttpUrl&           url,
+                               NPT_HttpClient&              client,
+                               const NPT_HttpProxyAddress*  proxy,
+                               bool                         reuse,
+                               NPT_HttpClient::Connection*& connection);
 };
 
 /*----------------------------------------------------------------------
 |   NPT_HttpTcpConnector::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpTcpConnector::Connect(const NPT_HttpUrl&          url,
-                              NPT_HttpClient&             client,
-                              const NPT_HttpProxyAddress* proxy,
-                              NPT_InputStreamReference&   input_stream, 
-                              NPT_OutputStreamReference&  output_stream)
+NPT_HttpTcpConnector::Connect(const NPT_HttpUrl&           url,
+                              NPT_HttpClient&              client,
+                              const NPT_HttpProxyAddress*  proxy,
+                              bool                         /* reuse */,
+                              NPT_HttpClient::Connection*& connection)
 {
     // default values
-    input_stream  = NULL;
-    output_stream = NULL;
-
+    connection = NULL;
+    
     // decide which host we need to connect to
     const char* server_hostname;
     NPT_UInt16  server_port;
@@ -942,16 +1001,18 @@ NPT_HttpTcpConnector::Connect(const NPT_HttpUrl&          url,
 
     // connect to the server
     NPT_LOG_FINE_2("TCP connector will connect to %s:%d", server_hostname, server_port);
-    NPT_TcpClientSocket connection;
-    connection.SetReadTimeout(client.GetConfig().m_IoTimeout);
-    connection.SetWriteTimeout(client.GetConfig().m_IoTimeout);
+    NPT_TcpClientSocket tcp_socket;
+    tcp_socket.SetReadTimeout(client.GetConfig().m_IoTimeout);
+    tcp_socket.SetWriteTimeout(client.GetConfig().m_IoTimeout);
     NPT_SocketAddress socket_address(address, server_port);
-    NPT_CHECK_FINE(connection.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
+    NPT_CHECK_FINE(tcp_socket.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
 
     // get the streams
-    NPT_CHECK_FINE(connection.GetInputStream(input_stream));
-    NPT_CHECK_FINE(connection.GetOutputStream(output_stream));
-
+    NPT_HttpSimpleConnection* _connection = new NPT_HttpSimpleConnection();
+    connection = _connection;
+    tcp_socket.GetInputStream(_connection->m_InputStream);
+    tcp_socket.GetOutputStream(_connection->m_OutputStream);
+    
     return NPT_SUCCESS;
 }
 
@@ -962,9 +1023,9 @@ class NPT_HttpEnvProxySelector : public NPT_HttpProxySelector
 {
 public:
     // singleton management
-    class Cleanup {
-        static Cleanup AutomaticCleaner;
-        ~Cleanup() {
+    class Cleaner {
+        static Cleaner AutomaticCleaner;
+        ~Cleaner() {
             if (Instance) {
                 delete Instance;
                 Instance = NULL;
@@ -990,7 +1051,7 @@ private:
     NPT_HttpProxyAddress m_AllProxy;
 };
 NPT_HttpEnvProxySelector* NPT_HttpEnvProxySelector::Instance = NULL;
-NPT_HttpEnvProxySelector::Cleanup NPT_HttpEnvProxySelector::Cleanup::AutomaticCleaner;
+NPT_HttpEnvProxySelector::Cleaner NPT_HttpEnvProxySelector::Cleaner::AutomaticCleaner;
 
 /*----------------------------------------------------------------------
 |   NPT_HttpEnvProxySelector::GetInstance
@@ -1229,20 +1290,146 @@ NPT_HttpStaticProxySelector::GetProxyForUrl(const NPT_HttpUrl&    url,
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::NPT_HttpConnectionManager
++---------------------------------------------------------------------*/
+NPT_HttpConnectionManager::NPT_HttpConnectionManager() :
+    m_MaxConnections(NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_POOL_SIZE),
+    m_MaxConnectionAge(NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_AGE)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::~NPT_HttpConnectionManager
++---------------------------------------------------------------------*/
+NPT_HttpConnectionManager::~NPT_HttpConnectionManager()
+{
+    m_Connections.Apply(NPT_ObjectDeleter<Connection>());
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::GetInstance
++---------------------------------------------------------------------*/
+NPT_HttpConnectionManager*
+NPT_HttpConnectionManager::GetInstance()
+{
+    if (Instance) return Instance;
+    
+    NPT_SingletonLock::GetInstance().Lock();
+    if (Instance == NULL) {
+        // create the shared instance
+        Instance = new NPT_HttpConnectionManager();
+    }
+    NPT_SingletonLock::GetInstance().Unlock();
+    
+    return Instance;
+}
+NPT_HttpConnectionManager* NPT_HttpConnectionManager::Instance = NULL;
+NPT_HttpConnectionManager::Cleaner NPT_HttpConnectionManager::Cleaner::AutomaticCleaner;
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::Cleanup
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpConnectionManager::Cleanup()
+{
+    NPT_TimeStamp now;
+    NPT_System::GetCurrentTimeStamp(now);
+    NPT_TimeStamp time_limit = now + NPT_TimeStamp((float)m_MaxConnectionAge);
+    
+    NPT_List<Connection*>::Iterator tail = m_Connections.GetLastItem();
+    while (tail) {
+        if ((*tail)->m_TimeStamp < time_limit) break;
+        NPT_LOG_FINE_1("cleaning up connection (%d remain)", m_Connections.GetItemCount());
+        m_Connections.Erase(tail);
+        delete *tail;
+        tail = m_Connections.GetLastItem();
+    }
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::FindConnection
++---------------------------------------------------------------------*/
+NPT_HttpConnectionManager::Connection*
+NPT_HttpConnectionManager::FindConnection(NPT_SocketAddress& address)
+{
+    NPT_AutoLock lock(m_Lock);
+    Cleanup();
+
+    for (NPT_List<Connection*>::Iterator i = m_Connections.GetFirstItem();
+                                         i;
+                                       ++i) {
+        Connection* connection = *i;
+        if (connection->m_SocketAddress == address) {
+            m_Connections.Erase(i);
+            return connection;
+        }
+    }
+    
+    // not found
+    return NULL;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::Recycle
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpConnectionManager::Recycle(NPT_HttpConnectionManager::Connection* connection)
+{
+    NPT_AutoLock lock(m_Lock);
+    Cleanup();
+
+    // remove older connections to make room
+    while (m_Connections.GetItemCount() >= m_MaxConnections) {
+        NPT_List<Connection*>::Iterator head = m_Connections.GetFirstItem();
+        m_Connections.Erase(head);
+        delete *head;
+        NPT_LOG_FINER("removing connection from pool to make some room");
+    }
+    
+    // label this connection with the current timestamp and flag
+    NPT_System::GetCurrentTimeStamp(connection->m_TimeStamp);
+    connection->m_IsRecycled = true;
+    
+    // add the connection to the pool
+    m_Connections.Add(connection);
+    
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::Connection::Connection
++---------------------------------------------------------------------*/
+NPT_HttpConnectionManager::Connection::Connection(NPT_HttpConnectionManager& manager,
+                                                  const NPT_SocketAddress&   address,
+                                                  NPT_InputStreamReference   input_stream,
+                                                  NPT_OutputStreamReference  output_stream) :
+    m_Manager(manager),
+    m_IsRecycled(false),
+    m_SocketAddress(address),
+    m_InputStream(input_stream),
+    m_OutputStream(output_stream)
+{
+}
+
+/*----------------------------------------------------------------------
+|   NPT_HttpConnectionManager::Connection::Recycle
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_HttpConnectionManager::Connection::Recycle()
+{
+    return m_Manager.Recycle(this);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_HttpClient::NPT_HttpClient
 +---------------------------------------------------------------------*/
 NPT_HttpClient::NPT_HttpClient(Connector* connector, bool transfer_ownership) :
     m_ProxySelector(NPT_HttpProxySelector::GetDefault()),
     m_ProxySelectorIsOwned(false),
     m_Connector(connector),
-    m_ConnectorIsOwned(transfer_ownership),
-    m_UserAgent(NPT_CONFIG_HTTP_DEFAULT_USER_AGENT)
+    m_ConnectorIsOwned(transfer_ownership)
 {
-    m_Config.m_FollowRedirect      = true;
-    m_Config.m_ConnectionTimeout   = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
-    m_Config.m_IoTimeout           = NPT_HTTP_CLIENT_DEFAULT_CONNECTION_TIMEOUT;
-    m_Config.m_NameResolverTimeout = NPT_HTTP_CLIENT_DEFAULT_NAME_RESOLVER_TIMEOUT;
-
     if (connector == NULL) {
 #if defined(NPT_CONFIG_ENABLE_TLS)
         m_Connector = new NPT_HttpTlsConnector();
@@ -1353,7 +1540,7 @@ NPT_HttpClient::SetTimeouts(NPT_Timeout connection_timeout,
 NPT_Result
 NPT_HttpClient::SetUserAgent(const char* user_agent)
 {
-    m_UserAgent = user_agent;
+    m_Config.m_UserAgent = user_agent;
     return NPT_SUCCESS;
 } 
 
@@ -1365,6 +1552,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
                                 NPT_HttpResponse*& response)
 {
     // setup default values
+    NPT_Result result = NPT_SUCCESS;   
     response = NULL;
 
     NPT_LOG_FINE_1("requesting URL %s", request.GetUrl().ToString().GetChars());
@@ -1374,7 +1562,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     bool                 use_proxy = false;
     if (m_ProxySelector) {
         // we have a proxy selector, ask it to select a proxy for this URL
-        NPT_Result result = m_ProxySelector->GetProxyForUrl(request.GetUrl(), proxy);
+        result = m_ProxySelector->GetProxyForUrl(request.GetUrl(), proxy);
         if (NPT_FAILED(result) && result != NPT_ERROR_HTTP_NO_PROXY) {
             NPT_LOG_WARNING_1("proxy selector failure (%d)", result);
             return result;
@@ -1383,20 +1571,39 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     }
 
     // connect to the server or proxy
-    NPT_InputStreamReference  input_stream;
-    NPT_OutputStreamReference output_stream;
-    NPT_LOG_FINE_1("calling connector (proxy:%s)", use_proxy?"yes":"no");
+    Connection* connection = NULL;
+    bool http_1_1 = (request.GetProtocol() == NPT_HTTP_PROTOCOL_1_1);
+    NPT_LOG_FINE_2("calling connector (proxy:%s) (http 1.1:%s)", 
+                   use_proxy?"yes":"no", http_1_1?"yes":"no");
     NPT_CHECK_WARNING(m_Connector->Connect(request.GetUrl(),
                                            *this,
                                            use_proxy?&proxy:NULL,
-                                           input_stream,
-                                           output_stream));
-
-    // add any headers that may be missing
+                                           http_1_1,
+                                           connection));
+    NPT_LOG_FINE_1("got connection (reused: %s)", connection->IsRecycled()?"true":"false");
+    NPT_Reference<Connection> cref(connection);
+    NPT_InputStreamReference  input_stream  = connection->GetInputStream();
+    NPT_OutputStreamReference output_stream = connection->GetOutputStream();
+    
+    // decide if this connection should persist
     NPT_HttpHeaders& headers = request.GetHeaders();
-    headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close", false); // set but don't replace
-    if (m_UserAgent.GetLength()) {
-        headers.SetHeader(NPT_HTTP_HEADER_USER_AGENT, m_UserAgent, false); // set but don't replace 
+    bool should_persist = http_1_1;
+    if (!connection->SupportsPersistence()) {
+        should_persist = false;
+    }
+    if (should_persist) {
+        const NPT_String* connection_header = headers.GetHeaderValue(NPT_HTTP_HEADER_CONNECTION);
+        if (connection_header && (*connection_header == "close")) {
+            should_persist = false;
+        }        
+    }
+    
+    // add any headers that may be missing
+    if (!should_persist) {
+        headers.SetHeader(NPT_HTTP_HEADER_CONNECTION, "close", false); // set but don't replace
+    }
+    if (m_Config.m_UserAgent.GetLength()) {
+        headers.SetHeader(NPT_HTTP_HEADER_USER_AGENT, m_Config.m_UserAgent, false); // set but don't replace 
     }
     NPT_String host = request.GetUrl().GetHost();
     NPT_UInt16 default_port = 0;
@@ -1444,29 +1651,102 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
     // emit the request headers into the header buffer
     request.Emit(header_stream, use_proxy && request.GetUrl().GetSchemeId()==NPT_Url::SCHEME_ID_HTTP);
 
-    // send the headers
-    NPT_CHECK_WARNING(output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
+    // send the request to the server (in a loop, since we may need to reconnect with 1.1)
+    NPT_BufferedInputStreamReference buffered_input_stream;
+    bool         reconnect = false;
+    unsigned int watchdog  = NPT_HTTP_MAX_RECONNECTS;
+    do {
+        // check if we need to reconnect
+        if (reconnect) {
+            cref = NULL;
+            connection = NULL;
+            NPT_LOG_FINE_2("re-calling connector (proxy:%s) (http 1.1:%s)", 
+                           use_proxy?"yes":"no", http_1_1?"yes":"no");
+            NPT_CHECK_WARNING(m_Connector->Connect(request.GetUrl(),
+                                                   *this,
+                                                   use_proxy?&proxy:NULL,
+                                                   http_1_1,
+                                                   connection));
+            NPT_LOG_FINE_1("got connection (reused: %s)", connection->IsRecycled()?"true":"false");
+            cref = connection;
+            input_stream  = connection->GetInputStream();
+            output_stream = connection->GetOutputStream();
+        }
+        reconnect = connection->IsRecycled();
+        
+        // send the headers
+        result = (output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
+        if (NPT_FAILED(result)) {
+            NPT_LOG_FINE_1("failed to write request headers (%d)", result);
+            if (reconnect) {
+                continue;
+            } else {
+                return result;
+            }
+        }
+        
+        // send request body
+        if (entity && entity->GetContentLength() && !body_stream.IsNull()) {
+            result = NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength());
+            if (NPT_FAILED(result)) {
+                NPT_LOG_FINE_1("failed to write request body (%d)", result);
+                if (reconnect) {
+                    continue;
+                } else {
+                    return result;
+                }
+            }
+        }
 
-    // send request body
-    if (entity && entity->GetContentLength() && !body_stream.IsNull()) {
-        NPT_CHECK_WARNING(NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength()));
+        // flush the output stream so that everything is sent to the server
+        output_stream->Flush();
+
+        // create a buffered stream for this socket stream
+        buffered_input_stream = new NPT_BufferedInputStream(input_stream);
+
+        // parse the response
+        result = (NPT_HttpResponse::Parse(*buffered_input_stream, response));
+        if (NPT_FAILED(result)) {
+            NPT_LOG_FINE_1("failed to parse the response (%d)", result);
+            if (reconnect &&
+                (result == NPT_ERROR_EOS                || 
+                 result == NPT_ERROR_CONNECTION_ABORTED ||
+                 result == NPT_ERROR_CONNECTION_RESET   ||
+                 result == NPT_ERROR_READ_FAILED)) {
+                NPT_LOG_FINE("error is not fatal, retrying");
+                continue;
+            } else {
+                // don't retry
+                return result;
+            }
+        }
+        NPT_LOG_FINE_2("got response, code=%d, msg=%s",
+                       response->GetStatusCode(),
+                       response->GetReasonPhrase().GetChars());
+        break;
+    } while (reconnect && --watchdog);
+    
+    // check that we have a valid connection
+    if (NPT_FAILED(result)) {
+        NPT_LOG_FINE("failed after max reconnection attempts");
+        return NPT_ERROR_HTTP_TOO_MANY_RECONNECTS;
     }
-
-    // flush the output stream so that everything is sent to the server
-    output_stream->Flush();
-
-    // create a buffered stream for this socket stream
-    NPT_BufferedInputStreamReference buffered_input_stream(new NPT_BufferedInputStream(input_stream));
-
-    // parse the response
-    NPT_CHECK_WARNING(NPT_HttpResponse::Parse(*buffered_input_stream, response));
-    NPT_LOG_FINE_2("got response, code=%d, msg=%s",
-                   response->GetStatusCode(),
-                   response->GetReasonPhrase().GetChars());
     
     // unbuffer the stream
     buffered_input_stream->SetBufferSize(0);
 
+    // decide if we should still try to reuse this connection later on
+    if (should_persist) {
+        if (response->GetProtocol() == NPT_HTTP_PROTOCOL_1_1) {
+            const NPT_String* connection_header = response->GetHeaders().GetHeaderValue(NPT_HTTP_HEADER_CONNECTION);
+            if (connection_header && (*connection_header == "close")) {
+                should_persist = false;
+            }
+        } else {
+            should_persist = false;
+        }
+    }
+    
     // create an entity if one is expected in the response
     if (request.GetMethod() != NPT_HTTP_METHOD_HEAD) {
         NPT_HttpEntity* response_entity = new NPT_HttpEntity(response->GetHeaders());
@@ -1481,14 +1761,27 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
             response_entity->SetTransferEncoding(NULL);
         }
         
+        // prepare to transfer ownership of the connection if needed 
+        cref.Detach(); // release the internal ref
+        if (!should_persist) {
+            delete connection;
+            connection = NULL;
+        }
+        
         // create the body stream wrapper
         NPT_InputStream* response_body_stream = 
             new NPT_HttpEntityBodyInputStream(buffered_input_stream, 
                                               response_entity->GetContentLength(),
                                               have_content_length,
-                                              chunked);
+                                              chunked,
+                                              connection);
         response_entity->SetInputStream(NPT_InputStreamReference(response_body_stream));
         response->SetEntity(response_entity);
+    } else {
+        if (should_persist) {
+            cref.Detach(); // release the internal ref
+            connection->Recycle();
+        }
     }
     
     return NPT_SUCCESS;
@@ -1501,7 +1794,7 @@ NPT_Result
 NPT_HttpClient::SendRequest(NPT_HttpRequest&   request, 
                             NPT_HttpResponse*& response)
 {
-    NPT_Cardinal watchdog = NPT_HTTP_MAX_REDIRECTS;
+    NPT_Cardinal watchdog = m_Config.m_MaxRedirects+1;
     bool         keep_going;
     NPT_Result   result;
 
@@ -1518,7 +1811,7 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
         keep_going = false;
         result = SendRequestOnce(request, response);
         if (NPT_FAILED(result)) break;
-        if (response && m_Config.m_FollowRedirect &&
+        if (response && m_Config.m_MaxRedirects &&
             (request.GetMethod() == NPT_HTTP_METHOD_GET ||
              request.GetMethod() == NPT_HTTP_METHOD_HEAD) &&
             (response->GetStatusCode() == 301 ||

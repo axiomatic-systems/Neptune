@@ -93,6 +93,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\Source\Core\NptBase64.cpp" />
     <ClCompile Include="..\..\..\..\Source\Core\NptHash.cpp" />
+    <ClCompile Include="..\..\..\..\Source\System\Bsd\NptBsdResolver.cpp" />
     <ClCompile Include="..\..\..\..\Source\System\Bsd\NptBsdSockets.cpp" />
     <ClCompile Include="..\..\..\..\Source\Core\NptBufferedStreams.cpp" />
     <ClCompile Include="..\..\..\..\Source\Core\NptCommon.cpp" />

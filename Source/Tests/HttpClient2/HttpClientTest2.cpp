@@ -103,7 +103,7 @@ main(int argc, char** argv)
         }
         NPT_TimeStamp after;
         NPT_System::GetCurrentTimeStamp(after);
-        float elapsed = (after-before);
+        float elapsed = (float)(after-before);
         printf("[%04d] TOTAL time elapsed = %f\n", i, elapsed);
     }
     

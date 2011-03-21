@@ -77,7 +77,10 @@ NPT_SimpleMessageQueue::QueueMessage(NPT_Message*        message,
                                      NPT_MessageHandler* handler)
 {
     // push the message on the queue, with the handler reference
-    return m_Queue.Push(new NPT_SimpleMessageCapsule(message, handler));
+    NPT_SimpleMessageCapsule* capsule = new NPT_SimpleMessageCapsule(message, handler);
+    NPT_Result result = m_Queue.Push(capsule);
+    if (NPT_FAILED(result)) delete capsule;
+    return result;
 }
 
 /*----------------------------------------------------------------------

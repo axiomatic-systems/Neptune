@@ -1023,18 +1023,39 @@ NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* host
 }
 
 /*----------------------------------------------------------------------
+|   NPT_HttpSimpleTlsConnection
++---------------------------------------------------------------------*/
+class NPT_HttpSimpleTlsConnection : public NPT_HttpClient::Connection
+{
+public:
+    virtual NPT_InputStreamReference&  GetInputStream() {
+        return m_InputStream;
+    }
+    virtual NPT_OutputStreamReference& GetOutputStream() {
+        return m_OutputStream;
+    }
+    
+    // members
+    NPT_InputStreamReference  m_InputStream;
+    NPT_OutputStreamReference m_OutputStream;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::Connect
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&          url,
-                              NPT_HttpClient&             client,
-                              const NPT_HttpProxyAddress* proxy,
-                              NPT_InputStreamReference&   input_stream, 
-                              NPT_OutputStreamReference&  output_stream)
+NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
+                              NPT_HttpClient&              client,
+                              const NPT_HttpProxyAddress*  proxy,
+                              bool                         reuse,
+                              NPT_HttpClient::Connection*& connection)
 {
     // default values
-    input_stream  = NULL;
-    output_stream = NULL;
+    connection = NULL;
+    
+    // local reference holders
+    NPT_InputStreamReference  input_stream;
+    NPT_OutputStreamReference output_stream;
     
     // decide which server we need to connect to
     const char* peer_hostname = (const char*)url.GetHost();
@@ -1051,22 +1072,34 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&          url,
     }
     
     // resolve the server address
-    NPT_IpAddress address;
-    NPT_CHECK_FINE(address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
+    NPT_IpAddress ip_address;
+    NPT_CHECK_FINE(ip_address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
 
+    // check if we can reuse a connection
+    // TODO: with this we don't yet support reusing a connection to a proxy
+    NPT_SocketAddress socket_address(ip_address, server_port);
+    NPT_HttpConnectionManager* connection_manager = NPT_HttpConnectionManager::GetInstance();
+    if (!proxy && reuse) {
+        NPT_LOG_FINE("looking for a connection to reuse");
+        connection = connection_manager->FindConnection(socket_address);
+        if (connection) {
+            NPT_LOG_FINE("reusing connection");
+            return NPT_SUCCESS;
+        }
+    }
+    
     // connect to the server
     NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
-    NPT_TcpClientSocket connection;
-    connection.SetReadTimeout(client.GetConfig().m_IoTimeout);
-    connection.SetWriteTimeout(client.GetConfig().m_IoTimeout);
-    NPT_SocketAddress socket_address(address, server_port);
-    NPT_CHECK_FINE(connection.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
+    NPT_TcpClientSocket tcp_socket;
+    tcp_socket.SetReadTimeout(client.GetConfig().m_IoTimeout);
+    tcp_socket.SetWriteTimeout(client.GetConfig().m_IoTimeout);
+    NPT_CHECK_FINE(tcp_socket.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
 
     // get the streams
     NPT_InputStreamReference  raw_input;
     NPT_OutputStreamReference raw_output;
-    NPT_CHECK_FINE(connection.GetInputStream(raw_input));
-    NPT_CHECK_FINE(connection.GetOutputStream(raw_output));
+    NPT_CHECK_FINE(tcp_socket.GetInputStream(raw_input));
+    NPT_CHECK_FINE(tcp_socket.GetOutputStream(raw_output));
     
     if (url.GetSchemeId() == NPT_Url::SCHEME_ID_HTTPS) {
         if (proxy) {
@@ -1136,6 +1169,12 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&          url,
         input_stream  = raw_input;
         output_stream = raw_output;
     }
+
+    // create a connection object for the streams
+    connection = new NPT_HttpConnectionManager::Connection(*connection_manager,
+                                                           socket_address,
+                                                           input_stream,
+                                                           output_stream);
     
     return NPT_SUCCESS;
 }

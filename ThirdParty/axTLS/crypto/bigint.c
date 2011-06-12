@@ -65,6 +65,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include "os_port.h"
 #include "bigint.h"
 
 #define V1      v->comps[v->size-1]                 /**< v1 for division */
@@ -442,18 +443,18 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
         else
         {
             q_dash = (comp)(((long_comp)U(0)*COMP_RADIX + U(1))/V1);
-        }
 
-        if (v->size > 1 && V2)
-        {
-            /* we are implementing the following:
-            if (V2*q_dash > (((U(0)*COMP_RADIX + U(1) - 
-                    q_dash*V1)*COMP_RADIX) + U(2))) ... */
-            comp inner = (comp)((long_comp)COMP_RADIX*U(0) + U(1) - 
-                                        (long_comp)q_dash*V1);
-            if ((long_comp)V2*q_dash > (long_comp)inner*COMP_RADIX + U(2))
+            if (v->size > 1 && V2)
             {
-                q_dash--;
+                /* we are implementing the following:
+                if (V2*q_dash > (((U(0)*COMP_RADIX + U(1) - 
+                        q_dash*V1)*COMP_RADIX) + U(2))) ... */
+                comp inner = (comp)((long_comp)COMP_RADIX*U(0) + U(1) - 
+                                            (long_comp)q_dash*V1);
+                if ((long_comp)V2*q_dash > (long_comp)inner*COMP_RADIX + U(2))
+                {
+                    q_dash--;
+                }
             }
         }
 
@@ -802,10 +803,15 @@ void bi_free_mod(BI_CTX *ctx, int mod_offset)
 
 /** 
  * Perform a standard multiplication between two bigints.
+ *
+ * Barrett reduction has no need for some parts of the product, so ignore bits
+ * of the multiply. This routine gives Barrett its big performance
+ * improvements over Classical/Montgomery reduction methods. 
  */
-static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
+static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
+        int inner_partial, int outer_partial)
 {
-    int i, j, i_plus_j;
+    int i = 0, j;
     int n = bia->size; 
     int t = bib->size;
     bigint *biR = alloc(ctx, n + t);
@@ -818,23 +824,33 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 
     /* clear things to start with */
     memset(biR->comps, 0, ((n+t)*COMP_BYTE_SIZE));
-    i = 0;
 
     do 
     {
+        long_comp tmp;
         comp carry = 0;
-        comp b = *sb++;
-        i_plus_j = i;
+        int r_index = i;
         j = 0;
+
+        if (outer_partial && outer_partial-i > 0 && outer_partial < n)
+        {
+            r_index = outer_partial-1;
+            j = outer_partial-i-1;
+        }
 
         do
         {
-            long_comp tmp = sr[i_plus_j] + (long_comp)sa[j]*b + carry;
-            sr[i_plus_j++] = (comp)tmp;              /* downsize */
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
+            if (inner_partial && r_index >= inner_partial) 
+            {
+                break;
+            }
+
+            tmp = sr[r_index] + ((long_comp)sa[j])*sb[i] + carry;
+            sr[r_index++] = (comp)tmp;              /* downsize */
+            carry = tmp >> COMP_BIT_SIZE;
         } while (++j < n);
 
-        sr[i_plus_j] = carry;
+        sr[r_index] = carry;
     } while (++i < t);
 
     bi_free(ctx, bia);
@@ -914,12 +930,12 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 #ifdef CONFIG_BIGINT_KARATSUBA
     if (min(bia->size, bib->size) < MUL_KARATSUBA_THRESH)
     {
-        return regular_multiply(ctx, bia, bib);
+        return regular_multiply(ctx, bia, bib, 0, 0);
     }
 
     return karatsuba(ctx, bia, bib, 0);
 #else
-    return regular_multiply(ctx, bia, bib);
+    return regular_multiply(ctx, bia, bib, 0, 0);
 #endif
 }
 
@@ -931,51 +947,46 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
 {
     int t = bi->size;
     int i = 0, j;
-    bigint *biR = alloc(ctx, t*2);
+    bigint *biR = alloc(ctx, t*2+1);
     comp *w = biR->comps;
     comp *x = bi->comps;
-    comp carry;
-
+    long_comp carry;
     memset(w, 0, biR->size*COMP_BYTE_SIZE);
 
     do
     {
         long_comp tmp = w[2*i] + (long_comp)x[i]*x[i];
-        comp u = 0;
         w[2*i] = (comp)tmp;
-        carry = (comp)(tmp >> COMP_BIT_SIZE);
+        carry = tmp >> COMP_BIT_SIZE;
 
         for (j = i+1; j < t; j++)
         {
+            uint8_t c = 0;
             long_comp xx = (long_comp)x[i]*x[j];
-            long_comp xx2 = 2*xx;
-            long_comp blob = (long_comp)w[i+j]+carry;
+            if ((COMP_MAX-xx) < xx)
+                c = 1;
 
-            if (u)                  /* previous overflow */
-            {
-                blob += COMP_RADIX;
-            }
+            tmp = (xx<<1);
 
+            if ((COMP_MAX-tmp) < w[i+j])
+                c = 1;
 
-            u = 0;
-            tmp = xx2 + blob;
+            tmp += w[i+j];
 
-            /* check for overflow */
-            if ((COMP_MAX-xx) < xx  || (COMP_MAX-xx2) < blob)
-            {
-                u = 1;
-            }
+            if ((COMP_MAX-tmp) < carry)
+                c = 1;
 
+            tmp += carry;
             w[i+j] = (comp)tmp;
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
+            carry = tmp >> COMP_BIT_SIZE;
+
+            if (c)
+                carry += COMP_RADIX;
         }
 
-        w[i+t] += carry;
-
-        if (u)
-        {
-            w[i+t+1] = 1;   /* add carry */
-        }
+        tmp = w[i+t] + carry;
+        w[i+t] = (comp)tmp;
+        w[i+t+1] = tmp >> COMP_BIT_SIZE;
     } while (++i < t);
 
     bi_free(ctx, bi);
@@ -1247,81 +1258,6 @@ static bigint *comp_mod(bigint *bi, int mod)
     return bi;
 }
 
-/*
- * Barrett reduction has no need for some parts of the product, so ignore bits
- * of the multiply. This routine gives Barrett its big performance
- * improvements over Classical/Montgomery reduction methods. 
- */
-static bigint *partial_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
-        int inner_partial, int outer_partial)
-{
-    int i = 0, j, n = bia->size, t = bib->size;
-    bigint *biR;
-    comp carry;
-    comp *sr, *sa, *sb;
-
-    check(bia);
-    check(bib);
-
-    biR = alloc(ctx, n + t);
-    sa = bia->comps;
-    sb = bib->comps;
-    sr = biR->comps;
-
-    if (inner_partial)
-    {
-        memset(sr, 0, inner_partial*COMP_BYTE_SIZE); 
-    }
-    else    /* outer partial */
-    {
-        if (n < outer_partial || t < outer_partial) /* should we bother? */
-        {
-            bi_free(ctx, bia);
-            bi_free(ctx, bib);
-            biR->comps[0] = 0;      /* return 0 */
-            biR->size = 1;
-            return biR;
-        }
-
-        memset(&sr[outer_partial], 0, (n+t-outer_partial)*COMP_BYTE_SIZE);
-    }
-
-    do 
-    {
-        comp *a = sa;
-        comp b = *sb++;
-        long_comp tmp;
-        int i_plus_j = i;
-        carry = 0;
-        j = n;
-
-        if (outer_partial && i_plus_j < outer_partial)
-        {
-            i_plus_j = outer_partial;
-            a = &sa[outer_partial-i];
-            j = n-(outer_partial-i);
-        }
-
-        do
-        {
-            if (inner_partial && i_plus_j >= inner_partial) 
-            {
-                break;
-            }
-
-            tmp = sr[i_plus_j] + ((long_comp)*a++)*b + carry;
-            sr[i_plus_j++] = (comp)tmp;              /* downsize */
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
-        } while (--j != 0);
-
-        sr[i_plus_j] = carry;
-    } while (++i < t);
-
-    bi_free(ctx, bia);
-    bi_free(ctx, bib);
-    return trim(biR);
-}
-
 /**
  * @brief Perform a single Barrett reduction.
  * @param ctx [in]  The bigint session context.
@@ -1347,12 +1283,12 @@ bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
     q1 = comp_right_shift(bi_clone(ctx, bi), k-1);
 
     /* do outer partial multiply */
-    q2 = partial_multiply(ctx, q1, ctx->bi_mu[mod_offset], 0, k-1); 
+    q2 = regular_multiply(ctx, q1, ctx->bi_mu[mod_offset], 0, k-1); 
     q3 = comp_right_shift(q2, k+1);
     r1 = comp_mod(bi, k+1);
 
     /* do inner partial multiply */
-    r2 = comp_mod(partial_multiply(ctx, q3, bim, k+1, 0), k+1);
+    r2 = comp_mod(regular_multiply(ctx, q3, bim, k+1, 0), k+1);
     r = bi_subtract(ctx, r1, r2, NULL);
 
     /* if (r >= m) r = r - m; */

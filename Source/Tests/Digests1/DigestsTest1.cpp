@@ -49,8 +49,9 @@
 static int
 TestDigests()
 {
-    NPT_Digest* sha1 = NULL;
-    NPT_Digest* md5 = NULL;
+    NPT_Digest* sha1   = NULL;
+    NPT_Digest* sha256 = NULL;
+    NPT_Digest* md5    = NULL;
     NPT_Result result;
     
     result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA1, sha1);
@@ -61,6 +62,7 @@ TestDigests()
     NPT_DataBuffer digest;
     result = sha1->GetDigest(digest);
     SHOULD_SUCCEED(result);
+    SHOULD_EQUAL(sha1->GetSize(), 20);
     SHOULD_EQUAL(digest.GetDataSize(), 20);
     NPT_UInt8 digest1[] = {0xaa, 0xf4, 0xc6, 0x1d, 0xdc, 0xc5, 0xe8, 0xa2, 0xda, 0xbe, 0xde, 0x0f, 0x3b, 0x48, 0x2c, 0xd9, 0xae, 0xa9, 0x43, 0x4d};
     SHOULD_EQUAL_MEM(digest.GetData(), digest1, 20);
@@ -91,6 +93,45 @@ TestDigests()
     NPT_UInt8 digest3[] = {0xf5, 0x2e, 0x3c, 0x27, 0x32, 0xde, 0x7b, 0xea, 0x28, 0xf2, 0x16, 0xd8, 0x77, 0xd7, 0x8d, 0xae, 0x1a, 0xa1, 0xac, 0x6a};
     SHOULD_EQUAL_MEM(digest.GetData(), digest3, 20);
     delete sha1;
+
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA256, sha256);
+    SHOULD_SUCCEED(result);
+    data = "hello";
+    result = sha256->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
+    SHOULD_SUCCEED(result);
+    result = sha256->GetDigest(digest);
+    SHOULD_SUCCEED(result);
+    SHOULD_EQUAL(sha256->GetSize(), 32);
+    SHOULD_EQUAL(digest.GetDataSize(), 32);
+    NPT_UInt8 digest4[] = {0x2c, 0xf2, 0x4d, 0xba, 0x5f, 0xb0, 0xa3, 0x0e, 0x26, 0xe8, 0x3b, 0x2a, 0xc5, 0xb9, 0xe2, 0x9e, 0x1b, 0x16, 0x1e, 0x5c, 0x1f, 0xa7, 0x42, 0x5e, 0x73, 0x04, 0x33, 0x62, 0x93, 0x8b, 0x98, 0x24};
+    SHOULD_EQUAL_MEM(digest.GetData(), digest4, 32);
+    delete sha256;
+    
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA256, sha256);
+    SHOULD_SUCCEED(result);
+    data = "Hello, this is a test for the Neptune digest functionality. Blablabla. Bliblibli";
+    result = sha256->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
+    SHOULD_SUCCEED(result);
+    result = sha256->GetDigest(digest);
+    SHOULD_SUCCEED(result);
+    SHOULD_EQUAL(digest.GetDataSize(), 32);
+    NPT_UInt8 digest5[] = {0xed, 0x9a, 0xee, 0xd7, 0x7e, 0x07, 0x1d, 0x3d, 0x24, 0x99, 0xc9, 0x11, 0xf5, 0x56, 0x89, 0x5a, 0x90, 0x22, 0x99, 0x59, 0xee, 0x51, 0x83, 0x4b, 0x17, 0x8b, 0xa1, 0x7e, 0x4b, 0x50, 0x32, 0x7e};
+    SHOULD_EQUAL_MEM(digest.GetData(), digest5, 32);
+    delete sha256;
+    
+    result = NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA256, sha256);
+    SHOULD_SUCCEED(result);
+    data = "0123456789";
+    for (unsigned int a=0; a<6; a++) {
+        result = sha256->Update((const NPT_UInt8*)data.GetChars(), data.GetLength());
+        SHOULD_SUCCEED(result);
+    }
+    result = sha256->GetDigest(digest);
+    SHOULD_SUCCEED(result);
+    SHOULD_EQUAL(digest.GetDataSize(), 32);
+    NPT_UInt8 digest6[] = {0x5e, 0x43, 0xc8, 0x70, 0x4a, 0xc8, 0x1f, 0x33, 0xd7, 0x01, 0xc1, 0xac, 0xe0, 0x46, 0xba, 0x9f, 0x25, 0x70, 0x62, 0xb4, 0xd1, 0x7e, 0x78, 0xf3, 0x25, 0x4c, 0xbf, 0x24, 0x31, 0x77, 0xe4, 0xf2};
+    SHOULD_EQUAL_MEM(digest.GetData(), digest6, 32);
+    delete sha256;
     
     result = NPT_Digest::Create(NPT_Digest::ALGORITHM_MD5, md5);
     SHOULD_SUCCEED(result);

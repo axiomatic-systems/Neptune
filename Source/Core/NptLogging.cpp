@@ -245,9 +245,9 @@ int
 NPT_Log::GetLogLevel(const char* name)
 {
     if (       NPT_StringsEqual(name, "FATAL")) {
-        return NPT_LOG_LEVEL_SEVERE;
+        return NPT_LOG_LEVEL_FATAL;
     } else if (NPT_StringsEqual(name, "SEVERE")) {
-        return NPT_LOG_LEVEL_WARNING;
+        return NPT_LOG_LEVEL_SEVERE;
     } else if (NPT_StringsEqual(name, "WARNING")) {
         return NPT_LOG_LEVEL_WARNING;
     } else if (NPT_StringsEqual(name, "INFO")) {
@@ -851,9 +851,6 @@ NPT_Logger::Log(int          level,
     /* check the log level (in case filtering has not already been done) */
     if (level < m_Level) return;
 
-    // we need to disable the log manager while someone is logging
-    NPT_LogManagerAutoDisabler autodisabler;
-    
     /* format the message */
     char     buffer[NPT_LOG_STACK_BUFFER_MAX_SIZE];
     NPT_Size buffer_size = sizeof(buffer);
@@ -893,6 +890,7 @@ NPT_Logger::Log(int          level,
 
     /* call all handlers for this logger and parents */
     m_Manager.Lock();
+    m_Manager.SetEnabled(false); // prevent recursion
     while (logger) {
         /* call all handlers for the current logger */
         for (NPT_List<NPT_LogHandler*>::Iterator i = logger->m_Handlers.GetFirstItem();
@@ -909,6 +907,7 @@ NPT_Logger::Log(int          level,
             break;
         }
     }
+    m_Manager.SetEnabled(true);
     m_Manager.Unlock();
 
     /* free anything we may have allocated */

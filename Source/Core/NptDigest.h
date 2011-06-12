@@ -46,6 +46,7 @@ public:
     // types
     typedef enum {
         ALGORITHM_SHA1,
+        ALGORITHM_SHA256,
         ALGORITHM_MD5
     } Algorithm;
     
@@ -53,9 +54,10 @@ public:
     static NPT_Result Create(Algorithm algorithm, NPT_Digest*& digest);
     
     // methods
-    virtual           ~NPT_Digest() {}
-    virtual NPT_Result Update(const NPT_UInt8* data, NPT_Size data_size) = 0;
-    virtual NPT_Result GetDigest(NPT_DataBuffer& digest) = 0;
+    virtual             ~NPT_Digest() {}
+    virtual unsigned int GetSize() = 0;
+    virtual NPT_Result   Update(const NPT_UInt8* data, NPT_Size data_size) = 0;
+    virtual NPT_Result   GetDigest(NPT_DataBuffer& digest) = 0;
 
 protected:
     NPT_Digest() {} // don't instantiate directly

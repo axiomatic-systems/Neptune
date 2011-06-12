@@ -42,9 +42,12 @@ extern "C" {
 
 #include "version.h"
 #include "crypto.h"
-#include "os_port.h"
 #include "crypto_misc.h"
 
+#define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */
+#define SSL_PROTOCOL_MINOR_VERSION  0x02   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION_MAX    0x32   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION1_1     0x32   /* TLS v1.1 */
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48
 #define SSL_FINISHED_HASH_SIZE      12
@@ -62,6 +65,7 @@ extern "C" {
 #define SSL_SESSION_RESUME          0x0008
 #define SSL_IS_CLIENT               0x0010
 #define SSL_HAS_CERT_REQ            0x0020
+#define SSL_SENT_CLOSE_NOTIFY       0x0040
 
 /* some macros to muck around with flag bits */
 #define SET_SSL_FLAG(A)             (ssl->flag |= A)
@@ -163,6 +167,8 @@ struct _SSL
     uint8_t record_type;
     uint8_t cipher;
     uint8_t sess_id_size;
+    uint8_t version;
+    uint8_t client_version;
     int16_t next_state;
     int16_t hs_status;
     DISPOSABLE_CTX *dc;         /* temporary data which we'll get rid of soon */
@@ -233,7 +239,7 @@ int send_packet(SSL *ssl, uint8_t protocol,
         const uint8_t *in, int length);
 int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);
 int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);
-int process_finished(SSL *ssl, int hs_len);
+int process_finished(SSL *ssl, uint8_t *buf, int hs_len);
 int process_sslv23_client_hello(SSL *ssl);
 int send_alert(SSL *ssl, int error_code);
 int send_finished(SSL *ssl);

@@ -40,6 +40,7 @@
 #include "NptUtils.h"
 #include "NptSockets.h"
 #include "NptSystem.h"
+#include "NptDigest.h"
 
 #include "ssl.h"
 
@@ -144,6 +145,22 @@ void
 SSL_Mutex_Unlock(NPT_Mutex* mutex)
 {
     mutex->Unlock();
+}
+
+/*----------------------------------------------------------------------
+|   SSL_Sha256_ComputeDigest
++---------------------------------------------------------------------*/
+void
+SSL_Sha256_ComputeDigest(const unsigned char* data, 
+                         unsigned int         data_size,
+                         unsigned char*       digest_value)
+{
+    NPT_Digest* digest = NULL;
+    NPT_Digest::Create(NPT_Digest::ALGORITHM_SHA256, digest);
+    digest->Update(data, data_size);
+    NPT_DataBuffer buffer;
+    digest->GetDigest(buffer);
+    NPT_CopyMemory(digest_value, buffer.GetData(), 32);
 }
 
 /*----------------------------------------------------------------------

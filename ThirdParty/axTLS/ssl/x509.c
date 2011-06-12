@@ -113,7 +113,9 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             asn1_validity(cert, &offset, x509_ctx) ||
             asn1_name(cert, &offset, x509_ctx->cert_dn) ||
             asn1_public_key(cert, &offset, x509_ctx))
+    {
         goto end_cert;
+    }
 
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
 
@@ -136,6 +138,12 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
         SHA1_Update(&sha_ctx, &cert[begin_tbs], end_tbs-begin_tbs);
         SHA1_Final(sha_dgst, &sha_ctx);
         x509_ctx->digest = bi_import(bi_ctx, sha_dgst, SHA1_SIZE);
+    }
+    else if (x509_ctx->sig_type == SIG_TYPE_SHA256)
+    {
+        uint8_t sha_dgst[SHA256_SIZE];
+        SSL_Sha256_ComputeDigest(&cert[begin_tbs], end_tbs-begin_tbs, sha_dgst);
+        x509_ctx->digest = bi_import(bi_ctx, sha_dgst, SHA256_SIZE);
     }
     else if (x509_ctx->sig_type == SIG_TYPE_MD2)
     {
@@ -198,36 +206,22 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             asn1_signature(cert, &offset, x509_ctx))
         goto end_cert;
 #endif
-
-    /* GBG: compute the fingerprints */
-    {
-        MD5_CTX md5_ctx;
-        MD5_Init(&md5_ctx);
-        MD5_Update(&md5_ctx, cert, cert_size);
-        MD5_Final(x509_ctx->fingerprint.md5, &md5_ctx);
-    }
-    {
-        SHA1_CTX sha1_ctx;
-        SHA1_Init(&sha1_ctx);
-        SHA1_Update(&sha1_ctx, cert, cert_size);
-        SHA1_Final(x509_ctx->fingerprint.sha1, &sha1_ctx);
-    }
-    /* /GBG: compute the fingerprints */
-    
+    ret = X509_OK;
+end_cert:
     if (len)
     {
         *len = cert_size;
     }
 
-    ret = X509_OK;
-end_cert:
-
-#ifdef CONFIG_SSL_FULL_MODE
     if (ret)
     {
-        printf("Error: Invalid X509 ASN.1 file\n");
-    }
+#ifdef CONFIG_SSL_FULL_MODE
+        printf("Error: Invalid X509 ASN.1 file (%s)\n",
+                        x509_display_error(ret));
 #endif
+        x509_free(x509_ctx);
+        *ctx = NULL;
+    }
 
     return ret;
 }

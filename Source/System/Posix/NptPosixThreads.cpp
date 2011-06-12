@@ -545,7 +545,6 @@ NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
         if (timeout != NPT_TIMEOUT_INFINITE) {
             result = m_Done.WaitUntilEquals(1, timeout);
             if (NPT_FAILED(result)) {
-                result = -1;
                 goto timedout;
             }
         }

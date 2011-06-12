@@ -40,7 +40,6 @@ extern "C" {
 #endif
 
 #include "config.h"
-#include "os_port.h"
 #include "bigint_impl.h"
 #include "bigint.h"
 
@@ -92,6 +91,11 @@ typedef struct
 
 void RC4_setup(RC4_CTX *s, const uint8_t *key, int length);
 void RC4_crypt(RC4_CTX *s, const uint8_t *msg, uint8_t *data, int length);
+
+/**************************************************************************
+ * SHA256 declarations 
+ **************************************************************************/
+#define SHA256_SIZE   32
 
 /**************************************************************************
  * SHA1 declarations 

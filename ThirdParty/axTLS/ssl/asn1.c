@@ -52,7 +52,7 @@ static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] =
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01
 };
 
-static const uint8_t sig_iis6_oid[SIG_IIS6_OID_SIZE] =
+static const uint8_t sig_sha1WithRSAEncrypt[SIG_IIS6_OID_SIZE] =
 {
     0x2b, 0x0e, 0x03, 0x02, 0x1d
 };
@@ -544,18 +544,17 @@ end_sig:
  */
 static int asn1_compare_dn_comp(const char *dn1, const char *dn2)
 {
-    int ret = 1;
+    int ret;
 
-    if ((dn1 && dn2 == NULL) || (dn1 == NULL && dn2)) goto err_no_match;
+    if (dn1 == NULL && dn2 == NULL)
+        ret = 0;
+    else
+        ret = (dn1 && dn2) ? strcmp(dn1, dn2) : -1;
 
-    ret = (dn1 && dn2) ? strcmp(dn1, dn2) : 0;
-
-err_no_match:
     return ret;
 }
 
-
-#if 0 /* GBG: removed */
+#if 0 /* GBG */
 /**
  * Clean up all of the CA certificates.
  */
@@ -654,7 +653,7 @@ int asn1_signature_type(const uint8_t *cert,
 
     len = get_asn1_length(cert, offset);
 
-    if (len == 5 && memcmp(sig_iis6_oid, &cert[*offset], 
+    if (len == 5 && memcmp(sig_sha1WithRSAEncrypt, &cert[*offset], 
                                     SIG_IIS6_OID_SIZE) == 0)
     {
         x509_ctx->sig_type = SIG_TYPE_SHA1;

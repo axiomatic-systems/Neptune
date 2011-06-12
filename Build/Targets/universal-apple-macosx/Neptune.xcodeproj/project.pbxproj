@@ -173,6 +173,7 @@
 		CAA97A1D0CF1659200C01909 /* StringsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979ED0CF1648300C01909 /* StringsTest1.cpp */; };
 		CAAAA08212FF825800ABC84B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAAAA08512FF828A00ABC84B /* NetResolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAAAA07612FF823200ABC84B /* NetResolve.cpp */; };
+		CAC029DE139D84D10034427F /* LoggingTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC029DD139D84D10034427F /* LoggingTest2.cpp */; };
 		CAC5048312FFB7EF00FEB1D8 /* NptBsdResolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */; };
 		CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */ = {isa = PBXBuildFile; fileRef = CAD78DD212A99DC500D7EBA7 /* NptHash.h */; };
 		CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */; };
@@ -950,6 +951,7 @@
 		CAA97A1B0CF1654A00C01909 /* StringsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = StringsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAAAA07612FF823200ABC84B /* NetResolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetResolve.cpp; sourceTree = "<group>"; };
 		CAAAA07C12FF824E00ABC84B /* NetResolve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetResolve; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAC029DD139D84D10034427F /* LoggingTest2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoggingTest2.cpp; sourceTree = "<group>"; };
 		CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptBsdResolver.cpp; sourceTree = "<group>"; };
 		CAD78DD212A99DC500D7EBA7 /* NptHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptHash.h; sourceTree = "<group>"; };
 		CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptHash.cpp; sourceTree = "<group>"; };
@@ -1596,6 +1598,7 @@
 				CAA979DC0CF1648300C01909 /* HttpServer1 */,
 				CAA979DE0CF1648300C01909 /* Lists1 */,
 				CAA979E00CF1648300C01909 /* Logging1 */,
+				CAC029DC139D84D10034427F /* Logging2 */,
 				CAA979E20CF1648300C01909 /* Maps1 */,
 				CAA979E40CF1648300C01909 /* Messages1 */,
 				CAA979E60CF1648300C01909 /* Messages2 */,
@@ -1761,6 +1764,14 @@
 				CAAAA07612FF823200ABC84B /* NetResolve.cpp */,
 			);
 			path = NetResolve;
+			sourceTree = "<group>";
+		};
+		CAC029DC139D84D10034427F /* Logging2 */ = {
+			isa = PBXGroup;
+			children = (
+				CAC029DD139D84D10034427F /* LoggingTest2.cpp */,
+			);
+			path = Logging2;
 			sourceTree = "<group>";
 		};
 		CAE417A50E0DC16300A530D1 /* Apps */ = {
@@ -2869,6 +2880,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAC029DE139D84D10034427F /* LoggingTest2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4751,7 +4763,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -4798,7 +4809,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = NO;
-				SDKROOT = macosx10.5;
 				VALID_ARCHS = "i386 ppc x86_64 armv6 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",

@@ -94,4 +94,6 @@ void SSL_Mutex_Unlock(SSL_CTX_MUTEX_TYPE mutex);
 #define SOCKET_READ(s,b,z) (s)->Read((s), (b), (z))
 #define SOCKET_WRITE(s,b,z) (s)->Write((s), (b), (z))
 
+void SSL_Sha256_ComputeDigest(const unsigned char* buffer, unsigned int buffer_length, unsigned char* digest);
+
 #endif /* _OS_PORT_H_ */

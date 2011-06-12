@@ -33,6 +33,7 @@
 #ifdef CONFIG_SSL_GENERATE_X509_CERT
 #include <string.h>
 #include <stdlib.h>
+#include "os_port.h"
 #include "ssl.h"
 
 /**
@@ -342,7 +343,6 @@ error:
 EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const char * dn[], uint8_t **cert_data)
 {
     int ret = X509_OK, offset = 0, seq_offset;
-
     /* allocate enough space to load a new certificate */
     uint8_t *buf = (uint8_t *)alloca(ssl_ctx->rsa_ctx->num_octets*2 + 512);
     uint8_t sha_dgst[SHA1_SIZE];

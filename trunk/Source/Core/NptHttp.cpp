@@ -1324,7 +1324,7 @@ NPT_HttpConnectionManager::GetInstance()
     return Instance;
 }
 NPT_HttpConnectionManager* NPT_HttpConnectionManager::Instance = NULL;
-NPT_HttpConnectionManager::Cleaner NPT_HttpConnectionManager::Cleaner::AutomaticCleaner;
+//NPT_HttpConnectionManager::Cleaner NPT_HttpConnectionManager::Cleaner::AutomaticCleaner;
 
 /*----------------------------------------------------------------------
 |   NPT_HttpConnectionManager::Cleanup
@@ -1334,11 +1334,11 @@ NPT_HttpConnectionManager::Cleanup()
 {
     NPT_TimeStamp now;
     NPT_System::GetCurrentTimeStamp(now);
-    NPT_TimeStamp time_limit = now + NPT_TimeStamp((float)m_MaxConnectionAge);
+    NPT_TimeStamp delta((float)m_MaxConnectionAge);
     
     NPT_List<Connection*>::Iterator tail = m_Connections.GetLastItem();
     while (tail) {
-        if ((*tail)->m_TimeStamp < time_limit) break;
+        if (now < (*tail)->m_TimeStamp + delta) break;
         NPT_LOG_FINE_1("cleaning up connection (%d remain)", m_Connections.GetItemCount());
         m_Connections.Erase(tail);
         delete *tail;
@@ -1691,6 +1691,12 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
             if (NPT_FAILED(result)) {
                 NPT_LOG_FINE_1("failed to write request body (%d)", result);
                 if (reconnect) {
+                    // go back to the start of the body so that we can resend
+                    NPT_LOG_FINE("rewinding body stream in order to resend");
+                    result = body_stream->Seek(0);
+                    if (NPT_FAILED(result)) {
+                        return NPT_ERROR_HTTP_CANNOT_RESEND_BODY;
+                    }
                     continue;
                 } else {
                     return result;
@@ -1705,24 +1711,33 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         buffered_input_stream = new NPT_BufferedInputStream(input_stream);
 
         // parse the response
-        result = (NPT_HttpResponse::Parse(*buffered_input_stream, response));
-        if (NPT_FAILED(result)) {
-            NPT_LOG_FINE_1("failed to parse the response (%d)", result);
-            if (reconnect &&
-                (result == NPT_ERROR_EOS                || 
-                 result == NPT_ERROR_CONNECTION_ABORTED ||
-                 result == NPT_ERROR_CONNECTION_RESET   ||
-                 result == NPT_ERROR_READ_FAILED)) {
-                NPT_LOG_FINE("error is not fatal, retrying");
-                continue;
-            } else {
-                // don't retry
-                return result;
+        for (unsigned int watchcat = 0; watchcat < NPT_HTTP_MAX_100_RESPONSES; watchcat++) {
+            result = (NPT_HttpResponse::Parse(*buffered_input_stream, response));
+            if (NPT_FAILED(result)) {
+                NPT_LOG_FINE_1("failed to parse the response (%d)", result);
+                if (reconnect &&
+                    (result == NPT_ERROR_EOS                || 
+                     result == NPT_ERROR_CONNECTION_ABORTED ||
+                     result == NPT_ERROR_CONNECTION_RESET   ||
+                     result == NPT_ERROR_READ_FAILED)) {
+                    NPT_LOG_FINE("error is not fatal, retrying");
+                    continue;
+                } else {
+                    // don't retry
+                    return result;
+                }
             }
+            if (response->GetStatusCode() >= 100 && response->GetStatusCode() < 200) {
+                NPT_LOG_FINE_1("got %d response, continuing", response->GetStatusCode());
+                delete response;
+                response = NULL;
+                continue;
+            }
+            NPT_LOG_FINE_2("got response, code=%d, msg=%s",
+                           response->GetStatusCode(),
+                           response->GetReasonPhrase().GetChars());
+            break;
         }
-        NPT_LOG_FINE_2("got response, code=%d, msg=%s",
-                       response->GetStatusCode(),
-                       response->GetReasonPhrase().GetChars());
         break;
     } while (reconnect && --watchdog);
     
@@ -2801,8 +2816,10 @@ NPT_HttpFileRequestHandler::SetupResponse(NPT_HttpRequest&              request,
                     }
                 }
             }
+            if (range_end >= file_size) range_end = file_size-1;
+            
             NPT_LOG_FINE_2("final range: start=%lld, end=%lld", range_start, range_end);
-            if (range_start > range_end || range_end >= file_size) {
+            if (range_start > range_end) {
                 NPT_LOG_FINE("out of range");
                 satisfied = false;
             } else {

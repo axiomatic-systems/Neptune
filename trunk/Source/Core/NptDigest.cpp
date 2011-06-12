@@ -50,6 +50,8 @@
 +---------------------------------------------------------------------*/
 #define NPT_Digest_ROL(x, y) \
 ( (((NPT_UInt32)(x) << (y)) | (((NPT_UInt32)(x) & 0xFFFFFFFFUL) >> (32 - (y)))) & 0xFFFFFFFFUL)
+#define NPT_Digest_ROR(x, y) \
+( ((((NPT_UInt32)(x)&0xFFFFFFFFUL)>>(NPT_UInt32)((y)&31)) | ((NPT_UInt32)(x)<<(NPT_UInt32)(32-((y)&31)))) & 0xFFFFFFFFUL)
 
 #define NPT_Sha1_F0(x,y,z)  (z ^ (x & (y ^ z)))
 #define NPT_Sha1_F1(x,y,z)  (x ^ y ^ z)
@@ -60,6 +62,16 @@
 #define NPT_Sha1_FF1(a,b,c,d,e,i) e = (NPT_Digest_ROL(a, 5) + NPT_Sha1_F1(b,c,d) + e + W[i] + 0x6ed9eba1UL); b = NPT_Digest_ROL(b, 30);
 #define NPT_Sha1_FF2(a,b,c,d,e,i) e = (NPT_Digest_ROL(a, 5) + NPT_Sha1_F2(b,c,d) + e + W[i] + 0x8f1bbcdcUL); b = NPT_Digest_ROL(b, 30);
 #define NPT_Sha1_FF3(a,b,c,d,e,i) e = (NPT_Digest_ROL(a, 5) + NPT_Sha1_F3(b,c,d) + e + W[i] + 0xca62c1d6UL); b = NPT_Digest_ROL(b, 30);
+
+#define NPT_Sha256_Ch(x,y,z)       (z ^ (x & (y ^ z)))
+#define NPT_Sha256_Maj(x,y,z)      (((x | y) & z) | (x & y)) 
+#define NPT_Sha256_S(x, n)         NPT_Digest_ROR((x),(n))
+#define NPT_Sha256_R(x, n)         (((x)&0xFFFFFFFFUL)>>(n))
+#define NPT_Sha256_Sigma0(x)       (NPT_Sha256_S(x,  2) ^ NPT_Sha256_S(x, 13) ^ NPT_Sha256_S(x, 22))
+#define NPT_Sha256_Sigma1(x)       (NPT_Sha256_S(x,  6) ^ NPT_Sha256_S(x, 11) ^ NPT_Sha256_S(x, 25))
+#define NPT_Sha256_Gamma0(x)       (NPT_Sha256_S(x,  7) ^ NPT_Sha256_S(x, 18) ^ NPT_Sha256_R(x,  3))
+#define NPT_Sha256_Gamma1(x)       (NPT_Sha256_S(x, 17) ^ NPT_Sha256_S(x, 19) ^ NPT_Sha256_R(x, 10))
+
 
 #define NPT_Md5_F(x,y,z)  (z ^ (x & (y ^ z)))
 #define NPT_Md5_G(x,y,z)  (y ^ (z & (y ^ x)))
@@ -209,7 +221,8 @@ public:
     NPT_Sha1Digest();
 
     // NPT_Digest methods
-    virtual NPT_Result GetDigest(NPT_DataBuffer& digest);
+    virtual NPT_Result   GetDigest(NPT_DataBuffer& digest);
+    virtual unsigned int GetSize() { return 20; }
     
 private:
     // methods
@@ -292,6 +305,114 @@ NPT_Sha1Digest::GetDigest(NPT_DataBuffer& digest)
 }
 
 /*----------------------------------------------------------------------
+|   constants
++---------------------------------------------------------------------*/
+static const NPT_UInt32 NPT_Sha256_K[64] = {
+    0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL, 0x3956c25bUL,
+    0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL, 0xd807aa98UL, 0x12835b01UL,
+    0x243185beUL, 0x550c7dc3UL, 0x72be5d74UL, 0x80deb1feUL, 0x9bdc06a7UL,
+    0xc19bf174UL, 0xe49b69c1UL, 0xefbe4786UL, 0x0fc19dc6UL, 0x240ca1ccUL,
+    0x2de92c6fUL, 0x4a7484aaUL, 0x5cb0a9dcUL, 0x76f988daUL, 0x983e5152UL,
+    0xa831c66dUL, 0xb00327c8UL, 0xbf597fc7UL, 0xc6e00bf3UL, 0xd5a79147UL,
+    0x06ca6351UL, 0x14292967UL, 0x27b70a85UL, 0x2e1b2138UL, 0x4d2c6dfcUL,
+    0x53380d13UL, 0x650a7354UL, 0x766a0abbUL, 0x81c2c92eUL, 0x92722c85UL,
+    0xa2bfe8a1UL, 0xa81a664bUL, 0xc24b8b70UL, 0xc76c51a3UL, 0xd192e819UL,
+    0xd6990624UL, 0xf40e3585UL, 0x106aa070UL, 0x19a4c116UL, 0x1e376c08UL,
+    0x2748774cUL, 0x34b0bcb5UL, 0x391c0cb3UL, 0x4ed8aa4aUL, 0x5b9cca4fUL,
+    0x682e6ff3UL, 0x748f82eeUL, 0x78a5636fUL, 0x84c87814UL, 0x8cc70208UL,
+    0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL
+};
+
+/*----------------------------------------------------------------------
+|   NPT_Sha256Digest
++---------------------------------------------------------------------*/
+class NPT_Sha256Digest : public NPT_BasicDigest
+{
+public:
+    NPT_Sha256Digest();
+
+    // NPT_Digest methods
+    virtual NPT_Result   GetDigest(NPT_DataBuffer& digest);
+    virtual unsigned int GetSize() { return 32; }
+
+private:
+    // methods
+    virtual void CompressBlock(const NPT_UInt8* block);
+    
+    // members
+    NPT_UInt32 m_State[8];
+};
+
+/*----------------------------------------------------------------------
+|   NPT_Sha256Digest::NPT_Sha256Digest
++---------------------------------------------------------------------*/
+NPT_Sha256Digest::NPT_Sha256Digest()
+{
+    m_State[0] = 0x6A09E667UL;
+    m_State[1] = 0xBB67AE85UL;
+    m_State[2] = 0x3C6EF372UL;
+    m_State[3] = 0xA54FF53AUL;
+    m_State[4] = 0x510E527FUL;
+    m_State[5] = 0x9B05688CUL;
+    m_State[6] = 0x1F83D9ABUL;
+    m_State[7] = 0x5BE0CD19UL;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Sha256Digest::CompressBlock
++---------------------------------------------------------------------*/
+void
+NPT_Sha256Digest::CompressBlock(const NPT_UInt8* block)
+{
+    NPT_UInt32 S[8], W[64];
+    
+    // copy the state into the local workspace
+    for (unsigned int i = 0; i < 8; i++) {
+        S[i] = m_State[i];
+    }
+    
+    // copy the 512-bit block into W[0..15]
+    for (unsigned int i = 0; i < 16; i++) {
+        W[i] = NPT_BytesToInt32Be(&block[4*i]);
+    }
+    
+    // fill W[16..63]
+    for (unsigned int i = 16; i < 64; i++) {
+        W[i] = NPT_Sha256_Gamma1(W[i - 2]) + W[i - 7] + NPT_Sha256_Gamma0(W[i - 15]) + W[i - 16];
+    }        
+    
+    // compress
+     for (unsigned int i = 0; i < 64; ++i) {
+         NPT_UInt32 t0 = 
+            S[7] + 
+            NPT_Sha256_Sigma1(S[4]) + 
+            NPT_Sha256_Ch(S[4], S[5], S[6]) + 
+            NPT_Sha256_K[i] + 
+            W[i];
+         NPT_UInt32 t1 = NPT_Sha256_Sigma0(S[0]) + NPT_Sha256_Maj(S[0], S[1], S[2]);
+         S[3] += t0;
+         S[7]  = t0 + t1;
+
+         NPT_UInt32 t = S[7]; S[7] = S[6]; S[6] = S[5]; S[5] = S[4]; 
+         S[4] = S[3]; S[3] = S[2]; S[2] = S[1]; S[1] = S[0]; S[0] = t;
+     }  
+
+    // store the local variables back into the state
+    for (unsigned i = 0; i < 8; i++) {
+        m_State[i] += S[i];
+    }    
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Sha256Digest::GetDigest
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Sha256Digest::GetDigest(NPT_DataBuffer& digest)
+{
+    return ComputeDigest(m_State, 8, true, digest);
+}
+
+/*----------------------------------------------------------------------
 |   NPT_Md5Digest
 +---------------------------------------------------------------------*/
 class NPT_Md5Digest : public NPT_BasicDigest
@@ -300,7 +421,8 @@ public:
     NPT_Md5Digest();
     
     // NPT_Digest methods
-    virtual NPT_Result GetDigest(NPT_DataBuffer& digest);
+    virtual NPT_Result   GetDigest(NPT_DataBuffer& digest);
+    virtual unsigned int GetSize() { return 16; }
     
 protected:
     // methods
@@ -452,6 +574,7 @@ public:
         return m_InnerDigest->Update(data, data_size);
     }
     virtual NPT_Result GetDigest(NPT_DataBuffer& buffer);
+    virtual unsigned int GetSize() { return m_InnerDigest->GetSize(); }
     
 private:
     NPT_Digest* m_InnerDigest;
@@ -536,8 +659,9 @@ NPT_Result
 NPT_Digest::Create(Algorithm algorithm, NPT_Digest*& digest)
 {
     switch (algorithm) {
-        case ALGORITHM_SHA1: digest = new NPT_Sha1Digest(); return NPT_SUCCESS;
-        case ALGORITHM_MD5:  digest = new NPT_Md5Digest();  return NPT_SUCCESS;
+        case ALGORITHM_SHA1:   digest = new NPT_Sha1Digest();   return NPT_SUCCESS;
+        case ALGORITHM_SHA256: digest = new NPT_Sha256Digest(); return NPT_SUCCESS;
+        case ALGORITHM_MD5:    digest = new NPT_Md5Digest();    return NPT_SUCCESS;
         default: return NPT_ERROR_NOT_SUPPORTED;
     }
 }

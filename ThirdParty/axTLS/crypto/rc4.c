@@ -73,7 +73,7 @@ void RC4_crypt(RC4_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 { 
     int i;
     uint8_t *m, x, y, a, b;
-    (void*)msg; /* GBG: unused */
+    (void)msg; /* GBG: unused */
     
     x = ctx->x;
     y = ctx->y;

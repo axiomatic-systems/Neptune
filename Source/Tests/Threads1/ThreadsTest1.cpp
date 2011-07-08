@@ -457,6 +457,48 @@ Test4()
     NPT_Debug("--- Test4 End ---\n");
 }
 
+/*----------------------------------------------------------------------
+|       TestSharedVariables
++---------------------------------------------------------------------*/
+class SharedVarThread : public NPT_Thread {
+public:
+    SharedVarThread(int target, NPT_SharedVariable& shared) : m_Target(target), m_Shared(shared), m_Result(NPT_FAILURE) {}
+    void Run() {
+        m_Result = m_Shared.WaitUntilEquals(m_Target, 10000);
+    }
+    
+    int                 m_Target;
+    NPT_SharedVariable& m_Shared;
+    NPT_Result          m_Result;
+};
+
+static void
+TestSharedVariables()
+{
+    NPT_SharedVariable shared;
+    SharedVarThread t1(1, shared);
+    SharedVarThread t2(2, shared);
+    SharedVarThread t3(2, shared);
+    
+    t1.Start();
+    t2.Start();
+    t3.Start();
+    NPT_System::Sleep(3.0);
+    shared.SetValue(1);
+    NPT_System::Sleep(2.0);
+    shared.SetValue(2);
+    
+    NPT_Result result = t1.Wait(1000);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(t1.m_Result == NPT_SUCCESS);
+    result = t2.Wait(1000);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(t2.m_Result == NPT_SUCCESS);
+    result = t3.Wait(1000);
+    CHECK(result == NPT_SUCCESS);
+    CHECK(t3.m_Result == NPT_SUCCESS);
+}
+
 #if defined(WIN32) && defined(_DEBUG)
 static int AllocHook( int allocType, void *userData, size_t size, int blockType, 
                      long requestNumber, const unsigned char *filename, int lineNumber)
@@ -488,6 +530,7 @@ main(int argc, char** argv)
     _CrtSetAllocHook(AllocHook);
 #endif
     
+    TestSharedVariables();
     TestPrio();
     Test3(100000, 0.0f, 0.0f);
     Test3(300, 0.1f, 0.0f);

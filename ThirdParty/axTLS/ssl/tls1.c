@@ -1093,14 +1093,12 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
     {
         int mode = IS_SET_SSL_FLAG(SSL_IS_CLIENT) ? 
                             SSL_CLIENT_WRITE : SSL_SERVER_WRITE;
-        uint8_t hmac_header[SSL_RECORD_SIZE] = 
-        {
-            protocol, 
-            0x03, /* version = 3.1 or higher */
-            ssl->version & 0x0f,
-            msg_length >> 8,
-            msg_length & 0xff 
-        };
+        uint8_t hmac_header[SSL_RECORD_SIZE]; /* GBG: modified intializer */
+        hmac_header[0] = protocol;
+        hmac_header[1] = 0x03; /* version = 3.1 or higher */
+        hmac_header[2] = ssl->version & 0x0f;
+        hmac_header[3] = msg_length >> 8;
+        hmac_header[4] = msg_length & 0xff;
 
         if (protocol == PT_HANDSHAKE_PROTOCOL)
         {
@@ -1296,7 +1294,6 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         if (buf[0] & 0x80 && buf[2] == 1)
         {
 #ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE
-            uint8_t version = (buf[3] << 4) + buf[4];
             DISPLAY_BYTES(ssl, "ssl2 record", buf, 5);
             add_packet(ssl, &buf[2], 3);
             ret = process_sslv23_client_hello(ssl); 

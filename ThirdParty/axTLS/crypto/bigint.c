@@ -727,6 +727,7 @@ void bi_export(BI_CTX *ctx, bigint *x, uint8_t *data, int size)
                 break;
             }
         }
+        if (k < 0) break; /* GBG */
     }
 
     bi_free(ctx, x);

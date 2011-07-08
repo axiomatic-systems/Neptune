@@ -42,7 +42,11 @@
 #include "wincrypt.h"
 #endif
 
-#ifndef WIN32
+#if !defined(WIN32)
+#include <sys/time.h>
+#endif
+
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
 static int rng_fd = -1;
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
 static HCRYPTPROV gCryptProv;
@@ -106,6 +110,7 @@ int get_file(const char *filename, uint8_t **buf)
  */
 EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
 {
+    (void)size; /* GBG */
     if (rng_ref_count == 0)
     {
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
@@ -127,7 +132,7 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
         }
 #else   
         int i;  
-        uint32_t seed_addr_val = (uint32_t)&seed_buf;
+        uint32_t seed_addr_val = (uint32_t)(intptr_t)&seed_buf;
         uint32_t *ep = (uint32_t *)entropy_pool;
 
         /* help start the entropy with the user's private key - this is 
@@ -153,7 +158,7 @@ EXP_FUNC void STDCALL RNG_terminate(void)
 {
     if (--rng_ref_count == 0)
     {
-#ifndef WIN32
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
         close(rng_fd);
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
         CryptReleaseContext(gCryptProv, 0);

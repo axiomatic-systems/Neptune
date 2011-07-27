@@ -1340,8 +1340,8 @@ NPT_HttpConnectionManager::Cleanup()
     while (tail) {
         if (now < (*tail)->m_TimeStamp + delta) break;
         NPT_LOG_FINE_1("cleaning up connection (%d remain)", m_Connections.GetItemCount());
-        m_Connections.Erase(tail);
         delete *tail;
+        m_Connections.Erase(tail);
         tail = m_Connections.GetLastItem();
     }
     return NPT_SUCCESS;
@@ -1721,7 +1721,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
                      result == NPT_ERROR_CONNECTION_RESET   ||
                      result == NPT_ERROR_READ_FAILED)) {
                     NPT_LOG_FINE("error is not fatal, retrying");
-                    continue;
+                    break; // we'll try to reconnect, maybe
                 } else {
                     // don't retry
                     return result;
@@ -1738,6 +1738,7 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
                            response->GetReasonPhrase().GetChars());
             break;
         }
+        if (NPT_FAILED(result)) continue; // try again if we didn't get a response
         break;
     } while (reconnect && --watchdog);
     

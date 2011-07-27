@@ -204,6 +204,25 @@ private:
 };
 
 /*----------------------------------------------------------------------
+|   NPT_LogManagerAutoLocker
++---------------------------------------------------------------------*/
+class NPT_LogManagerAutoLocker
+{
+ public:
+    // methods
+     NPT_LogManagerAutoLocker(NPT_LogManager &manager) : m_Manager(manager)   {
+        m_Manager.Lock();
+    }
+    ~NPT_LogManagerAutoLocker() {
+        m_Manager.Unlock(); 
+    }
+        
+ private:
+    // members
+    NPT_LogManager& m_Manager;
+};
+
+/*----------------------------------------------------------------------
 |   NPT_GetSystemLogConfig
 +---------------------------------------------------------------------*/
 #if !defined(NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG)
@@ -385,6 +404,7 @@ NPT_Log::FormatRecordToStream(const NPT_LogRecord& record,
 |   NPT_LogManager::NPT_LogManager
 +---------------------------------------------------------------------*/
 NPT_LogManager::NPT_LogManager() :
+    m_LockOwner(0),
     m_Enabled(true),
     m_Configured(false),
     m_Root(NULL)
@@ -415,6 +435,28 @@ NPT_LogManager&
 NPT_LogManager::GetDefault()
 {
     return LogManager;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogManager::Lock
++---------------------------------------------------------------------*/
+void
+NPT_LogManager::Lock()
+{
+    NPT_Thread::ThreadId me = NPT_Thread::GetCurrentThreadId();
+    if (m_LockOwner == me) return;
+    m_Lock.Lock();
+    m_LockOwner = me;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogManager::Unlock
++---------------------------------------------------------------------*/
+void
+NPT_LogManager::Unlock()
+{
+    m_LockOwner = 0;
+    m_Lock.Unlock();
 }
 
 /*----------------------------------------------------------------------
@@ -741,7 +783,7 @@ NPT_LogManager::GetLogger(const char* name)
     if (!LogManager.m_Enabled) return NULL;
 
     // auto lock until we return from this method
-    NPT_AutoLock lock(LogManager.m_Lock);
+    NPT_LogManagerAutoLocker lock(LogManager);
 
     /* check that the manager is initialized */
     if (!LogManager.m_Configured) {
@@ -781,9 +823,7 @@ NPT_LogManager::GetLogger(const char* name)
 
         /* this parent name does not exist, see if we need to create it */
         if (LogManager.HaveLoggerConfig(parent_name)) {
-            LogManager.m_Lock.Unlock();
             parent = GetLogger(parent_name);
-            LogManager.m_Lock.Lock();
             break;
         }
     }

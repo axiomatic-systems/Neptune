@@ -154,10 +154,10 @@ public:
     NPT_String*                   GetConfigValue(const char* prefix, const char* suffix);
     NPT_List<NPT_Logger*>&        GetLoggers() { return m_Loggers; }
     NPT_List<NPT_LogConfigEntry>& GetConfig()  { return m_Config;  }
-    void SetEnabled(bool enabled) { m_Enabled = enabled; }
-    bool IsEnabled()              { return m_Enabled;    }
-    void Lock()   { m_Lock.Lock();   }
-    void Unlock() { m_Lock.Unlock(); }
+    void                          SetEnabled(bool enabled) { m_Enabled = enabled; }
+    bool                          IsEnabled()              { return m_Enabled;    }
+    void                          Lock();
+    void                          Unlock();
 
 private:
     // methods
@@ -171,6 +171,7 @@ private:
 
     // members
     NPT_Mutex                    m_Lock;
+    NPT_Thread::ThreadId         m_LockOwner;
     bool                         m_Enabled;
     bool                         m_Configured;
     NPT_List<NPT_LogConfigEntry> m_Config;

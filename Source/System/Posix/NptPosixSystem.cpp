@@ -110,7 +110,10 @@ NPT_System::Sleep(const NPT_TimeInterval& duration)
     do {
         result = nanosleep(&time_req, &time_rem);
         time_req = time_rem;
-    } while (result == -1 && errno == EINTR);
+    } while (result == -1 && 
+             errno == EINTR && 
+             (long)time_req.tv_sec >= 0 && 
+             (long)time_req.tv_nsec >= 0);
 
     return NPT_SUCCESS;
 }

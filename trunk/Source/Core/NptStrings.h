@@ -67,7 +67,7 @@ public:
     NPT_String(const char* str, NPT_Size length);
     NPT_String(char c, NPT_Cardinal repeat = 1);
     NPT_String() : m_Chars(NULL) {}
-   ~NPT_String() { if (m_Chars) delete GetBuffer(); }
+   ~NPT_String() { if (m_Chars) GetBuffer()->Destroy(); }
 
     // string info and manipulations
     bool       IsEmpty() const { return m_Chars == NULL || GetBuffer()->GetLength() == 0; }
@@ -230,13 +230,14 @@ protected:
         NPT_Size GetLength() const      { return m_Length; }
         void SetLength(NPT_Size length) { m_Length = length; }
         NPT_Size GetAllocated() const   { return m_Allocated; }
-
+        void Destroy() { ::operator delete((void*)this); }
+        
     private:
         // methods
         Buffer(NPT_Size allocated, NPT_Size length = 0) : 
             m_Length(length),
             m_Allocated(allocated) {}
-
+        
         // members
         NPT_Cardinal m_Length;
         NPT_Cardinal m_Allocated;

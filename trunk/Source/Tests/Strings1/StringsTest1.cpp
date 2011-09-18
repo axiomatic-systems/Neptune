@@ -620,6 +620,11 @@ main(int /*argc*/, char** /*argv*/)
     IntTest("", sf.GetLength(), (1<<10)*7);
     
     
+    NPT_LargeSize lu1=2000000;
+    NPT_LargeSize lu2=2000002;
+    NPT_String range = NPT_String::Format("bytes=%lu-%lu", (long)lu1, (long)lu2);
+    StringTest("", "bytes=2000000-2000002", range.GetChars());
+    
     char s_buf[7];
     s_buf[5] = 'a';
     NPT_CopyString(s_buf, "hello");

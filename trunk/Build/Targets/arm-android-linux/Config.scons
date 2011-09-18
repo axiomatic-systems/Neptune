@@ -15,7 +15,7 @@ else:
 if ARGUMENTS.get('android_cross_prefix'):
     ANDROID_CROSS_PREFIX=ARGUMENTS.get('android_cross_prefix')
 else:
-    ANDROID_CROSS_PREFIX='arm-eabi'
+    ANDROID_CROSS_PREFIX='arm-linux-androideabi'
 
 if ARGUMENTS.get('android_platform'):
     ANDROID_PLATFORM=ARGUMENTS.get('android_platform')

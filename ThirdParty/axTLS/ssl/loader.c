@@ -179,16 +179,18 @@ void ssl_obj_free(SSLObjLoader *ssl_obj)
  */
 #ifdef CONFIG_SSL_HAS_PEM
 
-#define NUM_PEM_TYPES               3
+#define NUM_PEM_TYPES               4
 #define IV_SIZE                     16
 #define IS_RSA_PRIVATE_KEY          0
 #define IS_ENCRYPTED_PRIVATE_KEY    1
-#define IS_CERTIFICATE              2
+#define IS_PRIVATE_KEY              2
+#define IS_CERTIFICATE              3
 
 static const char * const begins[NUM_PEM_TYPES] =
 {
     "-----BEGIN RSA PRIVATE KEY-----",
     "-----BEGIN ENCRYPTED PRIVATE KEY-----",
+    "-----BEGIN PRIVATE KEY-----",
     "-----BEGIN CERTIFICATE-----",
 };
 
@@ -196,6 +198,7 @@ static const char * const ends[NUM_PEM_TYPES] =
 {
     "-----END RSA PRIVATE KEY-----",
     "-----END ENCRYPTED PRIVATE KEY-----",
+    "-----END PRIVATE KEY-----",
     "-----END CERTIFICATE-----",
 };
 
@@ -266,7 +269,7 @@ static int pem_decrypt(const char *where, const char *end,
 
     /* work out the key */
     MD5_Init(&md5_ctx);
-    MD5_Update(&md5_ctx, (const uint8_t *)password, (int)strlen(password));
+    MD5_Update(&md5_ctx, (const uint8_t *)password, (int)strlen(password)); /* GBG */
     MD5_Update(&md5_ctx, iv, SALT_SIZE);
     MD5_Final(key, &md5_ctx);
 
@@ -274,7 +277,7 @@ static int pem_decrypt(const char *where, const char *end,
     {
         MD5_Init(&md5_ctx);
         MD5_Update(&md5_ctx, key, MD5_SIZE);
-        MD5_Update(&md5_ctx, (const uint8_t *)password, (int)strlen(password));
+        MD5_Update(&md5_ctx, (const uint8_t *)password, (int)strlen(password)); /* GBG */
         MD5_Update(&md5_ctx, iv, SALT_SIZE);
         MD5_Final(&key[MD5_SIZE], &md5_ctx);
     }
@@ -342,6 +345,7 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where,
                         break;
 
                     case IS_ENCRYPTED_PRIVATE_KEY:
+                    case IS_PRIVATE_KEY:
                         obj_type = SSL_OBJ_PKCS8;
                         break;
 

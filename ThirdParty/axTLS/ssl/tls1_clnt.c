@@ -77,7 +77,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, SSL_SOCKET* client_fd, c
 int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 {
     int ret = SSL_OK;
-    (void)buf;
+    (void)buf; /* GBG: unused */
     
     /* To get here the state must be valid */
     switch (handshake_type)

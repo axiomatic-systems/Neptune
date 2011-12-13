@@ -249,7 +249,7 @@ end_utc_time:
 int asn1_version(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     int ret = X509_NOT_OK;
-    (void)x509_ctx; /* unused */
+    (void)x509_ctx; /* GBG: unused */
     
     (*offset) += 2;        /* get past explicit tag */
     if (asn1_skip_obj(cert, offset, ASN1_INTEGER))

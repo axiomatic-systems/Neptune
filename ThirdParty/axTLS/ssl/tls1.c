@@ -1294,7 +1294,24 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         if (buf[0] & 0x80 && buf[2] == 1)
         {
 #ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE
+            uint8_t version = (buf[3] << 4) + buf[4];
             DISPLAY_BYTES(ssl, "ssl2 record", buf, 5);
+
+            /* should be v3.1 (TLSv1) or better  */
+            ssl->version = ssl->client_version = version;
+
+            if (version > SSL_PROTOCOL_VERSION_MAX)
+            {
+                /* use client's version */
+                ssl->version = SSL_PROTOCOL_VERSION_MAX;
+            }
+            else if (version < SSL_PROTOCOL_MIN_VERSION)  
+            {
+                ret = SSL_ERROR_INVALID_VERSION;
+                ssl_display_error(ret);
+                return ret;
+            }
+
             add_packet(ssl, &buf[2], 3);
             ret = process_sslv23_client_hello(ssl); 
 #else
@@ -1606,7 +1623,7 @@ int process_finished(SSL *ssl, uint8_t *buf, int hs_len)
     int ret = SSL_OK;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     int resume = IS_SET_SSL_FLAG(SSL_SESSION_RESUME);
-    (void)hs_len;
+    (void)hs_len; /* GBG: unused */
     
     PARANOIA_CHECK(ssl->bm_index, SSL_FINISHED_HASH_SIZE+4);
 

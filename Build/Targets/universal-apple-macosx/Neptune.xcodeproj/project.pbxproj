@@ -2769,7 +2769,7 @@
 		F912B6870B8EB12700C1E90D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0410;
+				LastUpgradeCheck = 0420;
 			};
 			buildConfigurationList = F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */;
 			compatibilityVersion = "Xcode 3.2";

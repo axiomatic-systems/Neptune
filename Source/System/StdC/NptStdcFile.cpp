@@ -393,7 +393,7 @@ NPT_StdcFile::Open(NPT_File::OpenMode mode)
 
         // open the file
 #if defined(NPT_CONFIG_HAVE_FSOPEN)
-        file = _fsopen(name, fmode, _SH_DENYWR);
+        file = _fsopen(name, fmode, _SH_DENYNO);
         int open_result = file == NULL ? ENOENT : 0; 
 #else
         int open_result = fopen_s(&file, name, fmode);

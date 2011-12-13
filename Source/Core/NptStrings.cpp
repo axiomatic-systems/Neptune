@@ -478,7 +478,7 @@ NPT_String::Split(const char* separator) const
     int next;  
     do {
         next = Find(separator, current);
-        unsigned int end = (next>=0?next:GetLength());
+        unsigned int end = (next>=0?(unsigned int)next:GetLength());
         result.Add(SubString(current, end-current));
         current = next+separator_length;
     } while (next >= 0);

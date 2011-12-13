@@ -455,19 +455,26 @@ NPT_DateTime::FromString(const char* date, Format format)
     
     switch (format) {
       case FORMAT_W3C: {
-        if (input_size < 20) return NPT_ERROR_INVALID_SYNTAX;
+        if (input_size < 17) return NPT_ERROR_INVALID_SYNTAX;
 
         // check separators
         if (input[4]  != '-' || 
             input[7]  != '-' || 
             input[10] != 'T' || 
-            input[13] != ':' || 
-            input[16] != ':') {
+            input[13] != ':') {
             return NPT_ERROR_INVALID_SYNTAX;
         }
 
-        // replace terminators with separators
-        input[4] = input[7] = input[10] = input[13] = input[16] = '\0';
+        // replace separators with terminators
+        bool no_seconds = true;
+        input[4] = input[7] = input[10] = input[13] = '\0';
+        if (input[16] == ':') {
+            input[16] = '\0';
+            no_seconds = false;
+            if (input_size < 20) return NPT_ERROR_INVALID_SYNTAX;
+        } else {
+            m_Seconds = 0;
+        }
         
         // parse the timezone part
         if (input[input_size-1] == 'Z') {
@@ -495,10 +502,10 @@ NPT_DateTime::FromString(const char* date, Format format)
             NPT_FAILED(NPT_ParseInteger(input+14, m_Minutes, false))) {
             return NPT_ERROR_INVALID_SYNTAX;
         }
-        if (input[19] == '.') {
+        if (!no_seconds && input[19] == '.') {
             char fraction[10];
             fraction[9] = '\0';
-            unsigned int fraction_size = NPT_StringLength(input+20);
+            unsigned int fraction_size = NPT_StringLength(&input[20]);
             if (fraction_size == 0) return NPT_ERROR_INVALID_SYNTAX;
             for (unsigned int i=0; i<9; i++) {
                 if (i < fraction_size) {
@@ -514,8 +521,10 @@ NPT_DateTime::FromString(const char* date, Format format)
         } else {
             m_NanoSeconds = 0;
         }
-        if (NPT_FAILED(NPT_ParseInteger(input+17, m_Seconds, false))) {
-            return NPT_ERROR_INVALID_SYNTAX;
+        if (!no_seconds) {
+            if (NPT_FAILED(NPT_ParseInteger(input+17, m_Seconds, false))) {
+                return NPT_ERROR_INVALID_SYNTAX;
+            }
         }
         break;
       }

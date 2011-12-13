@@ -510,7 +510,7 @@ static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
 {
     int i = biR->size - 1;
     long_comp r = 0;
-    (void)ctx; /* unused */
+    (void)ctx; /* GBG: unused */
 
     check(biR);
 
@@ -724,11 +724,11 @@ void bi_export(BI_CTX *ctx, bigint *x, uint8_t *data, int size)
 
             if (k < 0)
             {
-                break;
+                goto buf_done;
             }
         }
-        if (k < 0) break; /* GBG */
     }
+buf_done:
 
     bi_free(ctx, x);
 }

@@ -205,6 +205,22 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     if (asn1_skip_obj(cert, &offset, ASN1_SEQUENCE) || 
             asn1_signature(cert, &offset, x509_ctx))
         goto end_cert;
+        
+    /* GBG: compute the fingerprints */
+    {
+        MD5_CTX md5_ctx;
+        MD5_Init(&md5_ctx);
+        MD5_Update(&md5_ctx, cert, cert_size);
+        MD5_Final(x509_ctx->fingerprint.md5, &md5_ctx);
+    }
+    {
+        SHA1_CTX sha1_ctx;
+        SHA1_Init(&sha1_ctx);
+        SHA1_Update(&sha1_ctx, cert, cert_size);
+        SHA1_Final(x509_ctx->fingerprint.sha1, &sha1_ctx);
+    }
+    /* /GBG: compute the fingerprints */
+        
 #endif
     ret = X509_OK;
 end_cert:

@@ -45,6 +45,8 @@
 +---------------------------------------------------------------------*/
 const int NPT_ERROR_XML_INVALID_NESTING = NPT_ERROR_BASE_XML - 0;
 const int NPT_ERROR_XML_TAG_MISMATCH    = NPT_ERROR_BASE_XML - 1;
+const int NPT_ERROR_XML_NO_ROOT         = NPT_ERROR_BASE_XML - 2;
+const int NPT_ERROR_XML_MULTIPLE_ROOTS  = NPT_ERROR_BASE_XML - 3;
 
 #define NPT_XML_ANY_NAMESPACE "*"
 #define NPT_XML_NO_NAMESPACE  NULL
@@ -304,10 +306,13 @@ class NPT_XmlParser
 
     // members
     NPT_XmlProcessor*   m_Processor;
-    NPT_XmlElementNode* m_Tree;
+    NPT_XmlElementNode* m_Root;
     NPT_XmlElementNode* m_CurrentElement;
     bool                m_KeepWhitespace;
 
+private:
+    void Reset();
+    
     // friends
     friend class NPT_XmlProcessor;
 };

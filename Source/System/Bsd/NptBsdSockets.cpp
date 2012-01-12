@@ -141,6 +141,7 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EADDRINUSE   WSAEADDRINUSE
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
+#define ENOTCONN     WSAENOTCONN
 #if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK 
 #define EINTR        WSAEINTR
@@ -392,6 +393,11 @@ MapErrorCode(int error)
 #if defined(EPIPE)
         case EPIPE:
             return NPT_ERROR_CONNECTION_RESET;
+#endif
+
+#if defined(ENOTCONN)
+        case ENOTCONN:
+            return NPT_ERROR_NOT_CONNECTED;
 #endif
 
 #if defined(EINTR)

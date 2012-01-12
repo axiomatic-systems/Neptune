@@ -1663,7 +1663,7 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 |   NPT_XmlParser::NPT_XmlParser
 +---------------------------------------------------------------------*/
 NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
-    m_Tree(NULL),
+    m_Root(NULL),
     m_CurrentElement(NULL),
     m_KeepWhitespace(keep_whitespace)
 {
@@ -1675,8 +1675,28 @@ NPT_XmlParser::NPT_XmlParser(bool keep_whitespace /* = false */) :
 +---------------------------------------------------------------------*/
 NPT_XmlParser::~NPT_XmlParser()
 {
+    Reset();
     delete m_CurrentElement;
     delete m_Processor;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_XmlParser::Reset
++---------------------------------------------------------------------*/
+void
+NPT_XmlParser::Reset()
+{
+    // delete anything that has been created 
+    NPT_XmlNode* walker = m_CurrentElement; 
+    while (walker && walker->GetParent()) { 
+        walker = walker->GetParent(); 
+    } 
+    delete walker; 
+    m_CurrentElement = NULL; 
+    
+    m_Processor->Reset();
+    
+    m_Root = NULL;
 }
 
 /*----------------------------------------------------------------------
@@ -1690,12 +1710,13 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
 {       
     NPT_Result result;
 
-    // reset the tree unless we're in incremental mode
-    if (!incremental) m_Tree = NULL;
-
-    // provide a default return node in case of error
-    node = m_Tree;
-
+    // start with a known state
+    m_Root = NULL;
+    node = NULL;
+    if (!incremental) {
+        Reset();
+    }
+    
     // use a  buffer on the stack
     char buffer[256];
 
@@ -1715,29 +1736,26 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
             size += bytes_read;
 
             // parse the buffer
-            NPT_CHECK(m_Processor->ProcessBuffer(buffer, bytes_read));
+            result = m_Processor->ProcessBuffer(buffer, bytes_read);
+            if (NPT_FAILED(result)) break;
         } else {
-            if (result == NPT_ERROR_WOULD_BLOCK && incremental) break;
-            if (result != NPT_ERROR_EOS) return result;
+            break;
         }
     } while(NPT_SUCCEEDED(result) && 
             (max_bytes_to_read == 0 || size < max_bytes_to_read));
 
     // return a tree if we have one 
-    node = m_Tree;
+    node = m_Root;
     if (incremental) {
         return result;
-    } else if (m_Tree) {
-        return NPT_SUCCESS;
     } else {
-        // delete anything that has been created 
-        NPT_XmlElementNode* parent = m_CurrentElement; 
-        while (parent && parent->GetParent()) { 
-            parent = parent->GetParent()->AsElementNode(); 
-        } 
-        delete parent; 
-        m_CurrentElement = NULL; 
-        return NPT_FAILURE;     
+        if (NPT_FAILED(result) && result != NPT_ERROR_EOS) {
+            delete m_Root;
+            m_Root = NULL;
+            return result;
+        } else {
+            return m_Root?NPT_SUCCESS:NPT_ERROR_XML_NO_ROOT;     
+        }
     }
 }
 
@@ -1775,31 +1793,27 @@ NPT_XmlParser::Parse(const char*   xml,
                      NPT_XmlNode*& node,
                      bool          incremental /* = false */)
 { 
-    // reset the tree unless we're in incremental mode
-    if (!incremental) m_Tree = NULL;
-
-    // provide a default return node in case of error
-    node = m_Tree;
+    // start with a known state
+    m_Root = NULL;
+    node = NULL;
+    if (!incremental) {
+        Reset();
+    }
 
     // parse the buffer
     NPT_Result result = m_Processor->ProcessBuffer(xml, size);
-    if (NPT_FAILED(result)) {
-        delete m_CurrentElement;
-        m_CurrentElement = NULL;
-        m_Processor->Reset();
-        return result;
-    }
     
     // return a tree if we have one 
-    node = m_Tree;
-
+    node = m_Root;
     if (incremental) {
-        return NPT_SUCCESS;
+        return result;
     } else {
-        if (m_Tree == NULL) {
-            return NPT_FAILURE;
+        if (NPT_FAILED(result)) {
+            delete m_Root;
+            m_Root = NULL;
+            return result;
         } else {
-            return NPT_SUCCESS;
+            return m_Root?NPT_SUCCESS:NPT_ERROR_XML_NO_ROOT;     
         }
     }
 }
@@ -1812,6 +1826,11 @@ NPT_XmlParser::OnStartElement(const char* name)
 {
     NPT_XML_Debug_1("\nNPT_XmlParser::OnStartElement: %s\n", name);
 
+    // we cannot start an element if we already have a root
+    if (m_Root) {
+        return NPT_ERROR_XML_MULTIPLE_ROOTS;
+    }
+    
     // create new node
     NPT_XmlElementNode* node = new NPT_XmlElementNode(name);
 
@@ -1896,8 +1915,15 @@ NPT_XmlParser::OnEndElement(const char* name)
     if (parent) {
         m_CurrentElement = parent->AsElementNode();
     } else {
-        m_Tree = m_CurrentElement;
-        m_CurrentElement = NULL;
+        if (m_Root) {
+            // this should never happen
+            delete m_CurrentElement;
+            m_CurrentElement = NULL;
+            return NPT_ERROR_XML_MULTIPLE_ROOTS;
+        } else {
+            m_Root = m_CurrentElement;
+            m_CurrentElement = NULL;
+        }
     }
 
     return NPT_SUCCESS;

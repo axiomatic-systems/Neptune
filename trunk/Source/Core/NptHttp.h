@@ -409,7 +409,7 @@ public:
         virtual NPT_Result Connect(const NPT_HttpUrl&          url,
                                    NPT_HttpClient&             client,
                                    const NPT_HttpProxyAddress* proxy,
-                                   bool                        reuse, // wether we can reuse a connection or not
+                                   bool                        reuse, // whether we can reuse a connection or not
                                    Connection*&                connection) = 0;
         virtual NPT_Result Abort() { return NPT_SUCCESS; }
         
@@ -674,8 +674,9 @@ public:
     NPT_Result Abort();
     NPT_Result WaitForNewClient(NPT_InputStreamReference&  input,
                                 NPT_OutputStreamReference& output,
-                                NPT_HttpRequestContext*    context);
-    NPT_Result Loop();
+                                NPT_HttpRequestContext*    context,
+                                NPT_Flags                  socket_flags = 0);
+    NPT_Result Loop(bool cancellable_sockets=true);
     
     void Terminate();
     

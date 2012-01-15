@@ -29,7 +29,6 @@ NPT_WinsockSystem::NPT_WinsockSystem() {
 NPT_WinsockSystem::~NPT_WinsockSystem() {
     WSACleanup();
 }
-
 NPT_WinsockSystem NPT_WinsockSystem::Initializer;
 
 #if defined(_WIN32_WCE)

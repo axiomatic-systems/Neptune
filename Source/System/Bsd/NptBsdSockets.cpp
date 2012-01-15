@@ -415,6 +415,26 @@ MapErrorCode(int error)
     }
 }
 
+/*----------------------------------------------------------------------
+|   MapGetAddrInfoErrorCode
++---------------------------------------------------------------------*/
+#if defined(NPT_CONFIG_HAVE_GETADDRINFO)
+static NPT_Result
+MapGetAddrInfoErrorCode(int error_code)
+{
+    switch (error_code) {
+        case EAI_NONAME:
+            return NPT_ERROR_HOST_UNKNOWN;
+            
+        case EAI_AGAIN:
+            return NPT_ERROR_TIMEOUT;
+            
+        default: 
+            return NPT_FAILURE;
+    }
+}
+#endif
+
 #if defined(_XBOX)
 
 struct hostent {
@@ -503,6 +523,31 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
         return NPT_ERROR_HOST_UNKNOWN;
     }
     sceNetResolverDelete(rid);
+#elif defined(NPT_CONFIG_HAVE_GETADDRINFO)
+    // get the addr list
+    struct addrinfo *infos = NULL;
+    int result = getaddrinfo(name,  /* hostname */
+                             NULL,  /* servname */
+                             NULL,  /* hints    */
+                             &infos /* res      */);
+    if (result != 0) {
+        return MapGetAddrInfoErrorCode(result);
+    }
+    
+    bool found = false;
+    for (struct addrinfo* info = infos; !found && info; info = info->ai_next) {
+        if (info->ai_family != AF_INET) continue;
+        if (info->ai_addrlen != sizeof(struct sockaddr_in)) continue;
+        if (info->ai_protocol != 0 && info->ai_protocol != IPPROTO_TCP) continue; 
+        struct sockaddr_in* inet_addr = (struct sockaddr_in*)info->ai_addr;
+        Set(ntohl(inet_addr->sin_addr.s_addr));
+        found = true;
+    }
+    freeaddrinfo(infos);
+    if (!found) {
+        return NPT_ERROR_HOST_UNKNOWN;
+    }
+    
 #else
     // do a name lookup
     struct hostent *host_entry = gethostbyname(name);

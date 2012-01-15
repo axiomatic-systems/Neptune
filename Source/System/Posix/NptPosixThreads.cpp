@@ -25,6 +25,7 @@
 #include "NptLogging.h"
 #include "NptTime.h"
 #include "NptSystem.h"
+#include "NptAutoreleasePool.h"
 
 /*----------------------------------------------------------------------
 |       logging
@@ -441,6 +442,11 @@ NPT_PosixThread::EntryPoint(void* argument)
 
     NPT_LOG_FINE("NPT_PosixThread::EntryPoint - in =======================");
 
+#if defined(NPT_CONFIG_HAVE_AUTORELEASE_POOL)
+    // ensure there is the top level autorelease pool for each thread
+    NPT_AutoreleasePool pool;
+#endif
+    
     // get the thread ID from this context, because m_ThreadId may not yet
     // have been set by the parent thread in the Start() method
     thread->m_ThreadId = pthread_self();
@@ -545,6 +551,7 @@ NPT_PosixThread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
         if (timeout != NPT_TIMEOUT_INFINITE) {
             result = m_Done.WaitUntilEquals(1, timeout);
             if (NPT_FAILED(result)) {
+                result = -1;
                 goto timedout;
             }
         }

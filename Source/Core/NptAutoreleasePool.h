@@ -1,6 +1,6 @@
 /*****************************************************************
 |
-|   Neptune - Version Info
+|   Neptune - AutoreleasePool
 |
 | Copyright (c) 2002-2008, Axiomatic Systems, LLC.
 | All rights reserved.
@@ -29,13 +29,29 @@
 |
  ****************************************************************/
 
-#ifndef _NPT_VERSION_H_
-#define _NPT_VERSION_H_
+#ifndef _NPT_AUTORELEASE_POOL_H_
+#define _NPT_AUTORELEASE_POOL_H_
 
 /*----------------------------------------------------------------------
-|   includes
+|   NPT_AutoreleasePoolInterface
 +---------------------------------------------------------------------*/
-#define NPT_NEPTUNE_VERSION        0x01010300
-#define NPT_NEPTUNE_VERSION_STRING "1.1.3"
+class NPT_AutoreleasePoolInterface 
+{
+public:
+    virtual ~NPT_AutoreleasePoolInterface() {}
+};
 
-#endif // _NPT_VERSION_H_
+/*----------------------------------------------------------------------
+|   NPT_AutoreleasePool
++---------------------------------------------------------------------*/
+class NPT_AutoreleasePool : public NPT_AutoreleasePoolInterface 
+{
+public:
+    NPT_AutoreleasePool();
+    virtual ~NPT_AutoreleasePool();
+
+private:
+    NPT_AutoreleasePoolInterface* m_Delegate;
+};
+
+#endif // _NPT_AUTORELEASE_POOL_H_

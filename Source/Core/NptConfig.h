@@ -149,6 +149,7 @@
 /* OSX and iOS */
 #if defined(__APPLE__)
 #define NPT_CONFIG_HAVE_GETADDRINFO
+#define NPT_CONFIG_HAVE_AUTORELEASE_POOL
 #endif
 
 /*----------------------------------------------------------------------

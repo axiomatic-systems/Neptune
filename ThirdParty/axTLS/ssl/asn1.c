@@ -441,6 +441,7 @@ int asn1_name(const uint8_t *cert, int *offset, char *dn[])
             }
             *offset += len;
         }
+        name = NULL;
         if (asn1_get_printable_str(cert, offset, &name) < 0) {
             free(name);
             if (name_prefix) free(name_prefix);

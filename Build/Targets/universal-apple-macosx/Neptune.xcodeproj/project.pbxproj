@@ -127,6 +127,10 @@
 		CA5041AF0C5AE2180060E6FE /* NptNullSerialPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */; };
 		CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAA979DD0CF1648300C01909 /* HttpServerTest1.cpp */; };
+		CA77C0C014C0BC7700442B97 /* NetworkTest1.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = CA77C0BF14C0BC7700442B97 /* NetworkTest1.1 */; };
+		CA77C0C614C0BCD600442B97 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		CA77C0C714C0BCF400442B97 /* NetworkTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA77C0B414C0BC5B00442B97 /* NetworkTest1.cpp */; };
+		CA77C18414C25AFF00442B97 /* NptNullAutoreleasePool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA77C18214C25AC100442B97 /* NptNullAutoreleasePool.cpp */; };
 		CA7848450F3B6E9B009E84AD /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA7848480F3B6EB8009E84AD /* MiniHttpServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA7848470F3B6EB8009E84AD /* MiniHttpServer.cpp */; };
 		CA790DAF1233BDF100875081 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
@@ -378,6 +382,13 @@
 			remoteInfo = NetGet;
 		};
 		CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CA77C0C414C0BCD100442B97 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
@@ -834,6 +845,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CA77C0B814C0BC7700442B97 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				CA77C0C014C0BC7700442B97 /* NetworkTest1.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsBase.cpp; sourceTree = "<group>"; };
 		CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsExtended.cpp; sourceTree = "<group>"; };
@@ -886,6 +910,12 @@
 		CA4090CD10AA25BE00ED81C5 /* TimeTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimeTest1.cpp; sourceTree = "<group>"; };
 		CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = NptNullSerialPort.cpp; sourceTree = "<group>"; };
 		CA550D550D20A37E00B22D72 /* HttpServerTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HttpServerTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA77C0B414C0BC5B00442B97 /* NetworkTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkTest1.cpp; sourceTree = "<group>"; };
+		CA77C0BA14C0BC7700442B97 /* NetworkTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetworkTest1; sourceTree = BUILT_PRODUCTS_DIR; };
+		CA77C0BD14C0BC7700442B97 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CA77C0BF14C0BC7700442B97 /* NetworkTest1.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = NetworkTest1.1; sourceTree = "<group>"; };
+		CA77C17E14C259AB00442B97 /* NptAutoreleasePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptAutoreleasePool.h; sourceTree = "<group>"; };
+		CA77C18214C25AC100442B97 /* NptNullAutoreleasePool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptNullAutoreleasePool.cpp; sourceTree = "<group>"; };
 		CA78483D0F3B6E69009E84AD /* minihttpserver */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = minihttpserver; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA7848470F3B6EB8009E84AD /* MiniHttpServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MiniHttpServer.cpp; sourceTree = "<group>"; };
 		CA790DA51233BDAA00875081 /* NetGet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetGet.cpp; sourceTree = "<group>"; };
@@ -1116,6 +1146,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D500D20A37E00B22D72 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA77C0B714C0BC7700442B97 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA77C0C614C0BCD600442B97 /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1475,9 +1513,27 @@
 		CA5041A70C5AE2180060E6FE /* Null */ = {
 			isa = PBXGroup;
 			children = (
+				CA77C18214C25AC100442B97 /* NptNullAutoreleasePool.cpp */,
 				CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */,
 			);
 			path = Null;
+			sourceTree = "<group>";
+		};
+		CA77C0B314C0BC5B00442B97 /* Network1 */ = {
+			isa = PBXGroup;
+			children = (
+				CA77C0B414C0BC5B00442B97 /* NetworkTest1.cpp */,
+			);
+			path = Network1;
+			sourceTree = "<group>";
+		};
+		CA77C0BC14C0BC7700442B97 /* NetworkTest1 */ = {
+			isa = PBXGroup;
+			children = (
+				CA77C0BD14C0BC7700442B97 /* main.cpp */,
+				CA77C0BF14C0BC7700442B97 /* NetworkTest1.1 */,
+			);
+			path = NetworkTest1;
 			sourceTree = "<group>";
 		};
 		CA7848460F3B6EB8009E84AD /* MiniHttpServer */ = {
@@ -1599,6 +1655,7 @@
 				CAA979E40CF1648300C01909 /* Messages1 */,
 				CAA979E60CF1648300C01909 /* Messages2 */,
 				CAA979E80CF1648300C01909 /* Misc1 */,
+				CA77C0B314C0BC5B00442B97 /* Network1 */,
 				CA197D190E1AE4200018E87C /* Queue1 */,
 				CAA979EA0CF1648300C01909 /* RingBuffer1 */,
 				CA289DBE10E31637001BC817 /* Sockets1 */,
@@ -1852,6 +1909,7 @@
 				F912B6A50B8EB27400C1E90D /* Source */,
 				CAE417A50E0DC16300A530D1 /* Apps */,
 				CAA979D50CF1648300C01909 /* Tests */,
+				CA77C0BC14C0BC7700442B97 /* NetworkTest1 */,
 				F912B6A00B8EB1C700C1E90D /* Products */,
 				CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */,
 			);
@@ -1897,6 +1955,7 @@
 				CA8069D9118B577E009D099D /* CryptoTest1 */,
 				CA790DA91233BDC100875081 /* NetGet */,
 				CAAAA07C12FF824E00ABC84B /* NetResolve */,
+				CA77C0BA14C0BC7700442B97 /* NetworkTest1 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1916,6 +1975,7 @@
 		F912B6AF0B8EB27400C1E90D /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CA77C17E14C259AB00442B97 /* NptAutoreleasePool.h */,
 				CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */,
 				CAD78DD212A99DC500D7EBA7 /* NptHash.h */,
 				CA806987118A602B009D099D /* NptCrypto.cpp */,
@@ -2249,6 +2309,24 @@
 			name = HttpServerTest1;
 			productName = XmlTest1;
 			productReference = CA550D550D20A37E00B22D72 /* HttpServerTest1 */;
+			productType = "com.apple.product-type.tool";
+		};
+		CA77C0B914C0BC7700442B97 /* NetworkTest1 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA77C0C114C0BC7700442B97 /* Build configuration list for PBXNativeTarget "NetworkTest1" */;
+			buildPhases = (
+				CA77C0B614C0BC7700442B97 /* Sources */,
+				CA77C0B714C0BC7700442B97 /* Frameworks */,
+				CA77C0B814C0BC7700442B97 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CA77C0C514C0BCD100442B97 /* PBXTargetDependency */,
+			);
+			name = NetworkTest1;
+			productName = NetworkTest1;
+			productReference = CA77C0BA14C0BC7700442B97 /* NetworkTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
 		CA78483C0F3B6E69009E84AD /* MiniHttpServer */ = {
@@ -2809,6 +2887,7 @@
 				CAE417060E0DBF0900A530D1 /* MessagesTest1 */,
 				CAE417130E0DBF2800A530D1 /* MessagesTest2 */,
 				CAE4169A0E0DBD6600A530D1 /* MiscTest1 */,
+				CA77C0B914C0BC7700442B97 /* NetworkTest1 */,
 				CA197D1D0E1AE4360018E87C /* QueueTest1 */,
 				CAE4172C0E0DC03500A530D1 /* RingBufferTest1 */,
 				CAA97A100CF1654A00C01909 /* StringsTest1 */,
@@ -2900,6 +2979,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA550D580D20A3AC00B22D72 /* HttpServerTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CA77C0B614C0BC7700442B97 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CA77C0C714C0BCF400442B97 /* NetworkTest1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3141,6 +3228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CA77C18414C25AFF00442B97 /* NptNullAutoreleasePool.cpp in Sources */,
 				F912B7480B8EB27400C1E90D /* Neptune.cpp in Sources */,
 				F912B74B0B8EB27400C1E90D /* NptBase64.cpp in Sources */,
 				F912B74D0B8EB27400C1E90D /* NptBufferedStreams.cpp in Sources */,
@@ -3268,6 +3356,11 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CA550D4C0D20A37E00B22D72 /* PBXContainerItemProxy */;
+		};
+		CA77C0C514C0BCD100442B97 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CA77C0C414C0BCD100442B97 /* PBXContainerItemProxy */;
 		};
 		CA7848420F3B6E71009E84AD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3784,6 +3877,36 @@
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpServerTest1;
 				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CA77C0C214C0BC7700442B97 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		CA77C0C314C0BC7700442B97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -4779,6 +4902,15 @@
 			buildConfigurations = (
 				CA550D520D20A37E00B22D72 /* Debug */,
 				CA550D540D20A37E00B22D72 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CA77C0C114C0BC7700442B97 /* Build configuration list for PBXNativeTarget "NetworkTest1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CA77C0C214C0BC7700442B97 /* Debug */,
+				CA77C0C314C0BC7700442B97 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

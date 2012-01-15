@@ -16,5 +16,5 @@ public:
     ~NPT_WinsockSystem();
     
 private:
-	NPT_WinsockSystem();
+    NPT_WinsockSystem();
 };

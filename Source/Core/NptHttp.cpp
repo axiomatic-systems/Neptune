@@ -2002,7 +2002,8 @@ NPT_HttpServer::Abort()
 NPT_Result
 NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
                                  NPT_OutputStreamReference& output,
-                                 NPT_HttpRequestContext*    context)
+                                 NPT_HttpRequestContext*    context,
+                                 NPT_Flags                  socket_flags)
 {
     // ensure that we're bound 
     NPT_CHECK_FINE(Bind());
@@ -2011,7 +2012,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
     NPT_Socket* client;
     NPT_LOG_FINE_1("waiting for connection on port %d...", m_Config.m_ListenPort);
     NPT_Result result;
-    result = m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout);
+    result = m_Socket.WaitForNewClient(client, m_Config.m_ConnectionTimeout, socket_flags);
     if (result != NPT_ERROR_TIMEOUT) {
         NPT_CHECK_WARNING(result);
     } else {
@@ -2050,7 +2051,7 @@ NPT_HttpServer::WaitForNewClient(NPT_InputStreamReference&  input,
 |   NPT_HttpServer::Loop
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_HttpServer::Loop()
+NPT_HttpServer::Loop(bool cancellable_sockets)
 {
     NPT_InputStreamReference  input;
     NPT_OutputStreamReference output;
@@ -2059,7 +2060,8 @@ NPT_HttpServer::Loop()
     
     do {
         // wait for a client to connect
-        result = WaitForNewClient(input, output, &context);
+        NPT_Flags flags = cancellable_sockets?NPT_SOCKET_FLAG_CANCELLABLE:0;
+        result = WaitForNewClient(input, output, &context, flags);
         NPT_LOG_FINE_2("WaitForNewClient returned %d (%s)", 
                        result,
                        NPT_ResultText(result));

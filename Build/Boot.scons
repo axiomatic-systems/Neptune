@@ -1,4 +1,5 @@
 import sys
+import os
 import platform
 
 EnsureSConsVersion(0,98,1)

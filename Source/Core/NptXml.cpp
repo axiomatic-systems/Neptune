@@ -1752,6 +1752,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
         if (NPT_FAILED(result) && result != NPT_ERROR_EOS) {
             delete m_Root;
             m_Root = NULL;
+            node = NULL;
             return result;
         } else {
             return m_Root?NPT_SUCCESS:NPT_ERROR_XML_NO_ROOT;     
@@ -1811,6 +1812,7 @@ NPT_XmlParser::Parse(const char*   xml,
         if (NPT_FAILED(result)) {
             delete m_Root;
             m_Root = NULL;
+            node = NULL;
             return result;
         } else {
             return m_Root?NPT_SUCCESS:NPT_ERROR_XML_NO_ROOT;     

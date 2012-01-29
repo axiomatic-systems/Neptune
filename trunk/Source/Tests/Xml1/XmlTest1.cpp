@@ -534,6 +534,21 @@ TestFile(const char* filename)
 }
 
 /*----------------------------------------------------------------------
+|       TestBadInput
++---------------------------------------------------------------------*/
+static void
+TestBadInput()
+{
+    NPT_XmlParser parser;
+    NPT_XmlNode* root = NULL;
+    
+    const char* doc = "<top1></top1><top2></top2>";
+    NPT_Result result = parser.Parse(doc, root);
+    CHECK(result == NPT_ERROR_XML_MULTIPLE_ROOTS);
+    CHECK(root == NULL);
+}
+
+/*----------------------------------------------------------------------
 |       main
 +---------------------------------------------------------------------*/
 int
@@ -569,6 +584,7 @@ main(int argc, char** argv)
     TestCanonicalizer();
     TestFinders();
     TestWriter();
+    TestBadInput();
     
     return 0;
 }

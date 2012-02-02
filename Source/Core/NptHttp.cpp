@@ -1848,7 +1848,12 @@ NPT_HttpClient::SendRequest(NPT_HttpRequest&   request,
                         request.GetUrl().ParsePathPlus(*location);
                     } else {
                         NPT_String redirect_path = request.GetUrl().GetPath();
-                        if (!redirect_path.EndsWith("/")) redirect_path += "/";
+                        int slash_pos = redirect_path.ReverseFind('/');
+                        if (slash_pos >= 0) {
+                            redirect_path.SetLength(slash_pos+1);
+                        } else {
+                            redirect_path = "/";
+                        }
                         redirect_path += *location;
                         NPT_LOG_FINE_1("redirecting to absolute path %s", redirect_path.GetChars());
                         request.GetUrl().ParsePathPlus(redirect_path);

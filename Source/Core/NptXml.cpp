@@ -667,19 +667,19 @@ NPT_XmlAccumulator::AppendUTF8(unsigned int c)
     if (needed > m_Allocated) Allocate(needed);
 
     if (c <= 0x7F) {
-        // 000000ﾖ00007F -> 1 char = 0xxxxxxx
+        // 000000-00007F -> 1 char = 0xxxxxxx
         m_Buffer[m_Valid++] = (char)c;
     } else if (c <= 0x7FF) {
-        // 000080ﾖ0007FF -> 2 chars = 110zzzzx 10xxxxxx
+        // 000080-0007FF -> 2 chars = 110zzzzx 10xxxxxx
         m_Buffer[m_Valid++] = 0xC0|(c>>6  );
         m_Buffer[m_Valid++] = 0x80|(c&0x3F);
     } else if (c <= 0xFFFF) {
-        // 000800ﾖ00FFFF -> 3 chars = 1110zzzz 10zxxxxx 10xxxxxx
+        // 000800-00FFFF -> 3 chars = 1110zzzz 10zxxxxx 10xxxxxx
         m_Buffer[m_Valid++] = 0xE0| (c>>12      );
         m_Buffer[m_Valid++] = 0x80|((c&0xFC0)>>6);
         m_Buffer[m_Valid++] = 0x80| (c&0x3F     );
     } else if (c <= 0x10FFFF) {
-        // 010000ﾖ10FFFF -> 4 chars = 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx
+        // 010000-10FFFF -> 4 chars = 11110zzz 10zzxxxx 10xxxxxx 10xxxxxx
         m_Buffer[m_Valid++] = 0xF0| (c>>18         );
         m_Buffer[m_Valid++] = 0x80|((c&0x3F000)>>12);
         m_Buffer[m_Valid++] = 0x80|((c&0xFC0  )>> 6);
@@ -1114,6 +1114,9 @@ private:
     } Context;
 
     typedef enum {
+        STATE_IN_INIT,
+        STATE_IN_BOM_EF,
+        STATE_IN_BOM_BB,
         STATE_IN_WHITESPACE,
         STATE_IN_NAME,
         STATE_IN_NAME_SPECIAL,
@@ -1152,6 +1155,9 @@ private:
 #ifdef NPT_XML_PARSER_DEBUG
     const char* StateName(State state) {
         switch (state) {
+          case STATE_IN_INIT: return "IN_INIT";
+          case STATE_IN_BOM_EF: return "IN_BOM_EF";
+          case STATE_IN_BOM_BB: return "IN_BOM_BB";
           case STATE_IN_WHITESPACE: return "IN_WHITESPACE";
           case STATE_IN_NAME: return "IN_NAME";
           case STATE_IN_NAME_SPECIAL: return "IN_NAME_SPECIAL";
@@ -1219,7 +1225,7 @@ private:
 +---------------------------------------------------------------------*/
 NPT_XmlProcessor::NPT_XmlProcessor(NPT_XmlParser* parser) :
     m_Parser(parser),
-    m_State(STATE_IN_WHITESPACE),
+    m_State(STATE_IN_INIT),
     m_Context(CONTEXT_NONE),
     m_SkipNewline(false)
 {
@@ -1231,7 +1237,7 @@ NPT_XmlProcessor::NPT_XmlProcessor(NPT_XmlParser* parser) :
 void
 NPT_XmlProcessor::Reset()
 {
-    m_State       = STATE_IN_WHITESPACE;
+    m_State       = STATE_IN_INIT;
     m_Context     = CONTEXT_NONE;
     m_SkipNewline = false;
 }
@@ -1327,6 +1333,28 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
 
         // process the character
         switch (m_State) {
+          case STATE_IN_INIT:
+            if (NPT_XML_CHAR_IS_WHITESPACE(c)) break;
+            if (c == 0xEF) {
+                SetState(STATE_IN_BOM_EF);
+                break;
+            }
+            return NPT_ERROR_INVALID_SYNTAX;
+            
+          case STATE_IN_BOM_EF:
+            if (c == 0xBB) {
+                SetState(STATE_IN_BOM_BB);
+                break;
+            }
+            return NPT_ERROR_INVALID_SYNTAX;
+            
+          case STATE_IN_BOM_BB:
+            if (c == 0xBF) {
+                SetState(STATE_IN_WHITESPACE);
+                break;
+            }
+            return NPT_ERROR_INVALID_SYNTAX;
+                        
           case STATE_IN_WHITESPACE:
             if (NPT_XML_CHAR_IS_WHITESPACE(c)) break;
             switch (m_Context) {

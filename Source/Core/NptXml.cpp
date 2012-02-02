@@ -1334,8 +1334,13 @@ NPT_XmlProcessor::ProcessBuffer(const char* buffer, NPT_Size size)
         // process the character
         switch (m_State) {
           case STATE_IN_INIT:
-            if (NPT_XML_CHAR_IS_WHITESPACE(c)) break;
-            if (c == 0xEF) {
+            if (NPT_XML_CHAR_IS_WHITESPACE(c)) {
+                SetState(STATE_IN_WHITESPACE);
+                break;
+            } else if (c == '<') {
+                SetState(STATE_IN_TAG_START);
+                break;
+            } else if (c == 0xEF) {
                 SetState(STATE_IN_BOM_EF);
                 break;
             }

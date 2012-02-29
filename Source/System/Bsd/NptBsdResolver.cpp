@@ -63,14 +63,11 @@ static NPT_Result
 MapGetAddrInfoErrorCode(int error_code)
 {
     switch (error_code) {
-        case EAI_NONAME:
-            return NPT_ERROR_HOST_UNKNOWN;
-            
         case EAI_AGAIN:
             return NPT_ERROR_TIMEOUT;
             
         default: 
-            return NPT_FAILURE;
+            return NPT_ERROR_HOST_UNKNOWN;
     }
 }
 

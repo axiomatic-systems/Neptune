@@ -63,6 +63,30 @@ static uint8_t entropy_pool[ENTROPY_POOL_SIZE];
 static int rng_ref_count;
 const char * const unsupported_str = "Error: Feature not supported\n";
 
+/* GBG: compatibility layer */
+#if defined(WIN32) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB)
+static int _gettimeofday(struct timeval *tv)
+{
+	if (tv) {
+		FILETIME ft;
+		unsigned __int64 tmpres = 0;
+
+		GetSystemTimeAsFileTime(&ft);
+
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
+
+		tmpres /= 10;
+		tv->tv_sec = (long)(tmpres / 1000000UL);
+		tv->tv_usec = (long)(tmpres % 1000000UL);
+  }
+
+  return 0;
+}
+#define gettimeofday(x,y) _gettimeofday(x)
+#endif
+
 #if 0 /* GBG */
 #ifndef CONFIG_SSL_SKELETON_MODE
 /** 
@@ -187,8 +211,8 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     uint64_t *ep;
     int i;
 
-    /* A proper implementation would use counters etc for entropy */
-    gettimeofday(&tv, NULL);    
+	/* A proper implementation would use counters etc for entropy */
+	gettimeofday(&tv, NULL);
     ep = (uint64_t *)entropy_pool;
     ep[0] ^= ENTROPY_COUNTER1;
     ep[1] ^= ENTROPY_COUNTER2; 

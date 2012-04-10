@@ -1715,15 +1715,16 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
             result = (NPT_HttpResponse::Parse(*buffered_input_stream, response));
             if (NPT_FAILED(result)) {
                 NPT_LOG_FINE_1("failed to parse the response (%d)", result);
-                if (reconnect &&
+                if (reconnect /* &&
                     (result == NPT_ERROR_EOS                || 
                      result == NPT_ERROR_CONNECTION_ABORTED ||
                      result == NPT_ERROR_CONNECTION_RESET   ||
-                     result == NPT_ERROR_READ_FAILED)) {
+                     result == NPT_ERROR_READ_FAILED) GBG: don't look for specific error codes */) {
                     NPT_LOG_FINE("error is not fatal, retrying");
                     break; // we'll try to reconnect, maybe
                 } else {
                     // don't retry
+                    NPT_LOG_FINE("no reconnection attempted");
                     return result;
                 }
             }

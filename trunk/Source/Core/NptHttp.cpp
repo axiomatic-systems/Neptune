@@ -1671,10 +1671,22 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
             cref = connection;
             input_stream  = connection->GetInputStream();
             output_stream = connection->GetOutputStream();
+
+            // rewind the entity body if necessary
+            if (entity && entity->GetContentLength() && !body_stream.IsNull()) {
+                // go back to the start of the body so that we can resend
+                NPT_LOG_FINE("rewinding body stream in order to resend");
+                result = body_stream->Seek(0);
+                if (NPT_FAILED(result)) {
+                    NPT_LOG_FINE_1("failed to rewind entity body (%d)", result);
+                    return NPT_ERROR_HTTP_CANNOT_RESEND_BODY;
+                }
+            }
         }
         reconnect = connection->IsRecycled();
         
         // send the headers
+        NPT_LOG_FINE("sending headers");
         result = (output_stream->WriteFully(header_stream.GetData(), header_stream.GetDataSize()));
         if (NPT_FAILED(result)) {
             NPT_LOG_FINE_1("failed to write request headers (%d)", result);
@@ -1687,16 +1699,11 @@ NPT_HttpClient::SendRequestOnce(NPT_HttpRequest&   request,
         
         // send request body
         if (entity && entity->GetContentLength() && !body_stream.IsNull()) {
+            NPT_LOG_FINE("sending body");
             result = NPT_StreamToStreamCopy(*body_stream.AsPointer(), *output_stream.AsPointer(), 0, entity->GetContentLength());
             if (NPT_FAILED(result)) {
                 NPT_LOG_FINE_1("failed to write request body (%d)", result);
                 if (reconnect) {
-                    // go back to the start of the body so that we can resend
-                    NPT_LOG_FINE("rewinding body stream in order to resend");
-                    result = body_stream->Seek(0);
-                    if (NPT_FAILED(result)) {
-                        return NPT_ERROR_HTTP_CANNOT_RESEND_BODY;
-                    }
                     continue;
                 } else {
                     return result;

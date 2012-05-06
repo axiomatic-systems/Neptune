@@ -420,12 +420,9 @@ MapErrorCode(int error)
 +---------------------------------------------------------------------*/
 #if defined(NPT_CONFIG_HAVE_GETADDRINFO)
 static NPT_Result
-MapGetAddrInfoErrorCode(int error_code)
+MapGetAddrInfoErrorCode(int /*error_code*/)
 {
-    switch (error_code) {
-        default: 
-            return NPT_ERROR_HOST_UNKNOWN;
-    }
+    return NPT_ERROR_HOST_UNKNOWN;
 }
 #endif
 

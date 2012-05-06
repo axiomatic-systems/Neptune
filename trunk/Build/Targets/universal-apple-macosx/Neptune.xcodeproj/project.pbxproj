@@ -117,6 +117,8 @@
 		CA289DBD10E31618001BC817 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA289DC010E31637001BC817 /* SocketsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA289DBF10E31637001BC817 /* SocketsTest1.cpp */; };
 		CA2B1E210FC22DBA00B9E79F /* NptResults.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA096EF10ED0DBCE00A5103D /* NptResults.cpp */; };
+		CA2EF628154DDFA700933B11 /* NptJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA2EF626154DDFA700933B11 /* NptJson.cpp */; };
+		CA2EF629154DDFA700933B11 /* NptJson.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2EF627154DDFA700933B11 /* NptJson.h */; };
 		CA2F54340EC1165700AEBC12 /* TlsTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */; };
 		CA2F54390EC1203A00AEBC12 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CA2F543A0EC1203A00AEBC12 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
@@ -902,6 +904,8 @@
 		CA289B6910E16150001BC817 /* NptCocoaMessageQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NptCocoaMessageQueue.mm; sourceTree = "<group>"; };
 		CA289DB710E31600001BC817 /* SocketsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SocketsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA289DBF10E31637001BC817 /* SocketsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketsTest1.cpp; sourceTree = "<group>"; };
+		CA2EF626154DDFA700933B11 /* NptJson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptJson.cpp; sourceTree = "<group>"; };
+		CA2EF627154DDFA700933B11 /* NptJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptJson.h; sourceTree = "<group>"; };
 		CA2F54240EC115E600AEBC12 /* TlsTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = TlsTest1; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA2F54330EC1165700AEBC12 /* TlsTest1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TlsTest1.cpp; sourceTree = "<group>"; };
 		CA30B76B0F0DCE990085B46E /* LoggingTest2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LoggingTest2; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1975,6 +1979,8 @@
 		F912B6AF0B8EB27400C1E90D /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				CA2EF626154DDFA700933B11 /* NptJson.cpp */,
+				CA2EF627154DDFA700933B11 /* NptJson.h */,
 				CA77C17E14C259AB00442B97 /* NptAutoreleasePool.h */,
 				CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */,
 				CAD78DD212A99DC500D7EBA7 /* NptHash.h */,
@@ -2185,6 +2191,7 @@
 				CAEB8EC611864F0B00B4AF01 /* NptDigest.h in Headers */,
 				CA80698A118A602B009D099D /* NptCrypto.h in Headers */,
 				CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */,
+				CA2EF629154DDFA700933B11 /* NptJson.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3291,6 +3298,7 @@
 				CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */,
 				CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */,
 				CAC5048312FFB7EF00FEB1D8 /* NptBsdResolver.cpp in Sources */,
+				CA2EF628154DDFA700933B11 /* NptJson.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

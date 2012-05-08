@@ -697,6 +697,7 @@ NPT_Url::ParsePathPlus(const char* path_plus)
     m_HasQuery = false;
     m_HasFragment = false;
 
+#ifdef _WIN32
     // Skip the leading '/' if there is an absolute path starting with
     // a drive letter on Windows.
     if (path_plus[0] == '/' && 
@@ -706,6 +707,7 @@ NPT_Url::ParsePathPlus(const char* path_plus)
     {
         ++path_plus;
     }
+#endif
 
     // intialize the parser
     NPT_UrlParserState state = NPT_URL_PARSER_STATE_PATH;

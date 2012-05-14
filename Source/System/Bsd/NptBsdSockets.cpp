@@ -601,6 +601,7 @@ public:
     NPT_Result SetBlockingMode(bool blocking);
     NPT_Result WaitUntilReadable();
     NPT_Result WaitUntilWriteable();
+    NPT_Result WaitForCondition(bool readable, bool writeable, bool async_connect, NPT_Timeout timeout);
 
     // members
     SocketFd          m_SocketFd;
@@ -617,7 +618,6 @@ private:
     // methods
     friend class NPT_BsdTcpServerSocket;
     friend class NPT_BsdTcpClientSocket;
-    NPT_Result WaitForCondition(bool readable, bool writeable, bool async_connect, NPT_Timeout timeout);
 };
 
 typedef NPT_Reference<NPT_BsdSocketFd> NPT_BsdSocketFdReference;
@@ -918,6 +918,15 @@ NPT_BsdSocketInputStream::GetAvailable(NPT_LargeSize& available)
         return NPT_ERROR_SOCKET_CONTROL_FAILED;
     } else {
         available = ready;
+        if (available == 0) {
+            // check if the socket is disconnected
+            NPT_Result result = m_SocketFdReference->WaitForCondition(true, false, false, 0);
+            if (result == NPT_ERROR_WOULD_BLOCK) {
+                return NPT_SUCCESS;
+            } else {
+                available = 1; // pretend that there's data available
+            }
+        }
         return NPT_SUCCESS;
     }
 }

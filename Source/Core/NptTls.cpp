@@ -161,6 +161,7 @@ SSL_Sha256_ComputeDigest(const unsigned char* data,
     NPT_DataBuffer buffer;
     digest->GetDigest(buffer);
     NPT_CopyMemory(digest_value, buffer.GetData(), 32);
+    delete digest;
 }
 
 /*----------------------------------------------------------------------

@@ -568,6 +568,7 @@ public:
       m_SocketFd(fd), 
       m_ReadTimeout(NPT_TIMEOUT_INFINITE), 
       m_WriteTimeout(NPT_TIMEOUT_INFINITE),
+      m_Position(0),
       m_Cancelled(false),
       m_Cancellable((flags & NPT_SOCKET_FLAG_CANCELLABLE) != 0) {
         // always use non-blocking mode

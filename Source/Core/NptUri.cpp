@@ -366,9 +366,7 @@ NPT_UrlQuery::Parse(const char* query)
     bool        in_name = true;
     do {
         if (*cursor == '\0' || *cursor == '&') {
-            if (!name.IsEmpty() && !value.IsEmpty()) {
-                AddField(name, value, true);   
-            }
+            AddField(name, value, true);   
             name.SetLength(0);
             value.SetLength(0);
             in_name = true;

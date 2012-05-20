@@ -1750,8 +1750,8 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
         Reset();
     }
     
-    // use a  buffer on the stack
-    char buffer[256];
+    // use a buffer on the stack
+    char buffer[1024];
 
     // read a buffer and parse it until the end of the stream
     NPT_Size max_bytes_to_read = size;
@@ -1763,7 +1763,7 @@ NPT_XmlParser::Parse(NPT_InputStream& stream,
             size+bytes_to_read > max_bytes_to_read) {
             bytes_to_read = max_bytes_to_read-size;
         }
-        result = stream.Read(buffer, sizeof(buffer), &bytes_read);
+        result = stream.Read(buffer, bytes_to_read, &bytes_read);
         if (NPT_SUCCEEDED(result)) {
             // update the counter
             size += bytes_read;

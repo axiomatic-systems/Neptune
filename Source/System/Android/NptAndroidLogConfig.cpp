@@ -1,7 +1,7 @@
 extern "C" {
 #include <sys/system_properties.h>
 }
-#import "NptLogging.h"
+#include "NptLogging.h"
 
 NPT_Result
 NPT_GetSystemLogConfig(NPT_String& config)

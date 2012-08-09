@@ -23,8 +23,12 @@ PrintUsageAndExit(void)
             "NetGet [options] <url>\n"
             "\n"
             "  Options:\n"
-            "    --verbose    : print verbose information\n"
-            "    --http-1-1   : use HTTP 1.1\n"
+            "    --verbose : print verbose information\n"
+            "    --http-1-1 : use HTTP 1.1\n"
+            "    --ssl-client-cert <filename> : load client TLS certificate from <filename> (PKCS12)\n"
+            "    --ssl-client-cert-password <password> : optional password for the client cert\n"
+            "    --ssl-accept-self-signed-certs : accept self-signed server certificates\n"
+            "    --ssl-accept-hostname-mismatch : accept server certificates that don't match\n"
             "    --show-proxy : show the proxy that will be used for the connection\n");
 }
 
@@ -46,6 +50,11 @@ main(int argc, char** argv)
     bool url_set    = false;
     bool http_1_1   = false;
     NPT_HttpUrl url;
+    NPT_HttpClient::Connector* connector = NULL;
+    NPT_TlsContext*    tls_context = NULL;
+    const char*        tls_cert_filename = NULL;
+    const char*        tls_cert_password = NULL;
+    unsigned int       tls_options = 0;
     
     // parse command line
     ++argv;
@@ -57,6 +66,22 @@ main(int argc, char** argv)
             show_proxy = true;
         } else if (NPT_StringsEqual(arg, "--http-1-1")) {
             http_1_1 = true;
+        } else if (NPT_StringsEqual(arg, "--ssl-client-cert")) {
+            tls_cert_filename = *argv++;
+            if (tls_cert_filename == NULL) {
+                fprintf(stderr, "ERROR: missing argument after --ssl-client-cert option\n");
+                return 1;
+            }
+        } else if (NPT_StringsEqual(arg, "--ssl-client-cert-password")) {
+            tls_cert_password = *argv++;
+            if (tls_cert_password == NULL) {
+                fprintf(stderr, "ERROR: missing argument after --ssl-client-cert-password option\n");
+                return 1;
+            }
+        } else if (NPT_StringsEqual(arg, "--ssl-accept-self-signed-certs")) {
+            tls_options |= NPT_HttpTlsConnector::OPTION_ACCEPT_SELF_SIGNED_CERTS;
+        } else if (NPT_StringsEqual(arg, "--ssl-accept-hostname-mismatch")) {
+            tls_options |= NPT_HttpTlsConnector::OPTION_ACCEPT_HOSTNAME_MISMATCH;
         } else if (!url_set) {
             NPT_Result result = url.Parse(arg);
             if (NPT_FAILED(result)) {
@@ -87,12 +112,32 @@ main(int argc, char** argv)
         }
     }
     
+    // load a client cert if needed
+    if (tls_cert_filename) {
+        NPT_DataBuffer cert;
+        NPT_Result result = NPT_File::Load(tls_cert_filename, cert);
+        if (NPT_FAILED(result)) {
+            fprintf(stderr, "ERROR: failed to load client cert from file %s (%d)\n", tls_cert_filename, result);
+            return 1;
+        }
+        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
+        result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS12, cert.GetData(), cert.GetDataSize(), tls_cert_password);
+        if (NPT_FAILED(result)) {
+            fprintf(stderr, "ERROR: failed to parse client cert (%d)\n", result);
+            return 1;
+        }
+        connector = new NPT_HttpTlsConnector(*tls_context, tls_options);
+    }
+
     // get the document
     NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
     NPT_HttpClient client;
     NPT_HttpResponse* response;
     if (http_1_1) {
         request.SetProtocol(NPT_HTTP_PROTOCOL_1_1);
+    }
+    if (connector) {
+        client.SetConnector(connector);
     }
     NPT_Result result = client.SendRequest(request, response);
     if (NPT_FAILED(result)) {
@@ -169,6 +214,8 @@ main(int argc, char** argv)
     }
 
     delete response;
+    delete connector;
+    delete tls_context;
     
     return 0;
 }

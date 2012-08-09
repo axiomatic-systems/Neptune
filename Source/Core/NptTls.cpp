@@ -224,6 +224,7 @@ NPT_Tls_MapResult(int err)
         case SSL_ERROR_CONN_LOST:           return NPT_ERROR_CONNECTION_ABORTED;
         case SSL_ERROR_TIMEOUT:             return NPT_ERROR_TIMEOUT;
         case SSL_ERROR_EOS:                 return NPT_ERROR_EOS;
+        case SSL_CLOSE_NOTIFY:              return NPT_ERROR_EOS;
         case SSL_ERROR_NOT_SUPPORTED:       return NPT_ERROR_NOT_SUPPORTED;
         case SSL_ERROR_INVALID_HANDSHAKE:   return NPT_ERROR_TLS_INVALID_HANDSHAKE;
         case SSL_ERROR_INVALID_PROT_MSG:    return NPT_ERROR_TLS_INVALID_PROTOCOL_MESSAGE;
@@ -1019,12 +1020,13 @@ NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* host
         if (result == NPT_ERROR_TLS_CERTIFICATE_SELF_SIGNED) {
             if (!m_Options && OPTION_ACCEPT_SELF_SIGNED_CERTS) {
                 // self-signed certs are not acceptable
-                NPT_LOG_FINE("accepting self-signed certificate");
+                NPT_LOG_FINE("rejecting self-signed certificate");
                 return result;
             }
+        } else {
+            NPT_LOG_WARNING_2("TLS certificate verification failed (%d:%s)", result, NPT_ResultText(result));
+            return result;
         }
-        NPT_LOG_WARNING_2("TLS certificate verification failed (%d:%s)", result, NPT_ResultText(result));
-        return result;
     }
 
     // chech the DNS name

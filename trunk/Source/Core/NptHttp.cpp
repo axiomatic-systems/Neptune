@@ -902,7 +902,7 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
     // check the response line
     // we are lenient here, as we allow the response to deviate slightly from
     // strict HTTP (for example, ICY servers response with a method equal to
-    // ICY insead of HTTP/1.X
+    // ICY insead of HTTP/1.X)
     int first_space = line.Find(' ');
     if (first_space < 1) return NPT_ERROR_HTTP_INVALID_RESPONSE_LINE;
     int second_space = line.Find(' ', first_space+1);

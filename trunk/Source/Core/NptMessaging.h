@@ -151,7 +151,7 @@ public:
 +---------------------------------------------------------------------*/
 class NPT_TerminateMessage : public NPT_Message
 {
- public:
+public:
     // methods
     NPT_Result Dispatch(NPT_MessageHandler* /*handler*/) {
         return NPT_ERROR_TERMINATED;
@@ -163,7 +163,7 @@ class NPT_TerminateMessage : public NPT_Message
 +---------------------------------------------------------------------*/
 class NPT_MessageQueue
 {
- public:
+public:
     // methods
     virtual           ~NPT_MessageQueue() {}
     virtual NPT_Result PumpMessage(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;

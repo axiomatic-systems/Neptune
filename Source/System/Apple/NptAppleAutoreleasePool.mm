@@ -1,11 +1,11 @@
 /*****************************************************************
- |
- |      Neptune - Autorelease Pool :: Apple Implementation
- |
- |      Author: Edin Hodzic (dino@concisoft.com)
- |
- ****************************************************************/
-
+|
+|      Neptune - Autorelease Pool :: Apple Implementation
+|
+|      (c) 2001-2008 Gilles Boccon-Gibod
+|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|
+****************************************************************/
 
 /*----------------------------------------------------------------------
 |   includes

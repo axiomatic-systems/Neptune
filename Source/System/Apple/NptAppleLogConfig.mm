@@ -1,3 +1,12 @@
+/*****************************************************************
+|
+|      Neptune - System Log Config
+|
+|      (c) 2001-2008 Gilles Boccon-Gibod
+|      Author: Gilles Boccon-Gibod (bok@bok.net)
+|
+****************************************************************/
+
 #import <Foundation/Foundation.h>
 
 #import "NptLogging.h"

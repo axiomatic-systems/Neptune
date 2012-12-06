@@ -21,8 +21,13 @@
 static void 
 TestHttpGet(const char* arg, bool use_http_1_1, int verbosity)
 {
+    const char* method = NPT_HTTP_METHOD_GET;
+    if (arg && arg[0] == '@') {
+        method = NPT_HTTP_METHOD_HEAD;
+        ++arg;
+    }
     NPT_HttpUrl url(arg);
-    NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
+    NPT_HttpRequest request(url, method);
     NPT_HttpClient client;
     NPT_HttpResponse* response;
 
@@ -38,15 +43,22 @@ TestHttpGet(const char* arg, bool use_http_1_1, int verbosity)
     if (NPT_FAILED(result)) {
         if (verbosity >= 1) printf(LOG_FORMAT, NPT_ResultText(result), 0, 0, 0, (int)elapsed, "", arg);
         return;
-    } 
-    NPT_DataBuffer payload;
-    result = response->GetEntity()->Load(payload);
+    }
     int loaded = -1;
-    if (NPT_SUCCEEDED(result))  {
-        loaded = (int)payload.GetDataSize();
+    if (method != NPT_HTTP_METHOD_HEAD) {
+        NPT_DataBuffer payload;
+        result = response->GetEntity()->Load(payload);
+        if (NPT_SUCCEEDED(result))  {
+            loaded = (int)payload.GetDataSize();
+        }
+    } else {
+        loaded = 0;
     }
     const NPT_String* server = response->GetHeaders().GetHeaderValue("Server");
-    if (verbosity >= 1) printf(LOG_FORMAT, "NPT_SUCCESS", response->GetStatusCode(), loaded, (int)response->GetEntity()->GetContentLength(), (int)elapsed, server?server->GetChars():"", arg);
+    if (verbosity >= 1) {
+        NPT_LargeSize entity_size = response->GetEntity()?response->GetEntity()->GetContentLength():0;
+        printf(LOG_FORMAT, "NPT_SUCCESS", response->GetStatusCode(), loaded, (int)entity_size, (int)elapsed, server?server->GetChars():"", arg);
+    }
 
     delete response;
 }

@@ -59,7 +59,7 @@ public:
 
     NPT_TcpServerSocket m_Socket;
     NPT_SharedVariable  m_Ready;
-    bool                m_Interrupted;
+    volatile bool       m_Interrupted;
 };
 
 /*----------------------------------------------------------------------

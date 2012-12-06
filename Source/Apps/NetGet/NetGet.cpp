@@ -26,10 +26,12 @@ PrintUsageAndExit(void)
             "    --verbose : print verbose information\n"
             "    --no-body-output : do not output the response body\n"
             "    --http-1-1 : use HTTP 1.1\n"
+#if defined(NPT_CONFIG_ENABLE_TLS)
             "    --ssl-client-cert <filename> : load client TLS certificate from <filename> (PKCS12)\n"
             "    --ssl-client-cert-password <password> : optional password for the client cert\n"
             "    --ssl-accept-self-signed-certs : accept self-signed server certificates\n"
             "    --ssl-accept-hostname-mismatch : accept server certificates that don't match\n"
+#endif
             "    --show-proxy : show the proxy that will be used for the connection\n");
 }
 
@@ -53,11 +55,13 @@ main(int argc, char** argv)
     bool http_1_1       = false;
     NPT_HttpUrl url;
     NPT_HttpClient::Connector* connector = NULL;
+#if defined(NPT_CONFIG_ENABLE_TLS)
     NPT_TlsContext*    tls_context = NULL;
     const char*        tls_cert_filename = NULL;
     const char*        tls_cert_password = NULL;
     unsigned int       tls_options = 0;
-    
+#endif
+
     // parse command line
     ++argv;
     const char* arg;
@@ -70,6 +74,7 @@ main(int argc, char** argv)
             no_body_output = true;
         } else if (NPT_StringsEqual(arg, "--http-1-1")) {
             http_1_1 = true;
+#if defined(NPT_CONFIG_ENABLE_TLS)
         } else if (NPT_StringsEqual(arg, "--ssl-client-cert")) {
             tls_cert_filename = *argv++;
             if (tls_cert_filename == NULL) {
@@ -86,6 +91,7 @@ main(int argc, char** argv)
             tls_options |= NPT_HttpTlsConnector::OPTION_ACCEPT_SELF_SIGNED_CERTS;
         } else if (NPT_StringsEqual(arg, "--ssl-accept-hostname-mismatch")) {
             tls_options |= NPT_HttpTlsConnector::OPTION_ACCEPT_HOSTNAME_MISMATCH;
+#endif
         } else if (!url_set) {
             NPT_Result result = url.Parse(arg);
             if (NPT_FAILED(result)) {
@@ -116,6 +122,7 @@ main(int argc, char** argv)
         }
     }
     
+#if defined(NPT_CONFIG_ENABLE_TLS)
     // load a client cert if needed
     if (tls_cert_filename) {
         NPT_DataBuffer cert;
@@ -132,6 +139,7 @@ main(int argc, char** argv)
         }
         connector = new NPT_HttpTlsConnector(*tls_context, tls_options);
     }
+#endif
 
     // get the document
     NPT_HttpRequest request(url, NPT_HTTP_METHOD_GET);
@@ -255,8 +263,10 @@ main(int argc, char** argv)
     
     delete response;
     delete connector;
+#if defined(NPT_CONFIG_ENABLE_TLS)
     delete tls_context;
-    
+#endif
+
     return 0;
 }
 

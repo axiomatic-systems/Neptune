@@ -29,8 +29,6 @@
 |
  ****************************************************************/
 
-#if defined(NPT_CONFIG_ENABLE_TLS)
-
 /*----------------------------------------------------------------------
 |   includes
 +---------------------------------------------------------------------*/
@@ -42,12 +40,13 @@
 #include "NptSystem.h"
 #include "NptDigest.h"
 
-#include "ssl.h"
-
 /*----------------------------------------------------------------------
 |   logging
 +---------------------------------------------------------------------*/
 NPT_SET_LOCAL_LOGGER("neptune.tls")
+
+#if defined(NPT_CONFIG_ENABLE_TLS)
+#include "ssl.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -1042,6 +1041,8 @@ NPT_HttpTlsConnector::VerifyPeer(NPT_TlsClientSession& session, const char* host
     return NPT_SUCCESS;
 }
 
+#endif // defined(NPT_CONFIG_ENABLE_TLS)
+
 /*----------------------------------------------------------------------
 |   NPT_HttpSimpleTlsConnection
 +---------------------------------------------------------------------*/
@@ -1122,6 +1123,7 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
     NPT_CHECK_FINE(tcp_socket.GetOutputStream(raw_output));
     
     if (url.GetSchemeId() == NPT_Url::SCHEME_ID_HTTPS) {
+#if defined(NPT_CONFIG_ENABLE_TLS)
         if (proxy) {
             // RFC 2817 CONNECT
             NPT_String connect_host = url.GetHost() + ":" + NPT_String::FromInteger(url.GetPort());
@@ -1185,6 +1187,9 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
         // return the TLS streams
         tls_session.GetInputStream(input_stream);
         tls_session.GetOutputStream(output_stream);
+#else
+        return NPT_ERROR_NOT_SUPPORTED;
+#endif
     } else {
         input_stream  = raw_input;
         output_stream = raw_output;
@@ -1199,4 +1204,3 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
     return NPT_SUCCESS;
 }
 
-#endif // NPT_CONFIG_ENABLE_TLS

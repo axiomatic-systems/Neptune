@@ -4821,12 +4821,6 @@
 		F912B6A20B8EB1C800C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					NPT_DEBUG,
-					NPT_CONFIG_ENABLE_LOGGING,
-					NPT_CONFIG_ENABLE_ZIP,
-					NPT_CONFIG_ENABLE_TLS,
-				);
 				PRODUCT_NAME = Neptune;
 			};
 			name = Debug;
@@ -4834,11 +4828,6 @@
 		F912B6A30B8EB1C800C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					NPT_CONFIG_ENABLE_LOGGING,
-					NPT_CONFIG_ENABLE_ZIP,
-					NPT_CONFIG_ENABLE_TLS,
-				);
 				PRODUCT_NAME = Neptune;
 			};
 			name = Release;

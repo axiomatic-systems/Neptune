@@ -940,83 +940,6 @@ NPT_HttpResponse::Parse(NPT_BufferedInputStream& stream,
 }
 
 /*----------------------------------------------------------------------
-|   NPT_HttpSimpleConnection
-+---------------------------------------------------------------------*/
-class NPT_HttpSimpleConnection : public NPT_HttpClient::Connection
-{
-public:
-    virtual NPT_InputStreamReference&  GetInputStream() {
-        return m_InputStream;
-    }
-    virtual NPT_OutputStreamReference& GetOutputStream() {
-        return m_OutputStream;
-    }
-    
-    // members
-    NPT_InputStreamReference  m_InputStream;
-    NPT_OutputStreamReference m_OutputStream;
-};
-
-/*----------------------------------------------------------------------
-|   NPT_HttpTcpConnector
-+---------------------------------------------------------------------*/
-class NPT_HttpTcpConnector : public NPT_HttpClient::Connector
-{
-    virtual NPT_Result Connect(const NPT_HttpUrl&           url,
-                               NPT_HttpClient&              client,
-                               const NPT_HttpProxyAddress*  proxy,
-                               bool                         reuse,
-                               NPT_HttpClient::Connection*& connection);
-};
-
-/*----------------------------------------------------------------------
-|   NPT_HttpTcpConnector::Connect
-+---------------------------------------------------------------------*/
-NPT_Result
-NPT_HttpTcpConnector::Connect(const NPT_HttpUrl&           url,
-                              NPT_HttpClient&              client,
-                              const NPT_HttpProxyAddress*  proxy,
-                              bool                         /* reuse */,
-                              NPT_HttpClient::Connection*& connection)
-{
-    // default values
-    connection = NULL;
-    
-    // decide which host we need to connect to
-    const char* server_hostname;
-    NPT_UInt16  server_port;
-    if (proxy) {
-        // the proxy is set
-        server_hostname = (const char*)proxy->GetHostName();
-        server_port = proxy->GetPort();
-    } else {
-        // no proxy: connect directly
-        server_hostname = (const char*)url.GetHost();
-        server_port = url.GetPort();
-    }
-
-    // get the address and port to which we need to connect
-    NPT_IpAddress address;
-    NPT_CHECK_FINE(address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
-
-    // connect to the server
-    NPT_LOG_FINE_2("TCP connector will connect to %s:%d", server_hostname, server_port);
-    NPT_TcpClientSocket tcp_socket;
-    tcp_socket.SetReadTimeout(client.GetConfig().m_IoTimeout);
-    tcp_socket.SetWriteTimeout(client.GetConfig().m_IoTimeout);
-    NPT_SocketAddress socket_address(address, server_port);
-    NPT_CHECK_FINE(tcp_socket.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
-
-    // get the streams
-    NPT_HttpSimpleConnection* _connection = new NPT_HttpSimpleConnection();
-    connection = _connection;
-    tcp_socket.GetInputStream(_connection->m_InputStream);
-    tcp_socket.GetOutputStream(_connection->m_OutputStream);
-    
-    return NPT_SUCCESS;
-}
-
-/*----------------------------------------------------------------------
 |   NPT_HttpEnvProxySelector
 +---------------------------------------------------------------------*/
 class NPT_HttpEnvProxySelector : public NPT_HttpProxySelector
@@ -1431,11 +1354,7 @@ NPT_HttpClient::NPT_HttpClient(Connector* connector, bool transfer_ownership) :
     m_ConnectorIsOwned(transfer_ownership)
 {
     if (connector == NULL) {
-#if defined(NPT_CONFIG_ENABLE_TLS)
         m_Connector = new NPT_HttpTlsConnector();
-#else
-        m_Connector = new NPT_HttpTcpConnector();
-#endif
         m_ConnectorIsOwned = true;
     }
 }

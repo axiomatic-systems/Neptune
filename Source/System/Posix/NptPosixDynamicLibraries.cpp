@@ -14,6 +14,9 @@
 #include "NptDynamicLibraries.h"
 
 #include <dlfcn.h>
+#ifndef RTLD_LOCAL
+#define RTLD_LOCAL 0
+#endif
 
 /*----------------------------------------------------------------------
 |   logging

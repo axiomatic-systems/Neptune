@@ -660,9 +660,10 @@ public:
     };
 
     // constructors and destructor
-    NPT_HttpServer(NPT_UInt16 listen_port = NPT_HTTP_DEFAULT_PORT);
+    NPT_HttpServer(NPT_UInt16 listen_port = NPT_HTTP_DEFAULT_PORT, bool cancellable = false);
     NPT_HttpServer(NPT_IpAddress listen_address, 
-                   NPT_UInt16    listen_port = NPT_HTTP_DEFAULT_PORT);
+                   NPT_UInt16    listen_port = NPT_HTTP_DEFAULT_PORT,
+                   bool          cancellable = false);
     virtual ~NPT_HttpServer();
 
     // methods

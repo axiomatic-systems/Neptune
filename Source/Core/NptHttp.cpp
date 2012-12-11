@@ -1819,7 +1819,8 @@ NPT_HttpRequestContext::NPT_HttpRequestContext(const NPT_SocketAddress* local_ad
 /*----------------------------------------------------------------------
 |   NPT_HttpServer::NPT_HttpServer
 +---------------------------------------------------------------------*/
-NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
+NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port, bool cancellable) :
+    m_Socket(cancellable?NPT_SOCKET_FLAG_CANCELLABLE:0),
     m_BoundPort(0),
     m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING),
     m_Run(true)
@@ -1833,7 +1834,10 @@ NPT_HttpServer::NPT_HttpServer(NPT_UInt16 listen_port) :
 /*----------------------------------------------------------------------
 |   NPT_HttpServer::NPT_HttpServer
 +---------------------------------------------------------------------*/
-NPT_HttpServer::NPT_HttpServer(NPT_IpAddress listen_address, NPT_UInt16 listen_port) :
+NPT_HttpServer::NPT_HttpServer(NPT_IpAddress listen_address,
+                               NPT_UInt16    listen_port,
+                               bool          cancellable) :
+    m_Socket(cancellable?NPT_SOCKET_FLAG_CANCELLABLE:0),
     m_BoundPort(0),
     m_ServerHeader("Neptune/" NPT_NEPTUNE_VERSION_STRING),
     m_Run(true)

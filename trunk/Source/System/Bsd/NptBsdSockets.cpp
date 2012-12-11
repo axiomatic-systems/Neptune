@@ -299,6 +299,7 @@ typedef int          SocketFd;
 #define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s) < 0)
 #define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e) < 0)
 #define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e) < 0)
+#define NPT_BSD_SOCKET_INVALID_HANDLE    (-1)
 
 // network initializer 
 static struct NPT_Ps3NetworkInitializer {
@@ -326,6 +327,7 @@ typedef int         SocketFd;
 #define NPT_BSD_SOCKET_IS_INVALID(_s)    ((_s)  < 0)
 #define NPT_BSD_SOCKET_CALL_FAILED(_e)   ((_e)  < 0)
 #define NPT_BSD_SOCKET_SELECT_FAILED(_e) ((_e)  < 0)
+#define NPT_BSD_SOCKET_INVALID_HANDLE    (-1)
 
 #endif
 

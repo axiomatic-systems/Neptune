@@ -1305,8 +1305,8 @@ NPT_HttpConnectionManager::Recycle(NPT_HttpConnectionManager::Connection* connec
     // remove older connections to make room
     while (m_Connections.GetItemCount() >= m_MaxConnections) {
         NPT_List<Connection*>::Iterator head = m_Connections.GetFirstItem();
-        m_Connections.Erase(head);
         delete *head;
+        m_Connections.Erase(head);
         NPT_LOG_FINER("removing connection from pool to make some room");
     }
     

@@ -124,19 +124,23 @@ main(int argc, char** argv)
     
 #if defined(NPT_CONFIG_ENABLE_TLS)
     // load a client cert if needed
-    if (tls_cert_filename) {
-        NPT_DataBuffer cert;
-        NPT_Result result = NPT_File::Load(tls_cert_filename, cert);
-        if (NPT_FAILED(result)) {
-            fprintf(stderr, "ERROR: failed to load client cert from file %s (%d)\n", tls_cert_filename, result);
-            return 1;
-        }
+    if (tls_options || tls_cert_filename) {
         tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
-        result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS12, cert.GetData(), cert.GetDataSize(), tls_cert_password);
-        if (NPT_FAILED(result)) {
-            fprintf(stderr, "ERROR: failed to parse client cert (%d)\n", result);
-            return 1;
+
+        if (tls_cert_filename) {
+            NPT_DataBuffer cert;
+            NPT_Result result = NPT_File::Load(tls_cert_filename, cert);
+            if (NPT_FAILED(result)) {
+                fprintf(stderr, "ERROR: failed to load client cert from file %s (%d)\n", tls_cert_filename, result);
+                return 1;
+            }
+            result = tls_context->LoadKey(NPT_TLS_KEY_FORMAT_PKCS12, cert.GetData(), cert.GetDataSize(), tls_cert_password);
+            if (NPT_FAILED(result)) {
+                fprintf(stderr, "ERROR: failed to parse client cert (%d)\n", result);
+                return 1;
+            }
         }
+        
         connector = new NPT_HttpTlsConnector(*tls_context, tls_options);
     }
 #endif

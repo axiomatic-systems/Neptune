@@ -15,6 +15,9 @@
 
 #define LOG_FORMAT "%30s,%3d,%8d, %8d, %8d, [%30s], %s\n"
 
+static NPT_HttpClient::Connector* HttpConnector = NULL;
+static NPT_TlsContext* TlsContext = NULL;
+
 /*----------------------------------------------------------------------
 |       TestHttpGet
 +---------------------------------------------------------------------*/
@@ -33,6 +36,7 @@ TestHttpGet(const char* arg, bool use_http_1_1, int verbosity)
 
     if (!url.IsValid()) return;
     if (use_http_1_1) request.SetProtocol(NPT_HTTP_PROTOCOL_1_1);
+    if (HttpConnector) client.SetConnector(HttpConnector);
 
     NPT_TimeStamp before;
     NPT_System::GetCurrentTimeStamp(before);
@@ -212,6 +216,9 @@ main(int argc, char** argv)
             NPT_ParseInteger(*++argv, verbosity);
         } else if (NPT_StringsEqual(*argv, "--threads")) {
             NPT_ParseInteger(*++argv, threads);
+        } else if (NPT_StringsEqual(*argv, "--no-cert-check")) {
+            TlsContext = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
+            HttpConnector = new NPT_HttpTlsConnector(*TlsContext, NPT_HttpTlsConnector::OPTION_ACCEPT_SELF_SIGNED_CERTS | NPT_HttpTlsConnector::OPTION_ACCEPT_HOSTNAME_MISMATCH);
         } else {
             break;
         }
@@ -236,6 +243,9 @@ main(int argc, char** argv)
         cthreads[i]->Wait();
         delete cthreads[i];
     }
+
+    delete TlsContext;
+    delete HttpConnector;
     
     return 0;
 }

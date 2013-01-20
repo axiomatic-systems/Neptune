@@ -181,6 +181,10 @@
 		CAAAA08512FF828A00ABC84B /* NetResolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAAAA07612FF823200ABC84B /* NetResolve.cpp */; };
 		CAC029DE139D84D10034427F /* LoggingTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC029DD139D84D10034427F /* LoggingTest2.cpp */; };
 		CAC5048312FFB7EF00FEB1D8 /* NptBsdResolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */; };
+		CAC8F0A716AB54EA00C49741 /* NetBench.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = CAC8F0A616AB54EA00C49741 /* NetBench.1 */; };
+		CAC8F0AB16AB550A00C49741 /* NetBench.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC8F09C16AB54AF00C49741 /* NetBench.cpp */; };
+		CAC8F0B016AB558100C49741 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
+		CAC8F0B116AB558100C49741 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAD78DD312A99DC500D7EBA7 /* NptHash.h in Headers */ = {isa = PBXBuildFile; fileRef = CAD78DD212A99DC500D7EBA7 /* NptHash.h */; };
 		CAD78E0412A9C42000D7EBA7 /* NptHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */; };
 		CAE063D31241473B00E5AFC4 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
@@ -515,6 +519,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = CAAAA07B12FF824E00ABC84B;
 			remoteInfo = NetResolve;
+		};
+		CAC8F0AC16AB553400C49741 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
+		CAC8F0AE16AB553400C49741 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
+			remoteInfo = axTLS;
 		};
 		CAE063D61241479100E5AFC4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -858,6 +876,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		CAC8F09F16AB54EA00C49741 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				CAC8F0A716AB54EA00C49741 /* NetBench.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -987,6 +1015,10 @@
 		CAAAA07C12FF824E00ABC84B /* NetResolve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetResolve; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAC029DD139D84D10034427F /* LoggingTest2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoggingTest2.cpp; sourceTree = "<group>"; };
 		CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptBsdResolver.cpp; sourceTree = "<group>"; };
+		CAC8F09C16AB54AF00C49741 /* NetBench.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetBench.cpp; sourceTree = "<group>"; };
+		CAC8F0A116AB54EA00C49741 /* NetBench */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetBench; sourceTree = BUILT_PRODUCTS_DIR; };
+		CAC8F0A416AB54EA00C49741 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		CAC8F0A616AB54EA00C49741 /* NetBench.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = NetBench.1; sourceTree = "<group>"; };
 		CAD78DD212A99DC500D7EBA7 /* NptHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NptHash.h; sourceTree = "<group>"; };
 		CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptHash.cpp; sourceTree = "<group>"; };
 		CAE4169B0E0DBD6600A530D1 /* MiscTest1 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MiscTest1; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1239,6 +1271,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAAAA08212FF825800ABC84B /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAC8F09E16AB54EA00C49741 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAC8F0B016AB558100C49741 /* libaxTLS.a in Frameworks */,
+				CAC8F0B116AB558100C49741 /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1835,15 +1876,33 @@
 			path = Logging2;
 			sourceTree = "<group>";
 		};
+		CAC8F09B16AB54AF00C49741 /* NetBench */ = {
+			isa = PBXGroup;
+			children = (
+				CAC8F09C16AB54AF00C49741 /* NetBench.cpp */,
+			);
+			path = NetBench;
+			sourceTree = "<group>";
+		};
+		CAC8F0A316AB54EA00C49741 /* NetBench */ = {
+			isa = PBXGroup;
+			children = (
+				CAC8F0A416AB54EA00C49741 /* main.cpp */,
+				CAC8F0A616AB54EA00C49741 /* NetBench.1 */,
+			);
+			path = NetBench;
+			sourceTree = "<group>";
+		};
 		CAE417A50E0DC16300A530D1 /* Apps */ = {
 			isa = PBXGroup;
 			children = (
 				CA7848460F3B6EB8009E84AD /* MiniHttpServer */,
+				CAC8F09B16AB54AF00C49741 /* NetBench */,
 				CAE417A60E0DC16300A530D1 /* NetConfig */,
 				CAE417A80E0DC16300A530D1 /* NetEcho */,
+				CA790DA41233BDAA00875081 /* NetGet */,
 				CAE417AA0E0DC16300A530D1 /* NetPing */,
 				CAE417AC0E0DC16300A530D1 /* NetPump */,
-				CA790DA41233BDAA00875081 /* NetGet */,
 				CAAAA07512FF823200ABC84B /* NetResolve */,
 			);
 			name = Apps;
@@ -1914,6 +1973,7 @@
 				CAE417A50E0DC16300A530D1 /* Apps */,
 				CAA979D50CF1648300C01909 /* Tests */,
 				CA77C0BC14C0BC7700442B97 /* NetworkTest1 */,
+				CAC8F0A316AB54EA00C49741 /* NetBench */,
 				F912B6A00B8EB1C700C1E90D /* Products */,
 				CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */,
 			);
@@ -1960,6 +2020,7 @@
 				CA790DA91233BDC100875081 /* NetGet */,
 				CAAAA07C12FF824E00ABC84B /* NetResolve */,
 				CA77C0BA14C0BC7700442B97 /* NetworkTest1 */,
+				CAC8F0A116AB54EA00C49741 /* NetBench */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2507,6 +2568,25 @@
 			productReference = CAAAA07C12FF824E00ABC84B /* NetResolve */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAC8F0A016AB54EA00C49741 /* NetBench */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAC8F0A816AB54EA00C49741 /* Build configuration list for PBXNativeTarget "NetBench" */;
+			buildPhases = (
+				CAC8F09D16AB54EA00C49741 /* Sources */,
+				CAC8F09E16AB54EA00C49741 /* Frameworks */,
+				CAC8F09F16AB54EA00C49741 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAC8F0AD16AB553400C49741 /* PBXTargetDependency */,
+				CAC8F0AF16AB553400C49741 /* PBXTargetDependency */,
+			);
+			name = NetBench;
+			productName = NetBench;
+			productReference = CAC8F0A116AB54EA00C49741 /* NetBench */;
+			productType = "com.apple.product-type.tool";
+		};
 		CAE4169A0E0DBD6600A530D1 /* MiscTest1 */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CAE416B30E0DBDBB00A530D1 /* Build configuration list for PBXNativeTarget "MiscTest1" */;
@@ -2882,6 +2962,7 @@
 				CAE417C70E0DC1B400A530D1 /* NetConfig */,
 				CAE417D40E0DC1D600A530D1 /* NetPing */,
 				CA790DA81233BDC100875081 /* NetGet */,
+				CAC8F0A016AB54EA00C49741 /* NetBench */,
 				CAAAA07B12FF824E00ABC84B /* NetResolve */,
 				CAE416B80E0DBDF800A530D1 /* ArraysTest1 */,
 				CAE416C50E0DBE2F00A530D1 /* BufferedStreamsTest1 */,
@@ -3075,6 +3156,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAAAA08512FF828A00ABC84B /* NetResolve.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAC8F09D16AB54EA00C49741 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAC8F0AB16AB550A00C49741 /* NetBench.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3454,6 +3543,16 @@
 			isa = PBXTargetDependency;
 			target = CAAAA07B12FF824E00ABC84B /* NetResolve */;
 			targetProxy = CAAAA08312FF827D00ABC84B /* PBXContainerItemProxy */;
+		};
+		CAC8F0AD16AB553400C49741 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CAC8F0AC16AB553400C49741 /* PBXContainerItemProxy */;
+		};
+		CAC8F0AF16AB553400C49741 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
+			targetProxy = CAC8F0AE16AB553400C49741 /* PBXContainerItemProxy */;
 		};
 		CAE063D71241479100E5AFC4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4173,6 +4272,50 @@
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetResolve;
 				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		CAC8F0A916AB54EA00C49741 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CAC8F0AA16AB54EA00C49741 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 			};
 			name = Release;
 		};
@@ -4996,6 +5139,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		CAC8F0A816AB54EA00C49741 /* Build configuration list for PBXNativeTarget "NetBench" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAC8F0A916AB54EA00C49741 /* Debug */,
+				CAC8F0AA16AB54EA00C49741 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		CAE416B30E0DBDBB00A530D1 /* Build configuration list for PBXNativeTarget "MiscTest1" */ = {
 			isa = XCConfigurationList;

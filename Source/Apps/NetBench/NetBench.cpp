@@ -164,7 +164,7 @@ main(int argc, char** argv)
     // load a client cert if needed
     NPT_TlsContext* tls_context = NULL;
     if (tls_options || tls_cert_filename) {
-        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
+        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS | NPT_TlsContext::OPTION_NO_SESSION_CACHE);
         if (tls_cert_filename) {
             NPT_DataBuffer cert;
             NPT_Result result = NPT_File::Load(tls_cert_filename, cert);

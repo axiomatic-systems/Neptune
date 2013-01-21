@@ -127,7 +127,8 @@ public:
     enum {
         OPTION_VERIFY_LATER               = 1,
         OPTION_REQUIRE_CLIENT_CERTIFICATE = 2,
-        OPTION_ADD_DEFAULT_TRUST_ANCHORS  = 4
+        OPTION_ADD_DEFAULT_TRUST_ANCHORS  = 4,
+        OPTION_NO_SESSION_CACHE           = 8
     };
     NPT_TlsContext(NPT_Flags options=0);
    ~NPT_TlsContext();

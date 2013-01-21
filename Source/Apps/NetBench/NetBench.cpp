@@ -34,10 +34,10 @@ PrintUsageAndExit(void)
             "  Options:\n"
             "    --verbose : print verbose information\n"
             "    --threads <n> : use <n> independent threads for requests\n"
+            "    --max-requests <n> : stop after <n> requests\n"
+            "    --max-time <n> : stop after <n> seconds\n"
             "    --ssl-client-cert <filename> : load client TLS certificate from <filename> (PKCS12)\n"
             "    --ssl-client-cert-password <password> : optional password for the client cert\n"
-            "    --ssl-accept-self-signed-certs : accept self-signed server certificates\n"
-            "    --ssl-accept-hostname-mismatch : accept server certificates that don't match\n"
     );
 }
 
@@ -54,7 +54,8 @@ public:
         m_Connector(NULL),
         m_Iterations(0),
         m_Failures(0),
-        m_Done(false)
+        m_Done(false),
+        m_ShouldStop(false)
     {
         if (tls_context) {
             m_Connector = new NPT_HttpTlsConnector(*tls_context, tls_options);
@@ -70,7 +71,7 @@ public:
         // get the document
         NPT_HttpRequest request(m_Url, NPT_HTTP_METHOD_GET);
         
-        for (;;) {
+        while (!m_ShouldStop) {
             NPT_HttpResponse* response = NULL;
 
             NPT_Result result = m_Client.SendRequest(request, response);
@@ -100,7 +101,8 @@ public:
     NPT_HttpClient::Connector* m_Connector;
     NPT_UInt32                 m_Iterations;
     NPT_UInt32                 m_Failures;
-    bool                       m_Done;
+    volatile bool              m_Done;
+    volatile bool              m_ShouldStop;
 };
 
 /*----------------------------------------------------------------------
@@ -121,6 +123,9 @@ main(int argc, char** argv)
     unsigned int tls_options       = NPT_HttpTlsConnector::OPTION_ACCEPT_SELF_SIGNED_CERTS | NPT_HttpTlsConnector::OPTION_ACCEPT_HOSTNAME_MISMATCH;
     const char*  url               = NULL;
     unsigned int threads           = 1;
+    unsigned int max_requests      = 0;
+    unsigned int max_time          = 0;
+    
     NPT_SetMemory(&Config, 0, sizeof(Config));
     
     // parse command line
@@ -132,6 +137,10 @@ main(int argc, char** argv)
         } else if (NPT_StringsEqual(arg, "--threads")) {
             NPT_ParseInteger(*argv++, threads);
             if (threads < 1) threads = 1;
+        } else if (NPT_StringsEqual(arg, "--max-requests")) {
+            NPT_ParseInteger(*argv++, max_requests);
+        } else if (NPT_StringsEqual(arg, "--max-time")) {
+            NPT_ParseInteger(*argv++, max_time);
         } else if (NPT_StringsEqual(arg, "--ssl-client-cert")) {
             tls_cert_filename = *argv++;
             if (tls_cert_filename == NULL) {
@@ -178,6 +187,9 @@ main(int argc, char** argv)
         worker->Start();
     }
 
+    NPT_TimeStamp start_time;
+    NPT_System::GetCurrentTimeStamp(start_time);
+    
     struct {
         unsigned int  request_count;
         unsigned int  failure_count;
@@ -193,7 +205,9 @@ main(int argc, char** argv)
             total_failures += workers[i]->m_Failures;
             if (!workers[i]->m_Done) all_done = false;
         }
-        NPT_System::GetCurrentTimeStamp(stats[cursor].timestamp);
+        NPT_TimeStamp now;
+        NPT_System::GetCurrentTimeStamp(now);
+        stats[cursor].timestamp     = now;
         stats[cursor].request_count = total_requests;
         stats[cursor].failure_count = total_failures;
         
@@ -208,16 +222,26 @@ main(int argc, char** argv)
         if (window_duration.ToMillis()) {
             rate = 1000.0*(double)reqs_in_window/(double)window_duration.ToMillis();
         }
-        printf("\rReqs: %d - Fail = %d - Rate: %.2f tps", total_requests, total_failures, (float)rate);
+        printf("\rReqs: %d - Fail: %d - Rate: %.2f tps", total_requests, total_failures, (float)rate);
         fflush(stdout);
 
         cursor = (cursor+1)%STATS_WINDOW_SIZE;
         
+        if (max_time && (now-start_time).ToSeconds() >= max_time) {
+            break;
+        }
+        if (max_requests && total_requests >= max_requests) {
+            break;
+        }
         if (all_done) {
-            printf("\n");
             break;
         }
         NPT_System::Sleep(0.1);
+    }
+    printf("\n");
+
+    for (unsigned int i=0; i<threads; i++) {
+        workers[i]->m_ShouldStop = true;
     }
     
     for (unsigned int i=0; i<threads; i++) {

@@ -266,7 +266,7 @@ public:
     NPT_TlsContextImpl(NPT_Flags options) :
         m_SSL_CTX(ssl_ctx_new(((options & NPT_TlsContext::OPTION_VERIFY_LATER)?SSL_SERVER_VERIFY_LATER:0) |
                               ((options & NPT_TlsContext::OPTION_REQUIRE_CLIENT_CERTIFICATE)?SSL_CLIENT_AUTHENTICATION:0),
-                              NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE)) {}
+                              (options & NPT_TlsContext::OPTION_NO_SESSION_CACHE)?0:NPT_TLS_CONTEXT_DEFAULT_SESSION_CACHE)) {}
     ~NPT_TlsContextImpl() { ssl_ctx_free(m_SSL_CTX); }
     
     NPT_Result LoadKey(NPT_TlsKeyFormat     key_format, 

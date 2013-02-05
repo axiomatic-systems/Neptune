@@ -16,10 +16,6 @@
 /*----------------------------------------------------------------------
 |   Config
 +---------------------------------------------------------------------*/
-struct {
-    bool verbose;
-} Config;
-
 const int STATS_WINDOW_SIZE = 100;
 
 /*----------------------------------------------------------------------
@@ -32,7 +28,6 @@ PrintUsageAndExit(void)
             "NetBench [options] <url>\n"
             "\n"
             "  Options:\n"
-            "    --verbose : print verbose information\n"
             "    --threads <n> : use <n> independent threads for requests\n"
             "    --max-requests <n> : stop after <n> requests\n"
             "    --max-time <n> : stop after <n> seconds\n"
@@ -126,15 +121,11 @@ main(int argc, char** argv)
     unsigned int max_requests      = 0;
     unsigned int max_time          = 0;
     
-    NPT_SetMemory(&Config, 0, sizeof(Config));
-    
     // parse command line
     ++argv;
     const char* arg;
     while ((arg = *argv++)) {
-        if (NPT_StringsEqual(arg, "--verbose")) {
-            Config.verbose = true;
-        } else if (NPT_StringsEqual(arg, "--threads")) {
+        if (NPT_StringsEqual(arg, "--threads")) {
             NPT_ParseInteger(*argv++, threads);
             if (threads < 1) threads = 1;
         } else if (NPT_StringsEqual(arg, "--max-requests")) {
@@ -164,7 +155,7 @@ main(int argc, char** argv)
     // load a client cert if needed
     NPT_TlsContext* tls_context = NULL;
     if (tls_options || tls_cert_filename) {
-        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS | NPT_TlsContext::OPTION_NO_SESSION_CACHE);
+        tls_context = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS/* | NPT_TlsContext::OPTION_NO_SESSION_CACHE*/);
         if (tls_cert_filename) {
             NPT_DataBuffer cert;
             NPT_Result result = NPT_File::Load(tls_cert_filename, cert);

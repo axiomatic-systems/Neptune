@@ -260,8 +260,9 @@ class NPT_XmlTextNode : public NPT_XmlNode
     NPT_XmlTextNode(TokenType token_type, const char* text);
 
     // methods
-    const NPT_String& GetString() const { return m_Text; }
-
+    const NPT_String& GetString()    const { return m_Text;      }
+    TokenType         GetTokenType() const { return m_TokenType; }
+    
     // type casting
     NPT_XmlTextNode*       AsTextNode()       { return this; }
     const NPT_XmlTextNode* AsTextNode() const { return this; }

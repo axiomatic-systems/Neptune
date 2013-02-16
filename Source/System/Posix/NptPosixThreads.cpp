@@ -404,7 +404,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
 +---------------------------------------------------------------------*/
 NPT_PosixThread::~NPT_PosixThread()
 {
-    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %d\n", m_ThreadId);
+    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lu\n", (unsigned long)m_ThreadId);
 
     if (!m_Detached) {
         // we're not detached, and not in the Run() method, so we need to 
@@ -501,8 +501,8 @@ NPT_PosixThread::Start()
     pthread_t thread_id;
     int result = pthread_create(&thread_id, attributes, EntryPoint, 
                                 static_cast<NPT_PosixThread*>(this));
-    NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %d, res=%d", 
-                   thread_id, result);
+    NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %lu, res=%d", 
+                   (unsigned long)thread_id, result);
     if (result != 0) {
         // failed
         return NPT_FAILURE;

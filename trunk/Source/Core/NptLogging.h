@@ -90,7 +90,11 @@ public:
              unsigned int source_line,
              const char*  source_function,
              const char*  msg, 
-                          ...);
+                          ...)
+#ifdef __GNUC__
+        __attribute__ ((format (printf, 6, 7)))
+#endif
+        ;
 
     NPT_Result AddHandler(NPT_LogHandler* handler);
     NPT_Result DeleteHandlers();

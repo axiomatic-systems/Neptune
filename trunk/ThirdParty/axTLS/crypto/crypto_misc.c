@@ -48,8 +48,11 @@ static int rng_fd = -1;
 static HCRYPTPROV gCryptProv;
 #endif
 
-#if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB) && !defined(WIN32))
+#if !defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB) && !defined(WIN32)
 #include <sys/time.h> /* GBG */
+#endif
+
+#if !defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB)
 /* change to processor registers as appropriate */
 #define ENTROPY_POOL_SIZE 32
 #define ENTROPY_COUNTER1 ((((uint64_t)tv.tv_sec)<<32) | tv.tv_usec)
@@ -149,7 +152,7 @@ EXP_FUNC void STDCALL RNG_initialize()
     }
 #else   
     /* start of with a stack to copy across */
-    int i;
+    int i = 0; /* GBG */
     memcpy(entropy_pool, &i, ENTROPY_POOL_SIZE);
     srand((unsigned int)&i); 
 #endif

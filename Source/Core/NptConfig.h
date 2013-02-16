@@ -121,6 +121,7 @@
 
 /* QNX */
 #if defined(__QNX__)
+#define NPT_CONFIG_HAVE_GETADDRINFO
 #endif
 
 /* cygwin */
@@ -273,6 +274,7 @@ typedef long NPT_PointerLong;
 #if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6)
 #define NPT_CONFIG_HAVE_STAT_ST_BIRTHTIME
 #endif
+#define NPT_CONFIG_HAVE_DEV_URANDOM
 #endif
 #endif
 

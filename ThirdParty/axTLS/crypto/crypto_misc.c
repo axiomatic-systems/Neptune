@@ -48,7 +48,8 @@ static int rng_fd = -1;
 static HCRYPTPROV gCryptProv;
 #endif
 
-#if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
+#if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB) && !defined(WIN32))
+#include <sys/time.h> /* GBG */
 /* change to processor registers as appropriate */
 #define ENTROPY_POOL_SIZE 32
 #define ENTROPY_COUNTER1 ((((uint64_t)tv.tv_sec)<<32) | tv.tv_usec)
@@ -172,7 +173,7 @@ EXP_FUNC void STDCALL RNG_custom_init(const uint8_t *seed_buf, int size)
  */
 EXP_FUNC void STDCALL RNG_terminate(void)
 {
-#ifndef WIN32
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
     close(rng_fd);
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
     CryptReleaseContext(gCryptProv, 0);

@@ -176,6 +176,7 @@ private:
     // members
     NPT_Mutex                    m_Lock;
     NPT_Thread::ThreadId         m_LockOwner;
+    unsigned int                 m_LockRecursion;
     bool                         m_Enabled;
     bool                         m_Configured;
     NPT_List<NPT_LogConfigEntry> m_Config;

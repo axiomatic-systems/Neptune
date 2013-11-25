@@ -937,7 +937,7 @@ NPT_BsdSocketInputStream::Read(void*     buffer,
     }
     
     // update position and return
-    if (bytes_read) *bytes_read = nb_read;
+    if (bytes_read) *bytes_read = (NPT_Size)nb_read;
     m_SocketFdReference->m_Position += nb_read;
     return NPT_SUCCESS;
 }
@@ -1056,7 +1056,7 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
     }
     
     // update position and return
-    if (bytes_written) *bytes_written = nb_written;
+    if (bytes_written) *bytes_written = (NPT_Size)nb_written;
     m_SocketFdReference->m_Position += nb_written;
     return NPT_SUCCESS;
 }
@@ -1489,7 +1489,7 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
     }
 
     // send the packet buffer
-    int io_result;
+    ssize_t io_result;
     if (address) {
         // send to the specified address
 
@@ -1558,7 +1558,7 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
     }
 
     // receive a packet
-    int io_result = 0;
+    ssize_t io_result = 0;
     if (address) {
         struct sockaddr_in inet_address;
         socklen_t          inet_address_length = sizeof(inet_address);
@@ -1601,7 +1601,7 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
     } 
     
     // update position and return
-    packet.SetDataSize(io_result);
+    packet.SetDataSize((NPT_Size)io_result);
     m_SocketFdReference->m_Position += io_result;
     return NPT_SUCCESS;
 }

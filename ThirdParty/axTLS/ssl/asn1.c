@@ -390,7 +390,7 @@ asn1_oid_to_string(const uint8_t *oid, int len)
     
     /* other values */
     {
-        unsigned long value = 0;
+        unsigned int /* GBG long */ value = 0;
         for (i=1; i<len; i++) {
             value = (value<<7) + (oid[i]&0x7F);
             if ((oid[i]&0x80) == 0) {

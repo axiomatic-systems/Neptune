@@ -423,7 +423,7 @@ NPT_Zip::Deflate(const NPT_DataBuffer& in,
     if (err != Z_OK) return MapError(err);
 
     // reserve an output buffer known to be large enough
-    out.Reserve(deflateBound(&stream, stream.avail_in) + (format==GZIP?10:0));
+    out.Reserve((NPT_Size)deflateBound(&stream, stream.avail_in) + (format==GZIP?10:0));
     stream.next_out  = out.UseData();
     stream.avail_out = out.GetBufferSize();
 
@@ -435,7 +435,7 @@ NPT_Zip::Deflate(const NPT_DataBuffer& in,
     }
     
     // update the output size
-    out.SetDataSize(stream.total_out);
+    out.SetDataSize((NPT_Size)stream.total_out);
 
     // cleanup
     err = deflateEnd(&stream);
@@ -472,12 +472,12 @@ NPT_Zip::Inflate(const NPT_DataBuffer& in,
     do {
         err = inflate(&stream, Z_SYNC_FLUSH);
         if (err == Z_STREAM_END || err == Z_OK || err == Z_BUF_ERROR) {
-            out.SetDataSize(stream.total_out);
+            out.SetDataSize((NPT_Size)stream.total_out);
             if ((err == Z_OK && stream.avail_out == 0) || err == Z_BUF_ERROR) {
                 // grow the output buffer
                 out.Reserve(out.GetBufferSize()*2);
                 stream.next_out = out.UseData()+stream.total_out;
-                stream.avail_out = out.GetBufferSize()-stream.total_out;
+                stream.avail_out = out.GetBufferSize()-(NPT_Size)stream.total_out;
             }
         }
     } while (err == Z_OK);

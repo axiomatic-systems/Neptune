@@ -1968,7 +1968,7 @@ NPT_XmlParser::OnEndElement(const char* name)
 |   NPT_XmlParser::OnCharacterData
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_XmlParser::OnCharacterData(const char* data, unsigned long size)
+NPT_XmlParser::OnCharacterData(const char* data, NPT_Size size)
 { 
     NPT_XML_Debug_1("\nNPT_XmlParser::OnCharacterData: %s\n", data);
     

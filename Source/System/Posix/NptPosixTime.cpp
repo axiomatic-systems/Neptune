@@ -72,5 +72,5 @@ NPT_DateTime::GetLocalTimeZone()
 
     localtime_r(&epoch, &tm_local);
     
-    return tm_local.tm_gmtoff/60;
+    return (NPT_Int32)(tm_local.tm_gmtoff/60);
 }

@@ -42,7 +42,7 @@
 #include "wincrypt.h"
 #endif
 
-#ifndef WIN32
+#if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM) /* GBG modified */
 static int rng_fd = -1;
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
 static HCRYPTPROV gCryptProv;
@@ -168,6 +168,9 @@ EXP_FUNC void STDCALL RNG_custom_init(const uint8_t *seed_buf, int size)
 
     for (i = 0; i < ENTROPY_POOL_SIZE && i < size; i++)
         entropy_pool[i] ^= seed_buf[i];
+#else /* GBG */
+    (void)seed_buf;
+    (void)size;
 #endif
 }
 

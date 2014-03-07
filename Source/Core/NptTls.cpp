@@ -1092,26 +1092,26 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
         server_port     = url.GetPort();
     }
     
-    // resolve the server address
-    NPT_IpAddress ip_address;
-    NPT_CHECK_FINE(ip_address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
-
     // check if we can reuse a connection
     // TODO: with this we don't yet support reusing a connection to a proxy
-    NPT_SocketAddress socket_address(ip_address, server_port);
     NPT_HttpConnectionManager* connection_manager = NPT_HttpConnectionManager::GetInstance();
     if (!proxy && reuse) {
         NPT_LOG_FINE("looking for a connection to reuse");
-        connection = connection_manager->FindConnection(socket_address);
+        connection = connection_manager->FindConnection(server_hostname, server_port);
         if (connection) {
             NPT_LOG_FINE("reusing connection");
             return NPT_SUCCESS;
         }
     }
     
+    // resolve the server address
+    NPT_IpAddress ip_address;
+    NPT_CHECK_FINE(ip_address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
+
     // connect to the server
     NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
     NPT_TcpClientSocket tcp_socket;
+    NPT_SocketAddress socket_address(ip_address, server_port);
     tcp_socket.SetReadTimeout(client.GetConfig().m_IoTimeout);
     tcp_socket.SetWriteTimeout(client.GetConfig().m_IoTimeout);
     NPT_CHECK_FINE(tcp_socket.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
@@ -1197,7 +1197,8 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
 
     // create a connection object for the streams
     connection = new NPT_HttpConnectionManager::Connection(*connection_manager,
-                                                           socket_address,
+                                                           server_hostname,
+                                                           server_port,
                                                            input_stream,
                                                            output_stream);
     

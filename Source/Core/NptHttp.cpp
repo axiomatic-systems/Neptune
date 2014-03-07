@@ -1274,8 +1274,10 @@ NPT_HttpConnectionManager::Cleanup()
 |   NPT_HttpConnectionManager::FindConnection
 +---------------------------------------------------------------------*/
 NPT_HttpConnectionManager::Connection*
-NPT_HttpConnectionManager::FindConnection(NPT_SocketAddress& address)
+NPT_HttpConnectionManager::FindConnection(const char* hostname, unsigned int port)
 {
+    if (hostname == NULL) return NULL;
+    
     NPT_AutoLock lock(m_Lock);
     Cleanup();
 
@@ -1283,7 +1285,8 @@ NPT_HttpConnectionManager::FindConnection(NPT_SocketAddress& address)
                                          i;
                                        ++i) {
         Connection* connection = *i;
-        if (connection->m_SocketAddress == address) {
+        if (connection->m_HostName.Compare(hostname, true) == 0 &&
+            connection->m_Port == port) {
             m_Connections.Erase(i);
             return connection;
         }
@@ -1324,12 +1327,14 @@ NPT_HttpConnectionManager::Recycle(NPT_HttpConnectionManager::Connection* connec
 |   NPT_HttpConnectionManager::Connection::Connection
 +---------------------------------------------------------------------*/
 NPT_HttpConnectionManager::Connection::Connection(NPT_HttpConnectionManager& manager,
-                                                  const NPT_SocketAddress&   address,
+                                                  const char*                hostname,
+                                                  unsigned int               port,
                                                   NPT_InputStreamReference   input_stream,
                                                   NPT_OutputStreamReference  output_stream) :
     m_Manager(manager),
     m_IsRecycled(false),
-    m_SocketAddress(address),
+    m_HostName(hostname),
+    m_Port(port),
     m_InputStream(input_stream),
     m_OutputStream(output_stream)
 {

@@ -49,7 +49,7 @@ TestHttpGet(const char* arg, bool use_http_1_1, int verbosity)
         return;
     }
     int loaded = -1;
-    if (method != NPT_HTTP_METHOD_HEAD) {
+    if (!NPT_StringsEqual(method, NPT_HTTP_METHOD_HEAD)) {
         NPT_DataBuffer payload;
         result = response->GetEntity()->Load(payload);
         if (NPT_SUCCEEDED(result))  {

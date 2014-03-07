@@ -482,7 +482,8 @@ public:
     {
     public:
         Connection(NPT_HttpConnectionManager& manager,
-                   const NPT_SocketAddress&   address,
+                   const char*                hostname,
+                   unsigned int               port,
                    NPT_InputStreamReference   input_stream,
                    NPT_OutputStreamReference  output_stream);
                    
@@ -498,7 +499,8 @@ public:
         NPT_HttpConnectionManager& m_Manager;
         bool                       m_IsRecycled;
         NPT_TimeStamp              m_TimeStamp;
-        NPT_SocketAddress          m_SocketAddress;
+        NPT_String                 m_HostName;
+        unsigned int               m_Port;
         NPT_InputStreamReference   m_InputStream;
         NPT_OutputStreamReference  m_OutputStream;
     };
@@ -507,7 +509,7 @@ public:
     ~NPT_HttpConnectionManager();
     
     // methods
-    Connection* FindConnection(NPT_SocketAddress& address);
+    Connection* FindConnection(const char* hostname, unsigned int port);
     NPT_Result  Recycle(Connection* connection);
     
 private:

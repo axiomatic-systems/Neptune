@@ -43,6 +43,7 @@
 +---------------------------------------------------------------------*/
 NPT_BufferedInputStream::NPT_BufferedInputStream(NPT_InputStreamReference& source, NPT_Size buffer_size) :
     m_Source(source),
+    m_Position(0),
     m_SkipNewline(false),
     m_Eos(false)
 {
@@ -217,6 +218,7 @@ done:
     *buffer = '\0';
 
     // return what we have
+    m_Position += (NPT_Size)(buffer-buffer_start);
     if (chars_read) *chars_read = (NPT_Size)(buffer-buffer_start);
     if (result == NPT_ERROR_EOS) {
         m_Eos = true;
@@ -326,6 +328,7 @@ NPT_BufferedInputStream::Read(void*     buffer,
     }
     
 done:
+    m_Position += total_read;
     if (bytes_read) *bytes_read = total_read;
     if (result == NPT_ERROR_EOS) { 
         m_Eos = true;
@@ -342,10 +345,26 @@ done:
 |   NPT_BufferedInputStream::Seek
 +---------------------------------------------------------------------*/
 NPT_Result 
-NPT_BufferedInputStream::Seek(NPT_Position /*offset*/)
+NPT_BufferedInputStream::Seek(NPT_Position offset)
 {
-    // not implemented yet
-    return NPT_ERROR_NOT_IMPLEMENTED;
+    NPT_Result result;
+
+    if (offset >= m_Position && 
+        offset - m_Position < m_Buffer.valid - m_Buffer.offset) {
+        m_Buffer.offset += offset - m_Position;
+        m_Position = offset;
+        return NPT_SUCCESS;
+    }
+
+    result = m_Source->Seek(offset);
+    if (NPT_FAILED(result)) return result;
+
+    m_Buffer.offset = 0;
+    m_Buffer.valid  = 0;
+    m_Eos = false;
+    m_Position = offset;
+
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -354,9 +373,8 @@ NPT_BufferedInputStream::Seek(NPT_Position /*offset*/)
 NPT_Result 
 NPT_BufferedInputStream::Tell(NPT_Position& offset)
 {
-    // not implemented yet
-    offset = 0;
-    return NPT_ERROR_NOT_IMPLEMENTED;
+    offset = m_Position;
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------

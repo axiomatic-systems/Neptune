@@ -38,7 +38,9 @@
 #include "NptLogging.h"
 #include "NptUtils.h"
 
+#if defined(NPT_CONFIG_ENABLE_ZIP)
 #include "zlib.h"
+#endif
 
 /*----------------------------------------------------------------------
 |   logging
@@ -280,7 +282,7 @@ NPT_ZipFile::GetInputStream(Entry& entry, NPT_InputStreamReference& zip_stream, 
         return NPT_ERROR_NOT_SUPPORTED;
     }
 #else
-    if (entry.m_CompressionMethod != NPT_ZIP_COMPRESSION_METHOD_NONE) {
+    if (entry.m_CompressionMethod != NPT_ZIP_FILE_COMPRESSION_METHOD_NONE) {
         return NPT_ERROR_NOT_SUPPORTED;
     }
 #endif

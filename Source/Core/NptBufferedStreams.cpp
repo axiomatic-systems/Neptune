@@ -351,7 +351,7 @@ NPT_BufferedInputStream::Seek(NPT_Position offset)
 
     if (offset >= m_Position && 
         offset - m_Position < m_Buffer.valid - m_Buffer.offset) {
-        m_Buffer.offset += offset - m_Position;
+        m_Buffer.offset += (NPT_Size)(offset - m_Position);
         m_Position = offset;
         return NPT_SUCCESS;
     }

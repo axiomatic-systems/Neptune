@@ -506,6 +506,7 @@ NPT_LogManager::Configure(const char* config_sources)
                 config_source.Assign(source, (NPT_Size)(cursor-source));
                 config_source.Trim(" \t");
                 ParseConfigSource(config_source);
+                if (*cursor == '|') source = cursor+1;
             }
             if (*cursor == '\0') break;
         }

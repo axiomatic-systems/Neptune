@@ -321,10 +321,6 @@ typedef long NPT_PointerLong;
 #define NPT_LocalFunctionName (NULL)
 #endif
 
-#if !defined(NPT_CONFIG_THREAD_STACK_SIZE)
-#define NPT_CONFIG_THREAD_STACK_SIZE 0
-#endif
-
 #if !defined(NPT_fseek)
 #define NPT_fseek fseeko
 #endif

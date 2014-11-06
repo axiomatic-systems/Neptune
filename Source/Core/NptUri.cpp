@@ -313,9 +313,9 @@ NPT_UrlQuery::UrlEncode(const char* str, bool encode_percents)
 NPT_String
 NPT_UrlQuery::UrlDecode(const char* str)
 {
-    NPT_String decoded = NPT_Uri::PercentDecode(str);
+    NPT_String decoded(str);
     decoded.Replace('+', ' ');
-    return decoded;
+    return NPT_Uri::PercentDecode(decoded);
 }
 
 /*----------------------------------------------------------------------

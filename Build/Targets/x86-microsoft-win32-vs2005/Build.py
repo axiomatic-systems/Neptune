@@ -3,7 +3,7 @@
 
 Visual Studio 2005 Build Script
 
-$Id$
+$Id: Build.py 87 2008-08-15 19:03:36Z bok $
 
 """
 

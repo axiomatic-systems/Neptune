@@ -1116,7 +1116,7 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
     
     // create a socket
     NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
-    NPT_TcpClientSocket* tcp_socket = new NPT_TcpClientSocket();
+    NPT_TcpClientSocket* tcp_socket = new NPT_TcpClientSocket(NPT_SOCKET_FLAG_CANCELLABLE);
     NPT_SocketReference socket(tcp_socket);
     tcp_socket->SetReadTimeout(client.GetConfig().m_IoTimeout);
     tcp_socket->SetWriteTimeout(client.GetConfig().m_IoTimeout);

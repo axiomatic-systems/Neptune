@@ -1102,7 +1102,10 @@ NPT_BsdSocketOutputStream::Flush()
     flags |= MSG_NOSIGNAL;
 #endif
     char dummy = 0;
-    send(m_SocketFdReference->m_SocketFd, &dummy, 0, flags); 
+    ssize_t io_result = send(m_SocketFdReference->m_SocketFd, &dummy, 0, flags);
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+        NPT_LOG_FINE_1("send failed during flush (%d)", MapErrorCode(GetSocketError()));
+    }
 
     // restore the nagle algorithm to its original setting
     args = 0;
@@ -1156,11 +1159,15 @@ NPT_BsdSocket::NPT_BsdSocket(SocketFd fd, NPT_Flags flags) :
     // disable the SIGPIPE signal
 #if defined(SO_NOSIGPIPE)
     int option = 1;
-    setsockopt(m_SocketFdReference->m_SocketFd, 
+    int io_result = setsockopt(m_SocketFdReference->m_SocketFd,
                SOL_SOCKET, 
                SO_NOSIGPIPE, 
                (SocketOption)&option, 
                sizeof(option));
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+        NPT_LOG_FINE_1("setsockopt SO_NOSIGPIPE failed (%d)", MapErrorCode(GetSocketError()));
+    }
+    
 #elif defined(SIGPIPE)
     signal(SIGPIPE, SIG_IGN);
 #endif
@@ -1333,6 +1340,11 @@ NPT_Result
 NPT_BsdSocket::SetWriteTimeout(NPT_Timeout timeout)
 {
     m_SocketFdReference->m_WriteTimeout = timeout;
+    setsockopt(m_SocketFdReference->m_SocketFd,
+               SOL_SOCKET,
+               SO_SNDTIMEO,
+               (SocketOption)&timeout,
+               sizeof(timeout));
     return NPT_SUCCESS;
 }
 
@@ -1356,7 +1368,10 @@ NPT_BsdSocket::Cancel(bool do_shutdown)
     // unblock waiting selects
     if (m_SocketFdReference->m_Cancellable) {
         char dummy = 0;
-        send(m_SocketFdReference->m_CancelFds[0], &dummy, 1, 0);
+        ssize_t io_result = send(m_SocketFdReference->m_CancelFds[0], &dummy, 1, 0);
+        if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+            NPT_LOG_FINE_1("send failed during cancel (%d)", MapErrorCode(GetSocketError()));
+        }
     }
 
     return NPT_SUCCESS;
@@ -1498,8 +1513,8 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
         SocketAddressToInetAddress(*address, &inet_address);
         
         // send the data
-        NPT_LOG_FINEST_2("sending datagram to %lx port %d",
-                         address->GetIpAddress().AsLong(),
+        NPT_LOG_FINEST_2("sending datagram to %s port %d",
+                         address->GetIpAddress().ToString().GetChars(),
                          address->GetPort());
         io_result = sendto(m_SocketFdReference->m_SocketFd, 
                            (SocketConstBuffer)buffer, 
@@ -1563,9 +1578,6 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
         struct sockaddr_in inet_address;
         socklen_t          inet_address_length = sizeof(inet_address);
 
-        NPT_LOG_FINEST_2("receiving dagagram from %lx port %d", 
-                         address->GetIpAddress().AsLong(), 
-                         address->GetPort());
         io_result = recvfrom(m_SocketFdReference->m_SocketFd, 
                              (SocketBuffer)buffer, 
                              buffer_size, 
@@ -1579,8 +1591,12 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
                 InetAddressToSocketAddress(&inet_address, *address);
             }
         }
+        
+        NPT_LOG_FINEST_2("receiving datagram from %s port %d", 
+                         address->GetIpAddress().ToString().GetChars(), 
+                         address->GetPort());
     } else {
-        NPT_LOG_FINEST("receiving dagagram");
+        NPT_LOG_FINEST("receiving datagram");
         io_result = recv(m_SocketFdReference->m_SocketFd,
                          (SocketBuffer)buffer,
                          buffer_size,
@@ -1668,12 +1684,12 @@ NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket(NPT_Flags flags) :
     NPT_BsdUdpSocket(flags)
 {
 #if !defined(_XBOX)
-        int option = 1;
-        setsockopt(m_SocketFdReference->m_SocketFd, 
-                   IPPROTO_IP, 
-                   IP_MULTICAST_LOOP,
-                   (SocketOption)&option,
-                   sizeof(option));
+    int option = 1;
+    setsockopt(m_SocketFdReference->m_SocketFd, 
+               IPPROTO_IP, 
+               IP_MULTICAST_LOOP,
+               (SocketOption)&option,
+               sizeof(option));
 #endif
 }
 
@@ -1711,8 +1727,8 @@ NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
     mreq.imr_multiaddr.s_addr = htonl(group.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_2("joining multicast addr %lx group %lx", 
-                   iface.AsLong(), group.AsLong());
+    NPT_LOG_FINE_2("joining multicast addr %s group %s", 
+                   iface.ToString().GetChars(), group.ToString().GetChars());
     int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
                                IPPROTO_IP, IP_ADD_MEMBERSHIP, 
                                (SocketOption)&mreq, sizeof(mreq));
@@ -1753,8 +1769,8 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
     mreq.imr_multiaddr.s_addr = htonl(group.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_2("leaving multicast addr %lx group %lx", 
-                   iface.AsLong(), group.AsLong());
+    NPT_LOG_FINE_2("leaving multicast addr %s group %s", 
+                   iface.ToString().GetChars(), group.ToString().GetChars());
     int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
                                IPPROTO_IP, IP_DROP_MEMBERSHIP, 
                                (SocketOption)&mreq, sizeof(mreq));
@@ -1789,7 +1805,7 @@ NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
     iface_addr.s_addr = htonl(iface.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_1("setting multicast interface %lx", iface.AsLong()); 
+    NPT_LOG_FINE_1("setting multicast interface %s", iface.ToString().GetChars()); 
     int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
                                IPPROTO_IP, IP_MULTICAST_IF, 
                                (char*)&iface_addr, sizeof(iface_addr));
@@ -1909,8 +1925,8 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     SocketAddressToInetAddress(address, &inet_address);
 
     // initiate connection
-    NPT_LOG_FINE_2("connecting to %lx port %d", 
-                   address.GetIpAddress().AsLong(),
+    NPT_LOG_FINER_2("connecting to %s port %d", 
+                   address.GetIpAddress().ToString().GetChars(),
                    address.GetPort());
     int io_result;
     io_result = connect(m_SocketFdReference->m_SocketFd, 

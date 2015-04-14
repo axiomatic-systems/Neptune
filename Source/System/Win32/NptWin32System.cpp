@@ -25,6 +25,7 @@
 #include "NptSystem.h"
 #include "NptResults.h"
 #include "NptDebug.h"
+#include "NptUtils.h"
 
 /*----------------------------------------------------------------------
 |   NPT_System::GetProcessId
@@ -35,6 +36,15 @@ NPT_System::GetProcessId(NPT_UInt32& id)
     //id = getpid();
     id = 0;
     return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_System::GetMachineName
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_System::GetMachineName(NPT_String& name)
+{
+    return NPT_GetEnvironment("COMPUTERNAME", name);
 }
 
 #if defined(_WIN32_WCE)

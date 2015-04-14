@@ -51,6 +51,7 @@ class NPT_TimeStamp
 {
  public:
     // methods
+    NPT_TimeStamp(const NPT_TimeStamp& timestamp);
     NPT_TimeStamp() : m_NanoSeconds(0) {}
     NPT_TimeStamp(NPT_Int64 nanoseconds) : m_NanoSeconds(nanoseconds) {}
     NPT_TimeStamp(double seconds);

@@ -64,6 +64,14 @@ const NPT_Int32 NPT_SECONDS_PER_YEAR = (365L * NPT_SECONDS_PER_DAY);
 /*----------------------------------------------------------------------
 |   NPT_TimeStamp::NPT_TimeStamp
 +---------------------------------------------------------------------*/
+NPT_TimeStamp::NPT_TimeStamp(const NPT_TimeStamp& timestamp)
+{
+    m_NanoSeconds = timestamp.m_NanoSeconds;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_TimeStamp::NPT_TimeStamp
++---------------------------------------------------------------------*/
 NPT_TimeStamp::NPT_TimeStamp(double seconds)
 {
     m_NanoSeconds = (NPT_Int64)(seconds * 1e9);

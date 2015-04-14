@@ -37,6 +37,23 @@
 #include "NptConstants.h"
 #include "NptBufferedStreams.h"
 #include "NptUtils.h"
+#include "NptLogging.h"
+
+/*----------------------------------------------------------------------
+|   logging
++---------------------------------------------------------------------*/
+NPT_SET_LOCAL_LOGGER("neptune.bufferedstreams")
+
+#define NPT_CHECK_NOLOGTIMEOUT(_x)   \
+do {                                 \
+    NPT_Result __result = (_x);      \
+    if (__result != NPT_SUCCESS) {   \
+        if (__result != NPT_ERROR_TIMEOUT && __result != NPT_ERROR_EOS) { \
+            NPT_CHECK_WARNING(__result);     \
+        }                            \
+        return __result;             \
+    }                                \
+} while(0)
 
 /*----------------------------------------------------------------------
 |   NPT_BufferedInputStream::NPT_BufferedInputStream
@@ -67,12 +84,13 @@ NPT_BufferedInputStream::~NPT_BufferedInputStream()
 |   NPT_BufferedInputStream::SetBufferSize
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_BufferedInputStream::SetBufferSize(NPT_Size size)
+NPT_BufferedInputStream::SetBufferSize(NPT_Size size, bool force /* = false */)
 {
     if (m_Buffer.data != NULL) {
         // we already have a buffer
-        if (m_Buffer.size < size) {
-            // the current buffer is too small, reallocate
+        if (m_Buffer.size < size || force) {
+            // the current buffer is too small or we want to move
+            // existing data to the beginning of the buffer, reallocate
             NPT_Byte* buffer = new NPT_Byte[size];
             if (buffer == NULL) return NPT_ERROR_OUT_OF_MEMORY;
 
@@ -248,8 +266,8 @@ NPT_BufferedInputStream::ReadLine(NPT_String& line,
     // read the line
     NPT_Size chars_read = 0;
     NPT_Result result = ReadLine(line.UseChars(), max_chars, &chars_read, break_on_cr);
-    if (NPT_FAILED(result)) return result;
-    
+	NPT_CHECK_NOLOGTIMEOUT(result);
+
     // adjust the length of the string object
     line.SetLength(chars_read);
 
@@ -339,6 +357,54 @@ done:
         }
     }
     return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BufferedInputStream::Peek
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_BufferedInputStream::Peek(void*     buffer, 
+                              NPT_Size  bytes_to_read, 
+                              NPT_Size* bytes_read)
+{
+    NPT_Result result = NPT_SUCCESS;
+    NPT_Size   buffered;
+    NPT_Size   new_size = m_Buffer.size?m_Buffer.size:NPT_BUFFERED_BYTE_STREAM_DEFAULT_SIZE;
+    
+    // check for a possible shortcut
+    if (bytes_to_read == 0) return NPT_SUCCESS;
+    
+    // compute how much is buffered
+    buffered = m_Buffer.valid-m_Buffer.offset;
+    if (bytes_to_read > buffered && buffered < new_size && !m_Eos) {
+        // we need more data than what we have          
+        // switch to unbuffered mode and resize to force relocation
+        // of data to the beginning of the buffer
+        SetBufferSize(new_size, true);
+        // fill up the end of the buffer
+        result = FillBuffer();
+        // continue even if it failed
+        buffered = m_Buffer.valid;
+    }
+    
+    // make sure we're returning what we can
+    if (bytes_to_read > buffered) bytes_to_read = buffered;
+    
+    // get what we can from the buffer
+    NPT_CopyMemory(buffer, 
+                   m_Buffer.data + m_Buffer.offset,
+                   bytes_to_read);
+
+    if (bytes_read) *bytes_read = bytes_to_read;
+    if (result == NPT_ERROR_EOS) { 
+        m_Eos = true;
+        if (bytes_to_read != 0) {
+            // we have reached the end of the stream, but we have read
+            // some chars, so do not return EOS now
+            return NPT_SUCCESS;
+        }
+    }
+    return result;    
 }
 
 /*----------------------------------------------------------------------

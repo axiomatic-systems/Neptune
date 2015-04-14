@@ -186,6 +186,8 @@ void ssl_obj_free(SSLObjLoader *ssl_obj)
 #define IS_PRIVATE_KEY              2
 #define IS_CERTIFICATE              3
 
+#if 0 /* GBG */
+
 static const char * const begins[NUM_PEM_TYPES] =
 {
     "-----BEGIN RSA PRIVATE KEY-----",
@@ -208,7 +210,6 @@ static const char * const aes_str[2] =
     "DEK-Info: AES-256-CBC," 
 };
 
-#if 0 /* GBG */
 /**
  * Take a base64 blob of data and decrypt it (using AES) into its 
  * proper ASN.1 form.

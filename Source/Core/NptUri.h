@@ -193,6 +193,11 @@ public:
     const NPT_String& GetPath() const { return m_Path; }
     
     /**
+     * Returns the path part of the URL, in its encoded or decoded form
+     */
+    NPT_String GetPath(bool decoded) const { return decoded?NPT_Uri::PercentDecode(m_Path):m_Path;}
+
+    /**
      * Returns the query part of the URL, in its encoded form
      */
     const NPT_String& GetQuery() const { return m_Query; }

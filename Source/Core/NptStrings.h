@@ -42,6 +42,7 @@
 #include "NptTypes.h"
 #include "NptConstants.h"
 #include "NptList.h"
+#include "NptArray.h"
 #include "NptDebug.h"
 #include "NptHash.h"
 
@@ -96,6 +97,7 @@ public:
                SubString(GetLength()-length, length);
     }
     NPT_List<NPT_String> Split(const char* separator) const;
+    NPT_Array<NPT_String> SplitAny(const char* separator) const;
     static NPT_String Join(NPT_List<NPT_String>& args, const char* separator);
     
     // buffer management
@@ -127,6 +129,7 @@ public:
     // search
     int  Find(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;
     int  Find(const char* s, NPT_Ordinal start = 0, bool ignore_case = false) const;
+    int  FindAny(const char* s, NPT_Ordinal start, bool ignore_case = false) const;
     int  ReverseFind(char c, NPT_Ordinal start = 0, bool ignore_case = false) const;
     int  ReverseFind(const char* s, NPT_Ordinal start = 0, bool ignore_case = false) const;
     bool StartsWith(const char* s, bool ignore_case = false) const;

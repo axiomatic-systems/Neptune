@@ -487,6 +487,32 @@ NPT_String::Split(const char* separator) const
 }
 
 /*----------------------------------------------------------------------
+|   NPT_String::SplitAny
++---------------------------------------------------------------------*/
+NPT_Array<NPT_String> 
+NPT_String::SplitAny(const char* separator) const
+{
+    NPT_Array<NPT_String> result((GetLength()>>1)+1);
+    
+    // sepcial case for empty separators
+    if (NPT_StringLength(separator) == 0) {
+        result.Add(*this);
+        return result;
+    }
+    
+    int current = 0;  
+    int next;  
+    do {
+        next = FindAny(separator, current);
+        unsigned int end = (next>=0?(unsigned int)next:GetLength());
+        result.Add(SubString(current, end-current));
+        current = next+1;
+    } while (next >= 0);
+    
+    return result;
+}
+
+/*----------------------------------------------------------------------
 |   NPT_String::Join
 +---------------------------------------------------------------------*/
 NPT_String
@@ -624,6 +650,40 @@ NPT_String::Find(char c, NPT_Ordinal start, bool ignore_case) const
         }
     }
 
+    return -1;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_String::FindAny
++---------------------------------------------------------------------*/
+int
+NPT_String::FindAny(const char* s, NPT_Ordinal start, bool ignore_case) const
+{
+    // check args
+    if (start >= GetLength()) return -1;
+    
+    // skip to start position
+    const char* src = m_Chars + start;
+    
+    // look for the character
+    if (ignore_case) {
+        while (*src) {
+            for (NPT_Size i=0; i<NPT_StringLength(s); i++) {
+                if (NPT_Uppercase(*src) == NPT_Uppercase(s[i])) {
+                    return (int)(src-m_Chars);
+                }
+            }
+            src++;
+        }
+    } else {
+        while (*src) {
+            for (NPT_Size i=0; i<NPT_StringLength(s); i++) {
+                if (*src == s[i]) return (int)(src-m_Chars);
+            }
+            src++;
+        }
+    }
+    
     return -1;
 }
 

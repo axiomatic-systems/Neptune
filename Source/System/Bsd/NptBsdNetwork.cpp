@@ -76,13 +76,14 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
     unsigned int buffer_size = 4096; // initial guess
     unsigned int last_size = 0;
     struct ifconf config;
-    unsigned char* buffer;
+    unsigned char* buffer = NULL;
     for (;buffer_size < 65536;) {
         buffer = new unsigned char[buffer_size];
         config.ifc_len = buffer_size;
         config.ifc_buf = (char*)buffer;
         if (ioctl(net, SIOCGIFCONF, &config) < 0) {
             if (errno != EINVAL || last_size != 0) {
+                delete[] buffer;
                 return NPT_ERROR_BASE_UNIX-errno;
             }
         } else {
@@ -97,6 +98,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         // supply 4096 more bytes more next time around
         buffer_size += 4096;
         delete[] buffer;
+        buffer = NULL;
     }
     
     // iterate over all objects

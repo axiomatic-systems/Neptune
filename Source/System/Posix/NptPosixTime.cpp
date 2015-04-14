@@ -13,6 +13,10 @@
 #include <time.h>
 #include <errno.h>
 
+#if defined(__CYGWIN__)
+extern time_t timezone;
+#endif
+
 #include "NptTime.h"
 #include "NptResults.h"
 #include "NptLogging.h"
@@ -71,6 +75,10 @@ NPT_DateTime::GetLocalTimeZone()
     NPT_SetMemory(&tm_local, 0, sizeof(tm_local));
 
     localtime_r(&epoch, &tm_local);
-    
-    return (NPT_Int32)(tm_local.tm_gmtoff/60);
+
+#if defined(__CYGWIN__)
+     return (NPT_Int32)timezone/60;
+#else
+     return (NPT_Int32)tm_local.tm_gmtoff/60;
+#endif
 }

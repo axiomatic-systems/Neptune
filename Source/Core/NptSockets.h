@@ -126,6 +126,7 @@ class NPT_SocketInterface
     // interface methods
     virtual NPT_Result Bind(const NPT_SocketAddress& address, bool reuse_address = true) = 0;
     virtual NPT_Result Connect(const NPT_SocketAddress& address, NPT_Timeout timeout) = 0;
+    virtual NPT_Result WaitForConnection(NPT_Timeout timeout) = 0;
     virtual NPT_Result GetInputStream(NPT_InputStreamReference& stream) = 0;
     virtual NPT_Result GetOutputStream(NPT_OutputStreamReference& stream) = 0;
     virtual NPT_Result GetInfo(NPT_SocketInfo& info) = 0;
@@ -199,6 +200,9 @@ public:
                        NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
        return m_SocketDelegate->Connect(address, timeout);                 
     }                                                               
+    NPT_Result WaitForConnection(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) {
+        return m_SocketDelegate->WaitForConnection(timeout);                 
+    } 
     NPT_Result GetInputStream(NPT_InputStreamReference& stream) {   
         return m_SocketDelegate->GetInputStream(stream);                   
     }                                                               

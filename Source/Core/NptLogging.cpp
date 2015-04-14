@@ -139,6 +139,19 @@ public:
     void Log(const NPT_LogRecord& record);
 };
 
+class NPT_LogCustomHandler : public NPT_LogHandler {
+public:
+    // class methods
+    static NPT_Result SetCustomHandlerFunction(CustomHandlerExternalFunction function);
+    static NPT_Result Create(NPT_LogHandler*& handler);
+    
+    // methods
+    void Log(const NPT_LogRecord& record);
+    
+private:
+    static CustomHandlerExternalFunction s_ExternalFunction;
+};
+
 /*----------------------------------------------------------------------
 |   constants
 +---------------------------------------------------------------------*/
@@ -167,7 +180,7 @@ public:
 
 #define NPT_LOG_UDP_HANDLER_DEFAULT_PORT            7724
 
-#if defined(_WIN32) || defined(_WIN32_WCE)
+#if defined(_WIN32) || defined(_WIN32_WCE) || defined(__APPLE__)
 #define NPT_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE false
 #else
 #define NPT_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE true
@@ -252,9 +265,20 @@ NPT_LogHandler::Create(const char*      logger_name,
         return NPT_LogTcpHandler::Create(logger_name, handler);
     } else if (NPT_StringsEqual(handler_name, "UdpHandler")) {
         return NPT_LogUdpHandler::Create(logger_name, handler);
+    } else if (NPT_StringsEqual(handler_name, "CustomHandler")) {
+        return NPT_LogCustomHandler::Create(handler);
     }
 
     return NPT_ERROR_NO_SUCH_CLASS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogHandler::SetCustomHandlerFunction
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_LogHandler::SetCustomHandlerFunction(CustomHandlerExternalFunction function)
+{
+    return NPT_LogCustomHandler::SetCustomHandlerFunction(function);
 }
 
 /*----------------------------------------------------------------------
@@ -865,6 +889,9 @@ NPT_Logger::NPT_Logger(const char* name, NPT_LogManager& manager) :
 +---------------------------------------------------------------------*/
 NPT_Logger::~NPT_Logger()
 {
+	/* remove external handlers before cleaning up */
+	m_Handlers.Remove(m_ExternalHandlers, true);
+
     /* delete all handlers */
     m_Handlers.Apply(NPT_ObjectDeleter<NPT_LogHandler>());
 }
@@ -875,6 +902,9 @@ NPT_Logger::~NPT_Logger()
 NPT_Result
 NPT_Logger::DeleteHandlers()
 {
+	/* remove external handlers before cleaning up */
+	m_Handlers.Remove(m_ExternalHandlers, true);
+
     /* delete all handlers and empty the list */
     if (m_Handlers.GetItemCount()) {
         m_Handlers.Apply(NPT_ObjectDeleter<NPT_LogHandler>());
@@ -968,10 +998,13 @@ NPT_Logger::Log(int          level,
 |   NPT_Logger::AddHandler
 +---------------------------------------------------------------------*/
 NPT_Result
-NPT_Logger::AddHandler(NPT_LogHandler* handler)
+NPT_Logger::AddHandler(NPT_LogHandler* handler, bool transfer_ownership /* = true */)
 {
     /* check parameters */
     if (handler == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+	/* keep track of what handlers we won't cleanup */
+	if (!transfer_ownership) m_ExternalHandlers.Add(handler);
 
     return m_Handlers.Add(handler);
 }
@@ -1011,6 +1044,41 @@ NPT_LogNullHandler::Create(NPT_LogHandler*& handler)
 void
 NPT_LogNullHandler::Log(const NPT_LogRecord& /*record*/)
 {
+}
+
+
+NPT_LogHandler::CustomHandlerExternalFunction NPT_LogCustomHandler::s_ExternalFunction = NULL;
+/*----------------------------------------------------------------------
+|   NPT_LogCustomHandler::SetCustomHandlerFunction
++---------------------------------------------------------------------*/
+NPT_Result 
+NPT_LogCustomHandler::SetCustomHandlerFunction(CustomHandlerExternalFunction function)
+{
+    s_ExternalFunction = function;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogCustomHandler::Create
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_LogCustomHandler::Create(NPT_LogHandler*& handler)
+{
+    /* allocate a new object */
+    NPT_LogCustomHandler* instance = new NPT_LogCustomHandler();
+    handler = instance;
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_LogCustomHandler::Log
++---------------------------------------------------------------------*/
+void
+NPT_LogCustomHandler::Log(const NPT_LogRecord& record)
+{
+    if (s_ExternalFunction) {
+        (*s_ExternalFunction)(&record);
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -1138,6 +1206,12 @@ NPT_LogFileHandler::Open(bool append /* = true */)
     if (NPT_FAILED(result)) return result;
 
     NPT_CHECK(file.GetOutputStream(m_Stream));
+    /* seek to end */
+    if (append) {
+        NPT_LargeSize size;
+        NPT_CHECK(NPT_File::GetSize(m_Filename, size));
+        NPT_CHECK(m_Stream->Seek(size));
+    }
     return NPT_SUCCESS;
 }
 

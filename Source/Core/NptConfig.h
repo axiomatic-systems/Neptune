@@ -35,6 +35,7 @@
 /*----------------------------------------------------------------------
 |   defaults
 +---------------------------------------------------------------------*/
+#define NPT_CONFIG_HAVE_ASSERT_H
 #define NPT_CONFIG_HAVE_STD_C
 #define NPT_CONFIG_HAVE_POSIX_TIME
 #define NPT_CONFIG_HAVE_ASSERT_H

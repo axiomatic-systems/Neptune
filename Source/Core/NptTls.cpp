@@ -39,6 +39,7 @@
 #include "NptSockets.h"
 #include "NptSystem.h"
 #include "NptDigest.h"
+#include "NptAutomaticCleaner.h"
 
 /*----------------------------------------------------------------------
 |   logging
@@ -968,7 +969,6 @@ NPT_TlsServerSession::NPT_TlsServerSession(NPT_TlsContext&            context,
 /*----------------------------------------------------------------------
 |   NPT_HttpTlsConnector::DefaultTlsContext
 +---------------------------------------------------------------------*/
-NPT_HttpTlsConnector::Cleanup NPT_HttpTlsConnector::Cleanup::AutomaticCleaner;
 NPT_TlsContext* NPT_HttpTlsConnector::DefaultTlsContext = NULL;
 
 /*----------------------------------------------------------------------
@@ -1000,6 +1000,9 @@ NPT_HttpTlsConnector::GetDefaultTlsContext()
         if (DefaultTlsContext == NULL) {
             DefaultTlsContext = new NPT_TlsContext(NPT_TlsContext::OPTION_VERIFY_LATER | 
                                                    NPT_TlsContext::OPTION_ADD_DEFAULT_TRUST_ANCHORS);
+            
+            // Prepare for recycling
+            NPT_AutomaticCleaner::GetInstance()->RegisterTlsContext(DefaultTlsContext);
         }
         NPT_SingletonLock::GetInstance().Unlock();
     }
@@ -1092,35 +1095,49 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
         server_port     = url.GetPort();
     }
     
-    // check if we can reuse a connection
-    // TODO: with this we don't yet support reusing a connection to a proxy
-    NPT_HttpConnectionManager* connection_manager = NPT_HttpConnectionManager::GetInstance();
-    if (!proxy && reuse) {
-        NPT_LOG_FINE("looking for a connection to reuse");
-        connection = connection_manager->FindConnection(server_hostname, server_port);
-        if (connection) {
-            NPT_LOG_FINE("reusing connection");
-            return NPT_SUCCESS;
-        }
-    }
-    
     // resolve the server address
     NPT_IpAddress ip_address;
     NPT_CHECK_FINE(ip_address.ResolveName(server_hostname, client.GetConfig().m_NameResolverTimeout));
 
-    // connect to the server
-    NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
-    NPT_TcpClientSocket tcp_socket;
+    // check if we can reuse a connection
+    // TODO: with this we don't yet support reusing a connection to a proxy
     NPT_SocketAddress socket_address(ip_address, server_port);
-    tcp_socket.SetReadTimeout(client.GetConfig().m_IoTimeout);
-    tcp_socket.SetWriteTimeout(client.GetConfig().m_IoTimeout);
-    NPT_CHECK_FINE(tcp_socket.Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
+    NPT_HttpConnectionManager* connection_manager = NPT_HttpConnectionManager::GetInstance();
+    if (!proxy && reuse) {
+        NPT_LOG_FINE("looking for a connection to reuse");
+        connection = connection_manager->FindConnection(socket_address);
+        if (connection) {
+            NPT_LOG_FINE("reusing connection");
+            // track connection immediately so we can abort it later
+            NPT_CHECK_FINE(Connector::TrackConnection(client, connection));
+            return NPT_SUCCESS;
+        }
+    }
+    
+    // create a socket
+    NPT_LOG_FINE_2("TLS connector will connect to %s:%d", server_hostname, server_port);
+    NPT_TcpClientSocket* tcp_socket = new NPT_TcpClientSocket();
+    NPT_SocketReference socket(tcp_socket);
+    tcp_socket->SetReadTimeout(client.GetConfig().m_IoTimeout);
+    tcp_socket->SetWriteTimeout(client.GetConfig().m_IoTimeout);
+ 
+    // create a connection object for the socket so we can abort it during connect
+    // even though streams are not valid yet
+    NPT_Reference<NPT_HttpConnectionManager::Connection> cref(new NPT_HttpConnectionManager::Connection(*connection_manager,
+                                                                                                        socket,
+                                                                                                        input_stream,
+                                                                                                        output_stream));
+    // track connection immediately before connecting so we can abort immediately it if necessary
+    NPT_CHECK_FINE(Connector::TrackConnection(client, cref.AsPointer()));
+    
+    // connect to the server
+    NPT_CHECK_FINE(tcp_socket->Connect(socket_address, client.GetConfig().m_ConnectionTimeout));
 
     // get the streams
     NPT_InputStreamReference  raw_input;
     NPT_OutputStreamReference raw_output;
-    NPT_CHECK_FINE(tcp_socket.GetInputStream(raw_input));
-    NPT_CHECK_FINE(tcp_socket.GetOutputStream(raw_output));
+    NPT_CHECK_FINE(tcp_socket->GetInputStream(raw_input));
+    NPT_CHECK_FINE(tcp_socket->GetOutputStream(raw_output));
     
     if (url.GetSchemeId() == NPT_Url::SCHEME_ID_HTTPS) {
 #if defined(NPT_CONFIG_ENABLE_TLS)
@@ -1195,12 +1212,12 @@ NPT_HttpTlsConnector::Connect(const NPT_HttpUrl&           url,
         output_stream = raw_output;
     }
 
-    // create a connection object for the streams
-    connection = new NPT_HttpConnectionManager::Connection(*connection_manager,
-                                                           server_hostname,
-                                                           server_port,
-                                                           input_stream,
-                                                           output_stream);
+    // update connection streams
+    cref->m_InputStream = input_stream;
+    cref->m_OutputStream = output_stream;
+    
+    connection = cref.AsPointer();
+    cref.Detach(); // release the internal ref
     
     return NPT_SUCCESS;
 }

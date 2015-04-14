@@ -121,7 +121,7 @@ private:
 /*----------------------------------------------------------------------
 |   NPT_TlsContext
 +---------------------------------------------------------------------*/
-class NPT_TlsContext
+class NPT_TlsContext : public NPT_AutomaticCleaner::Singleton
 {
 public:
     enum {
@@ -265,17 +265,6 @@ public:
                                   const char*           hostname);
 
 private:
-    // singleton management
-    class Cleanup {
-        static Cleanup AutomaticCleaner;
-        ~Cleanup() {
-            if (DefaultTlsContext) {
-                delete DefaultTlsContext;
-                DefaultTlsContext = NULL;
-            }
-        }
-    };
-    
     // class methods
     static NPT_TlsContext& GetDefaultTlsContext();
     

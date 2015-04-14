@@ -77,7 +77,7 @@ class NPT_Mutex : public NPT_MutexInterface
 {
  public:
     // methods
-               NPT_Mutex();
+               NPT_Mutex(bool recursive = false);
               ~NPT_Mutex() { delete m_Delegate; }
     NPT_Result Lock()   { return m_Delegate->Lock();   }
     NPT_Result Unlock() { return m_Delegate->Unlock(); }
@@ -224,6 +224,7 @@ class NPT_ThreadInterface: public NPT_Runnable, public NPT_Interruptible
     virtual NPT_Result Start() = 0;
     virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;
     virtual NPT_Result SetPriority(int /*priority*/) { return NPT_SUCCESS; } 
+    virtual NPT_Result GetPriority(int& priority) = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -238,6 +239,7 @@ class NPT_Thread : public NPT_ThreadInterface
     // class methods
     static ThreadId GetCurrentThreadId();
     static NPT_Result SetCurrentThreadPriority(int priority);
+    static NPT_Result GetCurrentThreadPriority(int& priority);
 
     // methods
     explicit NPT_Thread(bool detached = false);
@@ -251,8 +253,11 @@ class NPT_Thread : public NPT_ThreadInterface
     NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE)  { 
         return m_Delegate->Wait(timeout);  
     }
-    NPT_Result SetPriority(int priority)  { 
-        return m_Delegate->SetPriority(priority);  
+    NPT_Result SetPriority(int priority) {
+        return m_Delegate->SetPriority(priority);
+    }    
+    NPT_Result GetPriority(int& priority) {
+        return m_Delegate->GetPriority(priority);
     }
 
     // NPT_Runnable methods

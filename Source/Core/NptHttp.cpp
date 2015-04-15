@@ -1263,6 +1263,7 @@ NPT_HttpStaticProxySelector::GetProxyForUrl(const NPT_HttpUrl&    url,
 |   NPT_HttpConnectionManager::NPT_HttpConnectionManager
 +---------------------------------------------------------------------*/
 NPT_HttpConnectionManager::NPT_HttpConnectionManager() :
+    m_Lock(true),
     m_MaxConnections(NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_POOL_SIZE),
     m_MaxConnectionAge(NPT_HTTP_CONNECTION_MANAGER_MAX_CONNECTION_AGE)
 {

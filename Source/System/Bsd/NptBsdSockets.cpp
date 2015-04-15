@@ -1190,15 +1190,48 @@ NPT_BsdSocket::~NPT_BsdSocket()
 NPT_Result
 NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
 {
+    // on non windows, we need to set reuse address no matter what so
+    // that we can bind on the same port when the socket has closed 
+    // but is still in a timed-out mode
+#if !defined(__WIN32__) && !defined(_XBOX)
+    int option_ra = 1;
+    int io_result = setsockopt(m_SocketFdReference->m_SocketFd,
+                               SOL_SOCKET,
+                               SO_REUSEADDR,
+                               (SocketOption)&option_ra,
+                               sizeof(option_ra));
+    if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
+        NPT_LOG_FINE_1("setsockopt SO_REUSEADDR failed (%d)", MapErrorCode(GetSocketError()));
+    }
+    
+#elif defined(SIGPIPE)
+    signal(SIGPIPE, SIG_IGN);
+#endif
+    
     // set socket options
     if (reuse_address) {
         NPT_LOG_FINE("setting SO_REUSEADDR option on socket");
         int option = 1;
-        setsockopt(m_SocketFdReference->m_SocketFd, 
-                   SOL_SOCKET, 
-                   SO_REUSEADDR, 
-                   (SocketOption)&option, 
-                   sizeof(option));
+        // on macosx/linux, we need to use SO_REUSEPORT instead of SO_REUSEADDR
+#if defined(SO_REUSEPORT)
+        int result = setsockopt(m_SocketFdReference->m_SocketFd,
+                                   SOL_SOCKET,
+                                   SO_REUSEPORT,
+                                   (SocketOption)&option,
+                                   sizeof(option));
+        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+            NPT_LOG_FINE_1("setsockopt SO_REUSEPORT failed (%d)", MapErrorCode(GetSocketError()));
+        }
+#else
+        int result = setsockopt(m_SocketFdReference->m_SocketFd,
+                                   SOL_SOCKET,
+                                   SO_REUSEADDR,
+                                   (SocketOption)&option,
+                                   sizeof(option));
+        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+            NPT_LOG_FINE_1("setsockopt SO_REUSEADDR failed (%d)", MapErrorCode(GetSocketError()));
+        }
+#endif
     }
     
     // convert the address

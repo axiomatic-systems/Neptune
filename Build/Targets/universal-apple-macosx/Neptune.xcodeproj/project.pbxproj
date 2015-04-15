@@ -236,7 +236,6 @@
 		CAFC5B2618051F2800169F5A /* zlib.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFC5B1218051C7000169F5A /* zlib.h */; };
 		CAFC5B2718051F2800169F5A /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B1318051C7000169F5A /* zutil.c */; };
 		CAFC5B2818051F2800169F5A /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFC5B1418051C7000169F5A /* zutil.h */; };
-		E40616BA1ADE3FFD008BDAEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E40616B91ADE3FFD008BDAEB /* SystemConfiguration.framework */; };
 		E40D8B181AD868A80041A617 /* NptAutomaticCleaner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E40D8B161AD868A80041A617 /* NptAutomaticCleaner.cpp */; };
 		E40D8B191AD868A80041A617 /* NptAutomaticCleaner.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8B171AD868A80041A617 /* NptAutomaticCleaner.h */; };
 		E40D8B1B1AD86B480041A617 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */; };
@@ -1796,7 +1795,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E40616BA1ADE3FFD008BDAEB /* SystemConfiguration.framework in Frameworks */,
 				E40D8C1F1AD8741E0041A617 /* libaxTLS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -5633,11 +5631,14 @@
 					"-framework",
 					UIKit,
 				);
+				"OTHER_LDFLAGS[sdk=macosx*]" = (
+					"-framework",
+					SystemConfiguration,
+				);
 				PRODUCT_NAME = Neptune;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				"VALID_ARCHS[sdk=macosx*]" = "i386 x86_64";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -5683,6 +5684,18 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+					"-framework",
+					UIKit,
+				);
+				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
+					"-framework",
+					UIKit,
+				);
+				"OTHER_LDFLAGS[sdk=macosx*]" = (
+					"-framework",
+					SystemConfiguration,
+				);
 				PRODUCT_NAME = Neptune;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

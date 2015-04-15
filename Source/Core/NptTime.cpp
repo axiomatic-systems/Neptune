@@ -455,75 +455,89 @@ NPT_DateTime::FromString(const char* date, Format format)
     
     switch (format) {
       case FORMAT_W3C: {
-        if (input_size < 17) return NPT_ERROR_INVALID_SYNTAX;
+        if (input_size < 17 && input_size != 10) return NPT_ERROR_INVALID_SYNTAX;
 
         // check separators
-        if (input[4]  != '-' || 
-            input[7]  != '-' || 
-            input[10] != 'T' || 
-            input[13] != ':') {
+        if (input[4] != '-' || 
+            input[7] != '-') {
+            return NPT_ERROR_INVALID_SYNTAX;
+        }
+         
+        // replace separators with terminators
+        input[4] = input[7] = '\0';
+        
+        bool no_seconds = true;
+        if (input_size > 10) {
+            if (input[10] != 'T' || 
+                input[13] != ':') {
+                return NPT_ERROR_INVALID_SYNTAX;
+            }
+           input[10] = input[13] = '\0';
+            if (input[16] == ':') {
+                input[16] = '\0';
+                no_seconds = false;
+                if (input_size < 20) return NPT_ERROR_INVALID_SYNTAX;
+            } else {
+                m_Seconds = 0;
+            }
+        }
+          
+    
+        // parse CCYY-MM-DD fields
+        if (NPT_FAILED(NPT_ParseInteger(input,    m_Year,    false)) ||
+            NPT_FAILED(NPT_ParseInteger(input+5,  m_Month,   false)) ||
+            NPT_FAILED(NPT_ParseInteger(input+8,  m_Day,     false))) {
             return NPT_ERROR_INVALID_SYNTAX;
         }
 
-        // replace separators with terminators
-        bool no_seconds = true;
-        input[4] = input[7] = input[10] = input[13] = '\0';
-        if (input[16] == ':') {
-            input[16] = '\0';
-            no_seconds = false;
-            if (input_size < 20) return NPT_ERROR_INVALID_SYNTAX;
-        } else {
-            m_Seconds = 0;
-        }
-        
-        // parse the timezone part
-        if (input[input_size-1] == 'Z') {
-            m_TimeZone = 0;
-            input[input_size-1] = '\0';
-        } else if (input[input_size-6] == '+' || input[input_size-6] == '-') {
-            if (input[input_size-3] != ':') return NPT_ERROR_INVALID_SYNTAX;
-            input[input_size-3] = '\0';
-            unsigned int hh, mm;
-            if (NPT_FAILED(NPT_ParseInteger(input+input_size-5, hh, false)) ||
-                NPT_FAILED(NPT_ParseInteger(input+input_size-2, mm, false))) {
-                return NPT_ERROR_INVALID_SYNTAX;
-            }
-            if (hh > 59 || mm > 59) return NPT_ERROR_INVALID_SYNTAX;
-            m_TimeZone = hh*60+mm;
-            if (input[input_size-6] == '-') m_TimeZone = -m_TimeZone;
-            input[input_size-6] = '\0';
-        }
-        
-        // parse fields
-        if (NPT_FAILED(NPT_ParseInteger(input,    m_Year,    false)) ||
-            NPT_FAILED(NPT_ParseInteger(input+5,  m_Month,   false)) ||
-            NPT_FAILED(NPT_ParseInteger(input+8,  m_Day,     false)) ||
-            NPT_FAILED(NPT_ParseInteger(input+11, m_Hours,   false)) ||
-            NPT_FAILED(NPT_ParseInteger(input+14, m_Minutes, false))) {
-            return NPT_ERROR_INVALID_SYNTAX;
-        }
-        if (!no_seconds && input[19] == '.') {
-            char fraction[10];
-            fraction[9] = '\0';
-            unsigned int fraction_size = NPT_StringLength(&input[20]);
-            if (fraction_size == 0) return NPT_ERROR_INVALID_SYNTAX;
-            for (unsigned int i=0; i<9; i++) {
-                if (i < fraction_size) {
-                    fraction[i] = input[20+i];
-                } else {
-                    fraction[i] = '0';
+        // parse remaining fields if any
+        if (input_size > 10) {
+            // parse the timezone part
+            if (input[input_size-1] == 'Z') {
+                m_TimeZone = 0;
+                input[input_size-1] = '\0';
+            } else if (input[input_size-6] == '+' || input[input_size-6] == '-') {
+                if (input[input_size-3] != ':') return NPT_ERROR_INVALID_SYNTAX;
+                input[input_size-3] = '\0';
+                unsigned int hh, mm;
+                if (NPT_FAILED(NPT_ParseInteger(input+input_size-5, hh, false)) ||
+                    NPT_FAILED(NPT_ParseInteger(input+input_size-2, mm, false))) {
+                    return NPT_ERROR_INVALID_SYNTAX;
                 }
+                if (hh > 59 || mm > 59) return NPT_ERROR_INVALID_SYNTAX;
+                m_TimeZone = hh*60+mm;
+                if (input[input_size-6] == '-') m_TimeZone = -m_TimeZone;
+                input[input_size-6] = '\0';
             }
-            if (NPT_FAILED(NPT_ParseInteger(fraction, m_NanoSeconds, false))) {
+            
+            // parse fields
+            if (NPT_FAILED(NPT_ParseInteger(input+11, m_Hours,   false)) ||
+                NPT_FAILED(NPT_ParseInteger(input+14, m_Minutes, false))) {
                 return NPT_ERROR_INVALID_SYNTAX;
             }
-            input[19] = '\0';
-        } else {
-            m_NanoSeconds = 0;
-        }
-        if (!no_seconds) {
-            if (NPT_FAILED(NPT_ParseInteger(input+17, m_Seconds, false))) {
-                return NPT_ERROR_INVALID_SYNTAX;
+            if (!no_seconds && input[19] == '.') {
+                char fraction[10];
+                fraction[9] = '\0';
+                unsigned int fraction_size = NPT_StringLength(&input[20]);
+                if (fraction_size == 0) return NPT_ERROR_INVALID_SYNTAX;
+                for (unsigned int i=0; i<9; i++) {
+                    if (i < fraction_size) {
+                        fraction[i] = input[20+i];
+                    } else {
+                        fraction[i] = '0';
+                    }
+                }
+                if (NPT_FAILED(NPT_ParseInteger(fraction, m_NanoSeconds, false))) {
+                    return NPT_ERROR_INVALID_SYNTAX;
+                }
+                input[19] = '\0';
+            } else {
+                m_NanoSeconds = 0;
+            }
+            if (!no_seconds) {
+                if (NPT_FAILED(NPT_ParseInteger(input+17, m_Seconds, false))) {
+                    return NPT_ERROR_INVALID_SYNTAX;
+                }
             }
         }
         break;

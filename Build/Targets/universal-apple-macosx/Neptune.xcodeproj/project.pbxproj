@@ -51,6 +51,7 @@
 			buildPhases = (
 			);
 			dependencies = (
+				E44E2BC11AE7692F0092347B /* PBXTargetDependency */,
 				CAE417EC0E0DC20400A530D1 /* PBXTargetDependency */,
 				CAE417970E0DC11F00A530D1 /* PBXTargetDependency */,
 				CAE417990E0DC11F00A530D1 /* PBXTargetDependency */,
@@ -74,6 +75,18 @@
 			);
 			name = Apps;
 			productName = Apps;
+		};
+		E44E2BB81AE7691C0092347B /* Frameworks */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = E44E2BB91AE7691C0092347B /* Build configuration list for PBXAggregateTarget "Frameworks" */;
+			buildPhases = (
+			);
+			dependencies = (
+				E44E2BBD1AE769290092347B /* PBXTargetDependency */,
+				E44E2BBF1AE769290092347B /* PBXTargetDependency */,
+			);
+			name = Frameworks;
+			productName = Frameworks;
 		};
 /* End PBXAggregateTarget section */
 
@@ -209,7 +222,6 @@
 		CAF26E9918C74B110015ABB9 /* ZipTest2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF26E9818C74B110015ABB9 /* ZipTest2.cpp */; };
 		CAF26E9A18C74D320015ABB9 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAF26EAA18C7FF820015ABB9 /* ZipHttpServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF26EA918C7FF820015ABB9 /* ZipHttpServer.cpp */; };
-		CAF26EAB18C7FF8F0015ABB9 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		CAF2EFB60E64881E00948C04 /* NptPosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFB50E64881E00948C04 /* NptPosixFile.cpp */; };
 		CAF2EFB80E64882900948C04 /* NptPosixNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFB70E64882900948C04 /* NptPosixNetwork.cpp */; };
 		CAF2EFDE0E64A2AB00948C04 /* FileTest1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFD30E64A25700948C04 /* FileTest1.cpp */; };
@@ -559,8 +571,41 @@
 		E44E2B141AE75CD20092347B /* NptTlsDefaultTrustAnchorsBase.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8D671ADB808A0041A617 /* NptTlsDefaultTrustAnchorsBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E44E2B151AE75CD20092347B /* NptTlsDefaultTrustAnchorsExtended.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8D681ADB808A0041A617 /* NptTlsDefaultTrustAnchorsExtended.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E44E2B161AE75CD20092347B /* NptZip.h in Headers */ = {isa = PBXBuildFile; fileRef = CA84EC7A0C7E5A7000CC9622 /* NptZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E44E2B1F1AE75F8F0092347B /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
-		E44E2B221AE75F990092347B /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
+		E44E2B931AE764E80092347B /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
+		E44E2B941AE7662B0092347B /* aes.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E670EC0145900A9040C /* aes.c */; };
+		E44E2B951AE7662B0092347B /* bigint.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E680EC0145900A9040C /* bigint.c */; };
+		E44E2B961AE7662B0092347B /* crypto_misc.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6C0EC0145900A9040C /* crypto_misc.c */; };
+		E44E2B971AE7662B0092347B /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6D0EC0145900A9040C /* hmac.c */; };
+		E44E2B981AE7662B0092347B /* md2.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6E0EC0145900A9040C /* md2.c */; };
+		E44E2B991AE7662B0092347B /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6F0EC0145900A9040C /* md5.c */; };
+		E44E2B9A1AE7662B0092347B /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E700EC0145900A9040C /* rc4.c */; };
+		E44E2B9B1AE7662B0092347B /* rsa.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E710EC0145900A9040C /* rsa.c */; };
+		E44E2B9C1AE7662B0092347B /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E720EC0145900A9040C /* sha1.c */; };
+		E44E2B9D1AE7662B0092347B /* asn1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E750EC0145900A9040C /* asn1.c */; };
+		E44E2B9E1AE7662B0092347B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E790EC0145900A9040C /* loader.c */; };
+		E44E2B9F1AE7662B0092347B /* p12.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E7D0EC0145900A9040C /* p12.c */; };
+		E44E2BA01AE7662B0092347B /* tls1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E800EC0145900A9040C /* tls1.c */; };
+		E44E2BA11AE7662B0092347B /* tls1_clnt.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E820EC0145900A9040C /* tls1_clnt.c */; };
+		E44E2BA21AE7662B0092347B /* tls1_svr.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E830EC0145900A9040C /* tls1_svr.c */; };
+		E44E2BA31AE7662B0092347B /* x509.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E850EC0145900A9040C /* x509.c */; };
+		E44E2BA61AE7681D0092347B /* gen_cert.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E780EC0145900A9040C /* gen_cert.c */; };
+		E44E2BA71AE768AB0092347B /* aes.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E670EC0145900A9040C /* aes.c */; };
+		E44E2BA81AE768AB0092347B /* bigint.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E680EC0145900A9040C /* bigint.c */; };
+		E44E2BA91AE768AB0092347B /* crypto_misc.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6C0EC0145900A9040C /* crypto_misc.c */; };
+		E44E2BAA1AE768AB0092347B /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6D0EC0145900A9040C /* hmac.c */; };
+		E44E2BAB1AE768AB0092347B /* md2.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6E0EC0145900A9040C /* md2.c */; };
+		E44E2BAC1AE768AB0092347B /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6F0EC0145900A9040C /* md5.c */; };
+		E44E2BAD1AE768AB0092347B /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E700EC0145900A9040C /* rc4.c */; };
+		E44E2BAE1AE768AB0092347B /* rsa.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E710EC0145900A9040C /* rsa.c */; };
+		E44E2BAF1AE768AB0092347B /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E720EC0145900A9040C /* sha1.c */; };
+		E44E2BB01AE768AB0092347B /* asn1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E750EC0145900A9040C /* asn1.c */; };
+		E44E2BB11AE768AB0092347B /* gen_cert.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E780EC0145900A9040C /* gen_cert.c */; };
+		E44E2BB21AE768AB0092347B /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E790EC0145900A9040C /* loader.c */; };
+		E44E2BB31AE768AB0092347B /* p12.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E7D0EC0145900A9040C /* p12.c */; };
+		E44E2BB41AE768AB0092347B /* tls1.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E800EC0145900A9040C /* tls1.c */; };
+		E44E2BB51AE768AB0092347B /* tls1_clnt.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E820EC0145900A9040C /* tls1_clnt.c */; };
+		E44E2BB61AE768AB0092347B /* tls1_svr.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E830EC0145900A9040C /* tls1_svr.c */; };
+		E44E2BB71AE768AB0092347B /* x509.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E850EC0145900A9040C /* x509.c */; };
 		F912B7480B8EB27400C1E90D /* Neptune.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B00B8EB27400C1E90D /* Neptune.cpp */; };
 		F912B7490B8EB27400C1E90D /* Neptune.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B10B8EB27400C1E90D /* Neptune.h */; };
 		F912B74A0B8EB27400C1E90D /* NptArray.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B20B8EB27400C1E90D /* NptArray.h */; };
@@ -1188,19 +1233,33 @@
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
-		E44E2B1D1AE75F7D0092347B /* PBXContainerItemProxy */ = {
+		E44E2B911AE7649D0092347B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
-			remoteInfo = axTLS;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
 		};
-		E44E2B201AE75F950092347B /* PBXContainerItemProxy */ = {
+		E44E2BBC1AE769290092347B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
-			remoteInfo = axTLS;
+			remoteGlobalIDString = E40D8B9B1AD86D3A0041A617;
+			remoteInfo = "Neptune-iOS";
+		};
+		E44E2BBE1AE769290092347B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E44E2A9C1AE75CD20092347B;
+			remoteInfo = "Neptune-Mac";
+		};
+		E44E2BC01AE7692F0092347B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E44E2BB81AE7691C0092347B;
+			remoteInfo = Frameworks;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1480,7 +1539,6 @@
 		E40D8D671ADB808A0041A617 /* NptTlsDefaultTrustAnchorsBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NptTlsDefaultTrustAnchorsBase.h; sourceTree = "<group>"; };
 		E40D8D681ADB808A0041A617 /* NptTlsDefaultTrustAnchorsExtended.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NptTlsDefaultTrustAnchorsExtended.h; sourceTree = "<group>"; };
 		E44E2B1B1AE75CD20092347B /* Neptune.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Neptune.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		E44E2B1C1AE75CD30092347B /* Neptune-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Neptune-iOS copy-Info.plist"; path = "/Users/sylvain/dev/neptune-github/Build/Targets/universal-apple-macosx/Neptune-iOS copy-Info.plist"; sourceTree = "<absolute>"; };
 		F912B69F0B8EB1C700C1E90D /* libNeptune.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNeptune.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F912B6B00B8EB27400C1E90D /* Neptune.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = Neptune.cpp; sourceTree = "<group>"; };
 		F912B6B10B8EB27400C1E90D /* Neptune.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Neptune.h; sourceTree = "<group>"; };
@@ -1903,8 +1961,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E44E2B931AE764E80092347B /* libNeptune.a in Frameworks */,
 				E40D8B411AD86B5F0041A617 /* CoreFoundation.framework in Frameworks */,
-				CAF26EAB18C7FF8F0015ABB9 /* libNeptune.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1921,7 +1979,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E44E2B1F1AE75F8F0092347B /* libaxTLS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1929,7 +1986,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E44E2B221AE75F990092347B /* libaxTLS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2495,7 +2551,6 @@
 				F912B6A00B8EB1C700C1E90D /* Products */,
 				E40D8C221AD874560041A617 /* UIKit.framework */,
 				CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */,
-				E44E2B1C1AE75CD30092347B /* Neptune-iOS copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -3564,6 +3619,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				E44E2B921AE7649D0092347B /* PBXTargetDependency */,
 			);
 			name = ZipHttpServer;
 			productName = ZipHttpServer;
@@ -3599,7 +3655,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E44E2B1E1AE75F7D0092347B /* PBXTargetDependency */,
 			);
 			name = "Neptune-iOS";
 			productName = "Neptune-iOS";
@@ -3618,7 +3673,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				E44E2B211AE75F950092347B /* PBXTargetDependency */,
 			);
 			name = "Neptune-Mac";
 			productName = "Neptune-iOS";
@@ -3655,6 +3709,9 @@
 					E40D8B9B1AD86D3A0041A617 = {
 						CreatedOnToolsVersion = 6.2;
 					};
+					E44E2BB81AE7691C0092347B = {
+						CreatedOnToolsVersion = 6.3;
+					};
 				};
 			};
 			buildConfigurationList = F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */;
@@ -3675,6 +3732,7 @@
 				CAE417920E0DC11800A530D1 /* All */,
 				CAE417DF0E0DC1F600A530D1 /* Apps */,
 				CAE4176C0E0DC0FE00A530D1 /* Tests */,
+				E44E2BB81AE7691C0092347B /* Frameworks */,
 				F912B69E0B8EB1C700C1E90D /* Neptune */,
 				CA1A5EA80EC0152A00A9040C /* axTLS */,
 				CA78483C0F3B6E69009E84AD /* MiniHttpServer */,
@@ -4082,6 +4140,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E44E2BA61AE7681D0092347B /* gen_cert.c in Sources */,
+				E44E2B941AE7662B0092347B /* aes.c in Sources */,
+				E44E2B951AE7662B0092347B /* bigint.c in Sources */,
+				E44E2B961AE7662B0092347B /* crypto_misc.c in Sources */,
+				E44E2B971AE7662B0092347B /* hmac.c in Sources */,
+				E44E2B981AE7662B0092347B /* md2.c in Sources */,
+				E44E2B991AE7662B0092347B /* md5.c in Sources */,
+				E44E2B9A1AE7662B0092347B /* rc4.c in Sources */,
+				E44E2B9B1AE7662B0092347B /* rsa.c in Sources */,
+				E44E2B9C1AE7662B0092347B /* sha1.c in Sources */,
+				E44E2B9D1AE7662B0092347B /* asn1.c in Sources */,
+				E44E2B9E1AE7662B0092347B /* loader.c in Sources */,
+				E44E2B9F1AE7662B0092347B /* p12.c in Sources */,
+				E44E2BA01AE7662B0092347B /* tls1.c in Sources */,
+				E44E2BA11AE7662B0092347B /* tls1_clnt.c in Sources */,
+				E44E2BA21AE7662B0092347B /* tls1_svr.c in Sources */,
+				E44E2BA31AE7662B0092347B /* x509.c in Sources */,
 				E40D8C241AD8747E0041A617 /* adler32.c in Sources */,
 				E40D8C251AD8747E0041A617 /* compress.c in Sources */,
 				E40D8C261AD8747E0041A617 /* crc32.c in Sources */,
@@ -4155,6 +4230,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E44E2BA71AE768AB0092347B /* aes.c in Sources */,
+				E44E2BA81AE768AB0092347B /* bigint.c in Sources */,
+				E44E2BA91AE768AB0092347B /* crypto_misc.c in Sources */,
+				E44E2BAA1AE768AB0092347B /* hmac.c in Sources */,
+				E44E2BAB1AE768AB0092347B /* md2.c in Sources */,
+				E44E2BAC1AE768AB0092347B /* md5.c in Sources */,
+				E44E2BAD1AE768AB0092347B /* rc4.c in Sources */,
+				E44E2BAE1AE768AB0092347B /* rsa.c in Sources */,
+				E44E2BAF1AE768AB0092347B /* sha1.c in Sources */,
+				E44E2BB01AE768AB0092347B /* asn1.c in Sources */,
+				E44E2BB11AE768AB0092347B /* gen_cert.c in Sources */,
+				E44E2BB21AE768AB0092347B /* loader.c in Sources */,
+				E44E2BB31AE768AB0092347B /* p12.c in Sources */,
+				E44E2BB41AE768AB0092347B /* tls1.c in Sources */,
+				E44E2BB51AE768AB0092347B /* tls1_clnt.c in Sources */,
+				E44E2BB61AE768AB0092347B /* tls1_svr.c in Sources */,
+				E44E2BB71AE768AB0092347B /* x509.c in Sources */,
 				E44E2AA01AE75CD20092347B /* adler32.c in Sources */,
 				E44E2AA11AE75CD20092347B /* compress.c in Sources */,
 				E44E2AA21AE75CD20092347B /* crc32.c in Sources */,
@@ -4693,15 +4785,25 @@
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CAF2EFDC0E64A28000948C04 /* PBXContainerItemProxy */;
 		};
-		E44E2B1E1AE75F7D0092347B /* PBXTargetDependency */ = {
+		E44E2B921AE7649D0092347B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
-			targetProxy = E44E2B1D1AE75F7D0092347B /* PBXContainerItemProxy */;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = E44E2B911AE7649D0092347B /* PBXContainerItemProxy */;
 		};
-		E44E2B211AE75F950092347B /* PBXTargetDependency */ = {
+		E44E2BBD1AE769290092347B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
-			targetProxy = E44E2B201AE75F950092347B /* PBXContainerItemProxy */;
+			target = E40D8B9B1AD86D3A0041A617 /* Neptune-iOS */;
+			targetProxy = E44E2BBC1AE769290092347B /* PBXContainerItemProxy */;
+		};
+		E44E2BBF1AE769290092347B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E44E2A9C1AE75CD20092347B /* Neptune-Mac */;
+			targetProxy = E44E2BBE1AE769290092347B /* PBXContainerItemProxy */;
+		};
+		E44E2BC11AE7692F0092347B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E44E2BB81AE7691C0092347B /* Frameworks */;
+			targetProxy = E44E2BC01AE7692F0092347B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4750,6 +4852,7 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				PRODUCT_NAME = axTLS;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos";
+				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 arm64";
 				WARNING_CFLAGS = "";
 			};
 			name = Debug;
@@ -4772,6 +4875,7 @@
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				PRODUCT_NAME = axTLS;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos";
+				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 arm64";
 				WARNING_CFLAGS = "";
 			};
 			name = Release;
@@ -5826,7 +5930,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ziphttpserver;
 			};
 			name = Debug;
@@ -6031,6 +6134,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -6085,6 +6189,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -6101,10 +6206,23 @@
 			};
 			name = Release;
 		};
+		E44E2BBA1AE7691C0092347B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E44E2BBB1AE7691C0092347B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
@@ -6151,7 +6269,6 @@
 		F912B68A0B8EB12700C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -6614,6 +6731,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		E44E2BB91AE7691C0092347B /* Build configuration list for PBXAggregateTarget "Frameworks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E44E2BBA1AE7691C0092347B /* Debug */,
+				E44E2BBB1AE7691C0092347B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */ = {
 			isa = XCConfigurationList;

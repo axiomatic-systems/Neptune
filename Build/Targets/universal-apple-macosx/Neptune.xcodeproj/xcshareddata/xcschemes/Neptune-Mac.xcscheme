@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0620"
+   LastUpgradeVersion = "0630"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,23 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E40D8B9B1AD86D3A0041A617"
+               BlueprintIdentifier = "E44E2A9C1AE75CD20092347B"
                BuildableName = "Neptune.framework"
-               BlueprintName = "Neptune-Framework"
-               ReferencedContainer = "container:Neptune.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "NO"
-            buildForArchiving = "NO"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E40D8BA51AD86D3A0041A617"
-               BuildableName = "Neptune-iOSTests.xctest"
-               BlueprintName = "Neptune-iOSTests"
+               BlueprintName = "Neptune-Mac"
                ReferencedContainer = "container:Neptune.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -42,26 +28,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E40D8BA51AD86D3A0041A617"
-               BuildableName = "Neptune-iOSTests.xctest"
-               BlueprintName = "Neptune-iOSTests"
-               ReferencedContainer = "container:Neptune.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E40D8B9B1AD86D3A0041A617"
-            BuildableName = "Neptune.framework"
-            BlueprintName = "Neptune-Framework"
-            ReferencedContainer = "container:Neptune.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -75,9 +42,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E40D8B9B1AD86D3A0041A617"
+            BlueprintIdentifier = "E44E2A9C1AE75CD20092347B"
             BuildableName = "Neptune.framework"
-            BlueprintName = "Neptune-Framework"
+            BlueprintName = "Neptune-Mac"
             ReferencedContainer = "container:Neptune.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -93,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E40D8B9B1AD86D3A0041A617"
+            BlueprintIdentifier = "E44E2A9C1AE75CD20092347B"
             BuildableName = "Neptune.framework"
-            BlueprintName = "Neptune-Framework"
+            BlueprintName = "Neptune-Mac"
             ReferencedContainer = "container:Neptune.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

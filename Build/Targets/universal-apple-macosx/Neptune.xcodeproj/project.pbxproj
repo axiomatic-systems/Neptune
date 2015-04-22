@@ -376,7 +376,6 @@
 		E40D8C1A1AD8704E0041A617 /* NptStdcDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7000B8EB27400C1E90D /* NptStdcDebug.cpp */; };
 		E40D8C1B1AD8704E0041A617 /* NptStdcEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7010B8EB27400C1E90D /* NptStdcEnvironment.cpp */; };
 		E40D8C1C1AD8704E0041A617 /* NptStdcFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7020B8EB27400C1E90D /* NptStdcFile.cpp */; };
-		E40D8C1F1AD8741E0041A617 /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
 		E40D8C201AD874350041A617 /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */; };
 		E40D8C211AD874350041A617 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */; };
 		E40D8C241AD8747E0041A617 /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0118051C7000169F5A /* adler32.c */; };
@@ -444,6 +443,124 @@
 		E44A700D1ADE3A9D00970F48 /* NptZip.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = CA84EC7A0C7E5A7000CC9622 /* NptZip.h */; };
 		E44A700E1ADE3BDD00970F48 /* NptTlsDefaultTrustAnchorsBase.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = E40D8D671ADB808A0041A617 /* NptTlsDefaultTrustAnchorsBase.h */; };
 		E44A700F1ADE3BDD00970F48 /* NptTlsDefaultTrustAnchorsExtended.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = E40D8D681ADB808A0041A617 /* NptTlsDefaultTrustAnchorsExtended.h */; };
+		E44E2AA01AE75CD20092347B /* adler32.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0118051C7000169F5A /* adler32.c */; };
+		E44E2AA11AE75CD20092347B /* compress.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0218051C7000169F5A /* compress.c */; };
+		E44E2AA21AE75CD20092347B /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0318051C7000169F5A /* crc32.c */; };
+		E44E2AA31AE75CD20092347B /* deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0518051C7000169F5A /* deflate.c */; };
+		E44E2AA41AE75CD20092347B /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0718051C7000169F5A /* infback.c */; };
+		E44E2AA51AE75CD20092347B /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0818051C7000169F5A /* inffast.c */; };
+		E44E2AA61AE75CD20092347B /* inflate.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0B18051C7000169F5A /* inflate.c */; };
+		E44E2AA71AE75CD20092347B /* inftrees.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0D18051C7000169F5A /* inftrees.c */; };
+		E44E2AA81AE75CD20092347B /* trees.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B0F18051C7000169F5A /* trees.c */; };
+		E44E2AA91AE75CD20092347B /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B1318051C7000169F5A /* zutil.c */; };
+		E44E2AAA1AE75CD20092347B /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */; };
+		E44E2AAB1AE75CD20092347B /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */; };
+		E44E2AAC1AE75CD20092347B /* Neptune.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B00B8EB27400C1E90D /* Neptune.cpp */; };
+		E44E2AAD1AE75CD20092347B /* NptAutomaticCleaner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E40D8B161AD868A80041A617 /* NptAutomaticCleaner.cpp */; };
+		E44E2AAE1AE75CD20092347B /* NptBase64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B30B8EB27400C1E90D /* NptBase64.cpp */; };
+		E44E2AAF1AE75CD20092347B /* NptBufferedStreams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B50B8EB27400C1E90D /* NptBufferedStreams.cpp */; };
+		E44E2AB01AE75CD20092347B /* NptCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B70B8EB27400C1E90D /* NptCommon.cpp */; };
+		E44E2AB11AE75CD20092347B /* NptConsole.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6BA0B8EB27400C1E90D /* NptConsole.cpp */; };
+		E44E2AB21AE75CD20092347B /* NptCrypto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA806987118A602B009D099D /* NptCrypto.cpp */; };
+		E44E2AB31AE75CD20092347B /* NptDataBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6BD0B8EB27400C1E90D /* NptDataBuffer.cpp */; };
+		E44E2AB41AE75CD20092347B /* NptDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6BF0B8EB27400C1E90D /* NptDebug.cpp */; };
+		E44E2AB51AE75CD20092347B /* NptDigest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAEB8EC111864F0B00B4AF01 /* NptDigest.cpp */; };
+		E44E2AB61AE75CD20092347B /* NptDynamicLibraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA1D056C0E68E29C00E3DEE8 /* NptDynamicLibraries.cpp */; };
+		E44E2AB71AE75CD20092347B /* NptFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6C20B8EB27400C1E90D /* NptFile.cpp */; };
+		E44E2AB81AE75CD20092347B /* NptHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAD78E0312A9C42000D7EBA7 /* NptHash.cpp */; };
+		E44E2AB91AE75CD20092347B /* NptHttp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6C40B8EB27400C1E90D /* NptHttp.cpp */; };
+		E44E2ABA1AE75CD20092347B /* NptJson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA2EF626154DDFA700933B11 /* NptJson.cpp */; };
+		E44E2ABB1AE75CD20092347B /* NptList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6C70B8EB27400C1E90D /* NptList.cpp */; };
+		E44E2ABC1AE75CD20092347B /* NptLogging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6C90B8EB27400C1E90D /* NptLogging.cpp */; };
+		E44E2ABD1AE75CD20092347B /* NptMessaging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6CC0B8EB27400C1E90D /* NptMessaging.cpp */; };
+		E44E2ABE1AE75CD20092347B /* NptNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6CE0B8EB27400C1E90D /* NptNetwork.cpp */; };
+		E44E2ABF1AE75CD20092347B /* NptQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D00B8EB27400C1E90D /* NptQueue.cpp */; };
+		E44E2AC01AE75CD20092347B /* NptResults.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA096EF10ED0DBCE00A5103D /* NptResults.cpp */; };
+		E44E2AC11AE75CD20092347B /* NptRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D40B8EB27400C1E90D /* NptRingBuffer.cpp */; };
+		E44E2AC21AE75CD20092347B /* NptSimpleMessageQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D70B8EB27400C1E90D /* NptSimpleMessageQueue.cpp */; };
+		E44E2AC31AE75CD20092347B /* NptSockets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D90B8EB27400C1E90D /* NptSockets.cpp */; };
+		E44E2AC41AE75CD20092347B /* NptStreams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6DC0B8EB27400C1E90D /* NptStreams.cpp */; };
+		E44E2AC51AE75CD20092347B /* NptStrings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6DE0B8EB27400C1E90D /* NptStrings.cpp */; };
+		E44E2AC61AE75CD20092347B /* NptSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E00B8EB27400C1E90D /* NptSystem.cpp */; };
+		E44E2AC71AE75CD20092347B /* NptThreads.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E20B8EB27400C1E90D /* NptThreads.cpp */; };
+		E44E2AC81AE75CD20092347B /* NptTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E40B8EB27400C1E90D /* NptTime.cpp */; };
+		E44E2AC91AE75CD20092347B /* NptTls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAFB236E0EC760FE009C3459 /* NptTls.cpp */; };
+		E44E2ACA1AE75CD20092347B /* NptUri.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E70B8EB27400C1E90D /* NptUri.cpp */; };
+		E44E2ACB1AE75CD20092347B /* NptUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E90B8EB27400C1E90D /* NptUtils.cpp */; };
+		E44E2ACC1AE75CD20092347B /* NptXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6EC0B8EB27400C1E90D /* NptXml.cpp */; };
+		E44E2ACD1AE75CD20092347B /* NptZip.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF03CB50C7E7F15002C470F /* NptZip.cpp */; };
+		E44E2ACE1AE75CD20092347B /* NptAppleAutoreleasePool.mm in Sources */ = {isa = PBXBuildFile; fileRef = E40D8B951AD86CD20041A617 /* NptAppleAutoreleasePool.mm */; };
+		E44E2ACF1AE75CD20092347B /* NptAppleLogConfig.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA16FE6111C6C882006E2A86 /* NptAppleLogConfig.mm */; };
+		E44E2AD01AE75CD20092347B /* NptCocoaEnviroment.mm in Sources */ = {isa = PBXBuildFile; fileRef = E40D8B141AD868920041A617 /* NptCocoaEnviroment.mm */; };
+		E44E2AD11AE75CD20092347B /* NptCocoaConsole.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA289B6710E16150001BC817 /* NptCocoaConsole.mm */; };
+		E44E2AD21AE75CD20092347B /* NptCocoaMessageQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA289B6910E16150001BC817 /* NptCocoaMessageQueue.mm */; };
+		E44E2AD31AE75CD20092347B /* NptNullSerialPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA5041AA0C5AE2180060E6FE /* NptNullSerialPort.cpp */; };
+		E44E2AD41AE75CD20092347B /* NptBsdResolver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAC5048212FFB7EF00FEB1D8 /* NptBsdResolver.cpp */; };
+		E44E2AD51AE75CD20092347B /* NptBsdNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F00B8EB27400C1E90D /* NptBsdNetwork.cpp */; };
+		E44E2AD61AE75CD20092347B /* NptBsdSockets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F10B8EB27400C1E90D /* NptBsdSockets.cpp */; };
+		E44E2AD71AE75CD20092347B /* NptPosixTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA40905B10AA10A800ED81C5 /* NptPosixTime.cpp */; };
+		E44E2AD81AE75CD20092347B /* NptPosixDynamicLibraries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA1D05720E68E2AC00E3DEE8 /* NptPosixDynamicLibraries.cpp */; };
+		E44E2AD91AE75CD20092347B /* NptPosixNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFB70E64882900948C04 /* NptPosixNetwork.cpp */; };
+		E44E2ADA1AE75CD20092347B /* NptPosixFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAF2EFB50E64881E00948C04 /* NptPosixFile.cpp */; };
+		E44E2ADB1AE75CD20092347B /* NptPosixQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F80B8EB27400C1E90D /* NptPosixQueue.cpp */; };
+		E44E2ADC1AE75CD20092347B /* NptPosixSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F90B8EB27400C1E90D /* NptPosixSystem.cpp */; };
+		E44E2ADD1AE75CD20092347B /* NptPosixThreads.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6FA0B8EB27400C1E90D /* NptPosixThreads.cpp */; };
+		E44E2ADE1AE75CD20092347B /* NptSelectableMessageQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6FB0B8EB27400C1E90D /* NptSelectableMessageQueue.cpp */; };
+		E44E2ADF1AE75CD20092347B /* NptStdcDebug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7000B8EB27400C1E90D /* NptStdcDebug.cpp */; };
+		E44E2AE01AE75CD20092347B /* NptStdcEnvironment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7010B8EB27400C1E90D /* NptStdcEnvironment.cpp */; };
+		E44E2AE11AE75CD20092347B /* NptStdcFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B7020B8EB27400C1E90D /* NptStdcFile.cpp */; };
+		E44E2AE51AE75CD20092347B /* NptArray.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B20B8EB27400C1E90D /* NptArray.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AE61AE75CD20092347B /* NptAutomaticCleaner.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8B171AD868A80041A617 /* NptAutomaticCleaner.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AE71AE75CD20092347B /* NptAutoreleasePool.h in Headers */ = {isa = PBXBuildFile; fileRef = CA77C17E14C259AB00442B97 /* NptAutoreleasePool.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AE81AE75CD20092347B /* NptBase64.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B40B8EB27400C1E90D /* NptBase64.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AE91AE75CD20092347B /* NptBufferedStreams.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B60B8EB27400C1E90D /* NptBufferedStreams.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AEA1AE75CD20092347B /* NptCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B80B8EB27400C1E90D /* NptCommon.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AEB1AE75CD20092347B /* NptConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B90B8EB27400C1E90D /* NptConfig.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AEC1AE75CD20092347B /* NptConsole.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6BB0B8EB27400C1E90D /* NptConsole.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AED1AE75CD20092347B /* NptConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6BC0B8EB27400C1E90D /* NptConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AEE1AE75CD20092347B /* NptCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = CA806988118A602B009D099D /* NptCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AEF1AE75CD20092347B /* NptDataBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6BE0B8EB27400C1E90D /* NptDataBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF01AE75CD20092347B /* NptDebug.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C00B8EB27400C1E90D /* NptDebug.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF11AE75CD20092347B /* NptDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C10B8EB27400C1E90D /* NptDefs.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF21AE75CD20092347B /* NptDigest.h in Headers */ = {isa = PBXBuildFile; fileRef = CAEB8EC211864F0B00B4AF01 /* NptDigest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF31AE75CD20092347B /* NptDynamicCast.h in Headers */ = {isa = PBXBuildFile; fileRef = CA926A4F0F8BEB50003CB74E /* NptDynamicCast.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF41AE75CD20092347B /* NptDynamicLibraries.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1D056D0E68E29C00E3DEE8 /* NptDynamicLibraries.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF51AE75CD20092347B /* NptFile.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C30B8EB27400C1E90D /* NptFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF61AE75CD20092347B /* NptHash.h in Headers */ = {isa = PBXBuildFile; fileRef = CAD78DD212A99DC500D7EBA7 /* NptHash.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF71AE75CD20092347B /* NptHttp.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C50B8EB27400C1E90D /* NptHttp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF81AE75CD20092347B /* NptInterfaces.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C60B8EB27400C1E90D /* NptInterfaces.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AF91AE75CD20092347B /* NptJson.h in Headers */ = {isa = PBXBuildFile; fileRef = CA2EF627154DDFA700933B11 /* NptJson.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFA1AE75CD20092347B /* NptList.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6C80B8EB27400C1E90D /* NptList.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFB1AE75CD20092347B /* NptLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6CA0B8EB27400C1E90D /* NptLogging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFC1AE75CD20092347B /* NptMap.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6CB0B8EB27400C1E90D /* NptMap.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFD1AE75CD20092347B /* NptMessaging.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6CD0B8EB27400C1E90D /* NptMessaging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFE1AE75CD20092347B /* NptNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6CF0B8EB27400C1E90D /* NptNetwork.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2AFF1AE75CD20092347B /* NptSelectableMessageQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D60B8EB27400C1E90D /* NptSelectableMessageQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B001AE75CD20092347B /* NptSimpleMessageQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D80B8EB27400C1E90D /* NptSimpleMessageQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B011AE75CD20092347B /* NptQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D10B8EB27400C1E90D /* NptQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B021AE75CD20092347B /* NptReferences.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D20B8EB27400C1E90D /* NptReferences.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B031AE75CD20092347B /* NptResults.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D30B8EB27400C1E90D /* NptResults.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B041AE75CD20092347B /* NptTls.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFB236F0EC760FE009C3459 /* NptTls.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B051AE75CD20092347B /* NptRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D50B8EB27400C1E90D /* NptRingBuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B061AE75CD20092347B /* NptSerialPort.h in Headers */ = {isa = PBXBuildFile; fileRef = CA1D056E0E68E29C00E3DEE8 /* NptSerialPort.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B071AE75CD20092347B /* NptSockets.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6DA0B8EB27400C1E90D /* NptSockets.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B081AE75CD20092347B /* NptStack.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6DB0B8EB27400C1E90D /* NptStack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B091AE75CD20092347B /* NptStreams.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6DD0B8EB27400C1E90D /* NptStreams.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0A1AE75CD20092347B /* Neptune.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8BA01AD86D3A0041A617 /* Neptune.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0B1AE75CD20092347B /* NptStrings.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6DF0B8EB27400C1E90D /* NptStrings.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0C1AE75CD20092347B /* NptSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6E10B8EB27400C1E90D /* NptSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0D1AE75CD20092347B /* NptThreads.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6E30B8EB27400C1E90D /* NptThreads.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0E1AE75CD20092347B /* NptTime.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6E50B8EB27400C1E90D /* NptTime.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B0F1AE75CD20092347B /* NptVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6EB0B8EB27400C1E90D /* NptVersion.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B101AE75CD20092347B /* NptTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6E60B8EB27400C1E90D /* NptTypes.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B111AE75CD20092347B /* NptUri.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6E80B8EB27400C1E90D /* NptUri.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B121AE75CD20092347B /* NptUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6EA0B8EB27400C1E90D /* NptUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B131AE75CD20092347B /* NptXml.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6ED0B8EB27400C1E90D /* NptXml.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B141AE75CD20092347B /* NptTlsDefaultTrustAnchorsBase.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8D671ADB808A0041A617 /* NptTlsDefaultTrustAnchorsBase.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B151AE75CD20092347B /* NptTlsDefaultTrustAnchorsExtended.h in Headers */ = {isa = PBXBuildFile; fileRef = E40D8D681ADB808A0041A617 /* NptTlsDefaultTrustAnchorsExtended.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B161AE75CD20092347B /* NptZip.h in Headers */ = {isa = PBXBuildFile; fileRef = CA84EC7A0C7E5A7000CC9622 /* NptZip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E44E2B1F1AE75F8F0092347B /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
+		E44E2B221AE75F990092347B /* libaxTLS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CA1A5EA90EC0152A00A9040C /* libaxTLS.a */; };
 		F912B7480B8EB27400C1E90D /* Neptune.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B00B8EB27400C1E90D /* Neptune.cpp */; };
 		F912B7490B8EB27400C1E90D /* Neptune.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B10B8EB27400C1E90D /* Neptune.h */; };
 		F912B74A0B8EB27400C1E90D /* NptArray.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B20B8EB27400C1E90D /* NptArray.h */; };
@@ -1071,7 +1188,14 @@
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
-		E40D8C1D1AD874190041A617 /* PBXContainerItemProxy */ = {
+		E44E2B1D1AE75F7D0092347B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CA1A5EA80EC0152A00A9040C;
+			remoteInfo = axTLS;
+		};
+		E44E2B201AE75F950092347B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
 			proxyType = 1;
@@ -1355,6 +1479,8 @@
 		E40D8C221AD874560041A617 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.2.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		E40D8D671ADB808A0041A617 /* NptTlsDefaultTrustAnchorsBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NptTlsDefaultTrustAnchorsBase.h; sourceTree = "<group>"; };
 		E40D8D681ADB808A0041A617 /* NptTlsDefaultTrustAnchorsExtended.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NptTlsDefaultTrustAnchorsExtended.h; sourceTree = "<group>"; };
+		E44E2B1B1AE75CD20092347B /* Neptune.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Neptune.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E44E2B1C1AE75CD30092347B /* Neptune-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Neptune-iOS copy-Info.plist"; path = "/Users/sylvain/dev/neptune-github/Build/Targets/universal-apple-macosx/Neptune-iOS copy-Info.plist"; sourceTree = "<absolute>"; };
 		F912B69F0B8EB1C700C1E90D /* libNeptune.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNeptune.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F912B6B00B8EB27400C1E90D /* Neptune.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = Neptune.cpp; sourceTree = "<group>"; };
 		F912B6B10B8EB27400C1E90D /* Neptune.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Neptune.h; sourceTree = "<group>"; };
@@ -1795,7 +1921,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E40D8C1F1AD8741E0041A617 /* libaxTLS.a in Frameworks */,
+				E44E2B1F1AE75F8F0092347B /* libaxTLS.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E44E2AE21AE75CD20092347B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E44E2B221AE75F990092347B /* libaxTLS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2361,6 +2495,7 @@
 				F912B6A00B8EB1C700C1E90D /* Products */,
 				E40D8C221AD874560041A617 /* UIKit.framework */,
 				CA16FE6511C6C954006E2A86 /* CoreFoundation.framework */,
+				E44E2B1C1AE75CD30092347B /* Neptune-iOS copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2409,6 +2544,7 @@
 				CAF26E8E18C74A2F0015ABB9 /* ZipTest2 */,
 				CAF26E9F18C7FF630015ABB9 /* ziphttpserver */,
 				E40D8B9C1AD86D3A0041A617 /* Neptune.framework */,
+				E44E2B1B1AE75CD20092347B /* Neptune.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2638,6 +2774,63 @@
 				E40D8D6A1ADB80980041A617 /* NptTlsDefaultTrustAnchorsBase.h in Headers */,
 				E40D8D691ADB80950041A617 /* NptTlsDefaultTrustAnchorsExtended.h in Headers */,
 				E40D8D661ADB7F8D0041A617 /* NptZip.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E44E2AE41AE75CD20092347B /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E44E2AE51AE75CD20092347B /* NptArray.h in Headers */,
+				E44E2AE61AE75CD20092347B /* NptAutomaticCleaner.h in Headers */,
+				E44E2AE71AE75CD20092347B /* NptAutoreleasePool.h in Headers */,
+				E44E2AE81AE75CD20092347B /* NptBase64.h in Headers */,
+				E44E2AE91AE75CD20092347B /* NptBufferedStreams.h in Headers */,
+				E44E2AEA1AE75CD20092347B /* NptCommon.h in Headers */,
+				E44E2AEB1AE75CD20092347B /* NptConfig.h in Headers */,
+				E44E2AEC1AE75CD20092347B /* NptConsole.h in Headers */,
+				E44E2AED1AE75CD20092347B /* NptConstants.h in Headers */,
+				E44E2AEE1AE75CD20092347B /* NptCrypto.h in Headers */,
+				E44E2AEF1AE75CD20092347B /* NptDataBuffer.h in Headers */,
+				E44E2AF01AE75CD20092347B /* NptDebug.h in Headers */,
+				E44E2AF11AE75CD20092347B /* NptDefs.h in Headers */,
+				E44E2AF21AE75CD20092347B /* NptDigest.h in Headers */,
+				E44E2AF31AE75CD20092347B /* NptDynamicCast.h in Headers */,
+				E44E2AF41AE75CD20092347B /* NptDynamicLibraries.h in Headers */,
+				E44E2AF51AE75CD20092347B /* NptFile.h in Headers */,
+				E44E2AF61AE75CD20092347B /* NptHash.h in Headers */,
+				E44E2AF71AE75CD20092347B /* NptHttp.h in Headers */,
+				E44E2AF81AE75CD20092347B /* NptInterfaces.h in Headers */,
+				E44E2AF91AE75CD20092347B /* NptJson.h in Headers */,
+				E44E2AFA1AE75CD20092347B /* NptList.h in Headers */,
+				E44E2AFB1AE75CD20092347B /* NptLogging.h in Headers */,
+				E44E2AFC1AE75CD20092347B /* NptMap.h in Headers */,
+				E44E2AFD1AE75CD20092347B /* NptMessaging.h in Headers */,
+				E44E2AFE1AE75CD20092347B /* NptNetwork.h in Headers */,
+				E44E2AFF1AE75CD20092347B /* NptSelectableMessageQueue.h in Headers */,
+				E44E2B001AE75CD20092347B /* NptSimpleMessageQueue.h in Headers */,
+				E44E2B011AE75CD20092347B /* NptQueue.h in Headers */,
+				E44E2B021AE75CD20092347B /* NptReferences.h in Headers */,
+				E44E2B031AE75CD20092347B /* NptResults.h in Headers */,
+				E44E2B041AE75CD20092347B /* NptTls.h in Headers */,
+				E44E2B051AE75CD20092347B /* NptRingBuffer.h in Headers */,
+				E44E2B061AE75CD20092347B /* NptSerialPort.h in Headers */,
+				E44E2B071AE75CD20092347B /* NptSockets.h in Headers */,
+				E44E2B081AE75CD20092347B /* NptStack.h in Headers */,
+				E44E2B091AE75CD20092347B /* NptStreams.h in Headers */,
+				E44E2B0A1AE75CD20092347B /* Neptune.h in Headers */,
+				E44E2B0B1AE75CD20092347B /* NptStrings.h in Headers */,
+				E44E2B0C1AE75CD20092347B /* NptSystem.h in Headers */,
+				E44E2B0D1AE75CD20092347B /* NptThreads.h in Headers */,
+				E44E2B0E1AE75CD20092347B /* NptTime.h in Headers */,
+				E44E2B0F1AE75CD20092347B /* NptVersion.h in Headers */,
+				E44E2B101AE75CD20092347B /* NptTypes.h in Headers */,
+				E44E2B111AE75CD20092347B /* NptUri.h in Headers */,
+				E44E2B121AE75CD20092347B /* NptUtils.h in Headers */,
+				E44E2B131AE75CD20092347B /* NptXml.h in Headers */,
+				E44E2B141AE75CD20092347B /* NptTlsDefaultTrustAnchorsBase.h in Headers */,
+				E44E2B151AE75CD20092347B /* NptTlsDefaultTrustAnchorsExtended.h in Headers */,
+				E44E2B161AE75CD20092347B /* NptZip.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3394,9 +3587,9 @@
 			productReference = CAF2EFD70E64A27200948C04 /* FileTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
-		E40D8B9B1AD86D3A0041A617 /* Neptune-Framework */ = {
+		E40D8B9B1AD86D3A0041A617 /* Neptune-iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E40D8BAF1AD86D3A0041A617 /* Build configuration list for PBXNativeTarget "Neptune-Framework" */;
+			buildConfigurationList = E40D8BAF1AD86D3A0041A617 /* Build configuration list for PBXNativeTarget "Neptune-iOS" */;
 			buildPhases = (
 				E40D8B971AD86D3A0041A617 /* Sources */,
 				E40D8B981AD86D3A0041A617 /* Frameworks */,
@@ -3406,11 +3599,30 @@
 			buildRules = (
 			);
 			dependencies = (
-				E40D8C1E1AD874190041A617 /* PBXTargetDependency */,
+				E44E2B1E1AE75F7D0092347B /* PBXTargetDependency */,
 			);
-			name = "Neptune-Framework";
+			name = "Neptune-iOS";
 			productName = "Neptune-iOS";
 			productReference = E40D8B9C1AD86D3A0041A617 /* Neptune.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		E44E2A9C1AE75CD20092347B /* Neptune-Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E44E2B181AE75CD20092347B /* Build configuration list for PBXNativeTarget "Neptune-Mac" */;
+			buildPhases = (
+				E44E2A9F1AE75CD20092347B /* Sources */,
+				E44E2AE21AE75CD20092347B /* Frameworks */,
+				E44E2AE41AE75CD20092347B /* Headers */,
+				E44E2B171AE75CD20092347B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E44E2B211AE75F950092347B /* PBXTargetDependency */,
+			);
+			name = "Neptune-Mac";
+			productName = "Neptune-iOS";
+			productReference = E44E2B1B1AE75CD20092347B /* Neptune.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 		F912B69E0B8EB1C700C1E90D /* Neptune */ = {
@@ -3504,13 +3716,21 @@
 				CA8066481187BD08009D099D /* DigestsTest1 */,
 				CA8069D8118B577E009D099D /* CryptoTest1 */,
 				CAF26E9E18C7FF630015ABB9 /* ZipHttpServer */,
-				E40D8B9B1AD86D3A0041A617 /* Neptune-Framework */,
+				E40D8B9B1AD86D3A0041A617 /* Neptune-iOS */,
+				E44E2A9C1AE75CD20092347B /* Neptune-Mac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E40D8B9A1AD86D3A0041A617 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E44E2B171AE75CD20092347B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3928,6 +4148,79 @@
 				E40D8C1A1AD8704E0041A617 /* NptStdcDebug.cpp in Sources */,
 				E40D8C1B1AD8704E0041A617 /* NptStdcEnvironment.cpp in Sources */,
 				E40D8C1C1AD8704E0041A617 /* NptStdcFile.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E44E2A9F1AE75CD20092347B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E44E2AA01AE75CD20092347B /* adler32.c in Sources */,
+				E44E2AA11AE75CD20092347B /* compress.c in Sources */,
+				E44E2AA21AE75CD20092347B /* crc32.c in Sources */,
+				E44E2AA31AE75CD20092347B /* deflate.c in Sources */,
+				E44E2AA41AE75CD20092347B /* infback.c in Sources */,
+				E44E2AA51AE75CD20092347B /* inffast.c in Sources */,
+				E44E2AA61AE75CD20092347B /* inflate.c in Sources */,
+				E44E2AA71AE75CD20092347B /* inftrees.c in Sources */,
+				E44E2AA81AE75CD20092347B /* trees.c in Sources */,
+				E44E2AA91AE75CD20092347B /* zutil.c in Sources */,
+				E44E2AAA1AE75CD20092347B /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */,
+				E44E2AAB1AE75CD20092347B /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */,
+				E44E2AAC1AE75CD20092347B /* Neptune.cpp in Sources */,
+				E44E2AAD1AE75CD20092347B /* NptAutomaticCleaner.cpp in Sources */,
+				E44E2AAE1AE75CD20092347B /* NptBase64.cpp in Sources */,
+				E44E2AAF1AE75CD20092347B /* NptBufferedStreams.cpp in Sources */,
+				E44E2AB01AE75CD20092347B /* NptCommon.cpp in Sources */,
+				E44E2AB11AE75CD20092347B /* NptConsole.cpp in Sources */,
+				E44E2AB21AE75CD20092347B /* NptCrypto.cpp in Sources */,
+				E44E2AB31AE75CD20092347B /* NptDataBuffer.cpp in Sources */,
+				E44E2AB41AE75CD20092347B /* NptDebug.cpp in Sources */,
+				E44E2AB51AE75CD20092347B /* NptDigest.cpp in Sources */,
+				E44E2AB61AE75CD20092347B /* NptDynamicLibraries.cpp in Sources */,
+				E44E2AB71AE75CD20092347B /* NptFile.cpp in Sources */,
+				E44E2AB81AE75CD20092347B /* NptHash.cpp in Sources */,
+				E44E2AB91AE75CD20092347B /* NptHttp.cpp in Sources */,
+				E44E2ABA1AE75CD20092347B /* NptJson.cpp in Sources */,
+				E44E2ABB1AE75CD20092347B /* NptList.cpp in Sources */,
+				E44E2ABC1AE75CD20092347B /* NptLogging.cpp in Sources */,
+				E44E2ABD1AE75CD20092347B /* NptMessaging.cpp in Sources */,
+				E44E2ABE1AE75CD20092347B /* NptNetwork.cpp in Sources */,
+				E44E2ABF1AE75CD20092347B /* NptQueue.cpp in Sources */,
+				E44E2AC01AE75CD20092347B /* NptResults.cpp in Sources */,
+				E44E2AC11AE75CD20092347B /* NptRingBuffer.cpp in Sources */,
+				E44E2AC21AE75CD20092347B /* NptSimpleMessageQueue.cpp in Sources */,
+				E44E2AC31AE75CD20092347B /* NptSockets.cpp in Sources */,
+				E44E2AC41AE75CD20092347B /* NptStreams.cpp in Sources */,
+				E44E2AC51AE75CD20092347B /* NptStrings.cpp in Sources */,
+				E44E2AC61AE75CD20092347B /* NptSystem.cpp in Sources */,
+				E44E2AC71AE75CD20092347B /* NptThreads.cpp in Sources */,
+				E44E2AC81AE75CD20092347B /* NptTime.cpp in Sources */,
+				E44E2AC91AE75CD20092347B /* NptTls.cpp in Sources */,
+				E44E2ACA1AE75CD20092347B /* NptUri.cpp in Sources */,
+				E44E2ACB1AE75CD20092347B /* NptUtils.cpp in Sources */,
+				E44E2ACC1AE75CD20092347B /* NptXml.cpp in Sources */,
+				E44E2ACD1AE75CD20092347B /* NptZip.cpp in Sources */,
+				E44E2ACE1AE75CD20092347B /* NptAppleAutoreleasePool.mm in Sources */,
+				E44E2ACF1AE75CD20092347B /* NptAppleLogConfig.mm in Sources */,
+				E44E2AD01AE75CD20092347B /* NptCocoaEnviroment.mm in Sources */,
+				E44E2AD11AE75CD20092347B /* NptCocoaConsole.mm in Sources */,
+				E44E2AD21AE75CD20092347B /* NptCocoaMessageQueue.mm in Sources */,
+				E44E2AD31AE75CD20092347B /* NptNullSerialPort.cpp in Sources */,
+				E44E2AD41AE75CD20092347B /* NptBsdResolver.cpp in Sources */,
+				E44E2AD51AE75CD20092347B /* NptBsdNetwork.cpp in Sources */,
+				E44E2AD61AE75CD20092347B /* NptBsdSockets.cpp in Sources */,
+				E44E2AD71AE75CD20092347B /* NptPosixTime.cpp in Sources */,
+				E44E2AD81AE75CD20092347B /* NptPosixDynamicLibraries.cpp in Sources */,
+				E44E2AD91AE75CD20092347B /* NptPosixNetwork.cpp in Sources */,
+				E44E2ADA1AE75CD20092347B /* NptPosixFile.cpp in Sources */,
+				E44E2ADB1AE75CD20092347B /* NptPosixQueue.cpp in Sources */,
+				E44E2ADC1AE75CD20092347B /* NptPosixSystem.cpp in Sources */,
+				E44E2ADD1AE75CD20092347B /* NptPosixThreads.cpp in Sources */,
+				E44E2ADE1AE75CD20092347B /* NptSelectableMessageQueue.cpp in Sources */,
+				E44E2ADF1AE75CD20092347B /* NptStdcDebug.cpp in Sources */,
+				E44E2AE01AE75CD20092347B /* NptStdcEnvironment.cpp in Sources */,
+				E44E2AE11AE75CD20092347B /* NptStdcFile.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4400,10 +4693,15 @@
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CAF2EFDC0E64A28000948C04 /* PBXContainerItemProxy */;
 		};
-		E40D8C1E1AD874190041A617 /* PBXTargetDependency */ = {
+		E44E2B1E1AE75F7D0092347B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
-			targetProxy = E40D8C1D1AD874190041A617 /* PBXContainerItemProxy */;
+			targetProxy = E44E2B1D1AE75F7D0092347B /* PBXContainerItemProxy */;
+		};
+		E44E2B211AE75F950092347B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CA1A5EA80EC0152A00A9040C /* axTLS */;
+			targetProxy = E44E2B201AE75F950092347B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4451,6 +4749,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				PRODUCT_NAME = axTLS;
+				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos";
 				WARNING_CFLAGS = "";
 			};
 			name = Debug;
@@ -4472,6 +4771,7 @@
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				PRODUCT_NAME = axTLS;
+				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos";
 				WARNING_CFLAGS = "";
 			};
 			name = Release;
@@ -5623,21 +5923,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+				OTHER_LDFLAGS = (
 					"-framework",
 					UIKit,
-				);
-				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
-					"-framework",
-					UIKit,
-				);
-				"OTHER_LDFLAGS[sdk=macosx*]" = (
-					"-framework",
-					SystemConfiguration,
 				);
 				PRODUCT_NAME = Neptune;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -5684,21 +5977,123 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+				OTHER_LDFLAGS = (
 					"-framework",
 					UIKit,
-				);
-				"OTHER_LDFLAGS[sdk=iphonesimulator*]" = (
-					"-framework",
-					UIKit,
-				);
-				"OTHER_LDFLAGS[sdk=macosx*]" = (
-					"-framework",
-					SystemConfiguration,
 				);
 				PRODUCT_NAME = Neptune;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		E44E2B191AE75CD20092347B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG,
+					NPT_CONFIG_HAVE_SYSTEM_MACHINE_NAME,
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "Neptune-Framework/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SystemConfiguration,
+				);
+				PRODUCT_NAME = Neptune;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		E44E2B1A1AE75CD20092347B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1.1.3;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					NPT_CONFIG_HAVE_SYSTEM_LOG_CONFIG,
+					NPT_CONFIG_HAVE_SYSTEM_MACHINE_NAME,
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "Neptune-Framework/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SystemConfiguration,
+				);
+				PRODUCT_NAME = Neptune;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = macosx;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -5709,6 +6104,7 @@
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
@@ -5744,9 +6140,6 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
-				VALID_ARCHS = "i386 x86_64";
-				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 armv7s arm64";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -5758,6 +6151,7 @@
 		F912B68A0B8EB12700C1E90D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -5789,9 +6183,6 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
-				VALID_ARCHS = "i386 x86_64";
-				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 armv7s arm64";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -6206,11 +6597,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E40D8BAF1AD86D3A0041A617 /* Build configuration list for PBXNativeTarget "Neptune-Framework" */ = {
+		E40D8BAF1AD86D3A0041A617 /* Build configuration list for PBXNativeTarget "Neptune-iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E40D8BB01AD86D3A0041A617 /* Debug */,
 				E40D8BB11AD86D3A0041A617 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E44E2B181AE75CD20092347B /* Build configuration list for PBXNativeTarget "Neptune-Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E44E2B191AE75CD20092347B /* Debug */,
+				E44E2B1A1AE75CD20092347B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

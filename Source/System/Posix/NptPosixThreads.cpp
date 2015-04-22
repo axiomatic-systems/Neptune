@@ -404,7 +404,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
 +---------------------------------------------------------------------*/
 NPT_PosixThread::~NPT_PosixThread()
 {
-    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lu\n", (unsigned long)m_ThreadId);
+//    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lu\n", (unsigned long)m_ThreadId);
 
     if (!m_Detached) {
         // we're not detached, and not in the Run() method, so we need to 

@@ -151,6 +151,7 @@
 #if defined(__APPLE__)
 #define NPT_CONFIG_HAVE_GETADDRINFO
 #define NPT_CONFIG_HAVE_AUTORELEASE_POOL
+#define NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN
 #endif
 
 /*----------------------------------------------------------------------

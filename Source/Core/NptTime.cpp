@@ -208,7 +208,7 @@ NPT_DateTime::FromTimeStamp(const NPT_TimeStamp& ts, bool local)
 
     // adjust for leap years
     bool is_leap_year = false;
-    NPT_UInt32 leap_years_since_1900 = ElapsedLeapYearsSince1900(years_since_1900+1900);
+    NPT_Int64 leap_years_since_1900 = ElapsedLeapYearsSince1900(years_since_1900+1900);
     if (seconds < (leap_years_since_1900 * NPT_SECONDS_PER_DAY)) {
         // not enough seconds in the current year to compensate, move one year back
         seconds += NPT_SECONDS_PER_YEAR;

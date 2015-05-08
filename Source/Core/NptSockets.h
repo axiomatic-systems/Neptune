@@ -220,7 +220,7 @@ public:
 
 protected:
     // constructor
-    NPT_Socket() {}
+    NPT_Socket() : m_SocketDelegate(NULL) {}
 
     // members
     NPT_SocketInterface* m_SocketDelegate;

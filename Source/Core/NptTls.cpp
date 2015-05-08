@@ -315,6 +315,9 @@ NPT_TlsContextImpl::SelfSignCertificate(const char* common_name,
     uint8_t* certificate = NULL;
     int result = ssl_x509_create(m_SSL_CTX, 0, dn, &certificate);
     if (result <= 0) {
+        if (certificate) {
+            ssl_mem_free(certificate);
+        }
         return NPT_Tls_MapResult(result);
     }
     result = ssl_obj_memory_load(m_SSL_CTX, SSL_OBJ_X509_CERT, certificate, result, NULL);

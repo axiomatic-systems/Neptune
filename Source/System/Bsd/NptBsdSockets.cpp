@@ -339,11 +339,15 @@ SocketAddressToInetAddress(const NPT_SocketAddress& socket_address,
                            struct sockaddr_in*      inet_address)
 {
     // initialize the structure
-    for (int i=0; i<8; i++) inet_address->sin_zero[i]=0;
+    NPT_SetMemory(inet_address, 0, sizeof(*inet_address));
+    
+#if defined(NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN)
+    inet_address->sin_len = sizeof(*inet_address);
+#endif
 
     // setup the structure
-    inet_address->sin_family = AF_INET;
-    inet_address->sin_port = htons(socket_address.GetPort());
+    inet_address->sin_family      = AF_INET;
+    inet_address->sin_port        = htons(socket_address.GetPort());
     inet_address->sin_addr.s_addr = htonl(socket_address.GetIpAddress().AsLong());
 }
 
@@ -1156,11 +1160,11 @@ NPT_BsdSocket::NPT_BsdSocket(SocketFd fd, NPT_Flags flags) :
     // disable the SIGPIPE signal
 #if defined(SO_NOSIGPIPE)
     int option = 1;
-    setsockopt(m_SocketFdReference->m_SocketFd, 
-               SOL_SOCKET, 
-               SO_NOSIGPIPE, 
-               (SocketOption)&option, 
-               sizeof(option));
+    (void)setsockopt(m_SocketFdReference->m_SocketFd,
+                     SOL_SOCKET,
+                     SO_NOSIGPIPE,
+                     (SocketOption)&option,
+                     sizeof(option));
 #elif defined(SIGPIPE)
     signal(SIGPIPE, SIG_IGN);
 #endif
@@ -1187,11 +1191,13 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
     if (reuse_address) {
         NPT_LOG_FINE("setting SO_REUSEADDR option on socket");
         int option = 1;
-        setsockopt(m_SocketFdReference->m_SocketFd, 
-                   SOL_SOCKET, 
-                   SO_REUSEADDR, 
-                   (SocketOption)&option, 
-                   sizeof(option));
+        if (setsockopt(m_SocketFdReference->m_SocketFd,
+                       SOL_SOCKET,
+                       SO_REUSEADDR,
+                       (SocketOption)&option,
+                       sizeof(option))) {
+            return MapErrorCode(GetSocketError());
+        }
     }
     
     // convert the address
@@ -1405,11 +1411,11 @@ NPT_BsdUdpSocket::NPT_BsdUdpSocket(NPT_Flags flags) :
 {
     // set default socket options
     int option = 1;
-    setsockopt(m_SocketFdReference->m_SocketFd, 
-               SOL_SOCKET, 
-               SO_BROADCAST, 
-               (SocketOption)&option, 
-               sizeof(option));
+    (void)setsockopt(m_SocketFdReference->m_SocketFd,
+                     SOL_SOCKET,
+                     SO_BROADCAST,
+                     (SocketOption)&option,
+                     sizeof(option));
 
 #if defined(_XBOX)
     // set flag on the socket to allow sending of multicast
@@ -1430,11 +1436,13 @@ NPT_BsdUdpSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
         // some implementations (BSD 4.4) need this in addition to SO_REUSEADDR
         NPT_LOG_FINE("setting SO_REUSEPORT option on socket");
         int option = 1;
-        setsockopt(m_SocketFdReference->m_SocketFd, 
-                   SOL_SOCKET, 
-                   SO_REUSEPORT, 
-                   (SocketOption)&option, 
-                   sizeof(option));
+        if (setsockopt(m_SocketFdReference->m_SocketFd,
+                       SOL_SOCKET,
+                       SO_REUSEPORT,
+                       (SocketOption)&option,
+                       sizeof(option))) {
+            return MapErrorCode(GetSocketError());
+        }
 #endif
     }
     // call the inherited method
@@ -1669,11 +1677,11 @@ NPT_BsdUdpMulticastSocket::NPT_BsdUdpMulticastSocket(NPT_Flags flags) :
 {
 #if !defined(_XBOX)
         int option = 1;
-        setsockopt(m_SocketFdReference->m_SocketFd, 
-                   IPPROTO_IP, 
-                   IP_MULTICAST_LOOP,
-                   (SocketOption)&option,
-                   sizeof(option));
+        (void)setsockopt(m_SocketFdReference->m_SocketFd,
+                         IPPROTO_IP,
+                         IP_MULTICAST_LOOP,
+                         (SocketOption)&option,
+                         sizeof(option));
 #endif
 }
 
@@ -1713,16 +1721,14 @@ NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
     // set socket option
     NPT_LOG_FINE_2("joining multicast addr %lx group %lx", 
                    iface.AsLong(), group.AsLong());
-    int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
-                               IPPROTO_IP, IP_ADD_MEMBERSHIP, 
-                               (SocketOption)&mreq, sizeof(mreq));
-    if (io_result == 0) {
-        return NPT_SUCCESS;
-    } else {
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                   (SocketOption)&mreq, sizeof(mreq))) {
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+    return NPT_SUCCESS;
 }
 #endif
 
@@ -1755,16 +1761,15 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
     // set socket option
     NPT_LOG_FINE_2("leaving multicast addr %lx group %lx", 
                    iface.AsLong(), group.AsLong());
-    int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
-                               IPPROTO_IP, IP_DROP_MEMBERSHIP, 
-                               (SocketOption)&mreq, sizeof(mreq));
-    if (io_result == 0) {
-        return NPT_SUCCESS;
-    } else {
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IP, IP_DROP_MEMBERSHIP,
+                   (SocketOption)&mreq, sizeof(mreq))) {
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+    
+    return NPT_SUCCESS;
 }
 #endif
 
@@ -1790,16 +1795,15 @@ NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
 
     // set socket option
     NPT_LOG_FINE_1("setting multicast interface %lx", iface.AsLong()); 
-    int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
-                               IPPROTO_IP, IP_MULTICAST_IF, 
-                               (char*)&iface_addr, sizeof(iface_addr));
-    if (io_result == 0) {
-        return NPT_SUCCESS;
-    } else {
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IP, IP_MULTICAST_IF,
+                   (char*)&iface_addr, sizeof(iface_addr))) {
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+    
+    return NPT_SUCCESS;
 }
 #endif
 
@@ -1823,16 +1827,15 @@ NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
 
     // set socket option
     NPT_LOG_FINE_1("setting multicast TTL to %d", (int)ttl); 
-    int io_result = setsockopt(m_SocketFdReference->m_SocketFd, 
-                               IPPROTO_IP, IP_MULTICAST_TTL, 
-                               (SocketOption)&ttl_opt, sizeof(ttl_opt));
-    if (io_result == 0) {
-        return NPT_SUCCESS;
-    } else {
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IP, IP_MULTICAST_TTL,
+                   (SocketOption)&ttl_opt, sizeof(ttl_opt))) {
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+    
+    return NPT_SUCCESS;
 }
 #endif
 

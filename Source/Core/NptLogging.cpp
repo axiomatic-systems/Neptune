@@ -107,6 +107,9 @@ public:
     void Log(const NPT_LogRecord& record);
 
 private:
+    // constructor
+    NPT_LogTcpHandler() : m_Port(0) {}
+
     // methods
     NPT_Result Connect();
 

@@ -65,7 +65,7 @@ UdpPing(const char* hostname, int port)
     // build ping packet
     NPT_DataBuffer packet;
     const char* packet_data = "PING";
-    packet.SetData((NPT_Byte*)packet_data, sizeof(packet_data));
+    packet.SetData((NPT_Byte*)packet_data, 4);
 
     // resolve hostname
     NPT_IpAddress ip_address;

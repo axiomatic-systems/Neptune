@@ -6,3 +6,5 @@ Build/Targets/universal-apple-macosx/build
 Build/Targets/universal-apple-macosx/Neptune.xcodeproj/project.xcworkspace/xcuserdata/gilles.xcuserdatad
 Build/Targets/universal-apple-macosx/Neptune.xcodeproj/xcuserdata
 Build/Targets/universal-apple-macosx/cov-int
+Neptune.xcscmblueprint
+Build/Targets/x86-microsoft-win32-vs2010/Neptune/Debug

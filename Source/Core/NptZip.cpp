@@ -336,6 +336,15 @@ NPT_ZipFile::GetInputStream(Entry& entry, NPT_InputStreamReference& zip_stream, 
 |   NPT_ZipFile::Entry::Entry
 +---------------------------------------------------------------------*/
 NPT_ZipFile::Entry::Entry(const unsigned char* data, NPT_Size data_available) :
+    m_Flags(0),
+    m_CompressionMethod(0),
+    m_Crc32(0),
+    m_CompressedSize(0),
+    m_UncompressedSize(0),
+    m_DiskNumber(0),
+    m_InternalFileAttributes(0),
+    m_ExternalFileAttributes(0),
+    m_RelativeOffset(0),
     m_DirectoryEntrySize(0)
 {
     if (data_available < 46) return;

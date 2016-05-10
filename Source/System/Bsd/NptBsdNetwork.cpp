@@ -2,7 +2,7 @@
 |
 |      Neptune - Network :: BSD Implementation
 |
-|      (c) 2001-2005 Gilles Boccon-Gibod
+|      (c) 2001-2016 Gilles Boccon-Gibod
 |      Author: Gilles Boccon-Gibod (bok@bok.net)
 |
  ****************************************************************/
@@ -58,9 +58,154 @@
 #endif
 
 /*----------------------------------------------------------------------
+|   IPv6 support
++---------------------------------------------------------------------*/
+#if defined(NPT_CONFIG_HAVE_ARPA_INET_H)
+#include <arpa/inet.h>
+#endif
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::Any and NPT_IpAddress::Loopback
++---------------------------------------------------------------------*/
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+const NPT_IpAddress NPT_IpAddress::Any(NPT_IpAddress::IPV6, in6addr_any.s6_addr, 16);
+const NPT_IpAddress NPT_IpAddress::Loopback(NPT_IpAddress::IPV6, in6addr_loopback.s6_addr, 16);
+#else
+const NPT_IpAddress NPT_IpAddress::Any;
+const NPT_IpAddress NPT_IpAddress::Loopback(127,0,0,1);
+#endif
+
+/*----------------------------------------------------------------------
 |   NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
 const unsigned int NPT_BSD_NETWORK_MAX_IFCONF_SIZE = 1<<20;
+
+#if defined(NPT_CONFIG_HAVE_INET_NTOP)
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::ToString
++---------------------------------------------------------------------*/
+NPT_String
+NPT_IpAddress::ToString() const
+{
+    NPT_String address;
+    char workspace[128];
+    int af = AF_INET;
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    if (m_Type == IPV6) {
+        af = AF_INET6;
+    }
+#endif
+    const char* string = inet_ntop(af, &m_Address[0], workspace, sizeof(workspace));
+    if (string) {
+        address = string;
+    }
+    
+    return address;
+}
+#else
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::ToString
++---------------------------------------------------------------------*/
+NPT_String
+NPT_IpAddress::ToString() const
+{
+    NPT_String address;
+    address.Reserve(16);
+    address += NPT_String::FromInteger(m_Address[0]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[1]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[2]);
+    address += '.';
+    address += NPT_String::FromInteger(m_Address[3]);
+
+    return address;
+}
+#endif
+
+#if defined(NPT_CONFIG_HAVE_INET_PTON)
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::Parse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_IpAddress::Parse(const char* name)
+{
+    // check the name
+    if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    // clear the address
+    NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
+
+    // try IPv4 first
+    int result = inet_pton(AF_INET, name, &m_Address[0]);
+    if (result > 0) {
+        m_Type = IPV4;
+        return NPT_SUCCESS;
+    }
+    
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    // try IPv6 next
+    result = inet_pton(AF_INET6, name, &m_Address[0]);
+    if (result > 0) {
+        m_Type = IPV6;
+        return NPT_SUCCESS;
+    }
+#endif
+
+    if (result == 0) {
+        return NPT_ERROR_INVALID_SYNTAX;
+    } else {
+        return NPT_FAILURE;
+    }
+}
+#else
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::Parse
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_IpAddress::Parse(const char* name)
+{
+    // check the name
+    if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
+
+    // clear the address
+    NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
+
+    // parse
+    unsigned int  fragment;
+    bool          fragment_empty = true;
+    unsigned char address[4];
+    unsigned int  accumulator;
+    for (fragment = 0, accumulator = 0; fragment < 4; ++name) {
+        if (*name == '\0' || *name == '.') {
+            // fragment terminator
+            if (fragment_empty) return NPT_ERROR_INVALID_SYNTAX;
+            address[fragment++] = accumulator;
+            if (*name == '\0') break;
+            accumulator = 0;
+            fragment_empty = true;
+        } else if (*name >= '0' && *name <= '9') {
+            // numerical character
+            accumulator = accumulator*10 + (*name - '0');
+            if (accumulator > 255) return NPT_ERROR_INVALID_SYNTAX;
+            fragment_empty = false; 
+        } else {
+            // invalid character
+            return NPT_ERROR_INVALID_SYNTAX;
+        }
+    }
+
+    if (fragment == 4 && *name == '\0' && !fragment_empty) {
+        m_Address[0] = address[0];
+        m_Address[1] = address[1];
+        m_Address[2] = address[2];
+        m_Address[3] = address[3];
+        return NPT_SUCCESS;
+    } else {
+        return NPT_ERROR_INVALID_SYNTAX;
+    }
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   NPT_NetworkInterface::GetNetworkInterfaces
@@ -121,8 +266,11 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         // point to the next entry
         entries += NPT_IFREQ_SIZE(entry);
         
-        // ignore anything except AF_INET and AF_LINK addresses
+        // ignore anything except AF_INET, AF_INET6 (if enabled) and AF_LINK addresses
         if (entry->ifr_addr.sa_family != AF_INET
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+            && entry->ifr_addr.sa_family != AF_INET6
+#endif
 #if defined(AF_LINK)
             && entry->ifr_addr.sa_family != AF_LINK 
 #endif
@@ -264,6 +412,50 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
                 
                 break;
             }
+
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+            case AF_INET6: {
+                // primary address
+                NPT_IpAddress primary_address(NPT_IpAddress::IPV6, ((struct sockaddr_in6*)&entry->ifr_addr)->sin6_addr.s6_addr, 16);
+
+                // broadcast address
+                NPT_IpAddress broadcast_address(NPT_IpAddress::IPV6);
+#if defined(SIOCGIFBRDADDR)
+                if (flags & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
+                    if (ioctl(net, SIOCGIFBRDADDR, &query) == 0) {
+                        broadcast_address.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
+                    }
+                }
+#endif
+
+                // point to point address
+                NPT_IpAddress destination_address(NPT_IpAddress::IPV6);
+#if defined(SIOCGIFDSTADDR)
+                if (flags & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
+                    if (ioctl(net, SIOCGIFDSTADDR, &query) == 0) {
+                        destination_address.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
+                    }
+                }
+#endif
+
+                // netmask
+                NPT_IpAddress netmask((NPT_IpAddress::IPV6));
+#if defined(SIOCGIFNETMASK)
+                if (ioctl(net, SIOCGIFNETMASK, &query) == 0) {
+                    netmask.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
+                }
+#endif
+                // add the address to the interface
+                NPT_NetworkInterfaceAddress iface_address(
+                    primary_address,
+                    broadcast_address,
+                    destination_address,
+                    netmask);
+                interface->AddAddress(iface_address);
+                
+                break;
+            }
+#endif
 
 #if defined(AF_LINK) && defined(NPT_CONFIG_HAVE_SOCKADDR_DL)
             case AF_LINK: {

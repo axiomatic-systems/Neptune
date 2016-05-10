@@ -1,0 +1,153 @@
+﻿Build started 5/9/2016 9:38:25 PM.
+     1>Project "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Neptune\Neptune.vcxproj" on node 2 (build target(s)).
+     1>PrepareForBuild:
+         Creating directory "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\".
+       InitializeBuildStatus:
+         Creating "Release\Neptune.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\..\Source\Core /I..\..\..\..\Source\System\Win32 /I..\..\..\..\ThirdParty\axTLS\config\Win32 /I..\..\..\..\ThirdParty\axTLS\crypto /I..\..\..\..\ThirdParty\axTLS\ssl /Zi /nologo /W3 /WX- /Ox /Oy /D WIN32 /D NDEBUG /D _LIB /D NPT_CONFIG_ENABLE_TLS /D _MBCS /GF /Gm- /MT /GS /Gy /fp:fast /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\..\Source\Core\NptBase64.cpp ..\..\..\..\Source\Core\NptHash.cpp ..\..\..\..\Source\System\Bsd\NptBsdResolver.cpp ..\..\..\..\Source\System\Bsd\NptBsdSockets.cpp ..\..\..\..\Source\Core\NptBufferedStreams.cpp ..\..\..\..\Source\Core\NptCommon.cpp ..\..\..\..\Source\Core\NptConsole.cpp ..\..\..\..\Source\Core\NptCrypto.cpp ..\..\..\..\Source\Core\NptDataBuffer.cpp ..\..\..\..\Source\Core\NptDebug.cpp ..\..\..\..\Source\Core\NptDigest.cpp ..\..\..\..\Source\Core\NptFile.cpp ..\..\..\..\Source\Core\NptHttp.cpp ..\..\..\..\Source\Core\NptList.cpp ..\..\..\..\Source\Core\NptLogging.cpp ..\..\..\..\Source\Core\NptMessaging.cpp ..\..\..\..\Source\Core\NptNetwork.cpp ..\..\..\..\Source\System\Posix\NptPosixFile.cpp ..\..\..\..\Source\Core\NptQueue.cpp ..\..\..\..\Source\Core\NptResults.cpp ..\..\..\..\Source\Core\NptRingBuffer.cpp ..\..\..\..\Source\Core\NptSimpleMessageQueue.cpp ..\..\..\..\Source\Core\NptSockets.cpp ..\..\..\..\Source\System\StdC\NptStdcEnvironment.cpp ..\..\..\..\Source\System\StdC\NptStdcFile.cpp ..\..\..\..\Source\Core\NptStreams.cpp ..\..\..\..\Source\Core\NptStrings.cpp ..\..\..\..\Source\Core\NptSystem.cpp ..\..\..\..\Source\Core\NptThreads.cpp ..\..\..\..\Source\Core\NptTime.cpp ..\..\..\..\Source\Core\NptTls.cpp ..\..\..\..\Source\Core\NptUri.cpp ..\..\..\..\Source\Core\NptUtils.cpp ..\..\..\..\Source\System\Win32\NptWin32Console.cpp ..\..\..\..\Source\System\Win32\NptWin32Debug.cpp ..\..\..\..\Source\System\Win32\NptWin32DynamicLibraries.cpp ..\..\..\..\Source\System\Win32\NptWin32File.cpp ..\..\..\..\Source\System\Win32\NptWin32MessageQueue.cpp ..\..\..\..\Source\System\Win32\NptWin32Network.cpp ..\..\..\..\Source\System\Win32\NptWin32Queue.cpp ..\..\..\..\Source\System\Win32\NptWin32SerialPort.cpp ..\..\..\..\Source\System\Win32\NptWin32System.cpp ..\..\..\..\Source\System\Win32\NptWin32Threads.cpp ..\..\..\..\Source\System\Win32\NptWin32Time.cpp ..\..\..\..\Source\Core\NptXml.cpp ..\..\..\..\Source\Data\TLS\NptTlsDefaultTrustAnchorsBase.cpp ..\..\..\..\Source\Data\TLS\NptTlsDefaultTrustAnchorsExtended.cpp
+         NptBase64.cpp
+         NptHash.cpp
+         NptBsdResolver.cpp
+         NptBsdSockets.cpp
+         NptBufferedStreams.cpp
+         NptCommon.cpp
+         NptConsole.cpp
+         NptCrypto.cpp
+         NptDataBuffer.cpp
+         NptDebug.cpp
+         NptDigest.cpp
+         NptFile.cpp
+         NptHttp.cpp
+         NptList.cpp
+         NptLogging.cpp
+         NptMessaging.cpp
+         NptNetwork.cpp
+         NptPosixFile.cpp
+         NptQueue.cpp
+         NptResults.cpp
+         Generating Code...
+         Compiling...
+         NptRingBuffer.cpp
+         NptSimpleMessageQueue.cpp
+         NptSockets.cpp
+         NptStdcEnvironment.cpp
+         NptStdcFile.cpp
+         NptStreams.cpp
+         NptStrings.cpp
+         NptSystem.cpp
+         NptThreads.cpp
+         NptTime.cpp
+         NptTls.cpp
+         NptUri.cpp
+         NptUtils.cpp
+         NptWin32Console.cpp
+         NptWin32Debug.cpp
+         NptWin32DynamicLibraries.cpp
+         NptWin32File.cpp
+         NptWin32MessageQueue.cpp
+         NptWin32Network.cpp
+         NptWin32Queue.cpp
+         Generating Code...
+         Compiling...
+         NptWin32SerialPort.cpp
+         NptWin32System.cpp
+         NptWin32Threads.cpp
+         NptWin32Time.cpp
+         NptXml.cpp
+         NptTlsDefaultTrustAnchorsBase.cpp
+         NptTlsDefaultTrustAnchorsExtended.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\..\Source\Core /I..\..\..\..\Source\System\Win32 /I..\..\..\..\ThirdParty\axTLS\config\Win32 /I..\..\..\..\ThirdParty\axTLS\crypto /I..\..\..\..\ThirdParty\axTLS\ssl /Zi /nologo /W3 /WX- /Ox /Oy /D WIN32 /D NDEBUG /D _LIB /D NPT_CONFIG_ENABLE_TLS /D _MBCS /GF /Gm- /MT /GS /Gy /fp:fast /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt ..\..\..\..\ThirdParty\axTLS\crypto\aes.c ..\..\..\..\ThirdParty\axTLS\ssl\asn1.c ..\..\..\..\ThirdParty\axTLS\crypto\bigint.c ..\..\..\..\ThirdParty\axTLS\crypto\crypto_misc.c ..\..\..\..\ThirdParty\axTLS\ssl\gen_cert.c ..\..\..\..\ThirdParty\axTLS\crypto\hmac.c ..\..\..\..\ThirdParty\axTLS\ssl\loader.c ..\..\..\..\ThirdParty\axTLS\crypto\md2.c ..\..\..\..\ThirdParty\axTLS\crypto\md5.c ..\..\..\..\ThirdParty\axTLS\ssl\p12.c ..\..\..\..\ThirdParty\axTLS\crypto\rc4.c ..\..\..\..\ThirdParty\axTLS\crypto\rsa.c ..\..\..\..\ThirdParty\axTLS\crypto\sha1.c ..\..\..\..\ThirdParty\axTLS\ssl\tls1.c ..\..\..\..\ThirdParty\axTLS\ssl\tls1_clnt.c ..\..\..\..\ThirdParty\axTLS\ssl\tls1_svr.c ..\..\..\..\ThirdParty\axTLS\ssl\x509.c
+         aes.c
+         asn1.c
+         bigint.c
+         crypto_misc.c
+         gen_cert.c
+         hmac.c
+         loader.c
+         md2.c
+         md5.c
+         p12.c
+         rc4.c
+         rsa.c
+         sha1.c
+         tls1.c
+         tls1_clnt.c
+         tls1_svr.c
+         x509.c
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\Neptune.lib" ws2_32.lib /NOLOGO Release\NptBase64.obj
+         Release\NptHash.obj
+         Release\NptBsdResolver.obj
+         Release\NptBsdSockets.obj
+         Release\NptBufferedStreams.obj
+         Release\NptCommon.obj
+         Release\NptConsole.obj
+         Release\NptCrypto.obj
+         Release\NptDataBuffer.obj
+         Release\NptDebug.obj
+         Release\NptDigest.obj
+         Release\NptFile.obj
+         Release\NptHttp.obj
+         Release\NptList.obj
+         Release\NptLogging.obj
+         Release\NptMessaging.obj
+         Release\NptNetwork.obj
+         Release\NptPosixFile.obj
+         Release\NptQueue.obj
+         Release\NptResults.obj
+         Release\NptRingBuffer.obj
+         Release\NptSimpleMessageQueue.obj
+         Release\NptSockets.obj
+         Release\NptStdcEnvironment.obj
+         Release\NptStdcFile.obj
+         Release\NptStreams.obj
+         Release\NptStrings.obj
+         Release\NptSystem.obj
+         Release\NptThreads.obj
+         Release\NptTime.obj
+         Release\NptTls.obj
+         Release\NptUri.obj
+         Release\NptUtils.obj
+         Release\NptWin32Console.obj
+         Release\NptWin32Debug.obj
+         Release\NptWin32DynamicLibraries.obj
+         Release\NptWin32File.obj
+         Release\NptWin32MessageQueue.obj
+         Release\NptWin32Network.obj
+         Release\NptWin32Queue.obj
+         Release\NptWin32SerialPort.obj
+         Release\NptWin32System.obj
+         Release\NptWin32Threads.obj
+         Release\NptWin32Time.obj
+         Release\NptXml.obj
+         Release\aes.obj
+         Release\asn1.obj
+         Release\bigint.obj
+         Release\crypto_misc.obj
+         Release\gen_cert.obj
+         Release\hmac.obj
+         Release\loader.obj
+         Release\md2.obj
+         Release\md5.obj
+         Release\p12.obj
+         Release\rc4.obj
+         Release\rsa.obj
+         Release\sha1.obj
+         Release\tls1.obj
+         Release\tls1_clnt.obj
+         Release\tls1_svr.obj
+         Release\x509.obj
+         Release\NptTlsDefaultTrustAnchorsBase.obj
+         Release\NptTlsDefaultTrustAnchorsExtended.obj
+         Neptune.vcxproj -> Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\Neptune.lib
+       FinalizeBuildStatus:
+         Deleting file "Release\Neptune.unsuccessfulbuild".
+         Touching "Release\Neptune.lastbuildstate".
+     1>Done Building Project "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Neptune\Neptune.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:54.61

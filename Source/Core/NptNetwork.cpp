@@ -2,7 +2,7 @@
 |
 |   Neptune - Network
 |
-| Copyright (c) 2002-2008, Axiomatic Systems, LLC.
+| Copyright (c) 2002-2016, Axiomatic Systems, LLC.
 | All rights reserved.
 |
 | Redistribution and use in source and binary forms, with or without
@@ -36,22 +36,28 @@
 #include "NptUtils.h"
 
 /*----------------------------------------------------------------------
-|   NPT_IpAddress::Any
-+---------------------------------------------------------------------*/
-const NPT_IpAddress NPT_IpAddress::Any;
-
-/*----------------------------------------------------------------------
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
-NPT_IpAddress::NPT_IpAddress()
+NPT_IpAddress::NPT_IpAddress() :
+    m_Type(IPV4)
 {
-    m_Address[0] = m_Address[1] = m_Address[2] = m_Address[3] = 0;
+    NPT_SetMemory(m_Address, 0, sizeof(m_Address));
 }
 
 /*----------------------------------------------------------------------
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
-NPT_IpAddress::NPT_IpAddress(unsigned long address)
+NPT_IpAddress::NPT_IpAddress(Type type) :
+    m_Type(type)
+{
+    NPT_SetMemory(m_Address, 0, sizeof(m_Address));
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::NPT_IpAddress
++---------------------------------------------------------------------*/
+NPT_IpAddress::NPT_IpAddress(unsigned long address) :
+    m_Type(IPV4)
 {
     Set(address);
 }
@@ -62,8 +68,10 @@ NPT_IpAddress::NPT_IpAddress(unsigned long address)
 NPT_IpAddress::NPT_IpAddress(unsigned char a, 
                              unsigned char b, 
                              unsigned char c, 
-                             unsigned char d)
+                             unsigned char d) :
+    m_Type(IPV4)
 {
+    NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
     m_Address[0] = a;
     m_Address[1] = b;
     m_Address[2] = c;
@@ -71,49 +79,18 @@ NPT_IpAddress::NPT_IpAddress(unsigned char a,
 }
 
 /*----------------------------------------------------------------------
-|   NPT_IpAddress::Parse
+|   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
-NPT_Result
-NPT_IpAddress::Parse(const char* name)
+NPT_IpAddress::NPT_IpAddress(Type type, const unsigned char* address, unsigned int size) :
+    m_Type(type)
 {
-    // check the name
-    if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
-
-    // clear the address
-    m_Address[0] = m_Address[1] = m_Address[2] = m_Address[3] = 0;
-
-    // parse
-    unsigned int  fragment;
-    bool          fragment_empty = true;
-    unsigned char address[4];
-    unsigned int  accumulator;
-    for (fragment = 0, accumulator = 0; fragment < 4; ++name) {
-        if (*name == '\0' || *name == '.') {
-            // fragment terminator
-            if (fragment_empty) return NPT_ERROR_INVALID_SYNTAX;
-            address[fragment++] = accumulator;
-            if (*name == '\0') break;
-            accumulator = 0;
-            fragment_empty = true;
-        } else if (*name >= '0' && *name <= '9') {
-            // numerical character
-            accumulator = accumulator*10 + (*name - '0');
-            if (accumulator > 255) return NPT_ERROR_INVALID_SYNTAX;
-            fragment_empty = false; 
-        } else {
-            // invalid character
-            return NPT_ERROR_INVALID_SYNTAX;
-        }
-    }
-
-    if (fragment == 4 && *name == '\0' && !fragment_empty) {
-        m_Address[0] = address[0];
-        m_Address[1] = address[1];
-        m_Address[2] = address[2];
-        m_Address[3] = address[3];
-        return NPT_SUCCESS;
+    if (type == IPV6 && size == 16) {
+        NPT_CopyMemory(&m_Address[0], address, 16);
+    } else if (type == IPV4 && size == 4) {
+        NPT_CopyMemory(&m_Address[0], address, 4);
+        NPT_SetMemory(&m_Address[4], 0, 12);
     } else {
-        return NPT_ERROR_INVALID_SYNTAX;
+        NPT_SetMemory(&m_Address[0], 0, 16);
     }
 }
 
@@ -140,35 +117,18 @@ NPT_IpAddress::AsBytes() const
 }
 
 /*----------------------------------------------------------------------
-|   NPT_IpAddress::ToString
-+---------------------------------------------------------------------*/
-NPT_String
-NPT_IpAddress::ToString() const
-{
-    NPT_String address;
-    address.Reserve(16);
-    address += NPT_String::FromInteger(m_Address[0]);
-    address += '.';
-    address += NPT_String::FromInteger(m_Address[1]);
-    address += '.';
-    address += NPT_String::FromInteger(m_Address[2]);
-    address += '.';
-    address += NPT_String::FromInteger(m_Address[3]);
-
-    return address;
-}
-
-/*----------------------------------------------------------------------
 |   NPT_IpAddress::Set
 +---------------------------------------------------------------------*/
 NPT_Result    
 NPT_IpAddress::Set(const unsigned char bytes[4])
 {
+    m_Type = IPV4;
     m_Address[0] = bytes[0];
     m_Address[1] = bytes[1];
     m_Address[2] = bytes[2];
     m_Address[3] = bytes[3];
-
+    NPT_SetMemory(&m_Address[4], 0, sizeof(m_Address)-4);
+    
     return NPT_SUCCESS;
 }
 
@@ -178,11 +138,33 @@ NPT_IpAddress::Set(const unsigned char bytes[4])
 NPT_Result    
 NPT_IpAddress::Set(unsigned long address)
 {
+    m_Type = IPV4;
     m_Address[0] = (unsigned char)((address >> 24) & 0xFF);
     m_Address[1] = (unsigned char)((address >> 16) & 0xFF);
     m_Address[2] = (unsigned char)((address >>  8) & 0xFF);
     m_Address[3] = (unsigned char)((address      ) & 0xFF);
+    NPT_SetMemory(&m_Address[4], 0, sizeof(m_Address)-4);
 
+    return NPT_SUCCESS;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::Set
++---------------------------------------------------------------------*/
+NPT_Result    
+NPT_IpAddress::Set(const unsigned char* bytes, unsigned int size)
+{
+    NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
+    if (size == 4) {
+        m_Type = IPV4;
+        NPT_CopyMemory(&m_Address[0], bytes, 4);
+    } else if (size == 16) {
+        m_Type = IPV6;
+        NPT_CopyMemory(&m_Address[0], bytes, 16);
+    } else {
+        return NPT_ERROR_INVALID_PARAMETERS;
+    }
+    
     return NPT_SUCCESS;
 }
 

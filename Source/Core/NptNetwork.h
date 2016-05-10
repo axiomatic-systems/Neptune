@@ -74,20 +74,33 @@ typedef unsigned int NPT_IpPort;
 class NPT_IpAddress
 {
 public:
+    // constants
+    typedef enum {
+        IPV4,
+        IPV6
+    } Type;
+    
     // class members
     static const NPT_IpAddress Any;
+    static const NPT_IpAddress Loopback;
 
     // constructors and destructor
     NPT_IpAddress();
+    NPT_IpAddress(Type type);
     NPT_IpAddress(unsigned long address);
     NPT_IpAddress(unsigned char a, unsigned char b, unsigned char c, unsigned char d);
+    NPT_IpAddress(Type type, const unsigned char* address, unsigned int size);
 
+    // accessors
+    Type GetType() const { return m_Type; }
+    
     // methods
     NPT_Result       ResolveName(const char* name, 
                                  NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
     NPT_Result       Parse(const char* name);
     NPT_Result       Set(unsigned long address);
     NPT_Result       Set(const unsigned char bytes[4]);
+    NPT_Result       Set(const unsigned char* bytes, unsigned int size);
     const unsigned char* AsBytes() const;
     unsigned long    AsLong() const;
     NPT_String       ToString() const;
@@ -100,7 +113,8 @@ public:
 
 private:
     // members
-    unsigned char m_Address[4];
+    Type          m_Type;
+    unsigned char m_Address[16];
 };
 
 /*----------------------------------------------------------------------

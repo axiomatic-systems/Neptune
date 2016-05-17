@@ -622,7 +622,9 @@ fail:
 template <>
 struct NPT_Hash<NPT_Thread::ThreadId>
 {
-    NPT_UInt32 operator()(NPT_Thread::ThreadId i) const { return NPT_Fnv1aHash32(reinterpret_cast<const NPT_UInt8*>(&i), sizeof(i)); }
+    NPT_UInt32 operator()(NPT_Thread::ThreadId id) const {
+        return (NPT_UInt32)(id & 0xFFFFFFFF);
+    }
 };
 
 /*----------------------------------------------------------------------
@@ -1164,13 +1166,7 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
     if (buffer == NULL) {
         NPT_LOG_INFO("Cancelling BSD socket output stream through write...");
     
-        // force a shutdown if requested
-        int result = shutdown(m_SocketFdReference->m_SocketFd, SHUT_RDWR);
-        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
-            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
-        }
-    
-        m_SocketFdReference->Cancel(false);
+        m_SocketFdReference->Cancel(true);
 
         NPT_LOG_INFO("Done cancelling BSD socket output stream through write.");
         return NPT_SUCCESS;
@@ -1178,55 +1174,55 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
 
     int tries_left = 100;
     for (;;) {
-    // if we're blocking, wait until the socket is writeable
-    if (m_SocketFdReference->m_WriteTimeout) {
-        NPT_Result result = m_SocketFdReference->WaitUntilWriteable();
-        if (result != NPT_SUCCESS) return result;
-    }
-
-    int flags = 0;
-#if defined(MSG_NOSIGNAL)
-    // for some BSD stacks, ask for EPIPE to be returned instead
-    // of sending a SIGPIPE signal to the process
-    flags |= MSG_NOSIGNAL;
-#endif
-
-    // write to the socket
-    NPT_LOG_FINEST_1("writing %d to socket", (int)bytes_to_write);
-    ssize_t nb_written = send(m_SocketFdReference->m_SocketFd, 
-                              (SocketConstBuffer)buffer, 
-                              bytes_to_write, flags);
-    NPT_LOG_FINEST_1("send returned %d", (int)nb_written);
-    
-    if (nb_written <= 0) {
-        if (bytes_written) *bytes_written = 0;
-        if (m_SocketFdReference->m_Cancelled) return NPT_ERROR_CANCELLED;
-
-        if (nb_written == 0) {
-            NPT_LOG_FINE("connection reset");
-            return NPT_ERROR_CONNECTION_RESET;
-        } else {
-            NPT_Result result = MapErrorCode(GetSocketError());
-            NPT_LOG_FINE_1("socket result = %d", result);
-                if (m_SocketFdReference->m_WriteTimeout && result == NPT_ERROR_WOULD_BLOCK) {
-                    // Well, the socket was writeable but then failed with "would block"
-                    // Loop back and try again, a certain number of times only...
-                    NPT_LOG_FINE_1("Socket failed with 'would block' even though writeable?! Tries left: %d", tries_left);
-                    if (--tries_left < 0) {
-                        NPT_LOG_SEVERE("Failed to send any data, send kept returning with 'would block' even though timeout is not 0");
-                        return NPT_ERROR_WRITE_FAILED;
-                    }
-                    continue;
-                }
-            return result;
+        // if we're blocking, wait until the socket is writeable
+        if (m_SocketFdReference->m_WriteTimeout) {
+            NPT_Result result = m_SocketFdReference->WaitUntilWriteable();
+            if (result != NPT_SUCCESS) return result;
         }
-    }
-    
-    // update position and return
+
+        int flags = 0;
+    #if defined(MSG_NOSIGNAL)
+        // for some BSD stacks, ask for EPIPE to be returned instead
+        // of sending a SIGPIPE signal to the process
+        flags |= MSG_NOSIGNAL;
+    #endif
+
+        // write to the socket
+        NPT_LOG_FINEST_1("writing %d to socket", (int)bytes_to_write);
+        ssize_t nb_written = send(m_SocketFdReference->m_SocketFd, 
+                                  (SocketConstBuffer)buffer, 
+                                  bytes_to_write, flags);
+        NPT_LOG_FINEST_1("send returned %d", (int)nb_written);
+        
+        if (nb_written <= 0) {
+            if (bytes_written) *bytes_written = 0;
+            if (m_SocketFdReference->m_Cancelled) return NPT_ERROR_CANCELLED;
+
+            if (nb_written == 0) {
+                NPT_LOG_FINE("connection reset");
+                return NPT_ERROR_CONNECTION_RESET;
+            } else {
+                NPT_Result result = MapErrorCode(GetSocketError());
+                NPT_LOG_FINE_1("socket result = %d", result);
+                    if (m_SocketFdReference->m_WriteTimeout && result == NPT_ERROR_WOULD_BLOCK) {
+                        // Well, the socket was writeable but then failed with "would block"
+                        // Loop back and try again, a certain number of times only...
+                        NPT_LOG_FINE_1("Socket failed with 'would block' even though writeable?! Tries left: %d", tries_left);
+                        if (--tries_left < 0) {
+                            NPT_LOG_SEVERE("Failed to send any data, send kept returning with 'would block' even though timeout is not 0");
+                            return NPT_ERROR_WRITE_FAILED;
+                        }
+                        continue;
+                    }
+                return result;
+            }
+        }
+        
+        // update position and return
         if (bytes_written) *bytes_written = nb_written;
-    m_SocketFdReference->m_Position += nb_written;
-    return NPT_SUCCESS;
-}
+        m_SocketFdReference->m_Position += nb_written;
+        return NPT_SUCCESS;
+    }
 }
 
 /*----------------------------------------------------------------------

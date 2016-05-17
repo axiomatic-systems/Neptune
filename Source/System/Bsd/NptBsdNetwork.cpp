@@ -130,21 +130,16 @@ NPT_IpAddress::ToString() const
 NPT_Result
 NPT_IpAddress::Parse(const char* name)
 {
+    int result;
+    
     // check the name
     if (name == NULL) return NPT_ERROR_INVALID_PARAMETERS;
 
     // clear the address
     NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
 
-    // try IPv4 first
-    int result = inet_pton(AF_INET, name, &m_Address[0]);
-    if (result > 0) {
-        m_Type = IPV4;
-        return NPT_SUCCESS;
-    }
-    
 #if defined(NPT_CONFIG_ENABLE_IPV6)
-    // try IPv6 next
+    // try IPv6 first
     result = inet_pton(AF_INET6, name, &m_Address[0]);
     if (result > 0) {
         m_Type = IPV6;
@@ -152,6 +147,13 @@ NPT_IpAddress::Parse(const char* name)
     }
 #endif
 
+    // try IPv4 next
+    result = inet_pton(AF_INET, name, &m_Address[0]);
+    if (result > 0) {
+        m_Type = IPV4;
+        return NPT_SUCCESS;
+    }
+    
     if (result == 0) {
         return NPT_ERROR_INVALID_SYNTAX;
     } else {
@@ -213,7 +215,7 @@ NPT_IpAddress::Parse(const char* name)
 NPT_Result
 NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)
 {
-    int net = socket(AF_INET, SOCK_DGRAM, 0);
+    int net = socket(PF_INET, SOCK_DGRAM, 0);
     if (net < 0) {
         return NPT_ERROR_BASE_UNIX-errno;
     }

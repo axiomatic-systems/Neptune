@@ -176,6 +176,10 @@ public:
 #define NPT_LOG_CONSOLE_HANDLER_DEFAULT_COLOR_MODE true
 #endif
 
+#ifndef NPT_CONFIG_DEFAULT_LOG_CONSOLE_HANDLER_OUTPUTS
+#define NPT_CONFIG_DEFAULT_LOG_CONSOLE_HANDLER_OUTPUTS OUTPUT_TO_DEBUG
+#endif
+
 #define NPT_LOG_FILE_HANDLER_MIN_RECYCLE_SIZE   1000000
 
 #define NPT_LOG_FORMAT_FILTER_NO_SOURCE         1
@@ -1044,7 +1048,7 @@ NPT_LogConsoleHandler::Create(const char*      logger_name,
     }
 
     NPT_String* outputs;
-    instance->m_Outputs = OUTPUT_TO_DEBUG;
+    instance->m_Outputs = NPT_CONFIG_DEFAULT_LOG_CONSOLE_HANDLER_OUTPUTS;
     outputs = LogManager.GetConfigValue(logger_prefix,".outputs");
     if (outputs) {
         outputs->ToInteger(instance->m_Outputs, true);

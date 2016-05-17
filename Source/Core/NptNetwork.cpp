@@ -178,6 +178,21 @@ NPT_IpAddress::operator==(const NPT_IpAddress& other) const
 }
 
 /*----------------------------------------------------------------------
+|   NPT_IpAddress::ToUrlHost
++---------------------------------------------------------------------*/
+NPT_String
+NPT_IpAddress::ToUrlHost() const
+{
+    if (m_Type == IPV6) {
+        NPT_String result = "[";
+        result += ToString();
+        return result+"]";
+    } else {
+        return ToString();
+    }
+}
+
+/*----------------------------------------------------------------------
 |   NPT_MacAddress::NPT_MacAddress
 +---------------------------------------------------------------------*/
 NPT_MacAddress::NPT_MacAddress(Type                  type,

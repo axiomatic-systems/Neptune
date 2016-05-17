@@ -415,7 +415,7 @@ SocketAddressToInetAddress(const NPT_SocketAddress& socket_address,
     inet_address_length = sizeof(sockaddr_in);
     
 #if defined(NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN)
-    inet_address->sin_len = sizeof(inet_address);
+    inet_address.sa_in.sin_len = sizeof(inet_address);
 #endif
 
     // setup the structure
@@ -464,6 +464,9 @@ MapErrorCode(int error)
 
         case ENETUNREACH:
             return NPT_ERROR_NETWORK_UNREACHABLE;
+            
+        case EHOSTUNREACH:
+            return NPT_ERROR_HOST_UNREACHABLE;
 
         case EINPROGRESS:
         case EAGAIN:
@@ -621,12 +624,15 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
     // check parameters
     if (name == NULL || name[0] == '\0') return NPT_ERROR_HOST_UNKNOWN;
 
+#if !defined(NPT_CONFIG_ENABLE_IPV6)
     // handle numerical addrs
     NPT_IpAddress numerical_address;
     if (NPT_SUCCEEDED(numerical_address.Parse(name))) {
         /* the name is a numerical IP addr */
         *this = numerical_address;
+        return NPT_SUCCESS;
     }
+#endif
 
     // resolve the name into a list of addresses
     NPT_List<NPT_IpAddress> addresses;
@@ -684,6 +690,7 @@ public:
     NPT_Result WaitUntilReadable();
     NPT_Result WaitUntilWriteable();
     NPT_Result WaitForCondition(bool readable, bool writeable, bool async_connect, NPT_Timeout timeout);
+    NPT_Result Cancel(bool do_shutdown);
 
     // members
     SocketFd          m_SocketFd;
@@ -701,6 +708,88 @@ private:
 };
 
 typedef NPT_Reference<NPT_BsdSocketFd> NPT_BsdSocketFdReference;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket
++---------------------------------------------------------------------*/
+class NPT_BsdBlockerSocket {
+public:
+    NPT_BsdBlockerSocket(NPT_BsdSocketFd* fd) {
+        Set(NPT_Thread::GetCurrentThreadId(), fd);
+    }
+    ~NPT_BsdBlockerSocket() {
+        Set(NPT_Thread::GetCurrentThreadId(), NULL);
+    }
+
+    static NPT_Result Cancel(NPT_Thread::ThreadId id);
+
+private:
+    static NPT_Result Set(NPT_Thread::ThreadId id, NPT_BsdSocketFd* fd);
+
+    static NPT_Mutex MapLock;
+    static NPT_HashMap<NPT_Thread::ThreadId, NPT_BsdSocketFd*> Map;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_Hash<NPT_Thread::ThreadId>
++---------------------------------------------------------------------*/
+template <>
+struct NPT_Hash<NPT_Thread::ThreadId>
+{
+    NPT_UInt32 operator()(NPT_Thread::ThreadId i) const { return NPT_Fnv1aHash32(reinterpret_cast<const NPT_UInt8*>(&i), sizeof(i)); }
+};
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::MapLock
++---------------------------------------------------------------------*/
+NPT_Mutex NPT_BsdBlockerSocket::MapLock;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Map
++---------------------------------------------------------------------*/
+NPT_HashMap<NPT_Thread::ThreadId, NPT_BsdSocketFd*> NPT_BsdBlockerSocket::Map;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Set
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdBlockerSocket::Set(NPT_Thread::ThreadId id, NPT_BsdSocketFd* fd)
+{
+    NPT_AutoLock synchronized(MapLock);
+
+    if (fd) {
+        return Map.Put(id, fd);
+    } else {
+        return Map.Erase(id);
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Cancel
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdBlockerSocket::Cancel(NPT_Thread::ThreadId id)
+{
+    NPT_AutoLock synchronized(MapLock);
+    
+    NPT_BsdSocketFd** fd = NULL;
+    NPT_Result result = Map.Get(id, fd);
+    if (NPT_SUCCEEDED(result) && fd && *fd) {
+        (*fd)->Cancel(true);
+    }
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Socket::CancelBlockerSocket
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Socket::CancelBlockerSocket(NPT_Thread::ThreadId thread_id)
+{
+    return NPT_BsdBlockerSocket::Cancel(thread_id);
+}
+
 
 #if defined(__WINSOCK__) || defined(__TCS__)
 /*----------------------------------------------------------------------
@@ -788,6 +877,9 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     FD_ZERO(&except_set);
     FD_SET(m_SocketFd, &except_set);
 
+    // if the socket is cancellable, add it to the blocker map so a thread can cancel it
+    NPT_BsdBlockerSocket blocker(this);
+    
     // setup the cancel fd
     if (m_Cancellable && timeout) {
         if ((int)m_CancelFds[1] > max_fd) max_fd = m_CancelFds[1];
@@ -870,6 +962,32 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
         NPT_LOG_FINER_1("select result = %d", result);
     }
     return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdSocketFd::Cancel
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketFd::Cancel(bool do_shutdown)
+{
+    // mark the socket as cancelled
+    m_Cancelled = true;
+    
+    // force a shutdown if requested
+    if (do_shutdown) {
+        int result = shutdown(m_SocketFd, SHUT_RDWR);
+        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
+        }
+    }
+    
+    // unblock waiting selects
+    if (m_Cancellable) {
+        char dummy = 0;
+        send(m_CancelFds[0], &dummy, 1, 0);
+    }
+
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -1041,6 +1159,24 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
                                  NPT_Size     bytes_to_write, 
                                  NPT_Size*    bytes_written)
 {
+    // FIXME: A temporary hack to get to the Cancel method
+    if (buffer == NULL) {
+        NPT_LOG_INFO("Cancelling BSD socket output stream through write...");
+    
+        // force a shutdown if requested
+        int result = shutdown(m_SocketFdReference->m_SocketFd, SHUT_RDWR);
+        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
+        }
+    
+        m_SocketFdReference->Cancel(false);
+
+        NPT_LOG_INFO("Done cancelling BSD socket output stream through write.");
+        return NPT_SUCCESS;
+    }
+
+    int tries_left = 100;
+    for (;;) {
     // if we're blocking, wait until the socket is writeable
     if (m_SocketFdReference->m_WriteTimeout) {
         NPT_Result result = m_SocketFdReference->WaitUntilWriteable();
@@ -1071,14 +1207,25 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
         } else {
             NPT_Result result = MapErrorCode(GetSocketError());
             NPT_LOG_FINE_1("socket result = %d", result);
+                if (m_SocketFdReference->m_WriteTimeout && result == NPT_ERROR_WOULD_BLOCK) {
+                    // Well, the socket was writeable but then failed with "would block"
+                    // Loop back and try again, a certain number of times only...
+                    NPT_LOG_FINE_1("Socket failed with 'would block' even though writeable?! Tries left: %d", tries_left);
+                    if (--tries_left < 0) {
+                        NPT_LOG_SEVERE("Failed to send any data, send kept returning with 'would block' even though timeout is not 0");
+                        return NPT_ERROR_WRITE_FAILED;
+                    }
+                    continue;
+                }
             return result;
         }
     }
     
     // update position and return
-    if (bytes_written) *bytes_written = (NPT_Size)nb_written;
+        if (bytes_written) *bytes_written = nb_written;
     m_SocketFdReference->m_Position += nb_written;
     return NPT_SUCCESS;
+}
 }
 
 /*----------------------------------------------------------------------
@@ -1363,24 +1510,7 @@ NPT_BsdSocket::SetWriteTimeout(NPT_Timeout timeout)
 NPT_Result
 NPT_BsdSocket::Cancel(bool do_shutdown)
 {
-    // mark the socket as cancelled
-    m_SocketFdReference->m_Cancelled = true;
-    
-    // force a shutdown if requested
-    if (do_shutdown) {
-        int result = shutdown(m_SocketFdReference->m_SocketFd, SHUT_RDWR);
-        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
-            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
-        }
-    }
-    
-    // unblock waiting selects
-    if (m_SocketFdReference->m_Cancellable) {
-        char dummy = 0;
-        send(m_SocketFdReference->m_CancelFds[0], &dummy, 1, 0);
-    }
-
-    return NPT_SUCCESS;
+    return m_SocketFdReference->Cancel(do_shutdown);
 }
 
 /*----------------------------------------------------------------------
@@ -1477,11 +1607,9 @@ NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address,
     SocketAddressToInetAddress(address, inet_address, inet_address_length);
 
     // connect so that we can have some addr bound to the socket
-#if defined(NPT_CONFIG_ENABLE_LOGGING)
     NPT_LOG_FINE_2("connecting to %s, port %d",
                    address.GetIpAddress().ToString().GetChars(),
                    address.GetPort());
-#endif
     int io_result = connect(m_SocketFdReference->m_SocketFd, 
                             &inet_address.sa,
                             inet_address_length);
@@ -1930,12 +2058,9 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
     SocketAddressToInetAddress(address, inet_address, inet_address_length);
 
     // initiate connection
-#if defined(NPT_CONFIG_ENABLE_LOGGING)
-    NPT_String dest_host = address.GetIpAddress().ToString();
     NPT_LOG_FINE_2("connecting to %s, port %d",
-                   dest_host.GetChars(),
+                   address.GetIpAddress().ToString().GetChars(),
                    address.GetPort());
-#endif
     int io_result;
     io_result = connect(m_SocketFdReference->m_SocketFd, 
                         &inet_address.sa,

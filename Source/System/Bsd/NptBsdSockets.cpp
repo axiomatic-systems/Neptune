@@ -141,6 +141,7 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EADDRINUSE   WSAEADDRINUSE
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
+#define EHOSTUNREACH WSAEHOSTUNREACH
 #define ENOTCONN     WSAENOTCONN
 #if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK 
@@ -616,6 +617,15 @@ fail:
 #endif
 
 /*----------------------------------------------------------------------
+|   NPT_Hash<NPT_Thread::ThreadId>
++---------------------------------------------------------------------*/
+template <>
+struct NPT_Hash<NPT_Thread::ThreadId>
+{
+    NPT_UInt32 operator()(NPT_Thread::ThreadId i) const { return NPT_Fnv1aHash32(reinterpret_cast<const NPT_UInt8*>(&i), sizeof(i)); }
+};
+
+/*----------------------------------------------------------------------
 |   NPT_IpAddress::ResolveName
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -728,15 +738,6 @@ private:
 
     static NPT_Mutex MapLock;
     static NPT_HashMap<NPT_Thread::ThreadId, NPT_BsdSocketFd*> Map;
-};
-
-/*----------------------------------------------------------------------
-|   NPT_Hash<NPT_Thread::ThreadId>
-+---------------------------------------------------------------------*/
-template <>
-struct NPT_Hash<NPT_Thread::ThreadId>
-{
-    NPT_UInt32 operator()(NPT_Thread::ThreadId i) const { return NPT_Fnv1aHash32(reinterpret_cast<const NPT_UInt8*>(&i), sizeof(i)); }
 };
 
 /*----------------------------------------------------------------------

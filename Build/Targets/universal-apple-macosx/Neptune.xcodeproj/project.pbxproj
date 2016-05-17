@@ -273,7 +273,7 @@
 		F912B7690B8EB27400C1E90D /* NptQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D10B8EB27400C1E90D /* NptQueue.h */; };
 		F912B76A0B8EB27400C1E90D /* NptReferences.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D20B8EB27400C1E90D /* NptReferences.h */; };
 		F912B76B0B8EB27400C1E90D /* NptResults.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D30B8EB27400C1E90D /* NptResults.h */; };
-		F912B76C0B8EB27400C1E90D /* NptRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D40B8EB27400C1E90D /* NptRingBuffer.cpp */; };
+		F912B76C0B8EB27400C1E90D /* NptRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D40B8EB27400C1E90D /* NptRingBuffer.cpp */; settings = {COMPILER_FLAGS = "-Wno-unused-private-field"; }; };
 		F912B76D0B8EB27400C1E90D /* NptRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D50B8EB27400C1E90D /* NptRingBuffer.h */; };
 		F912B76E0B8EB27400C1E90D /* NptSelectableMessageQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6D60B8EB27400C1E90D /* NptSelectableMessageQueue.h */; };
 		F912B76F0B8EB27400C1E90D /* NptSimpleMessageQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6D70B8EB27400C1E90D /* NptSimpleMessageQueue.cpp */; };
@@ -297,7 +297,7 @@
 		F912B7810B8EB27400C1E90D /* NptUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6E90B8EB27400C1E90D /* NptUtils.cpp */; };
 		F912B7820B8EB27400C1E90D /* NptUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6EA0B8EB27400C1E90D /* NptUtils.h */; };
 		F912B7830B8EB27400C1E90D /* NptVersion.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6EB0B8EB27400C1E90D /* NptVersion.h */; };
-		F912B7840B8EB27400C1E90D /* NptXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6EC0B8EB27400C1E90D /* NptXml.cpp */; };
+		F912B7840B8EB27400C1E90D /* NptXml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6EC0B8EB27400C1E90D /* NptXml.cpp */; settings = {COMPILER_FLAGS = "-Wno-unused-private-field"; }; };
 		F912B7850B8EB27400C1E90D /* NptXml.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6ED0B8EB27400C1E90D /* NptXml.h */; };
 		F912B7860B8EB27400C1E90D /* NptBsdNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F00B8EB27400C1E90D /* NptBsdNetwork.cpp */; };
 		F912B7870B8EB27400C1E90D /* NptBsdSockets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6F10B8EB27400C1E90D /* NptBsdSockets.cpp */; };
@@ -3890,6 +3890,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = QueueTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -3902,6 +3903,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = QueueTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3958,6 +3960,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = SocketsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -3970,6 +3973,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = SocketsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -3984,6 +3988,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = TlsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -3996,6 +4001,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = TlsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4010,6 +4016,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = LoggingTest2;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4022,6 +4029,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = LoggingTest2;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4036,6 +4044,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = TimeTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4048,6 +4057,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = TimeTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4061,6 +4071,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpServerTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -4073,6 +4084,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpServerTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4091,6 +4103,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4104,6 +4117,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Release;
 		};
@@ -4117,6 +4131,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = minihttpserver;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4129,6 +4144,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = minihttpserver;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4143,6 +4159,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetGet;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4155,6 +4172,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetGet;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4169,6 +4187,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = DigestsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4181,6 +4200,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = DigestsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4195,6 +4215,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = CryptoTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4207,6 +4228,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = CryptoTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4221,6 +4243,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = StreamsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4233,6 +4256,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = StreamsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4247,6 +4271,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpClientTest2;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4259,6 +4284,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpClientTest2;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4273,6 +4299,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = FileTest2;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4285,6 +4312,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = FileTest2;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4298,6 +4326,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = XmlTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -4310,6 +4339,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = XmlTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4323,6 +4353,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = StringsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -4335,6 +4366,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = StringsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4349,6 +4381,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetResolve;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4361,6 +4394,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetResolve;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4386,6 +4420,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4404,6 +4439,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Release;
 		};
@@ -4417,6 +4453,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MiscTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4429,6 +4466,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MiscTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4437,6 +4475,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = ArraysTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4444,6 +4483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				PRODUCT_NAME = ArraysTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Release;
 		};
@@ -4457,6 +4497,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = BufferedStreamsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4469,6 +4510,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = BufferedStreamsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4483,6 +4525,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpClientTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4495,6 +4538,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = HttpClientTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4509,6 +4553,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ListsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4521,6 +4566,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ListsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4535,6 +4581,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = LoggingTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4547,6 +4594,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = LoggingTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4561,6 +4609,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MapsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4573,6 +4622,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MapsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4587,6 +4637,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MessagesTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4599,6 +4650,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MessagesTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4613,6 +4665,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MessagesTest2;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4625,6 +4678,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = MessagesTest2;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4639,6 +4693,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = RingBufferTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4651,6 +4706,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = RingBufferTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4665,6 +4721,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ThreadsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4677,6 +4734,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ThreadsTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4691,6 +4749,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = UdpTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4703,6 +4762,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = UdpTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4717,6 +4777,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = UrlTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4729,6 +4790,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = UrlTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4743,6 +4805,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ZipTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4755,6 +4818,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = ZipTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4809,6 +4873,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetPump;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4821,6 +4886,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetPump;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4835,6 +4901,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetEcho;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4847,6 +4914,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetEcho;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4861,6 +4929,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetConfig;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4873,6 +4942,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetConfig;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4887,6 +4957,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetPing;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4899,6 +4970,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = NetPing;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -4947,6 +5019,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -4973,6 +5046,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Release;
 		};
@@ -5000,6 +5074,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ziphttpserver;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -5026,6 +5101,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				PRODUCT_NAME = ziphttpserver;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Release;
 		};
@@ -5039,6 +5115,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = FileTest1;
+				SUPPORTED_PLATFORMS = macosx;
 			};
 			name = Debug;
 		};
@@ -5051,6 +5128,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = FileTest1;
+				SUPPORTED_PLATFORMS = macosx;
 				ZERO_LINK = NO;
 			};
 			name = Release;

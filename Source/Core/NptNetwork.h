@@ -104,6 +104,7 @@ public:
     const unsigned char* AsBytes() const;
     unsigned long    AsLong() const;
     NPT_String       ToString() const;
+    NPT_String       ToUrlHost() const;
     
     // operators
     bool             operator==(const NPT_IpAddress& other) const;

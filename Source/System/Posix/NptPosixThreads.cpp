@@ -405,7 +405,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
 +---------------------------------------------------------------------*/
 NPT_PosixThread::~NPT_PosixThread()
 {
-    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %p\n", (void*)m_ThreadId);
+    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lld\n", (NPT_Thread::ThreadId)m_ThreadId);
 
     if (!m_Detached) {
         // we're not detached, and not in the Run() method, so we need to 
@@ -421,7 +421,7 @@ NPT_Thread::ThreadId
 NPT_Thread::GetCurrentThreadId()
 {
     pthread_t pid = pthread_self();
-    return (NPT_Thread::ThreadId)((void*)pid);
+    return (NPT_Thread::ThreadId)pid;
 }
 
 /*----------------------------------------------------------------------

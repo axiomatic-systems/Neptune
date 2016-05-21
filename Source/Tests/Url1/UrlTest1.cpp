@@ -230,6 +230,27 @@ main(int /*argc*/, char** /*argv*/)
     CHECK(url.GetFragment() == "fragment");
     CHECK(url.ToRequestString() == "/?query=1&bla=2&slash=/&foo=a");
 
+    url.Reset();
+    CHECK(url.GetHost().IsEmpty());
+    CHECK(url.GetPath().IsEmpty());
+    CHECK(url.GetPort() == 0);
+    CHECK(url.GetQuery().IsEmpty());
+    CHECK(url.GetFragment().IsEmpty());
+    CHECK(url.SetHost("foobar.com:x1234") == NPT_ERROR_INVALID_SYNTAX);
+    CHECK(url.SetHost("[::1]foo") == NPT_ERROR_INVALID_SYNTAX);
+    CHECK(url.SetHost("[::1]:-1234") == NPT_ERROR_INVALID_SYNTAX);
+    CHECK(url.SetHost("[::1") == NPT_ERROR_INVALID_SYNTAX);
+    CHECK(url.SetHost("a:65536") == NPT_ERROR_OUT_OF_RANGE);
+    CHECK(url.SetHost("foobar.com:1234")  == NPT_SUCCESS);
+    CHECK(url.GetHost() == "foobar.com");
+    CHECK(url.GetPort() == 1234);
+    CHECK(url.SetHost("foobar.com") == NPT_SUCCESS);
+    CHECK(url.SetHost("[::1]") == NPT_SUCCESS);
+    CHECK(url.GetHost() == "::1");
+    CHECK(url.SetHost("[::1]:4567") == NPT_SUCCESS);
+    CHECK(url.GetHost() == "::1");
+    CHECK(url.GetPort() == 4567);
+    
     // url form encoding
     NPT_UrlQuery query;
     query.AddField("url1","http://foo.bar/foo?q=3&bar=+7/3&boo=a%3Db&bli=a b");

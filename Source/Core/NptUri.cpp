@@ -666,24 +666,39 @@ NPT_Url::IsValid() const
 NPT_Result 
 NPT_Url::SetHost(const char* host)
 {
-    const char* port = host;
-    while (*port && *port != ':') port++;
-    if (*port) {
-        m_Host.Assign(host, (NPT_Size)(port-host));
-        unsigned int port_number;
-        if (NPT_SUCCEEDED(NPT_ParseInteger(port+1, port_number, false))) {
-            m_Port = (short)port_number;
+    const char* port;
+    if (*host == '[') {
+        const char* host_end = host+1;
+        while (*host_end && *host_end != ']') ++host_end;
+        if (*host_end != ']') {
+            return NPT_ERROR_INVALID_SYNTAX;
         }
-    } else {
-        m_Host = host;
-    }
-
-    // deal with IPv6 addresses
-    if (m_Host.StartsWith("[") && m_Host.EndsWith("]")) {
+        port = host_end+1;
+        if (*port && *port != ':') {
+            return NPT_ERROR_INVALID_SYNTAX;
+        }
+        m_Host.Assign(host+1, (NPT_Size)(host_end-host-1));
         m_HostIsIpv6Address = true;
-        m_Host = m_Host.SubString(1, m_Host.GetLength()-2);
+    } else {
+        port = host;
+        while (*port && *port != ':') port++;
+        m_Host.Assign(host, (NPT_Size)(port-host));
+        m_HostIsIpv6Address = false;
     }
 
+    if (*port) {
+        unsigned int port_number;
+        // parse the port number but ignore errors (be lenient)
+        if (NPT_SUCCEEDED(NPT_ParseInteger(port+1, port_number, false))) {
+            if (port_number > 65535) {
+                return NPT_ERROR_OUT_OF_RANGE;
+            }
+            m_Port = (NPT_UInt16)port_number;
+        } else {
+            return NPT_ERROR_INVALID_SYNTAX;
+        }
+    }
+    
     return NPT_SUCCESS;
 }
 

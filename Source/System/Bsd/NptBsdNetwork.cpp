@@ -39,6 +39,10 @@
 #include <net/if_types.h>
 #endif
 
+#if defined(NPT_CONFIG_HAVE_GETIFADDRS)
+#include <ifaddrs.h>
+#endif
+
 /*----------------------------------------------------------------------
 |   platform adaptation
 +---------------------------------------------------------------------*/
@@ -74,11 +78,6 @@ const NPT_IpAddress NPT_IpAddress::Loopback(NPT_IpAddress::IPV6, in6addr_loopbac
 const NPT_IpAddress NPT_IpAddress::Any;
 const NPT_IpAddress NPT_IpAddress::Loopback(127,0,0,1);
 #endif
-
-/*----------------------------------------------------------------------
-|   NPT_NetworkInterface::GetNetworkInterfaces
-+---------------------------------------------------------------------*/
-const unsigned int NPT_BSD_NETWORK_MAX_IFCONF_SIZE = 1<<20;
 
 #if defined(NPT_CONFIG_HAVE_INET_NTOP)
 /*----------------------------------------------------------------------
@@ -209,13 +208,181 @@ NPT_IpAddress::Parse(const char* name)
 }
 #endif
 
+#if defined(NPT_CONFIG_HAVE_GETIFADDRS)
 /*----------------------------------------------------------------------
 |   NPT_NetworkInterface::GetNetworkInterfaces
 +---------------------------------------------------------------------*/
 NPT_Result
 NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)
 {
+    interfaces.Clear();
+    
+    struct ifaddrs* addrs = NULL;
+    int result = getifaddrs(&addrs);
+    if (result != 0) {
+        return NPT_ERROR_BASE_UNIX-errno;
+    }
+    
+    for (struct ifaddrs* addr = addrs;
+                         addr;
+                         addr = addr->ifa_next) {
+
+        // get detailed info about the interface
+        NPT_Flags flags = 0;
+        // process the flags
+        if ((addr->ifa_flags & IFF_UP) == 0) {
+            // the interface is not up, ignore it
+            continue;
+        }
+        if (addr->ifa_flags & IFF_BROADCAST) {
+            flags |= NPT_NETWORK_INTERFACE_FLAG_BROADCAST;
+        }
+        if (addr->ifa_flags & IFF_LOOPBACK) {
+            flags |= NPT_NETWORK_INTERFACE_FLAG_LOOPBACK;
+        }
+#if defined(IFF_POINTOPOINT)
+        if (addr->ifa_flags & IFF_POINTOPOINT) {
+            flags |= NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT;
+        }
+#endif // defined(IFF_POINTOPOINT)
+        if (addr->ifa_flags & IFF_PROMISC) {
+            flags |= NPT_NETWORK_INTERFACE_FLAG_PROMISCUOUS;
+        }
+        if (addr->ifa_flags & IFF_MULTICAST) {
+            flags |= NPT_NETWORK_INTERFACE_FLAG_MULTICAST;
+        }
+
+        // get a pointer to an interface we've looped over before
+        // or create a new one
+        NPT_NetworkInterface* interface = NULL;
+        for (NPT_List<NPT_NetworkInterface*>::Iterator iface_iter = interfaces.GetFirstItem();
+                                                       iface_iter;
+                                                     ++iface_iter) {
+            if ((*iface_iter)->GetName() == (const char*)addr->ifa_name) {
+                interface = *iface_iter;
+                break;
+            }
+        }
+        if (interface == NULL) {
+            // create a new interface object
+            interface = new NPT_NetworkInterface(addr->ifa_name, flags);
+
+            // add the interface to the list
+            interfaces.Add(interface);
+        }
+        
+        if (addr->ifa_addr == NULL) {
+            continue;
+        }
+        switch (addr->ifa_addr->sa_family) {
+            case AF_INET: {
+                // primary address
+                NPT_IpAddress primary_address(ntohl(((struct sockaddr_in*)addr->ifa_addr)->sin_addr.s_addr));
+
+                // broadcast address
+                NPT_IpAddress broadcast_address;
+                if (addr->ifa_broadaddr) {
+                    broadcast_address.Set(ntohl(((struct sockaddr_in*)addr->ifa_broadaddr)->sin_addr.s_addr));
+                }
+
+                // point to point address
+                NPT_IpAddress destination_address;
+                if (addr->ifa_dstaddr) {
+                    destination_address.Set(ntohl(((struct sockaddr_in*)addr->ifa_dstaddr)->sin_addr.s_addr));
+                }
+
+                // netmask
+                NPT_IpAddress netmask(0xFFFFFFFF);
+                if (addr->ifa_netmask) {
+                    netmask.Set(ntohl(((struct sockaddr_in*)addr->ifa_netmask)->sin_addr.s_addr));
+                }
+
+                // add the address to the interface
+                NPT_NetworkInterfaceAddress iface_address(
+                    primary_address,
+                    broadcast_address,
+                    destination_address,
+                    netmask);
+                interface->AddAddress(iface_address);  
+                
+                break;
+            }
+
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+            case AF_INET6: {
+                // primary address
+                const struct sockaddr_in6* ipv6_address = (const struct sockaddr_in6*)addr->ifa_addr;
+                NPT_IpAddress primary_address(NPT_IpAddress::IPV6, ipv6_address->sin6_addr.s6_addr, 16, ipv6_address->sin6_scope_id);
+
+                // empty broadcast address (no broadcast address for IPv6)
+                NPT_IpAddress broadcast_address(NPT_IpAddress::IPV6);
+
+                // point to point address
+                NPT_IpAddress destination_address(NPT_IpAddress::IPV6);
+                if (flags & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
+                    if (addr->ifa_dstaddr) {
+                        ipv6_address = (const struct sockaddr_in6*)addr->ifa_dstaddr;
+                        destination_address.Set(ipv6_address->sin6_addr.s6_addr, 16, ipv6_address->sin6_scope_id);
+                    }
+                }
+
+                // empty netmask (does not work for IPv6)
+                NPT_IpAddress netmask((NPT_IpAddress::IPV6));
+
+                // add the address to the interface
+                NPT_NetworkInterfaceAddress iface_address(
+                    primary_address,
+                    broadcast_address,
+                    destination_address,
+                    netmask);
+                interface->AddAddress(iface_address);
+                
+                break;
+#endif
+            }
+            
+#if defined(AF_LINK) && defined(NPT_CONFIG_HAVE_SOCKADDR_DL)
+            case AF_LINK: {
+                struct sockaddr_dl* mac_addr = (struct sockaddr_dl*)addr->ifa_addr;
+                NPT_MacAddress::Type mac_addr_type = NPT_MacAddress::TYPE_UNKNOWN;
+                switch (mac_addr->sdl_type) {
+#if defined(IFT_LOOP)
+                    case IFT_LOOP:  mac_addr_type = NPT_MacAddress::TYPE_LOOPBACK; break;
+#endif
+#if defined(IFT_ETHER)
+                    case IFT_ETHER: mac_addr_type = NPT_MacAddress::TYPE_ETHERNET; break;
+#endif
+#if defined(IFT_PPP)
+                    case IFT_PPP:   mac_addr_type = NPT_MacAddress::TYPE_PPP;      break;
+#endif                    
+                }
+                interface->SetMacAddress(mac_addr_type, 
+                                         (const unsigned char*)(&mac_addr->sdl_data[mac_addr->sdl_nlen]),
+                                         mac_addr->sdl_alen);
+                break;
+            }
+#endif
+        }
+    }
+    
+    freeifaddrs(addrs);
+    
+    return NPT_SUCCESS;
+}
+#else
+const unsigned int NPT_BSD_NETWORK_MAX_IFCONF_SIZE = 1<<20;
+
+/*----------------------------------------------------------------------
+|   NPT_NetworkInterface::GetNetworkInterfaces
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& interfaces)
+{
+//#if defined(NPT_CONFIG_ENABLE_IPV6)
+//    int net = socket(PF_INET6, SOCK_DGRAM, 0);
+//#else
     int net = socket(PF_INET, SOCK_DGRAM, 0);
+//#endif
     if (net < 0) {
         return NPT_ERROR_BASE_UNIX-errno;
     }
@@ -418,35 +585,26 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
 #if defined(NPT_CONFIG_ENABLE_IPV6)
             case AF_INET6: {
                 // primary address
-                NPT_IpAddress primary_address(NPT_IpAddress::IPV6, ((struct sockaddr_in6*)&entry->ifr_addr)->sin6_addr.s6_addr, 16);
+                const struct sockaddr_in6* ipv6_address = (const struct sockaddr_in6*)&entry->ifr_addr;
+                NPT_IpAddress primary_address(NPT_IpAddress::IPV6, ipv6_address->sin6_addr.s6_addr, 16, ipv6_address->sin6_scope_id);
 
-                // broadcast address
+                // empty broadcast address (no broadcast address for IPv6)
                 NPT_IpAddress broadcast_address(NPT_IpAddress::IPV6);
-#if defined(SIOCGIFBRDADDR)
-                if (flags & NPT_NETWORK_INTERFACE_FLAG_BROADCAST) {
-                    if (ioctl(net, SIOCGIFBRDADDR, &query) == 0) {
-                        broadcast_address.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
-                    }
-                }
-#endif
 
                 // point to point address
                 NPT_IpAddress destination_address(NPT_IpAddress::IPV6);
 #if defined(SIOCGIFDSTADDR)
                 if (flags & NPT_NETWORK_INTERFACE_FLAG_POINT_TO_POINT) {
                     if (ioctl(net, SIOCGIFDSTADDR, &query) == 0) {
-                        destination_address.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
+                        ipv6_address = (const struct sockaddr_in6*)&query.ifr_addr;
+                        destination_address.Set(ipv6_address->sin6_addr.s6_addr, 16, ipv6_address->sin6_scope_id);
                     }
                 }
 #endif
 
-                // netmask
+                // empty netmask (does not work for IPv6)
                 NPT_IpAddress netmask((NPT_IpAddress::IPV6));
-#if defined(SIOCGIFNETMASK)
-                if (ioctl(net, SIOCGIFNETMASK, &query) == 0) {
-                    netmask.Set(((struct sockaddr_in6*)&query.ifr_addr)->sin6_addr.s6_addr, 16);
-                }
-#endif
+
                 // add the address to the interface
                 NPT_NetworkInterfaceAddress iface_address(
                     primary_address,
@@ -489,3 +647,4 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
     
     return NPT_SUCCESS;
 }
+#endif

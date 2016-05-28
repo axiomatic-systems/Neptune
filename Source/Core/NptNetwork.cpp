@@ -39,7 +39,8 @@
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress() :
-    m_Type(IPV4)
+    m_Type(IPV4),
+    m_ScopeId(0)
 {
     NPT_SetMemory(m_Address, 0, sizeof(m_Address));
 }
@@ -48,7 +49,8 @@ NPT_IpAddress::NPT_IpAddress() :
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress(Type type) :
-    m_Type(type)
+    m_Type(type),
+    m_ScopeId(0)
 {
     NPT_SetMemory(m_Address, 0, sizeof(m_Address));
 }
@@ -57,7 +59,8 @@ NPT_IpAddress::NPT_IpAddress(Type type) :
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
 NPT_IpAddress::NPT_IpAddress(unsigned long address) :
-    m_Type(IPV4)
+    m_Type(IPV4),
+    m_ScopeId(0)
 {
     Set(address);
 }
@@ -69,7 +72,8 @@ NPT_IpAddress::NPT_IpAddress(unsigned char a,
                              unsigned char b, 
                              unsigned char c, 
                              unsigned char d) :
-    m_Type(IPV4)
+    m_Type(IPV4),
+    m_ScopeId(0)
 {
     NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
     m_Address[0] = a;
@@ -81,16 +85,19 @@ NPT_IpAddress::NPT_IpAddress(unsigned char a,
 /*----------------------------------------------------------------------
 |   NPT_IpAddress::NPT_IpAddress
 +---------------------------------------------------------------------*/
-NPT_IpAddress::NPT_IpAddress(Type type, const unsigned char* address, unsigned int size) :
-    m_Type(type)
+NPT_IpAddress::NPT_IpAddress(Type type, const unsigned char* address, unsigned int size, NPT_UInt32 scope_id) :
+    m_Type(type),
+    m_ScopeId(scope_id)
 {
     if (type == IPV6 && size == 16) {
         NPT_CopyMemory(&m_Address[0], address, 16);
     } else if (type == IPV4 && size == 4) {
         NPT_CopyMemory(&m_Address[0], address, 4);
         NPT_SetMemory(&m_Address[4], 0, 12);
+        m_ScopeId = 0;
     } else {
         NPT_SetMemory(&m_Address[0], 0, 16);
+        m_ScopeId = 0;
     }
 }
 
@@ -128,6 +135,7 @@ NPT_IpAddress::Set(const unsigned char bytes[4])
     m_Address[2] = bytes[2];
     m_Address[3] = bytes[3];
     NPT_SetMemory(&m_Address[4], 0, sizeof(m_Address)-4);
+    m_ScopeId = 0; // always 0 for IPv4
     
     return NPT_SUCCESS;
 }
@@ -144,7 +152,8 @@ NPT_IpAddress::Set(unsigned long address)
     m_Address[2] = (unsigned char)((address >>  8) & 0xFF);
     m_Address[3] = (unsigned char)((address      ) & 0xFF);
     NPT_SetMemory(&m_Address[4], 0, sizeof(m_Address)-4);
-
+    m_ScopeId = 0; // always 0 for IPv4
+    
     return NPT_SUCCESS;
 }
 
@@ -152,15 +161,17 @@ NPT_IpAddress::Set(unsigned long address)
 |   NPT_IpAddress::Set
 +---------------------------------------------------------------------*/
 NPT_Result    
-NPT_IpAddress::Set(const unsigned char* bytes, unsigned int size)
+NPT_IpAddress::Set(const unsigned char* bytes, unsigned int size, NPT_UInt32 scope_id)
 {
     NPT_SetMemory(&m_Address[0], 0, sizeof(m_Address));
     if (size == 4) {
         m_Type = IPV4;
         NPT_CopyMemory(&m_Address[0], bytes, 4);
+        m_ScopeId = 0; // always 0 for IPv4
     } else if (size == 16) {
         m_Type = IPV6;
         NPT_CopyMemory(&m_Address[0], bytes, 16);
+        m_ScopeId = scope_id;
     } else {
         return NPT_ERROR_INVALID_PARAMETERS;
     }
@@ -174,7 +185,13 @@ NPT_IpAddress::Set(const unsigned char* bytes, unsigned int size)
 bool
 NPT_IpAddress::operator==(const NPT_IpAddress& other) const
 {
-    return other.AsLong() == AsLong();
+    unsigned int bytes_to_check = (m_Type == IPV4)?4:16;
+    for (unsigned int i=0; i<bytes_to_check; i++) {
+        if (m_Address[i] != other.m_Address[i]) {
+            return false;
+        }
+    }
+    return m_Type == other.m_Type;
 }
 
 /*----------------------------------------------------------------------
@@ -189,6 +206,150 @@ NPT_IpAddress::ToUrlHost() const
         return result+"]";
     } else {
         return ToString();
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsUnspecified
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsUnspecified() const
+{
+    for (unsigned int i=0; i<(m_Type==IPV4?4:16); i++) {
+        if (m_Address[i]) return false;
+    }
+    return true;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsLooppack
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsLooppack() const
+{
+    if (m_Type == IPV4) {
+        return m_Address[0] == 127 &&
+               m_Address[1] == 0   &&
+               m_Address[2] == 0   &&
+               m_Address[3] == 1;
+    } else {
+        return m_Address[ 0] == 0 &&
+               m_Address[ 1] == 0 &&
+               m_Address[ 2] == 0 &&
+               m_Address[ 3] == 0 &&
+               m_Address[ 4] == 0 &&
+               m_Address[ 5] == 0 &&
+               m_Address[ 6] == 0 &&
+               m_Address[ 7] == 0 &&
+               m_Address[ 8] == 0 &&
+               m_Address[ 9] == 0 &&
+               m_Address[10] == 0 &&
+               m_Address[11] == 0 &&
+               m_Address[12] == 0 &&
+               m_Address[13] == 0 &&
+               m_Address[14] == 0 &&
+               m_Address[15] == 1;
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsV4Compatible
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsV4Compatible() const
+{
+    if (m_Type == IPV4) return true;
+    return m_Address[ 0] == 0 &&
+           m_Address[ 1] == 0 &&
+           m_Address[ 2] == 0 &&
+           m_Address[ 3] == 0 &&
+           m_Address[ 4] == 0 &&
+           m_Address[ 5] == 0 &&
+           m_Address[ 6] == 0 &&
+           m_Address[ 7] == 0 &&
+           m_Address[ 8] == 0 &&
+           m_Address[ 9] == 0 &&
+           m_Address[10] == 0 &&
+           m_Address[11] == 0 &&
+           !(m_Address[12] == 0 &&
+             m_Address[13] == 0 &&
+             m_Address[14] == 0 &&
+             m_Address[15] == 0) &&
+           !(m_Address[12] == 0 &&
+             m_Address[13] == 0 &&
+             m_Address[14] == 0 &&
+             m_Address[15] == 1);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsV4Mapped
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsV4Mapped() const
+{
+    if (m_Type == IPV4) return false;
+    return m_Address[ 0] == 0 &&
+           m_Address[ 1] == 0 &&
+           m_Address[ 2] == 0 &&
+           m_Address[ 3] == 0 &&
+           m_Address[ 4] == 0 &&
+           m_Address[ 5] == 0 &&
+           m_Address[ 6] == 0 &&
+           m_Address[ 7] == 0 &&
+           m_Address[ 8] == 0 &&
+           m_Address[ 9] == 0 &&
+           m_Address[10] == 0xFF &&
+           m_Address[11] == 0xFF;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsLinkLocal
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsLinkLocal() const
+{
+    if (m_Type == IPV4) {
+        return m_Address[0] == 169 && m_Address[1] == 254;
+    } else {
+        return m_Address[0] == 0xFE && ((m_Address[1]&0xC0) == 0x80);
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsSiteLocal
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsSiteLocal() const
+{
+    if (m_Type == IPV4) return false;
+    return m_Address[0] == 0xFE && ((m_Address[1]&0xC0) == 0xC0);
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsUniqueLocal
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsUniqueLocal() const
+{
+    if (m_Type == IPV4) {
+        return (m_Address[0] == 10) ||
+               (m_Address[0] == 172 && (m_Address[1]&0xF0) == 16) ||
+               (m_Address[0] == 192 && m_Address[1] == 168);
+    } else {
+        return ((m_Address[0] & 0xFE) == 0xFC);
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_IpAddress::IsMulticast
++---------------------------------------------------------------------*/
+bool
+NPT_IpAddress::IsMulticast() const
+{
+    if (m_Type == IPV4) {
+        return (m_Address[0] & 0xF0) == 224;
+    } else {
+        return m_Address[0] == 0xFF;
     }
 }
 

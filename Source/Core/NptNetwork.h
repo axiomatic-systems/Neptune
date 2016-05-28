@@ -89,10 +89,11 @@ public:
     NPT_IpAddress(Type type);
     NPT_IpAddress(unsigned long address);
     NPT_IpAddress(unsigned char a, unsigned char b, unsigned char c, unsigned char d);
-    NPT_IpAddress(Type type, const unsigned char* address, unsigned int size);
+    NPT_IpAddress(Type type, const unsigned char* address, unsigned int size, NPT_UInt32 scope_id = 0);
 
     // accessors
-    Type GetType() const { return m_Type; }
+    Type       GetType()    const { return m_Type;    }
+    NPT_UInt32 GetScopeId() const { return m_ScopeId; }
     
     // methods
     NPT_Result       ResolveName(const char* name, 
@@ -100,11 +101,21 @@ public:
     NPT_Result       Parse(const char* name);
     NPT_Result       Set(unsigned long address);
     NPT_Result       Set(const unsigned char bytes[4]);
-    NPT_Result       Set(const unsigned char* bytes, unsigned int size);
+    NPT_Result       Set(const unsigned char* bytes, unsigned int size, NPT_UInt32 scope_id = 0);
     const unsigned char* AsBytes() const;
     unsigned long    AsLong() const;
     NPT_String       ToString() const;
     NPT_String       ToUrlHost() const;
+    
+    // address properties
+    bool IsUnspecified() const;
+    bool IsLooppack() const;
+    bool IsV4Compatible() const;
+    bool IsV4Mapped() const;
+    bool IsLinkLocal() const;
+    bool IsSiteLocal() const;
+    bool IsUniqueLocal() const;
+    bool IsMulticast() const;
     
     // operators
     bool             operator==(const NPT_IpAddress& other) const;
@@ -116,6 +127,7 @@ private:
     // members
     Type          m_Type;
     unsigned char m_Address[16];
+    NPT_UInt32    m_ScopeId; // IPv6 only
 };
 
 /*----------------------------------------------------------------------

@@ -156,11 +156,14 @@
 /* OSX and iOS */
 #if defined(__APPLE__)
 #define NPT_CONFIG_HAVE_GETADDRINFO
+#define NPT_CONFIG_HAVE_GETIFADDRS
 #define NPT_CONFIG_HAVE_AUTORELEASE_POOL
 #define NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN
 #define NPT_CONFIG_HAVE_ARPA_INET_H
 #define NPT_CONFIG_HAVE_INET_NTOP
 #define NPT_CONFIG_HAVE_INET_PTON
+#define NPT_CONFIG_HAVE_NET_IF_DL_H
+#define NPT_CONFIG_HAVE_SOCKADDR_DL
 #endif
 
 /*----------------------------------------------------------------------
@@ -271,14 +274,14 @@ typedef long NPT_PointerLong;
 #if !defined(NPT_CONFIG_NO_RTTI)
 #define NPT_CONFIG_NO_RTTI
 #endif
+//#define NPT_ftell ftello64
+//#define NPT_fseek fseeko64
 #endif
 
 /* OSX and iOS */
 #if defined(__APPLE__)
 #include <TargetConditionals.h>
 #include <AvailabilityMacros.h>
-#define NPT_CONFIG_HAVE_NET_IF_DL_H
-#define NPT_CONFIG_HAVE_SOCKADDR_DL
 #if !defined(TARGET_OS_IPHONE) || !TARGET_OS_IPHONE
 #define NPT_CONFIG_HAVE_NET_IF_TYPES_H
 #if defined(MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6)

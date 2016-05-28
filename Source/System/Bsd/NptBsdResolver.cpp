@@ -125,7 +125,7 @@ NPT_NetworkNameResolver::Resolve(const char*              name,
 #if defined(NPT_CONFIG_ENABLE_IPV6)
         else if (info->ai_family == AF_INET6) {
             struct sockaddr_in6* inet_addr = (struct sockaddr_in6*)info->ai_addr;
-            NPT_IpAddress address(NPT_IpAddress::IPV6, inet_addr->sin6_addr.s6_addr, 16);
+            NPT_IpAddress address(NPT_IpAddress::IPV6, inet_addr->sin6_addr.s6_addr, 16, inet_addr->sin6_scope_id);
             addresses.Add(address);
         }
 #endif

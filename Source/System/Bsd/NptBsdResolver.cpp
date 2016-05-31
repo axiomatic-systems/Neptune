@@ -104,7 +104,7 @@ NPT_NetworkNameResolver::Resolve(const char*              name,
     for (struct addrinfo* info = infos; 
                           info && addresses.GetItemCount() < NPT_BSD_NETWORK_MAX_ADDR_LIST_LENGTH;
                           info = info->ai_next) {
-         unsigned int expected_length;
+        unsigned int expected_length;
         if (info->ai_family == AF_INET) {
             expected_length = sizeof(struct sockaddr_in);
 #if defined(NPT_CONFIG_ENABLE_IPV6)
@@ -114,7 +114,7 @@ NPT_NetworkNameResolver::Resolve(const char*              name,
         } else {
             continue;
         }
-        if (info->ai_addrlen < expected_length) continue;
+        if ((unsigned int)info->ai_addrlen < expected_length) continue;
         if (info->ai_protocol != 0 && info->ai_protocol != IPPROTO_TCP) continue;
     
         if (info->ai_family == AF_INET) {

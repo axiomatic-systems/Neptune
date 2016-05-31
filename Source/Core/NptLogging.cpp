@@ -943,7 +943,7 @@ NPT_Logger::Log(int          level,
     record.m_SourceLine     = source_line;
     record.m_SourceFunction = source_function;
     NPT_System::GetCurrentTimeStamp(record.m_TimeStamp);
-    record.m_ThreadId       = NPT_Thread::GetCurrentThreadId();
+    record.m_ThreadId       = (NPT_UInt64)NPT_Thread::GetCurrentThreadId();
 
     /* call all handlers for this logger and parents */
     m_Manager.Lock();

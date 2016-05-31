@@ -108,14 +108,14 @@ public:
     NPT_String       ToUrlHost() const;
     
     // address properties
-    bool IsUnspecified() const;
-    bool IsLooppack() const;
+    bool IsUnspecified()  const;
+    bool IsLooppack()     const;
     bool IsV4Compatible() const;
-    bool IsV4Mapped() const;
-    bool IsLinkLocal() const;
-    bool IsSiteLocal() const;
-    bool IsUniqueLocal() const;
-    bool IsMulticast() const;
+    bool IsV4Mapped()     const;
+    bool IsLinkLocal()    const;
+    bool IsSiteLocal()    const;
+    bool IsUniqueLocal()  const;
+    bool IsMulticast()    const;
     
     // operators
     bool             operator==(const NPT_IpAddress& other) const;

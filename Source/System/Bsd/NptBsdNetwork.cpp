@@ -338,8 +338,8 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
                 interface->AddAddress(iface_address);
                 
                 break;
-#endif
             }
+#endif
             
 #if defined(AF_LINK) && defined(NPT_CONFIG_HAVE_SOCKADDR_DL)
             case AF_LINK: {
@@ -405,6 +405,7 @@ NPT_NetworkInterface::GetNetworkInterfaces(NPT_List<NPT_NetworkInterface*>& inte
         config.ifc_buf = (char*)buffer;
         if (ioctl(net, SIOCGIFCONF, &config) < 0) {
             if (errno != EINVAL || last_size != 0) {
+                delete[] buffer;
                 close(net);
                 return NPT_ERROR_BASE_UNIX-errno;
             }

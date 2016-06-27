@@ -132,6 +132,8 @@
 /* linux */
 #if defined(__linux__)
 #define NPT_CONFIG_HAVE_GETADDRINFO
+//#define NPT_CONFIG_HAVE_GETIFADDRS // Linux has getifaddrs, but it doesn't return the MAC addrs
+                                     // in a convenient way, so we don't use it
 #undef NPT_CONFIG_HAVE_SOCKADDR_SA_LEN
 #define NPT_CONFIG_HAVE_ARPA_INET_H
 #define NPT_CONFIG_HAVE_INET_NTOP

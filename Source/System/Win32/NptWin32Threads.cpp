@@ -408,7 +408,8 @@ class NPT_Win32Thread : public NPT_ThreadInterface
                ~NPT_Win32Thread();
     NPT_Result  Start(); 
     NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
-	NPT_Result  SetPriority(int priority);
+    NPT_Result  SetPriority(int priority);
+    NPT_Result  CancelBlockerSocket();
 
  private:
     // methods
@@ -425,6 +426,7 @@ class NPT_Win32Thread : public NPT_ThreadInterface
     NPT_Runnable& m_Target;
     bool          m_Detached;
     HANDLE        m_ThreadHandle;
+    DWORD         m_ThreadId;
 };
 
 /*----------------------------------------------------------------------
@@ -436,7 +438,8 @@ NPT_Win32Thread::NPT_Win32Thread(NPT_Thread*   delegator,
     m_Delegator(delegator),
     m_Target(target),
     m_Detached(detached),
-    m_ThreadHandle(0)
+    m_ThreadHandle(0),
+    m_ThreadId(0)
 {
 }
 
@@ -503,6 +506,8 @@ NPT_Win32Thread::EntryPoint(void* argument)
     NPT_System::GetCurrentTimeStamp(now);
     NPT_System::SetRandomSeed((NPT_UInt32)(now.ToNanos()) + ::GetCurrentThreadId());
 
+    thread->m_ThreadId = (DWORD)::GetCurrentThreadId();
+
     // run the thread 
     thread->Run();
     
@@ -558,6 +563,8 @@ NPT_Win32Thread::Start()
         m_ThreadHandle = thread_handle;
     }
 
+    m_ThreadId = (DWORD)thread_id;
+
     return NPT_SUCCESS;
 }
 
@@ -600,6 +607,15 @@ NPT_Win32Thread::Wait(NPT_Timeout timeout /* = NPT_TIMEOUT_INFINITE */)
     } else {
         return NPT_SUCCESS;
     }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Win32Thread::CancelBlockerSocket
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Win32Thread::CancelBlockerSocket()
+{
+    return NPT_Socket::CancelBlockerSocket((NPT_Thread::ThreadId)m_ThreadId);
 }
 
 /*----------------------------------------------------------------------

@@ -41,6 +41,7 @@
 #include "NptStrings.h"
 #include "NptDataBuffer.h"
 #include "NptNetwork.h"
+#include "NptThreads.h"
 
 /*----------------------------------------------------------------------
 |   constants
@@ -60,7 +61,8 @@ const int NPT_ERROR_ACCEPT_FAILED         = NPT_ERROR_BASE_SOCKET - 11;
 const int NPT_ERROR_ADDRESS_IN_USE        = NPT_ERROR_BASE_SOCKET - 12;
 const int NPT_ERROR_NETWORK_DOWN          = NPT_ERROR_BASE_SOCKET - 13;
 const int NPT_ERROR_NETWORK_UNREACHABLE   = NPT_ERROR_BASE_SOCKET - 14;
-const int NPT_ERROR_NOT_CONNECTED         = NPT_ERROR_BASE_SOCKET - 15;
+const int NPT_ERROR_HOST_UNREACHABLE      = NPT_ERROR_BASE_SOCKET - 15;
+const int NPT_ERROR_NOT_CONNECTED         = NPT_ERROR_BASE_SOCKET - 16;
 
 const unsigned int NPT_SOCKET_FLAG_CANCELLABLE = 1; // make the socket cancellable
 
@@ -187,6 +189,9 @@ class NPT_TcpServerSocketInterface
 class NPT_Socket : public NPT_SocketInterface
 {
 public:
+    // static methods
+    static NPT_Result CancelBlockerSocket(NPT_Thread::ThreadId thread_id);
+    
     // constructor and destructor
     explicit NPT_Socket(NPT_SocketInterface* delegate) : m_SocketDelegate(delegate) {}
     virtual ~NPT_Socket();

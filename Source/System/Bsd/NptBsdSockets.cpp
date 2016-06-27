@@ -899,11 +899,15 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     NPT_LOG_FINER_2("waiting for condition (%s %s)",
                     wait_for_readable?"read":"",
                     wait_for_writeable?"write":"");
-    int io_result = select(max_fd+1, 
+    int io_result;
+    do {
+        io_result = select(max_fd+1,
                            &read_set, &write_set, &except_set, 
                            timeout == NPT_TIMEOUT_INFINITE ? 
                            NULL : &timeout_value);
-    NPT_LOG_FINER_1("select returned %d", io_result);
+        NPT_LOG_FINER_1("select returned %d", io_result);
+    } while (NPT_BSD_SOCKET_SELECT_FAILED(io_result) && GetSocketError() == EINTR);
+    
     if (m_Cancelled) return NPT_ERROR_CANCELLED;
 
     if (io_result == 0) {
@@ -1651,8 +1655,8 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
         SocketAddressToInetAddress(*address, inet_address, inet_address_length);
         
         // send the data
-        NPT_LOG_FINEST_2("sending datagram to %lx port %d",
-                         address->GetIpAddress().AsLong(),
+        NPT_LOG_FINEST_2("sending datagram to %s port %d",
+                         address->GetIpAddress().ToString().GetChars(),
                          address->GetPort());
         io_result = sendto(m_SocketFdReference->m_SocketFd, 
                            (SocketConstBuffer)buffer, 

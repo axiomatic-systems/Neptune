@@ -237,6 +237,8 @@
 		CAFC5B2618051F2800169F5A /* zlib.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFC5B1218051C7000169F5A /* zlib.h */; };
 		CAFC5B2718051F2800169F5A /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = CAFC5B1318051C7000169F5A /* zutil.c */; };
 		CAFC5B2818051F2800169F5A /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = CAFC5B1418051C7000169F5A /* zutil.h */; };
+		CAFE9C421D1863A000F9FF67 /* FileTest3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CAFE9C361D18635500F9FF67 /* FileTest3.cpp */; };
+		CAFE9C451D18640F00F9FF67 /* libNeptune.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F912B69F0B8EB1C700C1E90D /* libNeptune.a */; };
 		F912B7480B8EB27400C1E90D /* Neptune.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F912B6B00B8EB27400C1E90D /* Neptune.cpp */; };
 		F912B7490B8EB27400C1E90D /* Neptune.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B10B8EB27400C1E90D /* Neptune.h */; };
 		F912B74A0B8EB27400C1E90D /* NptArray.h in Headers */ = {isa = PBXBuildFile; fileRef = F912B6B20B8EB27400C1E90D /* NptArray.h */; };
@@ -865,6 +867,13 @@
 			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
 			remoteInfo = Neptune;
 		};
+		CAFE9C431D18640700F9FF67 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F912B6870B8EB12700C1E90D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F912B69E0B8EB1C700C1E90D;
+			remoteInfo = Neptune;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -896,6 +905,15 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		CAF26E9D18C7FF630015ABB9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		CAFE9C391D18637700F9FF67 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -1072,6 +1090,8 @@
 		CAFC5B1318051C7000169F5A /* zutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zutil.c; path = "../ThirdParty/zlib-1.2.8/zutil.c"; sourceTree = "<group>"; };
 		CAFC5B1418051C7000169F5A /* zutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zutil.h; path = "../ThirdParty/zlib-1.2.8/zutil.h"; sourceTree = "<group>"; };
 		CAFC5B291805210000169F5A /* gzguts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = gzguts.h; path = "../ThirdParty/zlib-1.2.8/gzguts.h"; sourceTree = "<group>"; };
+		CAFE9C361D18635500F9FF67 /* FileTest3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileTest3.cpp; sourceTree = "<group>"; };
+		CAFE9C3B1D18637700F9FF67 /* FileTest3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = FileTest3; sourceTree = BUILT_PRODUCTS_DIR; };
 		F912B69F0B8EB1C700C1E90D /* libNeptune.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libNeptune.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F912B6B00B8EB27400C1E90D /* Neptune.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = Neptune.cpp; sourceTree = "<group>"; };
 		F912B6B10B8EB27400C1E90D /* Neptune.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Neptune.h; sourceTree = "<group>"; };
@@ -1470,6 +1490,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAFE9C381D18637700F9FF67 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE9C451D18640F00F9FF67 /* libNeptune.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F912B69D0B8EB1C700C1E90D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1717,6 +1745,7 @@
 				CA8066441187BCF3009D099D /* Digests1 */,
 				CAF2EFD20E64A25700948C04 /* FileTest1 */,
 				CA9DDC7010AE3E52008B871E /* FileTest2 */,
+				CAFE9C351D18635500F9FF67 /* FileTest3 */,
 				CAA979DA0CF1648300C01909 /* HttpClient1 */,
 				CA9958A91047001B0073F34A /* HttpClient2 */,
 				CAA979DC0CF1648300C01909 /* HttpServer1 */,
@@ -2002,6 +2031,14 @@
 			path = FileTest1;
 			sourceTree = "<group>";
 		};
+		CAFE9C351D18635500F9FF67 /* FileTest3 */ = {
+			isa = PBXGroup;
+			children = (
+				CAFE9C361D18635500F9FF67 /* FileTest3.cpp */,
+			);
+			path = FileTest3;
+			sourceTree = "<group>";
+		};
 		F912B6850B8EB12700C1E90D = {
 			isa = PBXGroup;
 			children = (
@@ -2057,6 +2094,7 @@
 				CAC8F0A116AB54EA00C49741 /* NetBench */,
 				CAF26E8E18C74A2F0015ABB9 /* ZipTest2 */,
 				CAF26E9F18C7FF630015ABB9 /* ziphttpserver */,
+				CAFE9C3B1D18637700F9FF67 /* FileTest3 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2980,6 +3018,24 @@
 			productReference = CAF2EFD70E64A27200948C04 /* FileTest1 */;
 			productType = "com.apple.product-type.tool";
 		};
+		CAFE9C3A1D18637700F9FF67 /* FileTest3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CAFE9C3F1D18637700F9FF67 /* Build configuration list for PBXNativeTarget "FileTest3" */;
+			buildPhases = (
+				CAFE9C371D18637700F9FF67 /* Sources */,
+				CAFE9C381D18637700F9FF67 /* Frameworks */,
+				CAFE9C391D18637700F9FF67 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CAFE9C441D18640700F9FF67 /* PBXTargetDependency */,
+			);
+			name = FileTest3;
+			productName = FileTest3;
+			productReference = CAFE9C3B1D18637700F9FF67 /* FileTest3 */;
+			productType = "com.apple.product-type.tool";
+		};
 		F912B69E0B8EB1C700C1E90D /* Neptune */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F912B6A10B8EB1C800C1E90D /* Build configuration list for PBXNativeTarget "Neptune" */;
@@ -3005,6 +3061,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0630;
+				TargetAttributes = {
+					CAFE9C3A1D18637700F9FF67 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
 			};
 			buildConfigurationList = F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -3065,6 +3126,7 @@
 				CA8066481187BD08009D099D /* DigestsTest1 */,
 				CA8069D8118B577E009D099D /* CryptoTest1 */,
 				CAF26E9E18C7FF630015ABB9 /* ZipHttpServer */,
+				CAFE9C3A1D18637700F9FF67 /* FileTest3 */,
 			);
 		};
 /* End PBXProject section */
@@ -3405,6 +3467,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAF2EFDE0E64A2AB00948C04 /* FileTest1.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CAFE9C371D18637700F9FF67 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CAFE9C421D1863A000F9FF67 /* FileTest3.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3876,6 +3946,11 @@
 			isa = PBXTargetDependency;
 			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
 			targetProxy = CAF2EFDC0E64A28000948C04 /* PBXContainerItemProxy */;
+		};
+		CAFE9C441D18640700F9FF67 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F912B69E0B8EB1C700C1E90D /* Neptune */;
+			targetProxy = CAFE9C431D18640700F9FF67 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -5133,6 +5208,81 @@
 			};
 			name = Release;
 		};
+		CAFE9C401D18637700F9FF67 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		CAFE9C411D18637700F9FF67 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		F912B6890B8EB12700C1E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5633,6 +5783,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		CAFE9C3F1D18637700F9FF67 /* Build configuration list for PBXNativeTarget "FileTest3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CAFE9C401D18637700F9FF67 /* Debug */,
+				CAFE9C411D18637700F9FF67 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */ = {
 			isa = XCConfigurationList;

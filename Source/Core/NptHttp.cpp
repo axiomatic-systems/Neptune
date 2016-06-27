@@ -2129,11 +2129,15 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
             response->SetStatus(404, "Not Found");
         }
         response->SetEntity(body);
+        if (handler) {
+            handler->Completed(NPT_ERROR_NO_SUCH_ITEM);
         handler = NULL;
+        }
     } else if (result == NPT_ERROR_PERMISSION_DENIED) {
         body->SetInputStream(NPT_HTTP_DEFAULT_403_HTML);
         body->SetContentType("text/html");
         response->SetStatus(403, "Forbidden");
+        handler->Completed(NPT_ERROR_PERMISSION_DENIED);
         handler = NULL;
     } else if (result == NPT_ERROR_TERMINATED) {
         // mark that we want to exit
@@ -2142,6 +2146,7 @@ NPT_HttpServer::RespondToClient(NPT_InputStreamReference&     input,
         body->SetInputStream(NPT_HTTP_DEFAULT_500_HTML);
         body->SetContentType("text/html");
         response->SetStatus(500, "Internal Error");
+        handler->Completed(result);
         handler = NULL;
     }
 
@@ -2185,6 +2190,10 @@ end:
     // cleanup
     delete response;
     delete request;
+
+    if (handler) {
+        handler->Completed(result);
+    }
 
     return result;
 }

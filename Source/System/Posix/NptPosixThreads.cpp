@@ -362,6 +362,7 @@ class NPT_PosixThread : public NPT_ThreadInterface
                ~NPT_PosixThread();
     NPT_Result  Start(); 
     NPT_Result  Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE);
+    NPT_Result  CancelBlockerSocket();
     
  private:
     // methods
@@ -404,7 +405,7 @@ NPT_PosixThread::NPT_PosixThread(NPT_Thread*   delegator,
 +---------------------------------------------------------------------*/
 NPT_PosixThread::~NPT_PosixThread()
 {
-    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lu\n", (unsigned long)m_ThreadId);
+    NPT_LOG_FINE_1("NPT_PosixThread::~NPT_PosixThread %lld\n", (NPT_Thread::ThreadId)m_ThreadId);
 
     if (!m_Detached) {
         // we're not detached, and not in the Run() method, so we need to 
@@ -420,7 +421,7 @@ NPT_Thread::ThreadId
 NPT_Thread::GetCurrentThreadId()
 {
     pthread_t pid = pthread_self();
-    return (NPT_Thread::ThreadId)((void*)pid);
+    return (NPT_Thread::ThreadId)pid;
 }
 
 /*----------------------------------------------------------------------
@@ -497,12 +498,15 @@ NPT_PosixThread::Start()
     // before the pthread_create() function returns
     bool detached = m_Detached;
 
+    // reset the joined flag
+    m_Joined = false;
+
     // create the native thread
     pthread_t thread_id;
     int result = pthread_create(&thread_id, attributes, EntryPoint, 
                                 static_cast<NPT_PosixThread*>(this));
-    NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %lu, res=%d", 
-                   (unsigned long)thread_id, result);
+    NPT_LOG_FINE_2("NPT_PosixThread::Start - id = %p, res=%d",
+                   (void*)thread_id, result);
     if (result != 0) {
         // failed
         return NPT_FAILURE;
@@ -567,6 +571,15 @@ timedout:
     } else {
         return NPT_SUCCESS;
     }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_PosixThread::CancelBlockerSocket
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_PosixThread::CancelBlockerSocket()
+{
+    return NPT_Socket::CancelBlockerSocket((NPT_Thread::ThreadId)m_ThreadId);
 }
 
 /*----------------------------------------------------------------------

@@ -224,6 +224,7 @@ class NPT_ThreadInterface: public NPT_Runnable, public NPT_Interruptible
     virtual NPT_Result Start() = 0;
     virtual NPT_Result Wait(NPT_Timeout timeout = NPT_TIMEOUT_INFINITE) = 0;
     virtual NPT_Result SetPriority(int /*priority*/) { return NPT_SUCCESS; } 
+    virtual NPT_Result CancelBlockerSocket() = 0;
 };
 
 /*----------------------------------------------------------------------
@@ -233,16 +234,19 @@ class NPT_Thread : public NPT_ThreadInterface
 {
  public:
     // types
-    typedef unsigned long ThreadId;
+    typedef NPT_UInt64 ThreadId;
 
     // class methods
-    static ThreadId GetCurrentThreadId();
+    static ThreadId   GetCurrentThreadId();
     static NPT_Result SetCurrentThreadPriority(int priority);
 
     // methods
     explicit NPT_Thread(bool detached = false);
     explicit NPT_Thread(NPT_Runnable& target, bool detached = false);
    ~NPT_Thread() { delete m_Delegate; }
+
+    // cancel any socket that this thread may be waiting for
+    NPT_Result CancelBlockerSocket() { return m_Delegate->CancelBlockerSocket(); }
 
     // NPT_ThreadInterface methods
     NPT_Result Start() { 

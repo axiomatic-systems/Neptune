@@ -1,0 +1,22 @@
+﻿Build started 5/9/2016 9:39:58 PM.
+     1>Project "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\NetPump\NetPump.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Release\NetPump.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\..\..\Source\Config /I..\..\..\..\Source\Core /I..\..\..\..\Source\Neptune /Zi /nologo /W3 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _CONSOLE /D _MBCS /Gm- /EHsc /MT /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\..\..\Source\Apps\NetPump\NetPump.cpp
+         NetPump.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\NetPump.exe" /INCREMENTAL:NO /NOLOGO ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\NetPump.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\NetPump.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\NetPump.lib" /MACHINE:X86 Release\NetPump.obj
+         "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\Neptune.lib"
+         LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+         NetPump.vcxproj -> Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\NetPump.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\Release\NetPump.exe;#1" /manifest Release\NetPump.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "Release\NetPump.unsuccessfulbuild".
+         Touching "Release\NetPump.lastbuildstate".
+     1>Done Building Project "Z:\gilles\Workspace\Neptune\Build\Targets\x86-microsoft-win32-vs2010\NetPump\NetPump.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.57

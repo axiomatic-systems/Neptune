@@ -64,7 +64,7 @@ public:
     const char*   m_SourceFile;
     unsigned int  m_SourceLine;
     const char*   m_SourceFunction;
-    unsigned long m_ThreadId;
+    NPT_UInt64    m_ThreadId;
 };
 
 class NPT_LogHandler {

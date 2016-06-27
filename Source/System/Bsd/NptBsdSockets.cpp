@@ -141,6 +141,7 @@ static NPT_WinsockSystem& WinsockInitializer = NPT_WinsockSystem::Initializer;
 #define EADDRINUSE   WSAEADDRINUSE
 #define ENETDOWN     WSAENETDOWN
 #define ENETUNREACH  WSAENETUNREACH
+#define EHOSTUNREACH WSAEHOSTUNREACH
 #define ENOTCONN     WSAENOTCONN
 #if !defined(EAGAIN)
 #define EAGAIN       WSAEWOULDBLOCK 
@@ -332,36 +333,110 @@ typedef int         SocketFd;
 #endif
 
 /*----------------------------------------------------------------------
+|   IPv6 support
++---------------------------------------------------------------------*/
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+#include <arpa/inet.h>
+
+#define NPT_SOCKETS_PF_INET PF_INET6
+typedef union {
+    struct sockaddr         sa;
+    struct sockaddr_in      sa_in;
+    struct sockaddr_in6     sa_in6;
+    struct sockaddr_storage sa_storage;
+} NPT_sockaddr_in;
+
+#else
+
+#define NPT_SOCKETS_PF_INET PF_INET
+typedef union {
+    struct sockaddr    sa;
+    struct sockaddr_in sa_in;
+} NPT_sockaddr_in;
+
+#endif
+
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+/*----------------------------------------------------------------------
 |   SocketAddressToInetAddress
 +---------------------------------------------------------------------*/
 static void
 SocketAddressToInetAddress(const NPT_SocketAddress& socket_address, 
-                           struct sockaddr_in*      inet_address)
+                           NPT_sockaddr_in&         inet_address,
+                           socklen_t&               inet_address_length)
 {
     // initialize the structure
-    NPT_SetMemory(inet_address, 0, sizeof(*inet_address));
+    NPT_SetMemory(&inet_address, 0, sizeof(inet_address));
     
-#if defined(NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN)
-    inet_address->sin_len = sizeof(*inet_address);
-#endif
-
     // setup the structure
-    inet_address->sin_family      = AF_INET;
-    inet_address->sin_port        = htons(socket_address.GetPort());
-    inet_address->sin_addr.s_addr = htonl(socket_address.GetIpAddress().AsLong());
+    inet_address_length = sizeof(sockaddr_in6);
+    inet_address.sa_in6.sin6_len      = inet_address_length;
+    inet_address.sa_in6.sin6_family   = AF_INET6;
+    inet_address.sa_in6.sin6_port     = htons(socket_address.GetPort());
+    inet_address.sa_in6.sin6_scope_id = socket_address.GetIpAddress().GetScopeId();
+
+    NPT_IpAddress::Type type = socket_address.GetIpAddress().GetType();
+    if (type == NPT_IpAddress::IPV6) {
+        NPT_CopyMemory(inet_address.sa_in6.sin6_addr.s6_addr, socket_address.GetIpAddress().AsBytes(), 16);
+    } else {
+        NPT_SetMemory(&inet_address.sa_in6.sin6_addr.s6_addr[0], 0, 10);
+        inet_address.sa_in6.sin6_addr.s6_addr[10] = 0xFF;
+        inet_address.sa_in6.sin6_addr.s6_addr[11] = 0xFF;
+        NPT_CopyMemory(&inet_address.sa_in6.sin6_addr.s6_addr[12], socket_address.GetIpAddress().AsBytes(), 4);
+    }
 }
 
 /*----------------------------------------------------------------------
 |   InetAddressToSocketAddress
 +---------------------------------------------------------------------*/
 static void
-InetAddressToSocketAddress(const struct sockaddr_in* inet_address,
-                           NPT_SocketAddress&        socket_address)
+InetAddressToSocketAddress(const NPT_sockaddr_in& inet_address,
+                           NPT_SocketAddress&     socket_address)
 {
-    // read the fields
-    socket_address.SetPort(ntohs(inet_address->sin_port));
-    socket_address.SetIpAddress(NPT_IpAddress(ntohl(inet_address->sin_addr.s_addr)));
+    // setup the structure
+    socket_address.SetPort(inet_address.sa_in6.sin6_port);
+    if (inet_address.sa.sa_family == AF_INET6) {
+        socket_address.SetPort(ntohs(inet_address.sa_in6.sin6_port));
+        socket_address.SetIpAddress(NPT_IpAddress(NPT_IpAddress::IPV6, inet_address.sa_in6.sin6_addr.s6_addr, 16));
+    } else {
+        socket_address.SetPort(ntohs(inet_address.sa_in.sin_port));
+        socket_address.SetIpAddress(NPT_IpAddress(ntohl(inet_address.sa_in.sin_addr.s_addr)));
+    }
 }
+#else
+/*----------------------------------------------------------------------
+|   SocketAddressToInetAddress
++---------------------------------------------------------------------*/
+static void
+SocketAddressToInetAddress(const NPT_SocketAddress& socket_address, 
+                           NPT_sockaddr_in&         inet_address,
+                           socklen_t&               inet_address_length)
+{
+    // initialize the structure
+    NPT_SetMemory(&inet_address, 0, sizeof(inet_address));
+    inet_address_length = sizeof(sockaddr_in);
+    
+#if defined(NPT_CONFIG_HAVE_SOCKADDR_IN_SIN_LEN)
+    inet_address.sa_in.sin_len = sizeof(inet_address);
+#endif
+
+    // setup the structure
+    inet_address.sa_in.sin_family      = AF_INET;
+    inet_address.sa_in.sin_port        = htons(socket_address.GetPort());
+    inet_address.sa_in.sin_addr.s_addr = htonl(socket_address.GetIpAddress().AsLong());
+}
+
+/*----------------------------------------------------------------------
+|   InetAddressToSocketAddress
++---------------------------------------------------------------------*/
+static void
+InetAddressToSocketAddress(const NPT_sockaddr_in& inet_address,
+                           NPT_SocketAddress&     socket_address)
+{
+    socket_address.SetPort(ntohs(inet_address.sa_in.sin_port));
+    socket_address.SetIpAddress(NPT_IpAddress(ntohl(inet_address.sa_in.sin_addr.s_addr)));
+}
+#endif
 
 /*----------------------------------------------------------------------
 |   MapErrorCode
@@ -391,6 +466,9 @@ MapErrorCode(int error)
 
         case ENETUNREACH:
             return NPT_ERROR_NETWORK_UNREACHABLE;
+            
+        case EHOSTUNREACH:
+            return NPT_ERROR_HOST_UNREACHABLE;
 
         case EINPROGRESS:
         case EAGAIN:
@@ -423,17 +501,6 @@ MapErrorCode(int error)
             return NPT_ERROR_ERRNO(error);
     }
 }
-
-/*----------------------------------------------------------------------
-|   MapGetAddrInfoErrorCode
-+---------------------------------------------------------------------*/
-#if defined(NPT_CONFIG_HAVE_GETADDRINFO)
-static NPT_Result
-MapGetAddrInfoErrorCode(int /*error_code*/)
-{
-    return NPT_ERROR_HOST_UNKNOWN;
-}
-#endif
 
 #if defined(_XBOX)
 
@@ -504,7 +571,7 @@ socketpair(int, int, int, SOCKET sockets[2]) // we ignore the first two params: 
 	sockets[1] = INVALID_SOCKET;
 
 	// create a listener socket and bind to the loopback address, any port
-	SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);
+	SOCKET listener = socket(PF_INET, SOCK_STREAM, 0);
 	if (listener == INVALID_SOCKET) goto fail;
 
 	// bind the listener and listen for connections
@@ -524,7 +591,7 @@ socketpair(int, int, int, SOCKET sockets[2]) // we ignore the first two params: 
 	if (result != 0) goto fail;
 
 	// create the first socket 
-	sockets[0] = socket(AF_INET, SOCK_STREAM, 0);
+	sockets[0] = socket(PF_INET, SOCK_STREAM, 0);
 	if (sockets[0] == INVALID_SOCKET) goto fail;
 
 	// connect the first socket
@@ -551,6 +618,17 @@ fail:
 #endif
 
 /*----------------------------------------------------------------------
+|   NPT_Hash<NPT_Thread::ThreadId>
++---------------------------------------------------------------------*/
+template <>
+struct NPT_Hash<NPT_Thread::ThreadId>
+{
+    NPT_UInt32 operator()(NPT_Thread::ThreadId id) const {
+        return (NPT_UInt32)(id & 0xFFFFFFFF);
+    }
+};
+
+/*----------------------------------------------------------------------
 |   NPT_IpAddress::ResolveName
 +---------------------------------------------------------------------*/
 NPT_Result
@@ -559,69 +637,26 @@ NPT_IpAddress::ResolveName(const char* name, NPT_Timeout)
     // check parameters
     if (name == NULL || name[0] == '\0') return NPT_ERROR_HOST_UNKNOWN;
 
+#if !defined(NPT_CONFIG_ENABLE_IPV6)
     // handle numerical addrs
     NPT_IpAddress numerical_address;
     if (NPT_SUCCEEDED(numerical_address.Parse(name))) {
         /* the name is a numerical IP addr */
-        return Set(numerical_address.AsLong());
+        *this = numerical_address;
+        return NPT_SUCCESS;
     }
-
-#if defined(__TCS__)
-    Set(getHostByName(name));
-#elif defined(__PSP__)
-    int rid;
-    char buf[1024];
-    int buflen = sizeof(buf);
-
-    int ret = sceNetResolverCreate(&rid, buf, buflen);
-    if(ret < 0){
-        return NPT_FAILURE;
-    }
-    ret = sceNetResolverStartNtoA(rid, name, &address->sin_addr,
-        RESOLVER_TIMEOUT, RESOLVER_RETRY);
-    if(ret < 0){
-        return NPT_ERROR_HOST_UNKNOWN;
-    }
-    sceNetResolverDelete(rid);
-#elif defined(NPT_CONFIG_HAVE_GETADDRINFO)
-    // get the addr list
-    struct addrinfo *infos = NULL;
-    int result = getaddrinfo(name,  /* hostname */
-                             NULL,  /* servname */
-                             NULL,  /* hints    */
-                             &infos /* res      */);
-    if (result != 0) {
-        return MapGetAddrInfoErrorCode(result);
-    }
-    
-    bool found = false;
-    for (struct addrinfo* info = infos; !found && info; info = info->ai_next) {
-        if (info->ai_family != AF_INET) continue;
-        if (info->ai_addrlen != sizeof(struct sockaddr_in)) continue;
-        if (info->ai_protocol != 0 && info->ai_protocol != IPPROTO_TCP) continue; 
-        struct sockaddr_in* inet_addr = (struct sockaddr_in*)info->ai_addr;
-        Set(ntohl(inet_addr->sin_addr.s_addr));
-        found = true;
-    }
-    freeaddrinfo(infos);
-    if (!found) {
-        return NPT_ERROR_HOST_UNKNOWN;
-    }
-    
-#else
-    // do a name lookup
-    struct hostent *host_entry = gethostbyname(name);
-    if (host_entry == NULL ||
-        host_entry->h_addrtype != AF_INET) {
-        return NPT_ERROR_HOST_UNKNOWN;
-    }
-    NPT_CopyMemory(m_Address, host_entry->h_addr, 4);
-
-#if defined(_XBOX)
-    delete host_entry;   
 #endif
 
-#endif
+    // resolve the name into a list of addresses
+    NPT_List<NPT_IpAddress> addresses;
+    NPT_Result result = NPT_NetworkNameResolver::Resolve(name, addresses);
+    if (NPT_FAILED(result)) return result;
+    if (addresses.GetItemCount() < 1) {
+        return NPT_ERROR_NO_SUCH_NAME;
+    }
+    
+    // pick the first address
+    *this = *(addresses.GetFirstItem());
     
     return NPT_SUCCESS;
 }
@@ -668,6 +703,7 @@ public:
     NPT_Result WaitUntilReadable();
     NPT_Result WaitUntilWriteable();
     NPT_Result WaitForCondition(bool readable, bool writeable, bool async_connect, NPT_Timeout timeout);
+    NPT_Result Cancel(bool do_shutdown);
 
     // members
     SocketFd          m_SocketFd;
@@ -685,6 +721,79 @@ private:
 };
 
 typedef NPT_Reference<NPT_BsdSocketFd> NPT_BsdSocketFdReference;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket
++---------------------------------------------------------------------*/
+class NPT_BsdBlockerSocket {
+public:
+    NPT_BsdBlockerSocket(NPT_BsdSocketFd* fd) {
+        Set(NPT_Thread::GetCurrentThreadId(), fd);
+    }
+    ~NPT_BsdBlockerSocket() {
+        Set(NPT_Thread::GetCurrentThreadId(), NULL);
+    }
+
+    static NPT_Result Cancel(NPT_Thread::ThreadId id);
+
+private:
+    static NPT_Result Set(NPT_Thread::ThreadId id, NPT_BsdSocketFd* fd);
+
+    static NPT_Mutex MapLock;
+    static NPT_HashMap<NPT_Thread::ThreadId, NPT_BsdSocketFd*> Map;
+};
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::MapLock
++---------------------------------------------------------------------*/
+NPT_Mutex NPT_BsdBlockerSocket::MapLock;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Map
++---------------------------------------------------------------------*/
+NPT_HashMap<NPT_Thread::ThreadId, NPT_BsdSocketFd*> NPT_BsdBlockerSocket::Map;
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Set
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdBlockerSocket::Set(NPT_Thread::ThreadId id, NPT_BsdSocketFd* fd)
+{
+    NPT_AutoLock synchronized(MapLock);
+
+    if (fd) {
+        return Map.Put(id, fd);
+    } else {
+        return Map.Erase(id);
+    }
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdBlockerSocket::Cancel
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdBlockerSocket::Cancel(NPT_Thread::ThreadId id)
+{
+    NPT_AutoLock synchronized(MapLock);
+    
+    NPT_BsdSocketFd** fd = NULL;
+    NPT_Result result = Map.Get(id, fd);
+    if (NPT_SUCCEEDED(result) && fd && *fd) {
+        (*fd)->Cancel(true);
+    }
+
+    return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_Socket::CancelBlockerSocket
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_Socket::CancelBlockerSocket(NPT_Thread::ThreadId thread_id)
+{
+    return NPT_BsdBlockerSocket::Cancel(thread_id);
+}
+
 
 #if defined(__WINSOCK__) || defined(__TCS__)
 /*----------------------------------------------------------------------
@@ -772,6 +881,9 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     FD_ZERO(&except_set);
     FD_SET(m_SocketFd, &except_set);
 
+    // if the socket is cancellable, add it to the blocker map so a thread can cancel it
+    NPT_BsdBlockerSocket blocker(this);
+    
     // setup the cancel fd
     if (m_Cancellable && timeout) {
         if ((int)m_CancelFds[1] > max_fd) max_fd = m_CancelFds[1];
@@ -787,11 +899,15 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
     NPT_LOG_FINER_2("waiting for condition (%s %s)",
                     wait_for_readable?"read":"",
                     wait_for_writeable?"write":"");
-    int io_result = select(max_fd+1, 
+    int io_result;
+    do {
+        io_result = select(max_fd+1,
                            &read_set, &write_set, &except_set, 
                            timeout == NPT_TIMEOUT_INFINITE ? 
                            NULL : &timeout_value);
-    NPT_LOG_FINER_1("select returned %d", io_result);
+        NPT_LOG_FINER_1("select returned %d", io_result);
+    } while (NPT_BSD_SOCKET_SELECT_FAILED(io_result) && GetSocketError() == EINTR);
+    
     if (m_Cancelled) return NPT_ERROR_CANCELLED;
 
     if (io_result == 0) {
@@ -854,6 +970,32 @@ NPT_BsdSocketFd::WaitForCondition(bool        wait_for_readable,
         NPT_LOG_FINER_1("select result = %d", result);
     }
     return result;
+}
+
+/*----------------------------------------------------------------------
+|   NPT_BsdSocketFd::Cancel
++---------------------------------------------------------------------*/
+NPT_Result
+NPT_BsdSocketFd::Cancel(bool do_shutdown)
+{
+    // mark the socket as cancelled
+    m_Cancelled = true;
+    
+    // force a shutdown if requested
+    if (do_shutdown) {
+        int result = shutdown(m_SocketFd, SHUT_RDWR);
+        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
+            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
+        }
+    }
+    
+    // unblock waiting selects
+    if (m_Cancellable) {
+        char dummy = 0;
+        send(m_CancelFds[0], &dummy, 1, 0);
+    }
+
+    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -1025,44 +1167,67 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
                                  NPT_Size     bytes_to_write, 
                                  NPT_Size*    bytes_written)
 {
-    // if we're blocking, wait until the socket is writeable
-    if (m_SocketFdReference->m_WriteTimeout) {
-        NPT_Result result = m_SocketFdReference->WaitUntilWriteable();
-        if (result != NPT_SUCCESS) return result;
+    // FIXME: A temporary hack to get to the Cancel method
+    if (buffer == NULL) {
+        NPT_LOG_INFO("Cancelling BSD socket output stream through write...");
+    
+        m_SocketFdReference->Cancel(true);
+
+        NPT_LOG_INFO("Done cancelling BSD socket output stream through write.");
+        return NPT_SUCCESS;
     }
 
-    int flags = 0;
-#if defined(MSG_NOSIGNAL)
-    // for some BSD stacks, ask for EPIPE to be returned instead
-    // of sending a SIGPIPE signal to the process
-    flags |= MSG_NOSIGNAL;
-#endif
-
-    // write to the socket
-    NPT_LOG_FINEST_1("writing %d to socket", (int)bytes_to_write);
-    ssize_t nb_written = send(m_SocketFdReference->m_SocketFd, 
-                              (SocketConstBuffer)buffer, 
-                              bytes_to_write, flags);
-    NPT_LOG_FINEST_1("send returned %d", (int)nb_written);
-    
-    if (nb_written <= 0) {
-        if (bytes_written) *bytes_written = 0;
-        if (m_SocketFdReference->m_Cancelled) return NPT_ERROR_CANCELLED;
-
-        if (nb_written == 0) {
-            NPT_LOG_FINE("connection reset");
-            return NPT_ERROR_CONNECTION_RESET;
-        } else {
-            NPT_Result result = MapErrorCode(GetSocketError());
-            NPT_LOG_FINE_1("socket result = %d", result);
-            return result;
+    int tries_left = 100;
+    for (;;) {
+        // if we're blocking, wait until the socket is writeable
+        if (m_SocketFdReference->m_WriteTimeout) {
+            NPT_Result result = m_SocketFdReference->WaitUntilWriteable();
+            if (result != NPT_SUCCESS) return result;
         }
+
+        int flags = 0;
+    #if defined(MSG_NOSIGNAL)
+        // for some BSD stacks, ask for EPIPE to be returned instead
+        // of sending a SIGPIPE signal to the process
+        flags |= MSG_NOSIGNAL;
+    #endif
+
+        // write to the socket
+        NPT_LOG_FINEST_1("writing %d to socket", (int)bytes_to_write);
+        ssize_t nb_written = send(m_SocketFdReference->m_SocketFd, 
+                                  (SocketConstBuffer)buffer, 
+                                  bytes_to_write, flags);
+        NPT_LOG_FINEST_1("send returned %d", (int)nb_written);
+        
+        if (nb_written <= 0) {
+            if (bytes_written) *bytes_written = 0;
+            if (m_SocketFdReference->m_Cancelled) return NPT_ERROR_CANCELLED;
+
+            if (nb_written == 0) {
+                NPT_LOG_FINE("connection reset");
+                return NPT_ERROR_CONNECTION_RESET;
+            } else {
+                NPT_Result result = MapErrorCode(GetSocketError());
+                NPT_LOG_FINE_1("socket result = %d", result);
+                    if (m_SocketFdReference->m_WriteTimeout && result == NPT_ERROR_WOULD_BLOCK) {
+                        // Well, the socket was writeable but then failed with "would block"
+                        // Loop back and try again, a certain number of times only...
+                        NPT_LOG_FINE_1("Socket failed with 'would block' even though writeable?! Tries left: %d", tries_left);
+                        if (--tries_left < 0) {
+                            NPT_LOG_SEVERE("Failed to send any data, send kept returning with 'would block' even though timeout is not 0");
+                            return NPT_ERROR_WRITE_FAILED;
+                        }
+                        continue;
+                    }
+                return result;
+            }
+        }
+        
+        // update position and return
+        if (bytes_written) *bytes_written = nb_written;
+        m_SocketFdReference->m_Position += nb_written;
+        return NPT_SUCCESS;
     }
-    
-    // update position and return
-    if (bytes_written) *bytes_written = (NPT_Size)nb_written;
-    m_SocketFdReference->m_Position += nb_written;
-    return NPT_SUCCESS;
 }
 
 /*----------------------------------------------------------------------
@@ -1201,8 +1366,9 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
     }
     
     // convert the address
-    struct sockaddr_in inet_address;
-    SocketAddressToInetAddress(address, &inet_address);
+    NPT_sockaddr_in inet_address;
+    socklen_t       inet_address_length;
+    SocketAddressToInetAddress(address, inet_address, inet_address_length);
     
 #if defined(_XBOX)
     if( address.GetIpAddress().AsLong() != NPT_IpAddress::Any.AsLong() ) {
@@ -1213,8 +1379,8 @@ NPT_BsdSocket::Bind(const NPT_SocketAddress& address, bool reuse_address)
 
     // bind the socket
     if (bind(m_SocketFdReference->m_SocketFd, 
-             (struct sockaddr*)&inet_address, 
-             sizeof(inet_address)) < 0) {
+             &inet_address.sa,
+             inet_address_length) < 0) {
         return MapErrorCode(GetSocketError());
     }
     
@@ -1302,22 +1468,20 @@ NPT_BsdSocket::RefreshInfo()
     if (m_SocketFdReference.IsNull()) return NPT_ERROR_INVALID_STATE;
 
     // get the local socket addr
-    struct sockaddr_in inet_address;
-    socklen_t          name_length = sizeof(inet_address);
+    NPT_sockaddr_in inet_address;
+    socklen_t       inet_address_length = sizeof(inet_address);
     if (getsockname(m_SocketFdReference->m_SocketFd, 
-                    (struct sockaddr*)&inet_address, 
-                    &name_length) == 0) {
-        m_Info.local_address.SetIpAddress(ntohl(inet_address.sin_addr.s_addr));
-        m_Info.local_address.SetPort(ntohs(inet_address.sin_port));
-    }   
+                    &inet_address.sa,
+                    &inet_address_length) == 0) {
+        InetAddressToSocketAddress(inet_address, m_Info.local_address);
+    }
 
     // get the peer socket addr
     if (getpeername(m_SocketFdReference->m_SocketFd,
-                    (struct sockaddr*)&inet_address, 
-                    &name_length) == 0) {
-        m_Info.remote_address.SetIpAddress(ntohl(inet_address.sin_addr.s_addr));
-        m_Info.remote_address.SetPort(ntohs(inet_address.sin_port));
-    }   
+                    &inet_address.sa,
+                    &inet_address_length) == 0) {
+        InetAddressToSocketAddress(inet_address, m_Info.remote_address);
+    }
 
     return NPT_SUCCESS;
 }
@@ -1348,24 +1512,7 @@ NPT_BsdSocket::SetWriteTimeout(NPT_Timeout timeout)
 NPT_Result
 NPT_BsdSocket::Cancel(bool do_shutdown)
 {
-    // mark the socket as cancelled
-    m_SocketFdReference->m_Cancelled = true;
-    
-    // force a shutdown if requested
-    if (do_shutdown) {
-        int result = shutdown(m_SocketFdReference->m_SocketFd, SHUT_RDWR);
-        if (NPT_BSD_SOCKET_CALL_FAILED(result)) {
-            NPT_LOG_FINE_1("shutdown failed (%d)", MapErrorCode(GetSocketError()));
-        }
-    }
-    
-    // unblock waiting selects
-    if (m_SocketFdReference->m_Cancellable) {
-        char dummy = 0;
-        send(m_SocketFdReference->m_CancelFds[0], &dummy, 1, 0);
-    }
-
-    return NPT_SUCCESS;
+    return m_SocketFdReference->Cancel(do_shutdown);
 }
 
 /*----------------------------------------------------------------------
@@ -1406,8 +1553,8 @@ class NPT_BsdUdpSocket : public    NPT_UdpSocketInterface,
 /*----------------------------------------------------------------------
 |   NPT_BsdUdpSocket::NPT_BsdUdpSocket
 +---------------------------------------------------------------------*/
-NPT_BsdUdpSocket::NPT_BsdUdpSocket(NPT_Flags flags) : 
-    NPT_BsdSocket(socket(AF_INET, SOCK_DGRAM, 0), flags)
+NPT_BsdUdpSocket::NPT_BsdUdpSocket(NPT_Flags flags) :
+    NPT_BsdSocket(socket(NPT_SOCKETS_PF_INET, SOCK_DGRAM, 0), flags)
 {
     // set default socket options
     int option = 1;
@@ -1457,16 +1604,17 @@ NPT_BsdUdpSocket::Connect(const NPT_SocketAddress& address,
                           NPT_Timeout /* ignored */)
 {
     // setup an address structure
-    struct sockaddr_in inet_address;
-    SocketAddressToInetAddress(address, &inet_address);
+    NPT_sockaddr_in inet_address;
+    socklen_t       inet_address_length;
+    SocketAddressToInetAddress(address, inet_address, inet_address_length);
 
     // connect so that we can have some addr bound to the socket
-    NPT_LOG_FINE_2("connecting to %lx, port %d", 
-                   address.GetIpAddress().AsLong(), 
+    NPT_LOG_FINE_2("connecting to %s, port %d",
+                   address.GetIpAddress().ToString().GetChars(),
                    address.GetPort());
     int io_result = connect(m_SocketFdReference->m_SocketFd, 
-                            (struct sockaddr *)&inet_address, 
-                            sizeof(inet_address));
+                            &inet_address.sa,
+                            inet_address_length);
     if (NPT_BSD_SOCKET_CALL_FAILED(io_result)) { 
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("socket error %d", result);
@@ -1502,19 +1650,20 @@ NPT_BsdUdpSocket::Send(const NPT_DataBuffer&    packet,
         // send to the specified address
 
         // setup an address structure
-        struct sockaddr_in inet_address;
-        SocketAddressToInetAddress(*address, &inet_address);
+        NPT_sockaddr_in inet_address;
+        socklen_t       inet_address_length;
+        SocketAddressToInetAddress(*address, inet_address, inet_address_length);
         
         // send the data
-        NPT_LOG_FINEST_2("sending datagram to %lx port %d",
-                         address->GetIpAddress().AsLong(),
+        NPT_LOG_FINEST_2("sending datagram to %s port %d",
+                         address->GetIpAddress().ToString().GetChars(),
                          address->GetPort());
         io_result = sendto(m_SocketFdReference->m_SocketFd, 
                            (SocketConstBuffer)buffer, 
                            buffer_length, 
                            0, 
-                           (struct sockaddr *)&inet_address, 
-                           sizeof(inet_address));        
+                           &inet_address.sa,
+                           inet_address_length);
     } else {
         int flags = 0;
 #if defined(MSG_NOSIGNAL)
@@ -1568,24 +1717,22 @@ NPT_BsdUdpSocket::Receive(NPT_DataBuffer&    packet,
     // receive a packet
     ssize_t io_result = 0;
     if (address) {
-        struct sockaddr_in inet_address;
-        socklen_t          inet_address_length = sizeof(inet_address);
+        NPT_sockaddr_in inet_address;
+        socklen_t       inet_address_length = sizeof(inet_address);
 
-        NPT_LOG_FINEST_2("receiving dagagram from %lx port %d", 
-                         address->GetIpAddress().AsLong(), 
+        NPT_LOG_FINEST_2("receiving dagagram from %s port %d",
+                         address->GetIpAddress().ToString().GetChars(),
                          address->GetPort());
         io_result = recvfrom(m_SocketFdReference->m_SocketFd, 
                              (SocketBuffer)buffer, 
                              buffer_size, 
                              0, 
-                             (struct sockaddr *)&inet_address, 
+                             &inet_address.sa,
                              &inet_address_length);
 
         // convert the address format
         if (!NPT_BSD_SOCKET_CALL_FAILED(io_result)) {
-            if (inet_address_length == sizeof(inet_address)) {
-                InetAddressToSocketAddress(&inet_address, *address);
-            }
+            InetAddressToSocketAddress(inet_address, *address);
         }
     } else {
         NPT_LOG_FINEST("receiving dagagram");
@@ -1710,6 +1857,34 @@ NPT_Result
 NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
                                      const NPT_IpAddress& iface)
 {
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    struct ipv6_mreq mreq;
+
+    // set the interface index
+    mreq.ipv6mr_interface = 0; // FIXME: hardcoded to 0 for now
+    
+    // set the group address
+    if (group.GetType() == NPT_IpAddress::IPV6) {
+        NPT_CopyMemory(&mreq.ipv6mr_multiaddr.s6_addr[0], group.AsBytes(), 16);
+    } else {
+        NPT_SetMemory(&mreq.ipv6mr_multiaddr.s6_addr[0], 0, 10);
+        mreq.ipv6mr_multiaddr.s6_addr[10] = 0xFF;
+        mreq.ipv6mr_multiaddr.s6_addr[11] = 0xFF;
+        NPT_CopyMemory(&mreq.ipv6mr_multiaddr.s6_addr[12], group.AsBytes(), 4);
+    }
+
+    // set socket option
+    NPT_LOG_FINE_2("joining multicast addr %s group %s",
+                   iface.ToString().GetChars(), group.ToString().GetChars());
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IPV6, IPV6_JOIN_GROUP,
+                   (SocketOption)&mreq, sizeof(mreq))) {
+        NPT_Result result = MapErrorCode(GetSocketError());
+        NPT_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+    return NPT_SUCCESS;
+#else
     struct ip_mreq mreq;
 
     // set the interface address
@@ -1719,8 +1894,8 @@ NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
     mreq.imr_multiaddr.s_addr = htonl(group.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_2("joining multicast addr %lx group %lx", 
-                   iface.AsLong(), group.AsLong());
+    NPT_LOG_FINE_2("joining multicast addr %s group %s",
+                   iface.ToString().GetChars(), group.ToString().GetChars());
     if (setsockopt(m_SocketFdReference->m_SocketFd,
                    IPPROTO_IP, IP_ADD_MEMBERSHIP,
                    (SocketOption)&mreq, sizeof(mreq))) {
@@ -1729,6 +1904,7 @@ NPT_BsdUdpMulticastSocket::JoinGroup(const NPT_IpAddress& group,
         return result;
     }
     return NPT_SUCCESS;
+#endif
 }
 #endif
 
@@ -1750,6 +1926,33 @@ NPT_Result
 NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
                                       const NPT_IpAddress& iface)
 {
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    struct ipv6_mreq mreq;
+
+    // set the interface index
+    mreq.ipv6mr_interface = 0; // FIXME: hardcoded to 0 for now
+    
+    // set the group address
+    if (group.GetType() == NPT_IpAddress::IPV6) {
+        NPT_CopyMemory(&mreq.ipv6mr_multiaddr.s6_addr[0], group.AsBytes(), 16);
+    } else {
+        NPT_SetMemory(&mreq.ipv6mr_multiaddr.s6_addr[0], 0, 10);
+        mreq.ipv6mr_multiaddr.s6_addr[10] = 0xFF;
+        mreq.ipv6mr_multiaddr.s6_addr[11] = 0xFF;
+        NPT_CopyMemory(&mreq.ipv6mr_multiaddr.s6_addr[12], group.AsBytes(), 4);
+    }
+
+    // set socket option
+    NPT_LOG_FINE_2("leaving multicast addr %s group %s",
+                   iface.ToString().GetChars(), group.ToString().GetChars());
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IPV6, IPV6_LEAVE_GROUP,
+                   (SocketOption)&mreq, sizeof(mreq))) {
+        NPT_Result result = MapErrorCode(GetSocketError());
+        NPT_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+#else
     struct ip_mreq mreq;
 
     // set the interface address
@@ -1759,8 +1962,8 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
     mreq.imr_multiaddr.s_addr = htonl(group.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_2("leaving multicast addr %lx group %lx", 
-                   iface.AsLong(), group.AsLong());
+    NPT_LOG_FINE_2("leaving multicast addr %s group %s",
+                   iface.ToString().GetChars(), group.ToString().GetChars());
     if (setsockopt(m_SocketFdReference->m_SocketFd,
                    IPPROTO_IP, IP_DROP_MEMBERSHIP,
                    (SocketOption)&mreq, sizeof(mreq))) {
@@ -1768,6 +1971,7 @@ NPT_BsdUdpMulticastSocket::LeaveGroup(const NPT_IpAddress& group,
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+#endif
     
     return NPT_SUCCESS;
 }
@@ -1789,12 +1993,25 @@ NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
 NPT_Result
 NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
 {
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    unsigned int ifindex = 0; // FIXME: hardcoded to 0 for now
+    
+    // set socket option
+    NPT_LOG_FINE_1("setting multicast interface %s", iface.ToString().GetChars());
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IPV6, IPV6_MULTICAST_IF,
+                   (char*)&ifindex, sizeof(ifindex))) {
+        NPT_Result result = MapErrorCode(GetSocketError());
+        NPT_LOG_FINE_1("setsockopt error %d", result);
+        return result;
+    }
+#else
     struct in_addr iface_addr;
     // set the interface address
     iface_addr.s_addr = htonl(iface.AsLong());
 
     // set socket option
-    NPT_LOG_FINE_1("setting multicast interface %lx", iface.AsLong()); 
+    NPT_LOG_FINE_1("setting multicast interface %s", iface.ToString().GetChars());
     if (setsockopt(m_SocketFdReference->m_SocketFd,
                    IPPROTO_IP, IP_MULTICAST_IF,
                    (char*)&iface_addr, sizeof(iface_addr))) {
@@ -1802,6 +2019,7 @@ NPT_BsdUdpMulticastSocket::SetInterface(const NPT_IpAddress& iface)
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
     }
+#endif
     
     return NPT_SUCCESS;
 }
@@ -1823,13 +2041,20 @@ NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
 NPT_Result
 NPT_BsdUdpMulticastSocket::SetTimeToLive(unsigned char ttl)
 {
-    unsigned char ttl_opt = ttl;
 
     // set socket option
     NPT_LOG_FINE_1("setting multicast TTL to %d", (int)ttl); 
+#if defined(NPT_CONFIG_ENABLE_IPV6)
+    int ttl_opt = ttl;
+    if (setsockopt(m_SocketFdReference->m_SocketFd,
+                   IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                   (SocketOption)&ttl_opt, sizeof(ttl_opt))) {
+#else
+    unsigned char ttl_opt = ttl;
     if (setsockopt(m_SocketFdReference->m_SocketFd,
                    IPPROTO_IP, IP_MULTICAST_TTL,
                    (SocketOption)&ttl_opt, sizeof(ttl_opt))) {
+#endif
         NPT_Result result = MapErrorCode(GetSocketError());
         NPT_LOG_FINE_1("setsockopt error %d", result);
         return result;
@@ -1889,7 +2114,7 @@ protected:
 |   NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpClientSocket::NPT_BsdTcpClientSocket(NPT_Flags flags) : 
-    NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0), flags)
+    NPT_BsdSocket(socket(NPT_SOCKETS_PF_INET, SOCK_STREAM, 0), flags)
 {
 }
 
@@ -1908,17 +2133,18 @@ NPT_BsdTcpClientSocket::Connect(const NPT_SocketAddress& address,
                                 NPT_Timeout              timeout)
 {
     // convert the address
-    struct sockaddr_in inet_address;
-    SocketAddressToInetAddress(address, &inet_address);
+    NPT_sockaddr_in inet_address;
+    socklen_t       inet_address_length;
+    SocketAddressToInetAddress(address, inet_address, inet_address_length);
 
     // initiate connection
-    NPT_LOG_FINE_2("connecting to %lx port %d", 
-                   address.GetIpAddress().AsLong(),
+    NPT_LOG_FINE_2("connecting to %s, port %d",
+                   address.GetIpAddress().ToString().GetChars(),
                    address.GetPort());
     int io_result;
     io_result = connect(m_SocketFdReference->m_SocketFd, 
-                        (struct sockaddr *)&inet_address, 
-                        sizeof(inet_address));
+                        &inet_address.sa,
+                        inet_address_length);
     if (io_result == 0) {
         // immediate connection
         NPT_LOG_FINE("immediate connection");
@@ -2016,7 +2242,7 @@ protected:
 |   NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket
 +---------------------------------------------------------------------*/
 NPT_BsdTcpServerSocket::NPT_BsdTcpServerSocket(NPT_Flags flags) : 
-    NPT_BsdSocket(socket(AF_INET, SOCK_STREAM, 0), flags),
+    NPT_BsdSocket(socket(NPT_SOCKETS_PF_INET, SOCK_STREAM, 0), flags),
     m_ListenMax(0)
 {
 }
@@ -2066,9 +2292,9 @@ NPT_BsdTcpServerSocket::WaitForNewClient(NPT_Socket*& client,
     if (result != NPT_SUCCESS) return result;
 
     NPT_LOG_FINER("accepting connection");
-    struct sockaddr_in inet_address;
-    socklen_t          namelen = sizeof(inet_address);
-    SocketFd socket_fd = accept(m_SocketFdReference->m_SocketFd, (struct sockaddr*)&inet_address, &namelen); 
+    NPT_sockaddr_in inet_address;
+    socklen_t       inet_address_length = sizeof(inet_address);
+    SocketFd socket_fd = accept(m_SocketFdReference->m_SocketFd, &inet_address.sa, &inet_address_length);
     if (NPT_BSD_SOCKET_IS_INVALID(socket_fd)) {
         if (m_SocketFdReference->m_Cancelled) return NPT_ERROR_CANCELLED;
         result = MapErrorCode(GetSocketError());

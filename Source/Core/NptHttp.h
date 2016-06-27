@@ -581,6 +581,12 @@ public:
     virtual NPT_Result SendResponseBody(const NPT_HttpRequestContext& context,
                                         NPT_HttpResponse&             response,
                                         NPT_OutputStream&             output);
+    
+    /**
+     * A notification method called by the server upon completing the 
+     * processing of a request.
+     */
+    virtual void Completed(NPT_Result /*result*/) {}
 };
 
 /*----------------------------------------------------------------------

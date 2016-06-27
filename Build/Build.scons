@@ -230,7 +230,8 @@ tests = ['Arrays1',
          'Time1',
          'Sockets1',
          'FileTest1',
-         'FileTest2']+tls_tests
+         'FileTest2',
+         'FileTest3']+tls_tests
 
 for test in tests:
     Application(test+'Test', 'Source/Tests/'+test)

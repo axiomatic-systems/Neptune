@@ -1,5 +1,5 @@
 #################################################################
-# Important: this build file has been tested with Android NDK r6, r7 and r8
+# Important: this build file has been tested with Android NDK 11
 # It may or may not work with other releases of the NDK. Please notify
 # us if you find a newer NDK for which this does not work.
 #################################################################
@@ -100,11 +100,11 @@ env.AppendUnique(LINKFLAGS = ['--sysroot', ANDROID_SYSROOT,
                 			  '-lstdc++',
                 			  '-lm',
                 			  '-llog',
-                                 '-ldl',
-                                 '-pie'])
+                              '-ldl',
+                              '-pie'])
 
 ### Specific System choices
-env['NPT_SYSTEM_SOURCES']={'System/StdC':'NptStdc[!D]*.cpp',
+env['NPT_SYSTEM_SOURCES']={'System/StdC':['NptStdcConsole.cpp', 'NptStdcEnvironment.cpp'],
                            'System/Bsd':'*.cpp',
                            'System/Posix':'*.cpp',
                            'System/Null':'NptNullSerialPort.cpp',

@@ -19,3 +19,4 @@ Neptune.xcscmblueprint
 *.suo
 *.os
 *.pyc
+Build/Targets/x86-microsoft-win32-vs2010/Neptune/Debug

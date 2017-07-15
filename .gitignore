@@ -29,3 +29,4 @@ Build/Targets/x86-microsoft-win32-vs2015/NetResolve/Release/NetResolve.vcxprojRe
 Build/Targets/x86-microsoft-win32-vs2015/Release/
 Build/Targets/x86-microsoft-win32-vs2015/SharedVariables1/Debug/
 Build/Targets/x86-microsoft-win32-vs2015/SharedVariables1/Release/
+*.opendb

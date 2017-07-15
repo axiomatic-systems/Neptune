@@ -20,3 +20,12 @@ Neptune.xcscmblueprint
 *.os
 *.pyc
 Build/Targets/x86-microsoft-win32-vs2010/Neptune/Debug
+*.db
+*.user
+Build/Targets/x86-microsoft-win32-vs2015/NetGet/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/NetGet/Release/
+Build/Targets/x86-microsoft-win32-vs2015/NetResolve/Debug/NetResolve.vcxprojResolveAssemblyReference.cache
+Build/Targets/x86-microsoft-win32-vs2015/NetResolve/Release/NetResolve.vcxprojResolveAssemblyReference.cache
+Build/Targets/x86-microsoft-win32-vs2015/Release/
+Build/Targets/x86-microsoft-win32-vs2015/SharedVariables1/Debug/
+Build/Targets/x86-microsoft-win32-vs2015/SharedVariables1/Release/

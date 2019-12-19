@@ -215,7 +215,7 @@ NPT_IpAddress::ToUrlHost() const
 bool
 NPT_IpAddress::IsUnspecified() const
 {
-    for (unsigned int i=0; i<(m_Type==IPV4?4:16); i++) {
+    for (unsigned int i=0; i<(unsigned int)(m_Type==IPV4?4:16); i++) {
         if (m_Address[i]) return false;
     }
     return true;

@@ -1224,7 +1224,7 @@ NPT_BsdSocketOutputStream::Write(const void*  buffer,
         }
         
         // update position and return
-        if (bytes_written) *bytes_written = nb_written;
+        if (bytes_written) *bytes_written = (NPT_Size)nb_written;
         m_SocketFdReference->m_Position += nb_written;
         return NPT_SUCCESS;
     }

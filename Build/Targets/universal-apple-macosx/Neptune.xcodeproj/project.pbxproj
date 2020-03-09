@@ -78,6 +78,9 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		ACEAD30623EFB6530043F1EA /* sha256.c in Sources */ = {isa = PBXBuildFile; fileRef = ACEAD30523EFB64A0043F1EA /* sha256.c */; };
+		ACEAD30723EFB65A0043F1EA /* sha384.c in Sources */ = {isa = PBXBuildFile; fileRef = ACEAD30423EFB64A0043F1EA /* sha384.c */; };
+		ACEAD30823EFB65F0043F1EA /* sha512.c in Sources */ = {isa = PBXBuildFile; fileRef = ACEAD30323EFB64A0043F1EA /* sha512.c */; };
 		CA057AB011BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */; };
 		CA057AB111BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */; };
 		CA16FE6211C6C882006E2A86 /* NptAppleLogConfig.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA16FE6111C6C882006E2A86 /* NptAppleLogConfig.mm */; };
@@ -95,7 +98,6 @@
 		CA1A5EB80EC0155300A9040C /* rc4.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E700EC0145900A9040C /* rc4.c */; };
 		CA1A5EBA0EC0155400A9040C /* p12.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E7D0EC0145900A9040C /* p12.c */; };
 		CA1A5EBE0EC0155700A9040C /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6F0EC0145900A9040C /* md5.c */; };
-		CA1A5EBF0EC0155800A9040C /* md2.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6E0EC0145900A9040C /* md2.c */; };
 		CA1A5EC00EC0155900A9040C /* loader.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E790EC0145900A9040C /* loader.c */; };
 		CA1A5EC10EC0155900A9040C /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E6D0EC0145900A9040C /* hmac.c */; };
 		CA1A5EC20EC0155A00A9040C /* gen_cert.c in Sources */ = {isa = PBXBuildFile; fileRef = CA1A5E780EC0145900A9040C /* gen_cert.c */; };
@@ -925,6 +927,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		ACEAD30323EFB64A0043F1EA /* sha512.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha512.c; sourceTree = "<group>"; };
+		ACEAD30423EFB64A0043F1EA /* sha384.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha384.c; sourceTree = "<group>"; };
+		ACEAD30523EFB64A0043F1EA /* sha256.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sha256.c; sourceTree = "<group>"; };
 		CA057AAE11BC27F200C90519 /* NptTlsDefaultTrustAnchorsBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsBase.cpp; sourceTree = "<group>"; };
 		CA057AAF11BC27F200C90519 /* NptTlsDefaultTrustAnchorsExtended.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptTlsDefaultTrustAnchorsExtended.cpp; sourceTree = "<group>"; };
 		CA096EF10ED0DBCE00A5103D /* NptResults.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NptResults.cpp; sourceTree = "<group>"; };
@@ -939,7 +944,6 @@
 		CA1A5E6B0EC0145900A9040C /* crypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypto.h; sourceTree = "<group>"; };
 		CA1A5E6C0EC0145900A9040C /* crypto_misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crypto_misc.c; sourceTree = "<group>"; };
 		CA1A5E6D0EC0145900A9040C /* hmac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hmac.c; sourceTree = "<group>"; };
-		CA1A5E6E0EC0145900A9040C /* md2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md2.c; sourceTree = "<group>"; };
 		CA1A5E6F0EC0145900A9040C /* md5.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = md5.c; sourceTree = "<group>"; };
 		CA1A5E700EC0145900A9040C /* rc4.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rc4.c; sourceTree = "<group>"; };
 		CA1A5E710EC0145900A9040C /* rsa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rsa.c; sourceTree = "<group>"; };
@@ -1548,17 +1552,19 @@
 			isa = PBXGroup;
 			children = (
 				CA1A5E670EC0145900A9040C /* aes.c */,
+				CA1A5E6A0EC0145900A9040C /* bigint_impl.h */,
 				CA1A5E680EC0145900A9040C /* bigint.c */,
 				CA1A5E690EC0145900A9040C /* bigint.h */,
-				CA1A5E6A0EC0145900A9040C /* bigint_impl.h */,
-				CA1A5E6B0EC0145900A9040C /* crypto.h */,
 				CA1A5E6C0EC0145900A9040C /* crypto_misc.c */,
+				CA1A5E6B0EC0145900A9040C /* crypto.h */,
 				CA1A5E6D0EC0145900A9040C /* hmac.c */,
-				CA1A5E6E0EC0145900A9040C /* md2.c */,
 				CA1A5E6F0EC0145900A9040C /* md5.c */,
 				CA1A5E700EC0145900A9040C /* rc4.c */,
 				CA1A5E710EC0145900A9040C /* rsa.c */,
 				CA1A5E720EC0145900A9040C /* sha1.c */,
+				ACEAD30523EFB64A0043F1EA /* sha256.c */,
+				ACEAD30423EFB64A0043F1EA /* sha384.c */,
+				ACEAD30323EFB64A0043F1EA /* sha512.c */,
 			);
 			path = crypto;
 			sourceTree = "<group>";
@@ -3153,14 +3159,16 @@
 				CA1A5EB80EC0155300A9040C /* rc4.c in Sources */,
 				CA1A5EBA0EC0155400A9040C /* p12.c in Sources */,
 				CA1A5EBE0EC0155700A9040C /* md5.c in Sources */,
-				CA1A5EBF0EC0155800A9040C /* md2.c in Sources */,
+				ACEAD30823EFB65F0043F1EA /* sha512.c in Sources */,
 				CA1A5EC00EC0155900A9040C /* loader.c in Sources */,
 				CA1A5EC10EC0155900A9040C /* hmac.c in Sources */,
 				CA1A5EC20EC0155A00A9040C /* gen_cert.c in Sources */,
 				CA1A5EC40EC0155B00A9040C /* crypto_misc.c in Sources */,
 				CA1A5ECA0EC0156000A9040C /* bigint.c in Sources */,
 				CA1A5ECB0EC0156100A9040C /* asn1.c in Sources */,
+				ACEAD30623EFB6530043F1EA /* sha256.c in Sources */,
 				CA1A5ECC0EC0156100A9040C /* aes.c in Sources */,
+				ACEAD30723EFB65A0043F1EA /* sha384.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5321,6 +5329,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 				VALID_ARCHS = "i386 x86_64";
 				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 armv7s arm64";
@@ -5367,6 +5376,7 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator";
 				VALID_ARCHS = "i386 x86_64";
 				"VALID_ARCHS[sdk=iphoneos*]" = "armv7 armv7s arm64";
@@ -5791,6 +5801,7 @@
 				CAFE9C411D18637700F9FF67 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F912B6880B8EB12700C1E90D /* Build configuration list for PBXProject "Neptune" */ = {
 			isa = XCConfigurationList;

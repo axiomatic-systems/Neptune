@@ -167,7 +167,7 @@ public:
      * Parse a URL from its fully encoded form.
      *
      * @param url The URL string in its encoded form
-     * @param default port The defautl port number, or 0 if not specified
+     * @param default_port port The defautl port number, or 0 if not specified
      */
     NPT_Result Parse(const char* url, NPT_UInt16  default_port = 0);
     
@@ -267,7 +267,7 @@ public:
     /**
      * Sets the fragment part of the URL.
      * 
-     * @param query The fragment part of the URL
+     * @param fragment The fragment part of the URL
      * @param encoded Boolean flag indicating whether the fragment parameter is
      * already encoded or not. If it is not already encoded, it will be
      * automatically encoded.

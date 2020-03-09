@@ -527,23 +527,28 @@ NPT_TlsSessionImpl::GetPeerCertificateInfo(NPT_TlsCertificateInfo& cert_info,
     cert_info.issuer.organization         = ssl_cert_get_dn(cert, SSL_X509_CA_CERT_ORGANIZATION);
     cert_info.issuer.organizational_name  = ssl_cert_get_dn(cert, SSL_X509_CA_CERT_ORGANIZATIONAL_NAME);
     
-    ssl_cert_get_fingerprints(cert, cert_info.fingerprint.md5, cert_info.fingerprint.sha1);
-    SSL_DateTime not_before, not_after;
+    //ssl_cert_get_fingerprints(cert, cert_info.fingerprint.md5, cert_info.fingerprint.sha1);
+    time_t not_before;
+    time_t not_after;
+    struct tm not_before_tm;
+    struct tm not_after_tm;
     ssl_cert_get_validity_dates(cert, &not_before, &not_after);
-    cert_info.issue_date.m_Year        = not_before.year;
-    cert_info.issue_date.m_Month       = not_before.month;
-    cert_info.issue_date.m_Day         = not_before.day;
-    cert_info.issue_date.m_Hours       = not_before.hours;
-    cert_info.issue_date.m_Minutes     = not_before.minutes;
-    cert_info.issue_date.m_Seconds     = not_before.seconds;
+    localtime_r(&not_before, &not_before_tm);
+    localtime_r(&not_after, &not_after_tm);
+    cert_info.issue_date.m_Year        = not_before_tm.tm_year;
+    cert_info.issue_date.m_Month       = not_before_tm.tm_mon;
+    cert_info.issue_date.m_Day         = not_before_tm.tm_mday;
+    cert_info.issue_date.m_Hours       = not_before_tm.tm_hour;
+    cert_info.issue_date.m_Minutes     = not_before_tm.tm_min;
+    cert_info.issue_date.m_Seconds     = not_before_tm.tm_sec;
     cert_info.issue_date.m_NanoSeconds = 0;
     cert_info.issue_date.m_TimeZone    = 0;
-    cert_info.expiration_date.m_Year        = not_after.year;
-    cert_info.expiration_date.m_Month       = not_after.month;
-    cert_info.expiration_date.m_Day         = not_after.day;
-    cert_info.expiration_date.m_Hours       = not_after.hours;
-    cert_info.expiration_date.m_Minutes     = not_after.minutes;
-    cert_info.expiration_date.m_Seconds     = not_after.seconds;
+    cert_info.expiration_date.m_Year        = not_after_tm.tm_year;
+    cert_info.expiration_date.m_Month       = not_after_tm.tm_mon;
+    cert_info.expiration_date.m_Day         = not_after_tm.tm_mday;
+    cert_info.expiration_date.m_Hours       = not_after_tm.tm_hour;
+    cert_info.expiration_date.m_Minutes     = not_after_tm.tm_min;
+    cert_info.expiration_date.m_Seconds     = not_after_tm.tm_sec;
     cert_info.expiration_date.m_NanoSeconds = 0;
     cert_info.expiration_date.m_TimeZone    = 0;
 
@@ -579,7 +584,7 @@ NPT_TlsClientSessionImpl::Handshake()
 {
     if (m_SSL == NULL) {
         // we have not created the client object yet
-        m_SSL = ssl_client_new(m_SSL_CTX, &m_StreamAdapter.m_Base, NULL, 0);
+        m_SSL = ssl_client_new(m_SSL_CTX, &m_StreamAdapter.m_Base, NULL, 0, NULL);
     }
     
     int result = ssl_handshake_status(m_SSL);

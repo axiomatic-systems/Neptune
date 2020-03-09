@@ -50,6 +50,8 @@ typedef INT64 int64_t;
 #include <stdint.h>
 #endif
 
+#include <sys/time.h> // GBG added
+
 /*----------------------------------------------------------------------
 |   types
 +---------------------------------------------------------------------*/
@@ -75,7 +77,7 @@ uint64_t SSL_GetRandomSeed();
 #define STDCALL
 #define EXP_FUNC
 
-#if defined(__cplusplus) 
+#if defined(__cplusplus)
 typedef class NPT_Mutex* SSL_CTX_MUTEX_TYPE;
 #else
 typedef void* SSL_CTX_MUTEX_TYPE;

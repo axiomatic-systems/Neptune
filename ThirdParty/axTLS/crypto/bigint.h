@@ -31,6 +31,7 @@
 #ifndef BIGINT_HEADER
 #define BIGINT_HEADER
 
+#include "config.h" // GBG
 #include "crypto.h"
 
 BI_CTX *bi_initialize(void);

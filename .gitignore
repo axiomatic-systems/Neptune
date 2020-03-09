@@ -24,3 +24,4 @@ Build/Targets/universal-apple-macosx/Neptune.xcodeproj/xcuserdata
 Build/Targets/universal-apple-macosx/cov-int
 Build/Targets/x86-microsoft-win32-vs20*/*/Debug
 Build/Targets/x86-microsoft-win32-vs20*/*/Release
+IDEWorkspaceChecks.plist

@@ -147,7 +147,9 @@ NPT_File::CreateDir(const char* path, bool create_intermediate_dirs)
             dir_path = full_path.SubString(0, separator);
 
             // create the directory non recursively
-            NPT_CHECK_WARNING(NPT_File::CreateDir(dir_path, false));
+            if (!NPT_File::Exists(dir_path)) {
+				NPT_CHECK_WARNING(NPT_File::CreateDir(dir_path, false));
+			}
 
             // look for the next delimiter
             separator = full_path.Find(NPT_FilePath::Separator, separator + 1);
